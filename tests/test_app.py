@@ -199,5 +199,38 @@ class PageTests(unittest.TestCase):
         self.assertRegex(html, r'class="room-card \w+ reported')
 
 
+class TermFilterTests(unittest.TestCase):
+    """検索が「今の学期」の時間割で絞り込まれること（4/1〜9/20 前期、それ以外 後期）"""
+
+    def setUp(self):
+        self.c = rr.app.test_client()
+        rr._rate_store.clear()
+        conn = sqlite3.connect(rr.REPORTS_DB); conn.execute("DELETE FROM reports"); conn.commit(); conn.close()
+        # 後期には授業があるが前期には無い（曜日, 時限, 教室）を実データから1つ選ぶ
+        db = sqlite3.connect(str(ROOT / "schedule_final.db"))
+        self.day, self.period, self.room = db.execute("""
+            SELECT s.曜日, s.時限, s.教室 FROM schedules s
+            JOIN classrooms c ON c.name = s.教室
+            WHERE s.履修期名 = '後期'
+              AND s.曜日 IN ('月','火','水','木','金','土') AND s.時限 BETWEEN 1 AND 6
+              AND NOT EXISTS (SELECT 1 FROM schedules t
+                              WHERE t.曜日 = s.曜日 AND t.時限 = s.時限 AND t.教室 = s.教室
+                                AND t.履修期名 = '前期')
+            LIMIT 1""").fetchone()
+        db.close()
+
+    def rooms(self):
+        html = self.c.post("/", data={"day": self.day, "period": str(self.period), "building": "all"}).get_data(as_text=True)
+        return set(re.findall(r"openModal\('([^']+)'", html)), html
+
+    def test_room_is_free_in_first_term_but_occupied_in_second(self):
+        with _fixed_now(5, 1):
+            rooms, html = self.rooms()
+            self.assertIn(self.room, rooms)
+        with _fixed_now(10, 1):
+            rooms, html = self.rooms()
+            self.assertNotIn(self.room, rooms)
+
+
 if __name__ == "__main__":
     unittest.main()

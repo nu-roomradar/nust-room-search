@@ -15,7 +15,6 @@ DB_NAME = "schedule_final.db"
 JST = datetime.timezone(datetime.timedelta(hours=9))
 PERIODS = {1: ("09:00", "10:40"), 2: ("10:50", "12:30"), 3: ("13:20", "15:00"),
            4: ("15:10", "16:50"), 5: ("17:00", "18:40"), 6: ("18:50", "20:30")}
-ACTIVE_TERMS = ['前期', '通年']
 RESERVE_DB  = "reservations.db"
 REPORTS_DB  = "reports.db"
 REPORT_THRESHOLD = 2  # 何人報告でグレーアウトするか
@@ -1225,10 +1224,13 @@ def index():
         conn = sqlite3.connect(DB_NAME)
         cur = conn.cursor()
 
-        placeholders = ','.join(['?'] * len(ACTIVE_TERMS))
+        # 学期は日付で切り替える（4/1〜9/20 が前期、それ以外は後期）。
+        # 以前は定数で常に前期を見ていたため、後期は表示だけ「後期」で検索は前期の時間割になっていた
+        active_terms = get_active_terms()
+        placeholders = ','.join(['?'] * len(active_terms))
         cur.execute(
             f"SELECT 教室 FROM schedules WHERE 曜日=? AND 時限=? AND 履修期名 IN ({placeholders})",
-            [day, period] + ACTIVE_TERMS
+            [day, period] + active_terms
         )
         occupied = {str(row[0]) for row in cur.fetchall()}
 
