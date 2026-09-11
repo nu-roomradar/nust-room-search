@@ -9,7 +9,7 @@
 - `index.html` / `dashboard.html` — LPと運営用アナリティクス。**GitHub Pages**（https://nu-roomradar.github.io/nust-room-search/ ）で配信。
 - `schedule_final.db` — 時間割DB（検索の元データ）。`data/source/*.xlsx` が原本。
 - `reservations.db` / `reports.db` — 実行時に自動生成される揮発データ。**コミットしない**（.gitignore済み）。
-- `data/*.json` — Instagram/GA4の集計。自動更新は停止中（各ワークフローは workflow_dispatch のみ）。手元と競合したら新しい方（項目が多い方）を採用。
+- `data/*.json` — Instagram/GA4 の集計。**2026-08 で収集を終了**し、ダッシュボード表示用に凍結（更新しない。収集用のワークフロー・スクリプトは撤去済み）。
 
 ## 守るべきルール
 

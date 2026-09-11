@@ -56,6 +56,6 @@ argument-hint: "[feed|story|condolence|token] 投稿内容や相談の要点"
 3. **弔事（お見舞い・追悼）のストーリー**は、QR・LP リンク・CTA・ハッシュタグ・絵文字を一切入れない。ブランドカラー（青/ネイビー）も使わず明朝体（Noto Serif JP）で組む。実例は `scripts/make_condolence_story.py`（暖色グレージュ背景、ロゴ＋「RoomRadar 運営」の署名、上下の安全マージン 150px/240px、Playwright `/opt/pw-browsers/chromium-1194/chrome-linux/chrome` で `assets/instagram/kumamoto-condolence-story.png` を出力）。新しい弔事は同スクリプトを雛形に文面だけ差し替え、文面もユーザーに確認してから生成する。
 
 ## トークン失効（投稿・集計が急に失敗し出したとき）
-1. **長期アクセストークンは約60日で失効する**。まずトークンの期限を疑う。`get_job_logs` の `[ERROR] … type= code= message=` を見る（`OAuthException` / code=190 なら期限切れ・無効）。同じ secret を使う `instagram-insights.yml` / `instagram-fetch.yml` も同時に失敗する。
+1. **長期アクセストークンは約60日で失効する**。まずトークンの期限を疑う。`get_job_logs` の `[ERROR] … type= code= message=` を見る（`OAuthException` / code=190 なら期限切れ・無効）。週次の運用ヘルスチェックも同じ失効を Issue で知らせる。
 2. 再発行は Meta for Developers のアプリ設定（Instagram → API設定）。GitHub 側の secret `IG_ACCESS_TOKEN` の更新は MCP ではできないので、リポジトリ Settings → Secrets and variables → Actions でユーザーに差し替えてもらう。
 3. 差し替え後、失敗した run を `mcp__github__actions_run_trigger`（rerun_failed_jobs, run_id）で再実行するか、改めて起動する（再起動前にユーザー確認）。
