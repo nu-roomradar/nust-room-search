@@ -193,14 +193,14 @@ HTML_TEMPLATE = """
             .card { padding: 28px; }
             .form-grid { grid-template-columns: 1fr 1fr 2fr; }
             .form-full { grid-column: auto; }
-            .room-grid { grid-template-columns: repeat(5, 1fr); }
+            /* .room-grid の列数は「教室カード」節の末尾で定義（基本ルールより後に置かないと負ける） */
         }
         @media (min-width: 1100px) {
             .wrap { max-width: 1100px; padding: 48px 40px; }
             .page-cols { display: grid; grid-template-columns: 320px 1fr; gap: 32px; align-items: start; }
             .sidebar { position: sticky; top: 28px; }
             .logo { font-size: 2.8rem; }
-            .room-grid { grid-template-columns: repeat(7, 1fr); gap: 10px; }
+            /* .room-grid の列数は「教室カード」節の末尾で定義 */
             .modal { border-radius: 20px; max-width: 460px; margin: auto; }
             .modal-overlay { align-items: center; }
         }
@@ -362,8 +362,12 @@ HTML_TEMPLATE = """
         .badge-funabashi{ background: var(--funabashi-bg); color: var(--funabashi-color); border: 1px solid var(--funabashi-border); }
 
         /* ── 教室カード ── */
-        .room-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        @media (max-width: 340px) { .room-grid { grid-template-columns: repeat(2, 1fr); } }
+        /* 列は minmax(0, 1fr)。1fr だけだと「S1704/07/13/16」「521/2/3/4/5/7/8/9/10」のような
+           折り返し位置のない教室名が列を押し広げ、スマホ幅で右にはみ出す */
+        .room-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+        @media (max-width: 340px)  { .room-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (min-width: 768px)  { .room-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+        @media (min-width: 1100px) { .room-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; } }
 
         .room-card {
             border-radius: 10px; padding: 12px 8px;
@@ -371,6 +375,7 @@ HTML_TEMPLATE = """
             transition: transform 0.15s, opacity 0.15s;
             border: 1px solid transparent;
             position: relative;
+            min-width: 0;
         }
         .room-card:active { transform: scale(0.96); }
 
@@ -381,12 +386,13 @@ HTML_TEMPLATE = """
         .room-number {
             font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700;
             display: block; line-height: 1.2;
+            overflow-wrap: anywhere;  /* 長い教室名はカード内で折り返す */
         }
         .room-card.tower     .room-number { color: var(--tower-color); }
         .room-card.surugadai .room-number { color: var(--surugadai-color); }
         .room-card.funabashi .room-number { color: var(--funabashi-color); }
 
-        .room-bldg { font-size: 0.65rem; color: var(--muted); margin-top: 3px; display: block; }
+        .room-bldg { font-size: 0.65rem; color: var(--muted); margin-top: 3px; display: block; overflow-wrap: anywhere; }
 
         /* 予約中バッジ */
         .room-card.reserved::after {
