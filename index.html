@@ -127,6 +127,10 @@ body.lang-zh .hero-title .small{ font-size: 0.38em; letter-spacing: 0.02em; }
     overflow-x: auto; -webkit-overflow-scrolling: touch;
     scrollbar-width: none; -ms-overflow-style: none;
     margin: 0 6px;
+    /* 右端をフェードさせて「横にスワイプできる」ことを示す。末尾の項目が隠れないよう余白を足す */
+    padding-right: 28px;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
   }
   .nav-links::-webkit-scrollbar { display: none; }
   .nav-links a { padding: 6px 9px; font-size: 0.74rem; }
