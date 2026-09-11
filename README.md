@@ -39,15 +39,22 @@
 │   ├── post_to_instagram.py        # フィード / ストーリーズ投稿（必須タグ自動付与）
 │   ├── make_poster.py              # 学内掲示ポスター生成（PNG/PDF/PPTX・variant切替）
 │   ├── make_story_promo.py         # 新規投稿の告知ストーリー画像生成
+│   ├── ops_healthcheck.py          # 運用ヘルスチェック（本番URL・Actions・トークン → Issue）
 │   ├── fetch_instagram_insights.py # インサイト取得 → data/ へ記録
 │   ├── fetch_instagram_posts.py    # 投稿一覧取得
 │   └── fetch_ga4_metrics.py        # GA4 指標取得 → data/ へ記録
 │
+├── tests/                      # 運用スクリプト・hook・アプリの単体テスト（CI で実行）
+├── .claude/                    # Claude Code 用の設定（必須表記を守る hook / permissions / 手順書 skills）
+│
 └── .github/workflows/
+    ├── ci.yml                  # push / PR で構文チェックとテスト
+    ├── ops-healthcheck.yml     # 毎週月曜 運用ヘルスチェック（異常なら Issue、復旧で自動クローズ）
     ├── instagram-post.yml      # 手動トリガーで投稿（feed / story 選択・同時ストーリー可）
-    ├── instagram-insights.yml  # 週2回 インサイト記録（月・木）
-    ├── instagram-fetch.yml     # 投稿データ取得
-    └── ga4-fetch.yml           # 週2回 GA4 記録（月・木）
+    ├── instagram-insights.yml  # インサイト記録（手動のみ。自動実行は停止中）
+    ├── instagram-fetch.yml     # 投稿データ取得（手動のみ）
+    ├── ga4-fetch.yml           # GA4 記録（手動のみ）
+    └── render-plan-reminder.yml # 9/24 に Render プランを戻すリマインド Issue を作成
 ```
 
 ## 運用メモ
@@ -56,6 +63,9 @@
 - Instagram 投稿キャプションには規定の共通ハッシュタグ `#日大生プロジェクト` がスクリプトで自動付与されます。
 - ポスターは `python scripts/make_poster.py --print-files` で再生成できます（A4縦・約392dpi、PDF/PPTX同時出力）。
 - Claude Code on the web では `.claude/hooks/session-start.sh` がセッション開始時に依存パッケージを自動インストールします。
+- テストは `python -m unittest discover -s tests -v`（`pip install -r requirements.txt requests` が必要）。push / PR ごとに CI が同じものを回します。
+- 運用ヘルスチェックは毎週月曜 09:00 JST に動き、本番 URL の応答と必須表記・Actions の失敗・Instagram トークンの有効性を検査します。異常があると「【運用ヘルスチェック】異常を検知しました」という Issue が開き、復旧すると自動で閉じます。
+- Instagram 投稿・ポスター生成・画面検証の手順書は `.claude/skills/` にあります（Claude Code から `/instagram-post` `/make-poster` `/verify-ui`）。
 
 ---
 日本大学自主創造プロジェクト ／ #日大生プロジェクト
