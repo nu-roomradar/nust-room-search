@@ -24,7 +24,7 @@
 ├── requirements.txt
 │
 ├── data/
-│   ├── source/             # 時間割の元データ（xlsx）
+│   ├── source/             # 時間割の原本（教務ページ配布の時間割表 .xls）
 │   ├── instagram_*.json    # Instagram インサイト集計（2026-08 で収集終了・ダッシュボード表示用に凍結）
 │   └── ga4_*.json          # GA4 サイト分析集計（同上）
 │
@@ -39,6 +39,8 @@
 │   ├── post_to_instagram.py        # フィード / ストーリーズ投稿（必須タグ自動付与）
 │   ├── make_poster.py              # 学内掲示ポスター生成（PNG/PDF/PPTX・variant切替）
 │   ├── make_story_promo.py         # 新規投稿の告知ストーリー画像生成
+│   ├── build_schedule_db.py        # 原本の時間割表(.xls) → schedule_final.db を再構築
+│   ├── inspect_timetable.py        # 原本ファイルの構造を確認する道具
 │   └── ops_healthcheck.py          # 運用ヘルスチェック（本番URL・Actions・トークン → Issue）
 │
 ├── tests/                      # 運用スクリプト・hook・アプリの単体テスト（CI で実行）
@@ -61,6 +63,7 @@
 - 運用ヘルスチェックは毎週月曜 09:00 JST に動き、本番 URL の応答と必須表記・Actions の失敗・Instagram トークンの有効性を検査します。異常があると「【運用ヘルスチェック】異常を検知しました」という Issue が開き、復旧すると自動で閉じます。
 - Instagram 投稿・ポスター生成・画面検証の手順書は `.claude/skills/` にあります（Claude Code から `/instagram-post` `/make-poster` `/verify-ui`）。
 - 引き継ぎ・定期作業・障害対応は `docs/OPERATIONS.md`（運営ハンドブック）にまとめています。
+- 時間割の入れ替え（年1回）は `python scripts/build_schedule_db.py --report` で差分を確認してから `--replace`。既定では本番 DB を上書きしません。
 
 ---
 日本大学自主創造プロジェクト ／ #日大生プロジェクト

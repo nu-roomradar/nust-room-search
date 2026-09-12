@@ -2,6 +2,10 @@
 reservations.db
 reports.db
 
+# build_schedule_db.py の出力（--out の既定値と --replace のバックアップ）
+schedule_final.new.db
+schedule_final.db.bak
+
 # Python
 __pycache__/
 *.pyc

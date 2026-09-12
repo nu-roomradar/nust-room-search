@@ -7,7 +7,8 @@
 - リポジトリは Organization **`nu-roomradar`** 所有（2026-08、個人アカウント名がLPのURLに露出していたため移管）。セッションの `origin` が旧個人アカウントを指していてもリダイレクトされる。
 - `app.py` — Flask検索アプリ本体。**Render**（https://nust-room-search.onrender.com ）でホスティング。mainへのpushで自動デプロイ。Renderの参照元は `nu-roomradar/nust-room-search` の `main`。
 - `index.html` / `dashboard.html` — LPと運営用アナリティクス。**GitHub Pages**（https://nu-roomradar.github.io/nust-room-search/ ）で配信。
-- `schedule_final.db` — 時間割DB（検索の元データ、前期・後期とも収録）。**作成手順は失われており、`data/source/*.xlsx` は原本ではなく集計（DB の48%しか再現できない）**。差し替え時は `tests/test_schedule_db.py` が整合性を検査する。詳細は `docs/OPERATIONS.md` 6.
+- `schedule_final.db` — 時間割DB（検索の元データ、前期・後期とも収録）。原本は `data/source/` の `<区分>_<学部>_<学科>_..._時間割表N面_*.xls`（教務ページ配布の時間割表）。`python scripts/build_schedule_db.py --report` で原本から作り直せる（2026年度の原本で現行DBを全7列完全再現することを確認済み）。既定では本番DBを上書きせず `schedule_final.new.db` に出す。差し替え時は `tests/test_schedule_db.py` が整合性を検査する。手順は `docs/OPERATIONS.md`。
+- `data/source/1-01.xlsx`〜`1-15.xlsx` と `classroom_data.xlsx` / `summry_classrooms.xlsx` は令和7年度の**古い別形式のエクスポート・集計**。原本ではないので変換には使わない。
 - `reservations.db` / `reports.db` — 実行時に自動生成される揮発データ。**コミットしない**（.gitignore済み）。
 - `data/*.json` — Instagram/GA4 の集計。**2026-08 で収集を終了**し、ダッシュボード表示用に凍結（更新しない。収集用のワークフロー・スクリプトは撤去済み）。
 
