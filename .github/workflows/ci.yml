@@ -23,7 +23,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt requests
+        run: pip install -r requirements.txt -r requirements-dev.txt
 
       - name: Syntax check
         run: python -m py_compile app.py scripts/*.py .claude/hooks/guard-notices.py

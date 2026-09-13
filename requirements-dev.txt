@@ -1,0 +1,13 @@
+# 開発・運用スクリプト用の依存
+# アプリ本体（Render）が要るのは requirements.txt だけ。こちらは入れない。
+#
+# 追加したら .github/workflows/ci.yml と .claude/hooks/session-start.sh は
+# このファイルを読むので、両方を書き換える必要はない。
+
+requests          # Instagram Graph API / 運用ヘルスチェック
+xlrd              # 時間割の原本 .xls を読む（build_schedule_db.py / export_classes.py）
+openpyxl          # .xlsx を読む（inspect_timetable.py。requirements.txt にもあるが明示）
+qrcode            # ポスターの QR 生成
+pillow            # ポスターの画像処理
+python-pptx       # ポスターの PPTX 出力
+playwright        # ポスター・ストーリー画像の描画、画面検証のスクショ

@@ -56,6 +56,20 @@ argument-hint: "[feed|story|condolence|token] 投稿内容や相談の要点"
 3. **弔事（お見舞い・追悼）のストーリー**は、QR・LP リンク・CTA・ハッシュタグ・絵文字を一切入れない。ブランドカラー（青/ネイビー）も使わず明朝体（Noto Serif JP）で組む。実例は `scripts/make_condolence_story.py`（暖色グレージュ背景、ロゴ＋「RoomRadar 運営」の署名、上下の安全マージン 150px/240px、Playwright `/opt/pw-browsers/chromium-1194/chrome-linux/chrome` で `assets/instagram/kumamoto-condolence-story.png` を出力）。新しい弔事は同スクリプトを雛形に文面だけ差し替え、文面もユーザーに確認してから生成する。
 
 ## トークン失効（投稿・集計が急に失敗し出したとき）
-1. **長期アクセストークンは約60日で失効する**。まずトークンの期限を疑う。`get_job_logs` の `[ERROR] … type= code= message=` を見る（`OAuthException` / code=190 なら期限切れ・無効）。週次の運用ヘルスチェックも同じ失効を Issue で知らせる。
-2. 再発行は Meta for Developers のアプリ設定（Instagram → API設定）。GitHub 側の secret `IG_ACCESS_TOKEN` の更新は MCP ではできないので、リポジトリ Settings → Secrets and variables → Actions でユーザーに差し替えてもらう。
-3. 差し替え後、失敗した run を `mcp__github__actions_run_trigger`（rerun_failed_jobs, run_id）で再実行するか、改めて起動する（再起動前にユーザー確認）。
+
+使っているのは **Instagram ビジネスログイン方式**（実行ログの `[INFO] 使用エンドポイント: https://graph.instagram.com` で確認済み。Facebookページ経由の古い方式ではない）。`IG_ACCESS_TOKEN` は**長期アクセストークンで有効期限は発行から60日**。
+
+1. **まず期限を疑う。** `get_job_logs` の `[ERROR] … type= code= message=` を見る（`OAuthException` / code=190 なら期限切れ・無効）。週次の運用ヘルスチェックも同じ失効を Issue で知らせる。
+2. **再発行**（ユーザーの作業。Claude 側からはできない）:
+   1. https://developers.facebook.com/apps/ で RoomRadar のアプリを開く
+   2. 左メニュー **Instagram** → **API setup with Instagram business login**（日本語UIなら「Instagramビジネスログインを使用したAPIセットアップ」）
+   3. **「3. Generate access tokens」**の `@roomradar_nust` の横で **Generate token** → Instagram にログイン → 長いトークンが出る。**画面を閉じると二度と見られない**
+   4. 同じ画面の **Instagram account ID** が `IG_ACCOUNT_ID` と一致しているか確認（変わっていなければ触らない）
+3. **Secret の差し替え**（ユーザーの作業。MCP ではできない）:
+   https://github.com/nu-roomradar/nust-room-search/settings/secrets/actions → `IG_ACCESS_TOKEN` を更新。
+   iPad で編集ボタンが出ないときは Safari の「デスクトップ用Webサイトを表示」。
+4. **確認**: `mcp__github__actions_run_trigger`（run_workflow, `ops-healthcheck.yml`, inputs `{"dry_run":"true"}`）を回し、
+   ログの `Instagram: アクセストークンは有効です` を見る。本番実行（dry_run なし）なら Issue #23 系が自動で閉じる。
+5. 失敗した run を `rerun_failed_jobs` で再実行するか、改めて起動する（再起動前にユーザー確認）。
+
+**60日ごとの再発行をやめたい場合**: `GET https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=<現行>` で**失効前なら60日延長できる**。月1回これを叩くワークフローを置けば人手が要らなくなるが、Actions が自分の Secret を書き換えるには **Secrets の書き込み権限を持つ PAT** を1つ置く必要がある（60日ごとの手作業 ↔ 長期の PAT 1本、のトレードオフ）。未導入。導入するかはユーザーの判断。
