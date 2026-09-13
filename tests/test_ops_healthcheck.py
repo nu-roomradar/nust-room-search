@@ -57,9 +57,15 @@ class FakeGitHub:
         return {}
 
 
-def run(name, conclusion, created, url="https://github.com/x/y/actions/runs/1", status=None):
+def run(name, conclusion, created, url="https://github.com/x/y/actions/runs/1", status=None, path=None):
     return {"name": name, "conclusion": conclusion, "created_at": created, "html_url": url,
-            "status": status or ("completed" if conclusion else "in_progress")}
+            "status": status or ("completed" if conclusion else "in_progress"),
+            "path": path or f".github/workflows/{name}.yml"}
+
+
+# テストでは「今あるワークフロー」を明示する（実リポジトリの中身に依存させない）
+KNOWN = {".github/workflows/CI.yml", ".github/workflows/Instagramへ投稿.yml",
+         ".github/workflows/運用ヘルスチェック.yml"}
 
 
 class UrlCheckTests(unittest.TestCase):
@@ -98,7 +104,7 @@ class ActionsCheckTests(unittest.TestCase):
     def test_no_failures(self):
         gh = FakeGitHub(runs=[run("CI", "success", "2026-09-07T00:00:00Z")])
         res = hc.Result()
-        hc.check_recent_runs(res, gh, now=NOW)
+        hc.check_recent_runs(res, gh, now=NOW, known_paths=KNOWN)
         self.assertEqual(res.problems, [])
         self.assertEqual(gh.calls[0][2]["created"], ">=2026-08-25")
 
@@ -110,7 +116,7 @@ class ActionsCheckTests(unittest.TestCase):
             run("CI", None, "2026-09-07T00:00:00Z"),  # 実行中は判定に使わない
         ])
         res = hc.Result()
-        hc.check_recent_runs(res, gh, now=NOW)
+        hc.check_recent_runs(res, gh, now=NOW, known_paths=KNOWN)
         self.assertEqual(len(res.problems), 1)
         title, detail = res.problems[0]
         self.assertIn("Instagramへ投稿", title)
@@ -126,7 +132,7 @@ class ActionsCheckTests(unittest.TestCase):
             run("CI", "success", "2026-09-07T00:00:00Z"),   # 最新が成功 = もう壊れていない
         ])
         res = hc.Result()
-        hc.check_recent_runs(res, gh, now=NOW)
+        hc.check_recent_runs(res, gh, now=NOW, known_paths=KNOWN)
         self.assertEqual(res.problems, [])
         self.assertTrue(any("最新の実行が成功" in x for x in res.ok))
 
@@ -139,20 +145,47 @@ class ActionsCheckTests(unittest.TestCase):
             run("CI", "failure", "2026-09-07T00:00:00Z"),
         ])
         res = hc.Result()
-        hc.check_recent_runs(res, gh, now=NOW)
+        hc.check_recent_runs(res, gh, now=NOW, known_paths=KNOWN)
         self.assertEqual(len(res.problems), 1)
         self.assertIn("2 回連続", res.problems[0][0])
 
     def test_in_progress_only_workflow_is_not_judged(self):
         gh = FakeGitHub(runs=[run("CI", None, "2026-09-07T00:00:00Z")])
         res = hc.Result()
-        hc.check_recent_runs(res, gh, now=NOW)
+        hc.check_recent_runs(res, gh, now=NOW, known_paths=KNOWN)
         self.assertEqual(res.problems, [])
+
+    def test_removed_workflow_is_not_reported(self):
+        """撤去したワークフローの古い失敗は報告しない（ファイルが無い＝二度と実行されない）"""
+        gh = FakeGitHub(runs=[
+            run("Instagramインサイトを記録", "failure", "2026-09-03T00:00:00Z",
+                path=".github/workflows/instagram-insights.yml"),
+            run("CI", "success", "2026-09-07T00:00:00Z"),
+        ])
+        res = hc.Result()
+        hc.check_recent_runs(res, gh, now=NOW, known_paths=KNOWN)
+        self.assertEqual(res.problems, [])
+        self.assertTrue(any("撤去済み" in n for n in res.notes))
+
+    def test_without_known_paths_nothing_is_filtered(self):
+        """判定材料が無いときは絞り込まない（安全側）"""
+        gh = FakeGitHub(runs=[run("なにか", "failure", "2026-09-07T00:00:00Z",
+                                  path=".github/workflows/gone.yml")])
+        res = hc.Result()
+        hc.check_recent_runs(res, gh, now=NOW, known_paths=None)
+        self.assertEqual(len(res.problems), 1)
+
+    def test_existing_workflow_paths_reads_the_repo(self):
+        paths = hc.existing_workflow_paths()
+        self.assertIsNotNone(paths)
+        self.assertIn(".github/workflows/ci.yml", paths)
+        self.assertIn(".github/workflows/ops-healthcheck.yml", paths)
+        self.assertNotIn(".github/workflows/instagram-insights.yml", paths)
 
     def test_timed_out_counts_as_failure(self):
         gh = FakeGitHub(runs=[run("CI", "timed_out", "2026-09-07T00:00:00Z")])
         res = hc.Result()
-        hc.check_recent_runs(res, gh, now=NOW)
+        hc.check_recent_runs(res, gh, now=NOW, known_paths=KNOWN)
         self.assertEqual(len(res.problems), 1)
 
     def test_disabled_inactivity_is_problem_manual_is_note(self):

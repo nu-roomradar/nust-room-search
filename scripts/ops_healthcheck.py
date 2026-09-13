@@ -34,6 +34,7 @@ import sys
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import requests
 
@@ -120,8 +121,28 @@ def check_url(res, label, url, must_contain, attempts=3, wait=20, sleep=time.sle
                 "Render のスリープ復帰が遅いだけの可能性もあるので、まず手動で開いて確認してください。")
 
 
-def check_recent_runs(res, gh, days=RUN_LOOKBACK_DAYS, now=None):
+_UNSET = object()      # 「省略」と「None を明示」を区別するための番兵
+
+
+def existing_workflow_paths(root=None):
+    """リポジトリに今ある .github/workflows のパス集合
+
+    撤去したワークフローの古い失敗を報告し続けないために使う。
+    ファイルが無ければ二度と実行されないので、報告しても直しようがない。
+    """
+    root = Path(root) if root else Path(__file__).resolve().parents[1]
+    d = root / ".github" / "workflows"
+    if not d.is_dir():
+        return None                      # 判定材料が無いときは絞り込まない
+    return {f".github/workflows/{p.name}" for p in d.iterdir()
+            if p.is_file() and p.suffix in (".yml", ".yaml")}
+
+
+def check_recent_runs(res, gh, days=RUN_LOOKBACK_DAYS, now=None, known_paths=_UNSET):
+    """known_paths: 省略ならリポジトリから読む。None を明示すると絞り込まない"""
     now = now or datetime.now(timezone.utc)
+    if known_paths is _UNSET:
+        known_paths = existing_workflow_paths()
     since = (now - timedelta(days=days)).strftime("%Y-%m-%d")
     data = gh.get(f"/repos/{gh.repo}/actions/runs", per_page=100, created=f">={since}")
 
@@ -129,8 +150,16 @@ def check_recent_runs(res, gh, days=RUN_LOOKBACK_DAYS, now=None):
     # 「直近N日に1回でも失敗したか」で見ると、直した後も N 日間ずっと報告し続けてしまい、
     # Issue が「もう直っているのに赤いまま」になる（2026-09 に実際そうなった）。
     by_workflow = {}
+    removed = set()
     for run in data.get("workflow_runs", []):
-        by_workflow.setdefault(run.get("name") or run.get("path") or "?", []).append(run)
+        path = run.get("path")
+        if known_paths is not None and path and path not in known_paths:
+            removed.add(run.get("name") or path)      # 撤去済み。直しようがないので報告しない
+            continue
+        by_workflow.setdefault(run.get("name") or path or "?", []).append(run)
+    if removed:
+        res.notes.append("撤去済みのワークフローの古い実行は判定から除きました: "
+                         + "、".join(sorted(removed)))
 
     broken = False
     for name, runs in sorted(by_workflow.items()):
