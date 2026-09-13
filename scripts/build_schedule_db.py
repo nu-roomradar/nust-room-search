@@ -11,7 +11,14 @@
 原本の構造
 ────────────────────────────────────────────────────────────────────────
 data/source/ に置かれた `<区分番号>_<区分名>_<学科番号>_<学科名>[_<コース>]_<年>年_時間割表N面_<timestamp>.xls`。
-  区分番号 1=理工学部 / 3=博士前期 / 4=博士後期（2026年度は 16+15+15=46 ファイル）
+  区分番号 1=理工学部 / 2=短期大学部 / 3=博士前期 / 4=博士後期
+  （2026年度は 16+3+15+15=49 ファイル）
+
+短期大学部は船橋校舎を理工学部と共用している。短大の授業が入っている教室を「空き」と
+出さないよう schedules には取り込むが、**教室マスタ（＝検索結果に出る教室の一覧）は
+理工学部・大学院からだけ作る**。RoomRadar は理工学部の学生向けで、短大専用教室を
+「空いています」と出しても行って使えるとは限らないため、安全側に倒している。
+`--divisions 1,3,4` で短大を外すと、現行 schedule_final.db を全 7 列・13,614 行で完全再現する。
 各ファイルはシート「前期」「後期」の 2 枚。中身は曜日×時限のグリッド（人が読む時間割表）。
   行1(0始まり)  B列に「2026年度」
   行2           B列に「理工学部 土木工学科」（大学院は「博士前期 土木工学専攻」）
@@ -95,7 +102,7 @@ DEFAULT_REF = REPO / "schedule_final.db"
 DEFAULT_OUT = REPO / "schedule_final.new.db"
 
 # 原本ファイル名: <区分番号>_<区分名>_<学科番号>_<学科名>[_<コース>]_<年>年_時間割表N面_<timestamp>.xls
-SRC_GLOB = "[134]_*.xls"
+SRC_GLOB = "[0-9]_*.xls"
 FILENAME_YEAR = re.compile(r"^(\d{4})年$")
 SHEETS = ("前期", "後期")
 DAYS = ("月", "火", "水", "木", "金", "土")
@@ -121,7 +128,19 @@ ROOM_PLACEHOLDER = "0000"   # schedules には残るが classrooms には入れ�
 EXCEPTION_DROP = {
     "14製図室(1425～1429)": "範囲表記の注記。同じセルの 1325 だけが DB にある（1425〜1429 は展開されていない）",
     "階段(小)": "「階段教室(小)」の略記ゆれ。同じコマの DB 行は 1201/1202/1204 のみ",
+    "他": "短期大学部の原本にある「他」。教室名ではないので捨てる",
 }
+
+# 短期大学部の区分番号。船橋校舎を理工学部と共用しているため占有判定には入れるが、
+# 教室マスタ（＝検索結果に出る教室）は理工学部・大学院からだけ作る。
+# RoomRadar は理工学部の学生向けで、短大専用教室を「空いています」と出しても
+# 行って使えるとは限らないため、安全側に倒している。
+TANDAI_DIVISION = "2"
+
+# 中黒「・」の扱いは原本によって逆。理工では「テクノ・工作技術センター」という
+# 1 つの教室名の一部なので割ってはいけない。短大では「1111・521」のように
+# 教室番号の区切りとして使う。両側がどちらも教室コードの形のときだけ割る。
+MIDDLE_DOTS = "・･"
 
 # S 始まりでないのにタワースコラにある教室。DB では同じセルの先頭教室の校舎を引き継いでいる
 BUILDING_INHERIT_ROOMS = {"まち製図室１～５"}
@@ -163,6 +182,7 @@ class Stats:
         self.rule_b = collections.Counter()         # X(Y) → Y を展開
         self.paren_kept = collections.Counter()     # 規則C だがカッコ付き = 要目視
         self.building_inherited = collections.Counter()
+        self.tandai_rows = 0       # 短期大学部由来の行（教室マスタには入れない）
         self.warnings = []
 
     def warn(self, msg):
@@ -335,11 +355,19 @@ def read_workbook(path, meta, stats):
     return records
 
 
-def collect_sources(src_dir):
-    """原本ファイルを DB の登録順（区分番号 → 学科番号 → ファイル名）に並べて返す"""
+def collect_sources(src_dir, divisions=None):
+    """原本ファイルを DB の登録順（区分番号 → 学科番号 → ファイル名）に並べて返す
+
+    divisions に区分番号の集合を渡すとその区分だけ読む（例 {"1","3","4"} で理工＋大学院のみ）。
+    """
     if not src_dir.is_dir():
         raise SourceError(f"原本のフォルダがありません: {src_dir}")
     paths = sorted(src_dir.glob(SRC_GLOB))
+    if divisions:
+        paths = [p for p in paths
+                 if unicodedata.normalize("NFC", p.name).split("_", 1)[0] in divisions]
+        if not paths:
+            raise SourceError(f"--divisions {','.join(sorted(divisions))} に合う原本がありません: {src_dir}")
     if not paths:
         raise SourceError(
             f"原本が 1 つも見つかりません: {src_dir}/{SRC_GLOB}\n"
@@ -370,7 +398,21 @@ def tokenize_rooms(cell):
             buf += ch
     if buf:
         out.append(buf)
-    return out
+    return [p for t in out for p in split_middle_dot(t)]
+
+
+def split_middle_dot(token):
+    """中黒で割るのは、割った結果が全部教室コードの形のときだけ
+
+    「1111・521」→ ["1111", "521"]（短大の原本。どちらも実在する理工の教室）
+    「テクノ・工作技術センター」→ そのまま（理工の教室名。割ると壊れる）
+    """
+    if not any(d in token for d in MIDDLE_DOTS):
+        return [token]
+    parts = [p for p in re.split(f"[{MIDDLE_DOTS}]", token) if p]
+    if len(parts) > 1 and all(ROOM_CODE.match(p) for p in parts):
+        return parts
+    return [token]
 
 
 def normalize_rooms(cell, stats, where):
@@ -434,19 +476,29 @@ def resolve_buildings(rooms, building_col, stats, where):
 # ------------------------------------------------------------------ 組み立て
 
 def build_rows(metas, stats):
-    """原本 → schedules の行（DB の登録順）"""
-    rows = []
+    """原本 → schedules の行（DB の登録順）
+
+    戻り値は (全行, 教室マスタ用の行)。後者は短期大学部を除いたもので、
+    短大が使っている教室は占有として残しつつ、検索対象の教室一覧は増やさない。
+    """
+    rows, master_rows = [], []
     for meta, path in metas:
         stats.files += 1
+        is_tandai = meta["division_no"] == TANDAI_DIVISION
         for rec in read_workbook(path, meta, stats):
             stats.room_cells += 1
             rooms = normalize_rooms(rec["room_raw"], stats, rec["source"])
             buildings = resolve_buildings(rooms, rec["building_col"], stats, rec["source"])
             for room, building in zip(rooms, buildings):
-                rows.append((rec["dept"], rec["term"], rec["day"], rec["period"],
-                             room, building, rec["subject"]))
+                row = (rec["dept"], rec["term"], rec["day"], rec["period"],
+                       room, building, rec["subject"])
+                rows.append(row)
+                if is_tandai:
+                    stats.tandai_rows += 1
+                else:
+                    master_rows.append(row)
     stats.rows = len(rows)
-    return rows
+    return rows, master_rows
 
 
 def build_classrooms(rows, stats):
@@ -527,6 +579,9 @@ def report_build(stats):
     print(f"教室名セル（非空）      : {stats.room_cells:,}")
     print(f"分割後トークン          : {stats.tokens:,}")
     print(f"schedules 行            : {stats.rows:,}")
+    if stats.tandai_rows:
+        print(f"  うち短期大学部        : {stats.tandai_rows:,}"
+              f"（占有判定には入れるが、教室マスタ＝検索対象には加えない）")
 
     section("■ 再現できなかった分（捨てたトークン）")
     total = stats.dropped_undecided + sum(stats.dropped_exception.values())
@@ -638,17 +693,30 @@ def main(argv=None):
                     help="現行 DB（--ref）を置き換える。置き換え前に .bak を作る")
     ap.add_argument("--report", action="store_true", help="現行 DB との差分を出す")
     ap.add_argument("--no-write", action="store_true", help="DB を書かない（--report と組み合わせて確認だけ）")
+    ap.add_argument("--divisions", default=None,
+                    help="読む区分番号をカンマ区切りで絞る（1=理工学部 2=短期大学部 3=博士前期 4=博士後期）。"
+                         "既定は全部。`--divisions 1,3,4` で短大を外すと現行DBを完全再現する")
     args = ap.parse_args(argv)
+
+    divisions = None
+    if args.divisions is not None:
+        divisions = {d.strip() for d in args.divisions.split(",") if d.strip()}
+        bad = {d for d in divisions if not d.isdigit()}
+        if not divisions or bad:
+            print(f"--divisions の指定が不正です: {args.divisions!r}"
+                  f"（1〜9 の区分番号をカンマ区切りで。例: 1,3,4）", file=sys.stderr)
+            return 1
 
     stats = Stats()
     try:
-        metas = collect_sources(Path(args.src))
+        metas = collect_sources(Path(args.src), divisions)
         years = sorted({m["year"] for m, _ in metas})
         print(f"原本: {len(metas)} ファイル（{args.src}）  年度: {'/'.join(str(y) for y in years)}")
         if len(years) > 1:
             print(f"  ※ 年度が混ざっています: {years}。意図した組み合わせか確認してください")
-        rows = build_rows(metas, stats)
-        classrooms = build_classrooms(rows, stats)
+        rows, master_rows = build_rows(metas, stats)
+        # 教室マスタは短大を除いた行から作る（短大専用教室を検索対象に増やさないため）
+        classrooms = build_classrooms(master_rows, stats)
     except SourceError as exc:
         print("原本の読み取りに失敗しました。DB は作っていません。", file=sys.stderr)
         print(f"  {exc}", file=sys.stderr)
