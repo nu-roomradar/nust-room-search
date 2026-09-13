@@ -79,7 +79,10 @@ def summarize(rows, out):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="授業の生データを CSV にまとめる")
-    ap.add_argument("--src", default=str(REPO / "data" / "source"), help="原本のフォルダ")
+    ap.add_argument("--src", default=str(REPO / "data" / "source"),
+                    help="原本の置き場（既定 data/source）。直下の年度フォルダを使う")
+    ap.add_argument("--year", default=None,
+                    help="使う年度フォルダ（例 2027）。省略するといちばん新しい年度")
     ap.add_argument("--out", default=None, help="出力先 CSV（既定 data/classes_<年度>.csv）")
     ap.add_argument("--divisions", default=None,
                     help="区分番号をカンマ区切りで絞る（1=理工学部 2=短期大学部 3=博士前期 4=博士後期）")
@@ -96,7 +99,7 @@ def main(argv=None):
 
     stats = bsd.Stats()
     try:
-        rows = collect(Path(args.src), divisions, stats)
+        rows = collect(bsd.resolve_year_dir(Path(args.src), args.year), divisions, stats)
     except bsd.SourceError as exc:
         print("原本の読み取りに失敗しました。CSV は作っていません。", file=sys.stderr)
         print(f"  {exc}", file=sys.stderr)

@@ -71,7 +71,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 
   **翌年度の入れ替え手順**
   1. 教務ページ https://www.kyoumu.cst.nihon-u.ac.jp/timetable/ から時間割表をダウンロード（**理工学部・短期大学部・博士前期・博士後期の全学科**。ファイル名は変えない）
-  2. `data/source/` に置く（GitHub の Web 画面からアップロードでよい）
+  2. `data/source/<年度>/` に置く（例 `data/source/2027/`。GitHub の Web 画面からアップロードでよい。翌年度用のフォルダは用意してある）
   3. `python scripts/build_schedule_db.py --report` … 現行 DB との差分が出る。行数・学科別一致率・占有スロット・教室マスタの差分を見る。新年度なら当然大きく差が出るので、**件数の桁と学科の顔ぶれ**が妥当かを見る
   4. `python -m unittest discover -s tests` でテストが通ることを確認
   5. 問題なければ `python scripts/build_schedule_db.py --replace`（`.bak` が自動で作られる）と `python scripts/export_classes.py`（授業の生データ一覧 `data/classes_<年度>.csv` を更新）

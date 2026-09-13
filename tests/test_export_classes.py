@@ -20,8 +20,8 @@ COMMITTED_CSV = ROOT / "data" / "classes_2026.csv"
 sys.path.insert(0, str(ROOT / "scripts"))
 import export_classes as ec  # noqa: E402
 
-HAVE_SOURCES = SRC.is_dir() and any(SRC.glob("[0-9]_*.xls"))
-needs_sources = unittest.skipUnless(HAVE_SOURCES, "原本 data/source/*.xls が無い")
+HAVE_SOURCES = SRC.is_dir() and any(SRC.rglob("[0-9]_*.xls"))   # 年度フォルダの中を見る
+needs_sources = unittest.skipUnless(HAVE_SOURCES, "原本 data/source/<年度>/*.xls が無い")
 
 
 def run(*args):

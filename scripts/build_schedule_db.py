@@ -369,10 +369,43 @@ def read_workbook(path, meta, stats):
     return records
 
 
+YEAR_DIR = re.compile(r"^\d{4}$")
+
+
+def resolve_year_dir(src_dir, year=None):
+    """年度フォルダを解決する。data/source/2026/, 2027/ … の中から1つ選ぶ
+
+    year を指定すればそのフォルダ。指定が無ければ**いちばん新しい年度**を使う。
+    年度フォルダが1つも無ければ src_dir をそのまま使う（昔の平置きでも動くように）。
+    """
+    if not src_dir.is_dir():
+        raise SourceError(f"原本のフォルダがありません: {src_dir}")
+    years = sorted((p for p in src_dir.iterdir() if p.is_dir() and YEAR_DIR.match(p.name)),
+                   key=lambda p: p.name)
+    if year is not None:
+        chosen = [p for p in years if p.name == str(year)]
+        if not chosen:
+            found = "、".join(p.name for p in years) or "（年度フォルダなし）"
+            raise SourceError(f"{year} 年度の原本フォルダがありません: {src_dir}/{year}\n"
+                              f"  いまあるのは: {found}")
+        return chosen[0]
+    # 中身のある最新年度を使う。翌年度用に空のフォルダを先に用意してあっても止まらない。
+    # ただし黙って古い年度に落ちると事故になるので、飛ばした分は必ず知らせる
+    filled = [p for p in years if any(p.glob(SRC_GLOB))]
+    if not filled:
+        return src_dir if any(src_dir.glob(SRC_GLOB)) else (years[-1] if years else src_dir)
+    skipped = [p.name for p in years if p.name > filled[-1].name]
+    if skipped:
+        print(f"※ 原本が入っていない年度フォルダを飛ばしました: {'、'.join(skipped)}"
+              f" → {filled[-1].name} を使います", file=sys.stderr)
+    return filled[-1]
+
+
 def collect_sources(src_dir, divisions=None):
     """原本ファイルを DB の登録順（区分番号 → 学科番号 → ファイル名）に並べて返す
 
     divisions に区分番号の集合を渡すとその区分だけ読む（例 {"1","3","4"} で理工＋大学院のみ）。
+    src_dir は年度フォルダ（data/source/2026 など）を想定。
     """
     if not src_dir.is_dir():
         raise SourceError(f"原本のフォルダがありません: {src_dir}")
@@ -704,7 +737,10 @@ def main(argv=None):
     ap = argparse.ArgumentParser(
         description="時間割の原本(.xls) から schedule_final.db を組み立てる",
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--src", default=str(DEFAULT_SRC), help=f"原本のフォルダ（既定 {DEFAULT_SRC}）")
+    ap.add_argument("--src", default=str(DEFAULT_SRC),
+                    help=f"原本の置き場（既定 {DEFAULT_SRC}）。直下の年度フォルダを使う")
+    ap.add_argument("--year", default=None,
+                    help="使う年度フォルダ（例 2027）。省略するといちばん新しい年度")
     ap.add_argument("--out", default=str(DEFAULT_OUT), help=f"出力先 DB（既定 {DEFAULT_OUT}）")
     ap.add_argument("--ref", default=str(DEFAULT_REF), help=f"比較する現行 DB（既定 {DEFAULT_REF}）")
     ap.add_argument("--replace", action="store_true",
@@ -727,9 +763,10 @@ def main(argv=None):
 
     stats = Stats()
     try:
-        metas = collect_sources(Path(args.src), divisions)
+        src_dir = resolve_year_dir(Path(args.src), args.year)
+        metas = collect_sources(src_dir, divisions)
         years = sorted({m["year"] for m, _ in metas})
-        print(f"原本: {len(metas)} ファイル（{args.src}）  年度: {'/'.join(str(y) for y in years)}")
+        print(f"原本: {len(metas)} ファイル（{src_dir}）  年度: {'/'.join(str(y) for y in years)}")
         if len(years) > 1:
             print(f"  ※ 年度が混ざっています: {years}。意図した組み合わせか確認してください")
         rows, master_rows = build_rows(metas, stats)

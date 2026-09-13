@@ -3,6 +3,21 @@
 `schedule_final.db`（空き教室検索の元データ）と `data/classes_2026.csv`（授業の生データ一覧）は、
 どちらもここにある `.xls` から作られる。**ここが唯一の原本。**
 
+## 置き方
+
+**年度ごとのフォルダに入れる。**
+
+```
+data/source/
+├── README.md
+├── 2026/          ← いま使っている年度（49ファイル）
+├── 2027/          ← 翌年度。公開されたらここに入れる（中の README に手順あり）
+└── archive/       ← 使わない古いファイル
+```
+
+`build_schedule_db.py` と `export_classes.py` は、**原本が入っているいちばん新しい年度フォルダ**を
+自動で選ぶ。空の年度フォルダは飛ばして警告を出す。年度を明示するなら `--year 2026`。
+
 ## 置いてあるもの
 
 教務ページ https://www.kyoumu.cst.nihon-u.ac.jp/timetable/ が配布している時間割表。
@@ -26,11 +41,11 @@
 
 ## 翌年度の入れ替え
 
-1. 教務ページから全区分・全学科をダウンロードして、このフォルダに置く（古い年度のファイルは `archive/` へ）
+1. 教務ページから全区分・全学科をダウンロードして、**その年度のフォルダ**に置く（例 `data/source/2027/`）
 2. `python scripts/build_schedule_db.py --report` で差分を確認
 3. `python -m unittest discover -s tests` が通ることを確認
 4. `python scripts/build_schedule_db.py --replace` で差し替え（`.bak` が自動で作られる）
-5. `python scripts/export_classes.py` で生データ一覧も更新
+5. `python scripts/export_classes.py` で生データ一覧も更新（`data/classes_<年度>.csv` が増える）
 6. コミットして push（Render が自動デプロイ）
 
 詳しい手順と注意点は `docs/OPERATIONS.md` の 6.

@@ -24,7 +24,9 @@
 ├── requirements.txt
 │
 ├── data/
-│   ├── source/             # 時間割の原本（教務ページ配布の時間割表 .xls）※ source/README.md 参照
+│   ├── source/             # 時間割の原本 ※ source/README.md 参照
+│   │   ├── 2026/           # いま使っている年度（49ファイル）
+│   │   ├── 2027/           # 翌年度の置き場（公開されたらここへ）
 │   │   └── archive/        # 使わない古いエクスポート・集計
 │   ├── classes_2026.csv    # 授業の生データ一覧（教員名・単位・対象学年も含む）
 │   ├── instagram_*.json    # Instagram インサイト集計（2026-08 で収集終了・ダッシュボード表示用に凍結）
