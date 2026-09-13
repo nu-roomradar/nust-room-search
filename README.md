@@ -24,7 +24,9 @@
 ├── requirements.txt
 │
 ├── data/
-│   ├── source/             # 時間割の原本（教務ページ配布の時間割表 .xls）
+│   ├── source/             # 時間割の原本（教務ページ配布の時間割表 .xls）※ source/README.md 参照
+│   │   └── archive/        # 使わない古いエクスポート・集計
+│   ├── classes_2026.csv    # 授業の生データ一覧（教員名・単位・対象学年も含む）
 │   ├── instagram_*.json    # Instagram インサイト集計（2026-08 で収集終了・ダッシュボード表示用に凍結）
 │   └── ga4_*.json          # GA4 サイト分析集計（同上）
 │
@@ -40,6 +42,7 @@
 │   ├── make_poster.py              # 学内掲示ポスター生成（PNG/PDF/PPTX・variant切替）
 │   ├── make_story_promo.py         # 新規投稿の告知ストーリー画像生成
 │   ├── build_schedule_db.py        # 原本の時間割表(.xls) → schedule_final.db を再構築
+│   ├── export_classes.py           # 原本 → 授業の生データ一覧 CSV
 │   ├── inspect_timetable.py        # 原本ファイルの構造を確認する道具
 │   └── ops_healthcheck.py          # 運用ヘルスチェック（本番URL・Actions・トークン → Issue）
 │

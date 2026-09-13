@@ -356,6 +356,15 @@ def read_workbook(path, meta, stats):
                     "subject": subject, "room_raw": room_raw,
                     "building_col": cell_text(sheet, r, c0 + COLUMN_OFFSETS["校舎"]),
                     "source": f"{path.name} / {sheet_name} / {day}曜 行{r}",
+                    # 以下は DB には入れないが、生データの一覧（scripts/export_classes.py）で使う
+                    "code": code,
+                    "credits": cell_text(sheet, r, c0 + COLUMN_OFFSETS["単位"]),
+                    "grade": cell_text(sheet, r, c0 + COLUMN_OFFSETS["対象学年"]),
+                    "teacher": cell_text(sheet, r, c0 + COLUMN_OFFSETS["教員名"]),
+                    "division": meta["division"],
+                    "division_no": meta["division_no"],
+                    "year": meta["year"],
+                    "file": path.name,
                 })
     return records
 
