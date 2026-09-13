@@ -39,7 +39,8 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 | いつ | 何を | どうやって |
 |---|---|---|
 | **毎週月曜 09:00** | 運用ヘルスチェックの結果を見る | 自動で動く。異常があれば「【運用ヘルスチェック】異常を検知しました」という Issue が開く。復旧すると自動で閉じる。**Issue が開いたら中を読んで対応する**だけでよい |
-| **約60日ごと** | Instagram トークンの再発行 | 失効するとヘルスチェックが Issue で知らせる。Meta for Developers → アプリ → Instagram → API設定 で長期トークンを再発行し、GitHub Secrets の `IG_ACCESS_TOKEN` を差し替える |
+| **毎月1日** | Instagram トークンの自動延長 | 自動。`ig-token-refresh.yml` が60日先まで延ばして Secret を書き換える。**人がやることは無い。失敗したときだけ対応**（下の「Instagram トークンの自動更新」参照） |
+| **年1回程度** | `IG_REFRESH_PAT` の更新 | PAT に有効期限を付けた場合のみ。切れると上の自動延長が失敗し、ヘルスチェックが Issue で知らせる |
 | **後期開始前（9/24 に Issue が自動で立つ）** | Render のプランを Starter に戻す | Render ダッシュボード → `nust-room-search` → Settings → Instance Type。**再起動で仮予約データが消える**ので利用の少ない時間帯に |
 | **夏休み前（7月末）** | Render のプランを Free に落とす（費用節約） | 同上。戻し忘れ防止に `render-plan-reminder.yml` がある |
 | **4/1 と 9/21** | 検索の学期が自動で前期／後期に切り替わる | 何もしなくてよい。ただし DB にその学期の時間割が入っている必要がある |
@@ -57,6 +58,37 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 | 仮予約・報告が全部消えた | — | Render の再起動・デプロイで消える仕様。復旧不要。利用者への説明は「時限終了で自動リセット」の範囲内 |
 | 検索結果がおかしい（授業中のはずの教室が空きで出る） | `schedule_final.db` の該当学期のデータ | DB が古い、または学期切替の境界（4/1・9/21）。時間割の更新が必要 |
 | 何が壊れているか分からない | Claude Code on the web でリポジトリを開き、症状を説明する | `CLAUDE.md` と skills を読んだ状態で調査してくれる |
+
+## 4.5 Instagram トークンの自動更新
+
+`IG_ACCESS_TOKEN` は発行から **60日で失効**する。2026-08-13 に切れたときは気づくまで3週間かかり、その間まったく投稿できなかった。手で再発行し続けるのをやめるため、`.github/workflows/ig-token-refresh.yml` が**毎月1日に60日先まで延長**して Secret を書き換える。
+
+**仕組み**: `refresh_access_token` で新トークンを取得 → 実際に使えるか確認 → 確認できてから Secret を更新。検証に失敗したら Secret は触らない（古いトークンが残るので投稿は続けられる）。
+
+**必要な準備（一度だけ）**: GitHub Actions は `GITHUB_TOKEN` では Secret を書き換えられないので、専用の PAT が要る。
+
+1. GitHub の自分のアイコン → **Settings** → 一番下の **Developer settings**
+2. **Personal access tokens** → **Fine-grained tokens** → **Generate new token**
+3. 設定:
+   - **Resource owner**: `nu-roomradar`（個人アカウントではなく Organization。※ 組織の承認が要る場合がある）
+   - **Repository access**: Only select repositories → `nust-room-search`
+   - **Repository permissions** → **Secrets** を **Read and write** に
+   - **Expiration**: 長め、または無期限
+4. 生成されたトークンをコピー
+5. https://github.com/nu-roomradar/nust-room-search/settings/secrets/actions → **New repository secret**
+   - Name: `IG_REFRESH_PAT`
+   - Secret: コピーしたトークン
+6. Actions タブ → 「Instagramトークンの自動更新」→ **Run workflow**（`dry_run` を **true**）で疎通確認
+
+**失敗したときは**: Actions が赤くなり、週次の運用ヘルスチェックが Issue で知らせる。ログを見て切り分ける。
+
+| ログ | 意味 | 対応 |
+|---|---|---|
+| `既に失効しています` (code=190) | 延長できる期限を過ぎた | **自動では直せない。** Meta for Developers で手動再発行（`.claude/skills/instagram-post/SKILL.md`） |
+| `Secret の公開鍵を取れません` | PAT の権限不足・期限切れ | PAT を作り直して `IG_REFRESH_PAT` を差し替える |
+| `新しいトークンが使えません` | Meta 側でアプリ設定が変わった等 | Secret は無事。Meta のアプリ設定を確認 |
+
+トークンはログに出ない（長さと末尾4文字だけ）。
 
 ## 5. 日常の作業のしかた
 

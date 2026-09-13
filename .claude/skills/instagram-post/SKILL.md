@@ -72,4 +72,5 @@ argument-hint: "[feed|story|condolence|token] 投稿内容や相談の要点"
    ログの `Instagram: アクセストークンは有効です` を見る。本番実行（dry_run なし）なら Issue #23 系が自動で閉じる。
 5. 失敗した run を `rerun_failed_jobs` で再実行するか、改めて起動する（再起動前にユーザー確認）。
 
-**60日ごとの再発行をやめたい場合**: `GET https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=<現行>` で**失効前なら60日延長できる**。月1回これを叩くワークフローを置けば人手が要らなくなるが、Actions が自分の Secret を書き換えるには **Secrets の書き込み権限を持つ PAT** を1つ置く必要がある（60日ごとの手作業 ↔ 長期の PAT 1本、のトレードオフ）。未導入。導入するかはユーザーの判断。
+**自動更新が入っている（2026-09〜）**: `.github/workflows/ig-token-refresh.yml` が毎月1日に `refresh_access_token` で60日先まで延長し、Secret を書き換える（`scripts/refresh_ig_token.py`）。**通常は人がやることは無い。** 上の手動再発行が要るのは、自動更新が止まっていて**失効まで至った**ときだけ（`code=190`／`既に失効しています`）。
+自動更新には `IG_REFRESH_PAT`（Secrets への書き込み権限を持つ PAT）が要る。作り方と失敗時の切り分けは `docs/OPERATIONS.md` の 4.5。

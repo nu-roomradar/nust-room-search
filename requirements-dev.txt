@@ -5,6 +5,7 @@
 # このファイルを読むので、両方を書き換える必要はない。
 
 requests          # Instagram Graph API / 運用ヘルスチェック
+pynacl            # GitHub Secret の暗号化（refresh_ig_token.py）
 xlrd              # 時間割の原本 .xls を読む（build_schedule_db.py / export_classes.py）
 openpyxl          # .xlsx を読む（inspect_timetable.py。requirements.txt にもあるが明示）
 qrcode            # ポスターの QR 生成

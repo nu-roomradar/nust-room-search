@@ -37,7 +37,7 @@
 - この環境から github.io・onrender.com 等の公開URLへの到達はプロキシに阻まれる。公開URLの表示確認はユーザーに依頼する。raw.githubusercontent.com は到達可。
 - `pip install -r requirements.txt` が debian 製 blinker と衝突する場合は `--ignore-installed blinker` を付ける。
 - Playwright のブラウザは preinstall 済み（`/opt/pw-browsers/chromium-1194/chrome-linux/chrome`）。`playwright install` は不要。
-- Instagram の長期アクセストークンは約60日で失効する。投稿・集計が急に失敗し出したらまず疑う。
+- Instagram の長期アクセストークンは約60日で失効する。`ig-token-refresh.yml` が毎月1日に自動延長するので通常は人の作業は不要。投稿が急に失敗し出したらまず自動更新が止まっていないかを見る（`docs/OPERATIONS.md` 4.5）。
 
 ## 運用の自動化
 

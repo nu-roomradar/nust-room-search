@@ -1,0 +1,56 @@
+name: Instagramトークンの自動更新
+
+# IG_ACCESS_TOKEN は発行から60日で失効する。手で再発行し続けるのをやめるため、
+# 月1回 refresh_access_token を叩いて60日先まで延ばし、Secret を書き換える。
+# 失効してからでは自動で直せないので、余裕をもって毎月1日に回す。
+#
+# 必要な Secret:
+#   IG_ACCESS_TOKEN  現行トークン（このワークフローが書き換える）
+#   IG_REFRESH_PAT   Secrets への書き込み権限を持つ PAT。GITHUB_TOKEN では Secret を
+#                    書き換えられないため別途必要。作り方は docs/OPERATIONS.md
+#
+# 失敗したら Actions が赤くなり、週次の運用ヘルスチェックが Issue で拾う。
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "延長の可否だけ確認し、Secret は書き換えない"
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    # 毎月1日 JST 09:00（UTC 00:00）。60日の期限に対して十分な余裕がある
+    - cron: "0 0 1 * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ig-token-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests pynacl
+
+      - name: Refresh Instagram access token
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_REFRESH_PAT: ${{ secrets.IG_REFRESH_PAT }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python scripts/refresh_ig_token.py --dry-run
+          else
+            python scripts/refresh_ig_token.py
+          fi

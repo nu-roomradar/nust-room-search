@@ -45,6 +45,7 @@
 │   ├── make_story_promo.py         # 新規投稿の告知ストーリー画像生成
 │   ├── build_schedule_db.py        # 原本の時間割表(.xls) → schedule_final.db を再構築
 │   ├── export_classes.py           # 原本 → 授業の生データ一覧 CSV
+│   ├── refresh_ig_token.py         # Instagramトークンを60日延長して Secret を更新
 │   ├── inspect_timetable.py        # 原本ファイルの構造を確認する道具
 │   └── ops_healthcheck.py          # 運用ヘルスチェック（本番URL・Actions・トークン → Issue）
 │
@@ -54,6 +55,7 @@
 └── .github/workflows/
     ├── ci.yml                  # push / PR で構文チェックとテスト
     ├── ops-healthcheck.yml     # 毎週月曜 運用ヘルスチェック（異常なら Issue、復旧で自動クローズ）
+    ├── ig-token-refresh.yml    # 毎月1日 Instagramトークンを60日延長して Secret を更新
     ├── instagram-post.yml      # 手動トリガーで投稿（feed / story 選択・同時ストーリー可）
     └── render-plan-reminder.yml # 9/24 に Render プランを戻すリマインド Issue を作成
 ```
