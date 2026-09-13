@@ -104,26 +104,37 @@ class ReproductionTests(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls.tmp, ignore_errors=True)
 
-    def test_rikou_only_reproduces_production_db_exactly(self):
+    def test_full_build_reproduces_production_db_exactly(self):
+        """全区分（短大込み）で本番 DB を再現できる。年1回の入れ替えが成り立つ前提"""
         prod_s, prod_r = rows_of(PROD_DB)
-        new_s, new_r = rows_of(self.rikou)
+        new_s, new_r = rows_of(self.allx)
         self.assertEqual(Counter(new_s), Counter(prod_s), "schedules が現行 DB と一致しない")
         self.assertEqual(set(new_r), set(prod_r), "classrooms が現行 DB と一致しない")
 
-    def test_including_tandai_adds_rows_but_not_classrooms(self):
-        prod_s, prod_r = rows_of(PROD_DB)
+    def test_excluding_tandai_drops_rows_but_keeps_classrooms(self):
+        """--divisions 1,3,4 で短大が抜ける。教室マスタは元から理工のみなので変わらない"""
         all_s, all_r = rows_of(self.allx)
-        self.assertGreater(len(all_s), len(prod_s), "短大を入れたのに行が増えていない")
-        self.assertEqual(set(all_r), set(prod_r),
-                         "教室マスタが変わっている（短大専用教室を検索対象に入れてはいけない）")
+        rikou_s, rikou_r = rows_of(self.rikou)
+        self.assertLess(len(rikou_s), len(all_s), "短大を外したのに行が減っていない")
+        self.assertEqual(set(rikou_r), set(all_r),
+                         "教室マスタは短大の有無で変わってはいけない（理工からだけ作るため）")
+
+    def test_tandai_rows_are_labelled_and_on_funabashi(self):
+        """短大の行は学科名で見分けがつき、船橋校舎に限られる"""
+        all_s, _ = rows_of(self.allx)
+        tandai = [x for x in all_s if x[0].startswith(bsd.TANDAI_PREFIX)]
+        self.assertGreater(len(tandai), 0, "短大の行が1つも入っていない")
+        self.assertEqual({x[5] for x in tandai}, {"船橋校舎"},
+                         "短大は船橋校舎を共用している。他の校舎が出るのはおかしい")
 
     def test_tandai_marks_shared_rooms_as_occupied(self):
-        prod_s, prod_r = rows_of(PROD_DB)
-        all_s, _ = rows_of(self.allx)
-        names = {n for n, _ in prod_r}
-        old = {(x[1], x[2], x[3], x[4]) for x in prod_s}
-        new = {(x[1], x[2], x[3], x[4]) for x in all_s}
-        added = {x for x in new - old if x[3] in names}
+        """短大が理工の教室を使っている時間は使用中になる（これが取り込みの目的）"""
+        all_s, all_r = rows_of(self.allx)
+        rikou_s, _ = rows_of(self.rikou)
+        names = {n for n, _ in all_r}
+        without = {(x[1], x[2], x[3], x[4]) for x in rikou_s}
+        with_t = {(x[1], x[2], x[3], x[4]) for x in all_s}
+        added = {x for x in with_t - without if x[3] in names}
         self.assertGreater(len(added), 0, "短大を入れても共用教室の占有が増えていない")
 
     def test_no_junk_room_in_output(self):

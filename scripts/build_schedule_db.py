@@ -136,6 +136,7 @@ EXCEPTION_DROP = {
 # RoomRadar は理工学部の学生向けで、短大専用教室を「空いています」と出しても
 # 行って使えるとは限らないため、安全側に倒している。
 TANDAI_DIVISION = "2"
+TANDAI_PREFIX = "短大 "     # 学科名に付ける印（「一般教育」が理工と衝突するため）
 
 # 中黒「・」の扱いは原本によって逆。理工では「テクノ・工作技術センター」という
 # 1 つの教室名の一部なので割ってはいけない。短大では「1111・521」のように
@@ -328,6 +329,10 @@ def read_workbook(path, meta, stats):
         elif dept != meta["dept"]:
             stats.warn(f"{where}: ファイル名の学科「{meta['dept']}」とシートの学科「{dept}」が違います。"
                        f"シート側を採用します")
+        if meta["division_no"] == TANDAI_DIVISION:
+            # 短大の「一般教育」は理工の「一般教育」と名前が衝突する。
+            # 学科列は検索に使わないので実害は無いが、後から見て区別できるように印を付ける
+            dept = f"{TANDAI_PREFIX}{dept}"
 
         for day, c0, label_col in blocks:
             period = None
@@ -612,9 +617,13 @@ def report_build(stats):
             print(f"    {n:>4} 件  {key}")
 
 
-def report_diff(rows, classrooms, ref_path):
-    """現行 DB との差分。行数・学科別一致率・占有スロット・教室マスタ"""
-    ref_rows, ref_rooms = read_ref(ref_path)
+def report_diff(rows, classrooms, ref_path, ref_data=None):
+    """現行 DB との差分。行数・学科別一致率・占有スロット・教室マスタ
+
+    ref_data を渡すとそれを比較対象にする（--replace で上書きする前に取った
+    スナップショットを渡すため。渡さなければ ref_path を読む）
+    """
+    ref_rows, ref_rooms = ref_data if ref_data is not None else read_ref(ref_path)
     new_c, ref_c = collections.Counter(rows), collections.Counter(ref_rows)
 
     section(f"■ 現行 DB との差分（{ref_path}）")
@@ -727,6 +736,11 @@ def main(argv=None):
               file=sys.stderr)
         return 1
 
+    # --replace で上書きすると比較対象が消えるので、先に中身を控えておく
+    ref_before = None
+    if args.replace and args.report and not args.no_write and Path(args.ref).exists():
+        ref_before = read_ref(Path(args.ref))
+
     out_path = Path(args.out)
     if args.no_write:
         print("--no-write のため DB は書きません" + ("（--replace は無視します）" if args.replace else ""))
@@ -754,9 +768,11 @@ def main(argv=None):
         if not ref.exists():
             print(f"\n比較する現行 DB がありません: {ref}", file=sys.stderr)
             return 1
-        if args.replace:
-            print("\n※ --replace で置き換えた後なので、差分は「置き換え後の DB」との比較です")
-        identical = report_diff(rows, classrooms, ref)
+        if ref_before is not None:
+            # --replace で上書きした後に現物と比べても「同じ」に決まっている。
+            # 差し替え前に取っておいたスナップショットと比べて、何が変わったかを出す
+            print("\n※ --replace で置き換えました。以下は「置き換え前の DB」との差分です")
+        identical = report_diff(rows, classrooms, ref, ref_data=ref_before)
     report_warnings(stats)
 
     if identical is True:

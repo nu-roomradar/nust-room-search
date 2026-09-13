@@ -46,10 +46,28 @@ class ScheduleDbTests(unittest.TestCase):
         self.assertEqual({r[0] for r in self.q("SELECT DISTINCT 時限 FROM schedules")}, {1, 2, 3, 4, 5, 6})
         self.assertEqual(self.q("SELECT COUNT(*) FROM schedules WHERE 教室 IS NULL OR TRIM(教室) = ''")[0][0], 0)
 
-    def test_every_scheduled_room_is_in_classrooms(self):
-        missing = {r[0] for r in self.q("SELECT DISTINCT 教室 FROM schedules WHERE 教室 NOT IN (SELECT name FROM classrooms)")}
+    def test_every_rikou_room_is_in_classrooms(self):
+        """理工学部・大学院の授業が使う教室は必ず検索対象に載っていること
+
+        短期大学部の行は例外。短大専用教室はあえて classrooms に入れていない
+        （占有判定には効かせるが、理工の学生には「空き」として出さない）。
+        詳細は scripts/build_schedule_db.py の docstring と docs/OPERATIONS.md 6.
+        """
+        missing = {r[0] for r in self.q(
+            "SELECT DISTINCT 教室 FROM schedules "
+            "WHERE 教室 NOT IN (SELECT name FROM classrooms) AND 学科 NOT LIKE '短大 %'")}
         self.assertEqual(missing - PLACEHOLDER_ROOMS, set(),
                          "schedules にあって classrooms に無い教室（検索で永遠に表示されない）")
+
+    def test_tandai_only_rooms_are_kept_out_of_classrooms(self):
+        """短大専用教室が検索対象に混ざっていないこと（混ざると行っても使えない教室を出す）"""
+        rooms = {r[0] for r in self.q("SELECT DISTINCT 教室 FROM schedules WHERE 学科 LIKE '短大 %'")}
+        master = {r[0] for r in self.q("SELECT name FROM classrooms")}
+        rikou = {r[0] for r in self.q("SELECT DISTINCT 教室 FROM schedules WHERE 学科 NOT LIKE '短大 %'")}
+        tandai_only = rooms - rikou
+        self.assertGreater(len(tandai_only), 0, "短大専用の教室が1つも無いのは想定外")
+        self.assertEqual(tandai_only & master, set(),
+                         "短大専用教室が classrooms に入っている")
 
     def test_classrooms_master_is_sane(self):
         self.assertEqual({r[0] for r in self.q("SELECT DISTINCT building FROM classrooms")}, BUILDINGS)
