@@ -117,7 +117,10 @@ TITLE_ROW = 1           # 「2026年度」がある行
 DEPT_ROW, DEPT_COL = 2, 1   # 「理工学部 土木工学科」があるセル
 
 ROOM_CODE = re.compile(r"^[A-Za-z]?\d{3,4}$")     # 641 / 819 / 1425 / S407
-PAREN = re.compile(r"^([^()]*)\(([^()]*)\)$")     # 半角カッコのみ。全角は対象外
+# 「名前(中身)」の形。半角・全角どちらのカッコでも拾う（開きと閉じは同じ幅で揃っていること）。
+# 全角と半角は別物として扱う。教室マスタには「階段教室(大)」と「階段教室（大）」が別々に載っている
+PAREN_PAIRS = (("(", ")"), ("（", "）"))
+PAREN = re.compile(r"^([^()（）]*)(?:\(([^()（）]*)\)|（([^()（）]*)）)$")
 SPACES = re.compile(r"[ 　]+")
 
 ROOM_UNDECIDED = "000"      # 教室未定。DB には入っていない
@@ -428,13 +431,19 @@ def collect_sources(src_dir, divisions=None):
 # ------------------------------------------------------------------ 教室名の正規化
 
 def tokenize_rooms(cell):
-    """教室名セルを教室トークンに割る。半角カッコの内側では割らない（全角カッコは保護しない）"""
+    """教室名セルを教室トークンに割る。カッコ（半角・全角とも）の内側では割らない
+
+    「スタジオ（S701 S702 S705）」を空白で割ってしまうと「スタジオ（S701」「S705）」という
+    壊れた教室名ができる（2026-09 まで実際にそうなっていた）。
+    """
     out, buf, depth = [], "", 0
+    openers = {p[0] for p in PAREN_PAIRS}
+    closers = {p[1] for p in PAREN_PAIRS}
     for ch in cell:
-        if ch == "(":
+        if ch in openers:
             depth += 1
             buf += ch
-        elif ch == ")":
+        elif ch in closers:
             depth = max(0, depth - 1)
             buf += ch
         elif ch in " 　" and depth == 0:
@@ -477,7 +486,8 @@ def normalize_rooms(cell, stats, where):
         if not m:
             rooms.append(token)
             continue
-        head, inner = m.group(1), m.group(2)
+        # group(2) が半角カッコの中身、group(3) が全角カッコの中身
+        head, inner = m.group(1), m.group(2) if m.group(2) is not None else m.group(3)
         parts = [p for p in SPACES.split(inner) if p]
         if parts and all(ROOM_CODE.match(p) for p in parts):
             stats.rule_b[token] += 1              # 規則B: 括弧内が教室番号の並び → 展開

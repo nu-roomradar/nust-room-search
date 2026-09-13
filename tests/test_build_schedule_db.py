@@ -53,6 +53,19 @@ class RoomTokenTests(unittest.TestCase):
 
     def test_does_not_split_inside_parentheses(self):
         self.assertEqual(bsd.tokenize_rooms("8号館実験室(819 826 829)"), ["8号館実験室(819 826 829)"])
+        # 全角カッコも守る。守らないと「スタジオ（S701」「S705）」という壊れた教室名ができる
+        self.assertEqual(bsd.tokenize_rooms("スタジオ（S701 S702 S705）"), ["スタジオ（S701 S702 S705）"])
+
+    def test_expands_room_codes_in_full_width_parentheses(self):
+        st = bsd.Stats()
+        self.assertEqual(bsd.normalize_rooms("スタジオ（S701 S702 S705）", st, "t"),
+                         ["S701", "S702", "S705"])
+
+    def test_keeps_full_and_half_width_variants_apart(self):
+        """教室マスタには「階段教室(大)」と「階段教室（大）」が別々に載っている。幅を揃えてはいけない"""
+        st = bsd.Stats()
+        self.assertEqual(bsd.normalize_rooms("階段教室（大）", st, "t"), ["階段教室（大）"])
+        self.assertEqual(bsd.normalize_rooms("階段教室(大)", st, "t"), ["階段教室(大)"])
 
     def test_middle_dot_splits_only_between_room_codes(self):
         # 短大の原本: 教室番号の区切り

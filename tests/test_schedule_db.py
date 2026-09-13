@@ -69,6 +69,16 @@ class ScheduleDbTests(unittest.TestCase):
         self.assertEqual(tandai_only & master, set(),
                          "短大専用教室が classrooms に入っている")
 
+    def test_no_broken_room_names(self):
+        """カッコの対応が崩れた教室名が検索結果に出ないこと
+
+        原本の「スタジオ（S701 S702 S705）」を全角カッコを守らずに空白で割った結果、
+        「スタジオ（S701」「S705）」という教室が 2026-09 まで実在していた。
+        """
+        bad = [n for (n,) in self.q("SELECT name FROM classrooms")
+               if n.count("(") + n.count("（") != n.count(")") + n.count("）")]
+        self.assertEqual(bad, [], "カッコの対応が崩れた教室名がある")
+
     def test_classrooms_master_is_sane(self):
         self.assertEqual({r[0] for r in self.q("SELECT DISTINCT building FROM classrooms")}, BUILDINGS)
         self.assertGreater(self.q("SELECT COUNT(*) FROM classrooms")[0][0], 150)
