@@ -57,8 +57,9 @@ class FakeGitHub:
         return {}
 
 
-def run(name, conclusion, created, url="https://github.com/x/y/actions/runs/1"):
-    return {"name": name, "conclusion": conclusion, "created_at": created, "html_url": url}
+def run(name, conclusion, created, url="https://github.com/x/y/actions/runs/1", status=None):
+    return {"name": name, "conclusion": conclusion, "created_at": created, "html_url": url,
+            "status": status or ("completed" if conclusion else "in_progress")}
 
 
 class UrlCheckTests(unittest.TestCase):
@@ -106,16 +107,53 @@ class ActionsCheckTests(unittest.TestCase):
             run("Instagramへ投稿", "failure", "2026-09-01T00:00:00Z", "https://gh/old"),
             run("Instagramへ投稿", "failure", "2026-09-06T00:00:00Z", "https://gh/new"),
             run("CI", "success", "2026-09-06T00:00:00Z"),
-            run("CI", None, "2026-09-07T00:00:00Z"),  # 実行中は失敗扱いにしない
+            run("CI", None, "2026-09-07T00:00:00Z"),  # 実行中は判定に使わない
         ])
         res = hc.Result()
         hc.check_recent_runs(res, gh, now=NOW)
         self.assertEqual(len(res.problems), 1)
         title, detail = res.problems[0]
         self.assertIn("Instagramへ投稿", title)
-        self.assertIn("2 回", title)
+        self.assertIn("2 回連続", title)
         self.assertIn("https://gh/new", detail)
         self.assertIn("IG_ACCESS_TOKEN", detail)  # Instagram 系にはトークン失効のヒント
+
+    def test_fixed_workflow_stops_being_reported(self):
+        """直したら次の実行が通った時点で報告をやめる（直近N日に失敗があっても蒸し返さない）"""
+        gh = FakeGitHub(runs=[
+            run("CI", "failure", "2026-09-01T00:00:00Z"),
+            run("CI", "failure", "2026-09-02T00:00:00Z"),
+            run("CI", "success", "2026-09-07T00:00:00Z"),   # 最新が成功 = もう壊れていない
+        ])
+        res = hc.Result()
+        hc.check_recent_runs(res, gh, now=NOW)
+        self.assertEqual(res.problems, [])
+        self.assertTrue(any("最新の実行が成功" in x for x in res.ok))
+
+    def test_counts_only_the_current_failure_streak(self):
+        """「連続何回」は直近の連続分だけ。間に成功があればそこで切れる"""
+        gh = FakeGitHub(runs=[
+            run("CI", "failure", "2026-09-01T00:00:00Z"),
+            run("CI", "success", "2026-09-02T00:00:00Z"),
+            run("CI", "failure", "2026-09-05T00:00:00Z"),
+            run("CI", "failure", "2026-09-07T00:00:00Z"),
+        ])
+        res = hc.Result()
+        hc.check_recent_runs(res, gh, now=NOW)
+        self.assertEqual(len(res.problems), 1)
+        self.assertIn("2 回連続", res.problems[0][0])
+
+    def test_in_progress_only_workflow_is_not_judged(self):
+        gh = FakeGitHub(runs=[run("CI", None, "2026-09-07T00:00:00Z")])
+        res = hc.Result()
+        hc.check_recent_runs(res, gh, now=NOW)
+        self.assertEqual(res.problems, [])
+
+    def test_timed_out_counts_as_failure(self):
+        gh = FakeGitHub(runs=[run("CI", "timed_out", "2026-09-07T00:00:00Z")])
+        res = hc.Result()
+        hc.check_recent_runs(res, gh, now=NOW)
+        self.assertEqual(len(res.problems), 1)
 
     def test_disabled_inactivity_is_problem_manual_is_note(self):
         gh = FakeGitHub(workflows=[

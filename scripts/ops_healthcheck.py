@@ -124,21 +124,38 @@ def check_recent_runs(res, gh, days=RUN_LOOKBACK_DAYS, now=None):
     now = now or datetime.now(timezone.utc)
     since = (now - timedelta(days=days)).strftime("%Y-%m-%d")
     data = gh.get(f"/repos/{gh.repo}/actions/runs", per_page=100, created=f">={since}")
-    failed = {}
+
+    # ワークフローごとに新しい順へ。判定に使うのは「いちばん新しい完了した実行」だけ。
+    # 「直近N日に1回でも失敗したか」で見ると、直した後も N 日間ずっと報告し続けてしまい、
+    # Issue が「もう直っているのに赤いまま」になる（2026-09 に実際そうなった）。
+    by_workflow = {}
     for run in data.get("workflow_runs", []):
-        if run.get("conclusion") in FAILED_CONCLUSIONS:
-            failed.setdefault(run.get("name") or run.get("path") or "?", []).append(run)
-    if not failed:
-        res.ok.append(f"GitHub Actions: 直近{days}日に失敗した実行はありません")
-        return
-    for name, runs in failed.items():
+        by_workflow.setdefault(run.get("name") or run.get("path") or "?", []).append(run)
+
+    broken = False
+    for name, runs in sorted(by_workflow.items()):
         runs.sort(key=lambda r: r.get("created_at", ""), reverse=True)
-        latest = runs[0]
+        done = [r for r in runs if r.get("status") == "completed" and r.get("conclusion")]
+        if not done:
+            continue                                    # まだ実行中のものしかない
+        latest = done[0]
+        if latest.get("conclusion") not in FAILED_CONCLUSIONS:
+            continue                                    # 最新が通っている = いま壊れていない
+        broken = True
+        streak = 0
+        for r in done:                                  # 直近で何回続けて失敗しているか
+            if r.get("conclusion") not in FAILED_CONCLUSIONS:
+                break
+            streak += 1
         hint = ""
         if "instagram" in name.lower():
-            hint = "\nInstagram 系の失敗は IG_ACCESS_TOKEN の失効（約60日）をまず疑ってください。"
-        res.problem(f"Actions「{name}」が失敗しています（直近{days}日で {len(runs)} 回）",
+            hint = ("\nInstagram 系の失敗は IG_ACCESS_TOKEN の失効（約60日）をまず疑ってください。"
+                    "自動更新については docs/OPERATIONS.md 4.5。")
+        res.problem(f"Actions「{name}」が失敗しています（{streak} 回連続）",
                     f"最新の失敗: {latest.get('created_at', '')[:10]} {latest.get('html_url', '')}{hint}")
+
+    if not broken:
+        res.ok.append(f"GitHub Actions: 直近{days}日のワークフローはすべて最新の実行が成功しています")
 
 
 def check_disabled_workflows(res, gh):
