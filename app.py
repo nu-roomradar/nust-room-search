@@ -641,22 +641,6 @@ HTML_TEMPLATE = """
                 <form method="POST" id="search-form">
                     <div class="form-grid">
                         <div>
-                            <label>曜日</label>
-                            <select name="day" id="sel-day">
-                                {% for d in ["月", "火", "水", "木", "金", "土"] %}
-                                <option value="{{ d }}" {% if selected_day == d %}selected{% endif %}>{{ d }}曜日</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div>
-                            <label>時限</label>
-                            <select name="period" id="sel-period">
-                                {% for p in range(1, 7) %}
-                                <option value="{{ p }}" {% if selected_period == p %}selected{% endif %}>{{ p }}限 ({{ period_times[p] }})</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div>
                             <label>年度</label>
                             <select name="year" id="sel-year">
                                 {% for y in available_years %}
@@ -669,6 +653,22 @@ HTML_TEMPLATE = """
                             <select name="term" id="sel-term">
                                 {% for t in available_terms %}
                                 <option value="{{ t }}" {% if selected_term == t %}selected{% endif %}>{{ t }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label>曜日</label>
+                            <select name="day" id="sel-day">
+                                {% for d in ["月", "火", "水", "木", "金", "土"] %}
+                                <option value="{{ d }}" {% if selected_day == d %}selected{% endif %}>{{ d }}曜日</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label>時限</label>
+                            <select name="period" id="sel-period">
+                                {% for p in range(1, 7) %}
+                                <option value="{{ p }}" {% if selected_period == p %}selected{% endif %}>{{ p }}限 ({{ period_times[p] }})</option>
                                 {% endfor %}
                             </select>
                         </div>
