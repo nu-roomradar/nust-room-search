@@ -5,7 +5,8 @@
 背景: schedule_final.db は手作業で作られ、作成スクリプトが失われていた
 （docs/OPERATIONS.md 6.）。原本が無いと翌年度の時間割を入れられないため、
 2026年度（令和8年度）の原本を突き合わせて変換規則を復元し、スクリプト化したもの。
-2026年度の原本からは現行 DB の 13,614 行を 7 列すべて完全に再現できる。
+複数年度を 1 つの DB に同居させ、アプリ側で年度と学期を選べるようにしている
+（schedules.年度 / classrooms.年度）。既定では data/source/ 配下の年度フォルダを全部読む。
 
 ────────────────────────────────────────────────────────────────────────
 原本の構造
@@ -18,7 +19,7 @@ data/source/ に置かれた `<区分番号>_<区分名>_<学科番号>_<学科�
 出さないよう schedules には取り込むが、**教室マスタ（＝検索結果に出る教室の一覧）は
 理工学部・大学院からだけ作る**。RoomRadar は理工学部の学生向けで、短大専用教室を
 「空いています」と出しても行って使えるとは限らないため、安全側に倒している。
-`--divisions 1,3,4` で短大を外すと、現行 schedule_final.db を全 7 列・13,614 行で完全再現する。
+`--divisions 1,3,4` で短大を外すと、短大取り込み前の内容を再現できる。
 各ファイルはシート「前期」「後期」の 2 枚。中身は曜日×時限のグリッド（人が読む時間割表）。
   行1(0始まり)  B列に「2026年度」
   行2           B列に「理工学部 土木工学科」（大学院は「博士前期 土木工学専攻」）
@@ -43,32 +44,31 @@ data/source/ に置かれた `<区分番号>_<区分名>_<学科番号>_<学科�
 [行の採否] 時間割CD と 科目名 がどちらも空の行は読み飛ばす。それ以外は教室名セルを採用。
 [科目名] 原本の値をそのまま使う（注記込み。1,869 種すべて DB と一致）。
 [教室名] 教室名セルは複数教室を含みうる。半角/全角スペースで分割する。ただし
-         半角カッコ (...) の内側では分割しない。全角カッコ（）は保護しない
-         （現行 DB が「スタジオ（S701」「S705）」という壊れ方で登録されており、
-          素朴に分割されたことが確定しているため。下の「既知の未解決」参照）。
+         カッコ (...) （...） の内側では分割しない（全角も保護する。保護しないと
+         「スタジオ（S701 S702 S705）」が「スタジオ（S701」「S705）」に割れる）。
          分割した各トークンを次の優先順で正規化する。教室番号 = ^[A-Za-z]?\\d{3,4}$
            規則B  X(Y) で Y を分割した要素がすべて教室番号 → X を捨て Y を展開
                   例: 8号館実験室(819 826 829) → 819, 826, 829
            規則A  X(Y) で X が教室番号 → X だけ採用し (Y) は捨てる
                   例: 1201(PC演習室) → 1201 / S407(ｻﾃﾗｲﾄ時の主な相手:F1451) → S407
            規則C  上に当たらなければ無加工（階段教室(大) 等はこの綴りで DB に載っている）
-         中黒「・」は教室名の一部なので分割しない（テクノ・工作技術センター）。
+         中黒「・」は、両側がどちらも教室番号の形のときだけ分割する
+         （短大の「1111・521」は分割、理工の「テクノ・工作技術センター」は分割しない）。
 [教室 000/0000] "000"（教室未定）は捨てる。"0000" は schedules には残すが classrooms には入れない。
 [例外表] 規則では説明できず、DB 作成者が黙って捨てた 2 トークンだけを破棄する
          （EXCEPTION_DROP。件数と理由は必ずレポートに出す）。
 [校舎]   校舎列 F → 船橋校舎 ／ S かつ教室名が "S" 始まり → タワースコラ ／ S かつそれ以外 → 駿河台校舎。
          例外: 「まち製図室１～５」は S 始まりでないのにタワースコラにあり、DB では
          同じセルの先頭教室の校舎を引き継いでいる（BUILDING_INHERIT_ROOMS）。
-[classrooms] schedules に出た教室名から作る（"0000" は除く）。building はその教室が
-         schedules で最も多く取った校舎（最頻値）。
+[classrooms] schedules に出た教室名から**年度ごとに**作る（"0000" は除く）。building は
+         その教室がその年度の schedules で最も多く取った校舎（最頻値）。短期大学部（区分2）の
+         行からは作らない（短大専用教室を検索対象に増やさないため）。
 
 ────────────────────────────────────────────────────────────────────────
 既知の未解決（翌年度に向けて）
 ────────────────────────────────────────────────────────────────────────
 * 例外表の 2 件は一般規則に還元できない。規則A〜Cのどれにも当たらずカッコを含んだまま
   採用したトークンは「要目視」として警告に出すので、翌年度は必ず目を通すこと。
-* 全角カッコを保護しないのは現行 DB の壊れたデータ（スタジオ（S701 / S702 / S705））に
-  合わせるため。本来は S701/S702/S705 の 3 教室。直すなら app.py と classrooms の整理も要る。
 * 教室 134/143/144 は原本の校舎列で F と S の両方に現れる（原本側の品質問題の可能性）。
 * 「まち製図室１～５」は現行 DB 内で 駿河台校舎4行 / タワースコラ7行 に割れている。
   上の継承規則はそれを再現するもので、classrooms（タワースコラ）とは 4 行食い違う。
@@ -80,7 +80,8 @@ data/source/ に置かれた `<区分番号>_<区分名>_<学科番号>_<学科�
   python scripts/build_schedule_db.py --report             # 作った上で現行 DB との差分を出す
   python scripts/build_schedule_db.py --report --no-write  # 差分だけ見る（DB を書かない）
   python scripts/build_schedule_db.py --replace            # 本番を置き換える（.bak を残す）
-  python scripts/build_schedule_db.py --src data/source/2027 --out /tmp/2027.db --report
+  python scripts/build_schedule_db.py --year 2026            # その年度だけで作る
+  python scripts/build_schedule_db.py --divisions 1,3,4      # 短大を外す
 既定では現行 schedule_final.db を絶対に上書きしない。--replace を付けたときだけ置き換える。
 異常（入力が無い・シートが違う・列見出しが違う）は日本語で述べて終了コード 1 で止まる。
 """
@@ -150,18 +151,22 @@ MIDDLE_DOTS = "・･"
 BUILDING_INHERIT_ROOMS = {"まち製図室１～５"}
 BUILDING_ORDER = ("タワースコラ", "駿河台校舎", "船橋校舎")
 
+# 年度は行に持たせる。複数年度を同じ DB に同居させ、アプリ側で選べるようにするため。
+# 教室マスタも年度ごとに持つ（年度で教室が増減するので、他の年度の教室を
+# 「空き」として出さないように）。
 SCHEMA = """
 CREATE TABLE schedules (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    学科 TEXT, 履修期名 TEXT, 曜日 TEXT,
+    年度 INTEGER, 学科 TEXT, 履修期名 TEXT, 曜日 TEXT,
     時限 INTEGER, 教室 TEXT, 校舎 TEXT, 科目名 TEXT
 );
 CREATE TABLE classrooms (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT UNIQUE, building TEXT
+    年度 INTEGER, name TEXT, building TEXT,
+    UNIQUE (年度, name)
 );
-CREATE INDEX idx_schedules ON schedules (曜日, 時限, 履修期名);
-CREATE INDEX idx_classrooms ON classrooms (building);
+CREATE INDEX idx_schedules ON schedules (年度, 曜日, 時限, 履修期名);
+CREATE INDEX idx_classrooms ON classrooms (年度, building);
 """
 
 
@@ -375,10 +380,11 @@ def read_workbook(path, meta, stats):
 YEAR_DIR = re.compile(r"^\d{4}$")
 
 
-def resolve_year_dir(src_dir, year=None):
-    """年度フォルダを解決する。data/source/2026/, 2027/ … の中から1つ選ぶ
+def resolve_year_dirs(src_dir, year=None):
+    """使う年度フォルダを返す（古い順）
 
-    year を指定すればそのフォルダ。指定が無ければ**いちばん新しい年度**を使う。
+    year を指定すればそのフォルダだけ。指定が無ければ**原本が入っている年度を全部**使う。
+    DB は複数年度を同居させ、アプリ側で選べるようにしているため、既定は「全部」。
     年度フォルダが1つも無ければ src_dir をそのまま使う（昔の平置きでも動くように）。
     """
     if not src_dir.is_dir():
@@ -391,17 +397,15 @@ def resolve_year_dir(src_dir, year=None):
             found = "、".join(p.name for p in years) or "（年度フォルダなし）"
             raise SourceError(f"{year} 年度の原本フォルダがありません: {src_dir}/{year}\n"
                               f"  いまあるのは: {found}")
-        return chosen[0]
-    # 中身のある最新年度を使う。翌年度用に空のフォルダを先に用意してあっても止まらない。
-    # ただし黙って古い年度に落ちると事故になるので、飛ばした分は必ず知らせる
+        return chosen
     filled = [p for p in years if any(p.glob(SRC_GLOB))]
     if not filled:
-        return src_dir if any(src_dir.glob(SRC_GLOB)) else (years[-1] if years else src_dir)
-    skipped = [p.name for p in years if p.name > filled[-1].name]
-    if skipped:
-        print(f"※ 原本が入っていない年度フォルダを飛ばしました: {'、'.join(skipped)}"
-              f" → {filled[-1].name} を使います", file=sys.stderr)
-    return filled[-1]
+        return [src_dir]              # 平置き、または空。この後 collect_sources が判定する
+    # 空の年度フォルダ（翌年度用に先に作ってあるもの）は黙って飛ばさず知らせる
+    empty = [p.name for p in years if p not in filled]
+    if empty:
+        print(f"※ 原本が入っていない年度フォルダを飛ばしました: {'、'.join(empty)}", file=sys.stderr)
+    return filled
 
 
 def collect_sources(src_dir, divisions=None):
@@ -547,7 +551,7 @@ def build_rows(metas, stats):
             rooms = normalize_rooms(rec["room_raw"], stats, rec["source"])
             buildings = resolve_buildings(rooms, rec["building_col"], stats, rec["source"])
             for room, building in zip(rooms, buildings):
-                row = (rec["dept"], rec["term"], rec["day"], rec["period"],
+                row = (rec["year"], rec["dept"], rec["term"], rec["day"], rec["period"],
                        room, building, rec["subject"])
                 rows.append(row)
                 if is_tandai:
@@ -559,30 +563,36 @@ def build_rows(metas, stats):
 
 
 def build_classrooms(rows, stats):
-    """schedules の行から教室マスタを作る。building は最頻値、並びは初出順"""
+    """schedules の行から教室マスタを作る。年度ごとに、building は最頻値、並びは初出順
+
+    年度で教室が増減しうるので、年度をまたいで混ぜない。混ぜると、翌年度に無くなった
+    教室を「空き」として出してしまう（行っても使えない = 一番困る外し方）。
+    """
     seen, counts = [], collections.defaultdict(collections.Counter)
-    for _, _, _, _, room, building, _ in rows:
+    for year, _, _, _, _, room, building, _ in rows:
         if room == ROOM_PLACEHOLDER:      # 教室未定の仮名。マスタには入れない
             continue
-        if room not in counts:
-            seen.append(room)
-        counts[room][building] += 1
+        key = (year, room)
+        if key not in counts:
+            seen.append(key)
+        counts[key][building] += 1
     out = []
-    for room in seen:
-        tally = counts[room]
+    for key in seen:
+        year, room = key
+        tally = counts[key]
         building = sorted(tally.items(),
                           key=lambda kv: (-kv[1], BUILDING_ORDER.index(kv[0])
                                           if kv[0] in BUILDING_ORDER else len(BUILDING_ORDER)))[0][0]
         if len(tally) > 1:
             detail = " / ".join(f"{b}{n}行" for b, n in tally.most_common())
-            stats.warn(f"教室「{room}」の校舎が schedules 内で割れています（{detail}）。"
+            stats.warn(f"{year}年度 教室「{room}」の校舎が schedules 内で割れています（{detail}）。"
                        f"マスタは最頻値の {building} にしました")
-        out.append((room, building))
+        out.append((year, room, building))
     return out
 
 
 def write_db(path, rows, classrooms):
-    """スキーマは現行 schedule_final.db と同一（列名・型・インデックス）"""
+    """年度つきのスキーマで書き出す（SCHEMA 参照）"""
     path = Path(path)
     if path.exists():
         path.unlink()
@@ -591,8 +601,9 @@ def write_db(path, rows, classrooms):
     try:
         con.executescript(SCHEMA)
         con.executemany(
-            "INSERT INTO schedules (学科, 履修期名, 曜日, 時限, 教室, 校舎, 科目名) VALUES (?,?,?,?,?,?,?)", rows)
-        con.executemany("INSERT INTO classrooms (name, building) VALUES (?,?)", classrooms)
+            "INSERT INTO schedules (年度, 学科, 履修期名, 曜日, 時限, 教室, 校舎, 科目名) "
+            "VALUES (?,?,?,?,?,?,?,?)", rows)
+        con.executemany("INSERT INTO classrooms (年度, name, building) VALUES (?,?,?)", classrooms)
         con.commit()
     finally:
         con.close()
@@ -612,12 +623,20 @@ def replace_db(new_path, target):
 # ------------------------------------------------------------------ レポート
 
 def read_ref(ref_path):
-    """現行 DB を読み取り専用で開いて中身を返す（絶対に書き換えない）"""
+    """現行 DB を読み取り専用で開いて中身を返す（絶対に書き換えない）
+
+    年度列を持たない古い DB とも比較できるよう、無ければ None で埋める。
+    """
     con = sqlite3.connect(f"file:{ref_path}?mode=ro", uri=True)
     try:
+        cols = {r[1] for r in con.execute("PRAGMA table_info(schedules)")}
+        has_year = "年度" in cols
+        year_col = "年度" if has_year else "NULL"
         rows = con.execute(
-            "SELECT 学科, 履修期名, 曜日, 時限, 教室, 校舎, 科目名 FROM schedules").fetchall()
-        rooms = con.execute("SELECT name, building FROM classrooms").fetchall()
+            f"SELECT {year_col}, 学科, 履修期名, 曜日, 時限, 教室, 校舎, 科目名 FROM schedules").fetchall()
+        rcols = {r[1] for r in con.execute("PRAGMA table_info(classrooms)")}
+        ryear = "年度" if "年度" in rcols else "NULL"
+        rooms = con.execute(f"SELECT {ryear}, name, building FROM classrooms").fetchall()
     finally:
         con.close()
     return rows, rooms
@@ -681,7 +700,7 @@ def report_diff(rows, classrooms, ref_path, ref_data=None):
     section(f"■ 現行 DB との差分（{ref_path}）")
     both = sum((new_c & ref_c).values())
     print(f"行数  新 {len(rows):,} / 現行 {len(ref_rows):,}  （差 {len(rows) - len(ref_rows):+,}）")
-    print(f"7列（学科,履修期名,曜日,時限,教室,校舎,科目名）の多重集合一致: "
+    print(f"8列（年度,学科,履修期名,曜日,時限,教室,校舎,科目名）の多重集合一致: "
           f"{both:,} / {len(ref_rows):,}  = {both / max(len(ref_rows), 1) * 100:.2f}%")
     print(f"  原本にだけある行: {sum((new_c - ref_c).values()):,}")
     print(f"  現行DBにだけある行: {sum((ref_c - new_c).values()):,}")
@@ -689,9 +708,9 @@ def report_diff(rows, classrooms, ref_path, ref_data=None):
     section("■ 学科別の一致率")
     new_by, ref_by = collections.defaultdict(collections.Counter), collections.defaultdict(collections.Counter)
     for r in rows:
-        new_by[r[0]][r] += 1
+        new_by[r[1]][r] += 1
     for r in ref_rows:
-        ref_by[r[0]][r] += 1
+        ref_by[r[1]][r] += 1
     print(f"{'学科':<24}{'新':>8}{'現行':>8}{'一致':>8}{'一致率':>9}")
     bad = 0
     for dept in sorted(set(new_by) | set(ref_by)):
@@ -706,9 +725,9 @@ def report_diff(rows, classrooms, ref_path, ref_data=None):
         print(f"{dept}{' ' * max(pad, 1)}{tot_n:>8,}{tot_d:>8,}{hit:>8,}{rate:>8.2f}%{mark}")
     print(f"不一致の学科: {bad} / {len(set(new_by) | set(ref_by))}")
 
-    section("■ 占有スロット（履修期名, 曜日, 時限, 教室）")
-    new_slots = {(r[1], r[2], r[3], r[4]) for r in rows}
-    ref_slots = {(r[1], r[2], r[3], r[4]) for r in ref_rows}
+    section("■ 占有スロット（年度, 履修期名, 曜日, 時限, 教室）")
+    new_slots = {(r[0], r[2], r[3], r[4], r[5]) for r in rows}
+    ref_slots = {(r[0], r[2], r[3], r[4], r[5]) for r in ref_rows}
     print(f"一致        : {len(new_slots & ref_slots):,}")
     print(f"原本にだけ  : {len(new_slots - ref_slots):,}")
     for s in sorted(new_slots - ref_slots)[:20]:
@@ -718,7 +737,8 @@ def report_diff(rows, classrooms, ref_path, ref_data=None):
         print(f"    {s}")
 
     section("■ 教室マスタ")
-    new_map, ref_map = dict(classrooms), dict(ref_rooms)
+    new_map = {(y, n): b for y, n, b in classrooms}
+    ref_map = {(y, n): b for y, n, b in ref_rooms}
     print(f"件数  新 {len(new_map):,} / 現行 {len(ref_map):,}")
     only_new = sorted(set(new_map) - set(ref_map))
     only_ref = sorted(set(ref_map) - set(new_map))
@@ -773,8 +793,11 @@ def main(argv=None):
 
     stats = Stats()
     try:
-        src_dir = resolve_year_dir(Path(args.src), args.year)
-        metas = collect_sources(src_dir, divisions)
+        src_dirs = resolve_year_dirs(Path(args.src), args.year)
+        metas = []
+        for d in src_dirs:
+            metas.extend(collect_sources(d, divisions))
+        src_dir = "、".join(str(d) for d in src_dirs)
         years = sorted({m["year"] for m, _ in metas})
         print(f"原本: {len(metas)} ファイル（{src_dir}）  年度: {'/'.join(str(y) for y in years)}")
         if len(years) > 1:

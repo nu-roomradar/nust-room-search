@@ -232,5 +232,96 @@ class TermFilterTests(unittest.TestCase):
             self.assertNotIn(self.room, rooms)
 
 
+class YearAndTermSelectionTests(unittest.TestCase):
+    """年度と学期をサイト上で選べること。以前は日付から決め打ちで、他を見る手段が無かった"""
+
+    def setUp(self):
+        self.c = rr.app.test_client()
+        rr._rate_store.clear()
+        conn = sqlite3.connect(rr.REPORT_DB if hasattr(rr, "REPORT_DB") else rr.REPORTS_DB)
+        conn.execute("DELETE FROM reports"); conn.commit(); conn.close()
+        self.years = rr.get_available_years()
+
+    def search(self, **over):
+        body = {"day": "月", "period": "2", "building": "all"}
+        body.update(over)
+        return self.c.post("/", data=body).get_data(as_text=True)
+
+    def rooms(self, html):
+        return set(re.findall(r"openModal\('([^']+)'", html))
+
+    def test_form_offers_year_and_term(self):
+        html = self.c.get("/").get_data(as_text=True)
+        self.assertIn('name="year"', html)
+        self.assertIn('name="term"', html)
+        for t in rr.VALID_TERMS:
+            self.assertIn(f'value="{t}"', html)
+        for y in self.years:
+            self.assertIn(f'value="{y}"', html)
+
+    def test_db_exposes_at_least_one_year(self):
+        self.assertTrue(self.years, "DB に年度が入っていない（年度列の移行漏れ）")
+
+    def test_term_changes_the_result(self):
+        a = self.rooms(self.search(term="前期"))
+        b = self.rooms(self.search(term="後期"))
+        self.assertNotEqual(a, b, "前期と後期で空き教室が同じなのはおかしい")
+
+    def test_selected_term_is_echoed_back(self):
+        for term in rr.VALID_TERMS:
+            html = self.search(term=term)
+            self.assertRegex(html, rf'<option value="{term}" selected')
+            self.assertIn(f"{term} 月曜 2限", html)
+
+    def test_invalid_values_fall_back_instead_of_failing(self):
+        for bad in ({"term": "ぬるぽ"}, {"year": "9999"}, {"year": "abc"}, {"term": ""}):
+            html = self.search(**bad)
+            self.assertIn("の空き教室", html)          # 落ちずに結果が出る
+            self.assertNotIn("エラーが発生", html)
+
+    def test_notice_only_when_viewing_another_term(self):
+        notice = "の時間割を表示しています"
+        current = rr.get_current_term_label()
+        other = [t for t in rr.VALID_TERMS if t != current][0]
+        self.assertNotIn(notice, self.search(term=current))
+        self.assertIn(notice, self.search(term=other))
+
+    def test_default_term_follows_the_date(self):
+        with _fixed_now(5, 1):
+            self.assertIn('<option value="前期" selected', self.c.get("/").get_data(as_text=True))
+        with _fixed_now(10, 1):
+            self.assertIn('<option value="後期" selected', self.c.get("/").get_data(as_text=True))
+
+    def test_current_year_follows_the_japanese_academic_year(self):
+        with _fixed_now(4, 1):
+            self.assertEqual(rr.get_current_year(), 2026)
+        with _fixed_now(3, 31):
+            self.assertEqual(rr.get_current_year(), 2025)   # 1〜3月は前年度
+
+    def test_resolve_year_prefers_current_then_newest(self):
+        self.assertEqual(rr.resolve_year(None, []), None)
+        self.assertEqual(rr.resolve_year("2026", [2026, 2025]), 2026)
+        self.assertEqual(rr.resolve_year("2025", [2026, 2025]), 2025)
+        self.assertEqual(rr.resolve_year("9999", [2026, 2025]), rr.get_current_year()
+                         if rr.get_current_year() in (2026, 2025) else 2026)
+        self.assertEqual(rr.resolve_year(None, [2019, 2018]), 2019)   # 現年度が無ければ最新
+
+    def test_only_the_selected_year_is_searched(self):
+        """他の年度の授業・教室が混ざらないこと（混ざると空き判定が狂う）"""
+        conn = sqlite3.connect(f"file:{rr.DB_NAME}?mode=ro", uri=True)
+        try:
+            year = self.years[0]
+            occupied = {r[0] for r in conn.execute(
+                "SELECT DISTINCT 教室 FROM schedules WHERE 年度=? AND 曜日='月' AND 時限=2 AND 履修期名='前期'",
+                (year,))}
+            master = {r[0] for r in conn.execute(
+                "SELECT name FROM classrooms WHERE 年度=?", (year,))}
+        finally:
+            conn.close()
+        shown = self.rooms(self.search(term="前期", year=str(year)))
+        self.assertEqual(shown, master - occupied,
+                         "画面の空き教室が「その年度の教室マスタ − その年度の占有」と一致しない")
+
+
 if __name__ == "__main__":
     unittest.main()

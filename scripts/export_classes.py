@@ -35,10 +35,13 @@ FIELDS = ["年度", "区分", "学科", "時間割CD", "履修期名", "曜日",
           "単位", "対象学年", "教員名", "校舎記号", "校舎", "教室名", "教室", "原本ファイル"]
 
 
-def collect(src_dir, divisions, stats):
+def collect(src_dirs, divisions, stats):
     """原本 → CSV の行。教室ごとに 1 行（schedule_final.db と同じ数え方）"""
     rows = []
-    for meta, path in bsd.collect_sources(src_dir, divisions):
+    metas = []
+    for d in src_dirs:
+        metas.extend(bsd.collect_sources(d, divisions))
+    for meta, path in metas:
         stats.files += 1
         for rec in bsd.read_workbook(path, meta, stats):
             stats.room_cells += 1
@@ -99,7 +102,7 @@ def main(argv=None):
 
     stats = bsd.Stats()
     try:
-        rows = collect(bsd.resolve_year_dir(Path(args.src), args.year), divisions, stats)
+        rows = collect(bsd.resolve_year_dirs(Path(args.src), args.year), divisions, stats)
     except bsd.SourceError as exc:
         print("原本の読み取りに失敗しました。CSV は作っていません。", file=sys.stderr)
         print(f"  {exc}", file=sys.stderr)

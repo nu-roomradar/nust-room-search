@@ -56,6 +56,7 @@ init_reports_db()
 VALID_DAYS      = {'月','火','水','木','金','土'}
 VALID_PERIODS   = {1,2,3,4,5,6}
 VALID_BUILDINGS = {'all','tower','main','funabashi'}
+VALID_TERMS     = ('前期','後期')
 _rate_store = collections.defaultdict(list)
 RATE_LIMIT, RATE_WINDOW = 30, 60
 
@@ -72,6 +73,41 @@ def get_active_terms():
 
 def get_current_term_label():
     return '前期' if '前期' in get_active_terms() else '後期'
+
+def get_current_year():
+    """いまの年度。日本の年度は 4/1 始まりなので 1〜3月は前年扱い"""
+    now = datetime.datetime.now(JST)
+    return now.year if now.month >= 4 else now.year - 1
+
+def get_available_years():
+    """DB に入っている年度（新しい順）。年度列が無い古い DB でも落ちないようにする"""
+    try:
+        conn = sqlite3.connect(f"file:{DB_NAME}?mode=ro", uri=True)
+        try:
+            cols = {r[1] for r in conn.execute("PRAGMA table_info(schedules)")}
+            if "年度" not in cols:
+                return []
+            return [r[0] for r in conn.execute(
+                "SELECT DISTINCT 年度 FROM schedules WHERE 年度 IS NOT NULL ORDER BY 年度 DESC")]
+        finally:
+            conn.close()
+    except Exception:
+        return []
+
+def resolve_year(requested, available):
+    """選ばれた年度を決める。未指定・不正なら「いまの年度」、無ければいちばん新しい年度"""
+    if not available:
+        return None
+    try:
+        if requested is not None and int(requested) in available:
+            return int(requested)
+    except (TypeError, ValueError):
+        pass
+    current = get_current_year()
+    return current if current in available else available[0]
+
+def resolve_term(requested):
+    return requested if requested in VALID_TERMS else get_current_term_label()
 
 def period_end_dt(day_str, period_num):
     """指定の曜日・時限の終了日時（今週分）を返す"""
@@ -306,6 +342,13 @@ HTML_TEMPLATE = """
             line-height: 1.6; margin-bottom: 14px;
         }
         .disclaimer-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+        /* いま以外の年度・学期を見ているときの注意。危険ではないので青系にする */
+        .disclaimer.past-view {
+            background: rgba(108,143,255,0.07);
+            border-color: rgba(108,143,255,0.28);
+            color: #8ea6ff;
+        }
+        .disclaimer.past-view strong { color: var(--text); }
 
         /* ── 結果ヘッダー ── */
         .result-meta {
@@ -613,6 +656,22 @@ HTML_TEMPLATE = """
                                 {% endfor %}
                             </select>
                         </div>
+                        <div>
+                            <label>年度</label>
+                            <select name="year" id="sel-year">
+                                {% for y in available_years %}
+                                <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>{{ y }}年度</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label>学期</label>
+                            <select name="term" id="sel-term">
+                                {% for t in available_terms %}
+                                <option value="{{ t }}" {% if selected_term == t %}selected{% endif %}>{{ t }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                         <div class="form-full">
                             <label>校舎</label>
                             <select name="building">
@@ -638,12 +697,18 @@ HTML_TEMPLATE = """
 
             <!-- 結果 -->
             {% if empty_rooms is not none and not error_message %}
+            {% if not is_current_view %}
+            <div class="disclaimer past-view">
+                <span class="disclaimer-icon">🗓</span>
+                <span><strong>{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }}</strong>の時間割を表示しています（現在は{{ current_year }}年度 {{ current_term }}）。いま空いている教室を探す場合は、年度と学期を戻してください。</span>
+            </div>
+            {% endif %}
             <div class="disclaimer">
                 <span class="disclaimer-icon">⚠</span>
                 <span>時間割に登録されていないゲリラ授業・急遽変更が行われている場合があります。実際に教室を使用する前に、ドア越しに確認することをおすすめします。</span>
             </div>
             <div class="result-meta" id="result-meta">
-                <span class="result-label">{{ selected_day }}曜 {{ selected_period }}限 の空き教室</span>
+                <span class="result-label">{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }} {{ selected_day }}曜 {{ selected_period }}限 の空き教室</span>
                 <span class="count-chip" id="count-chip"><em>{{ empty_rooms|length }}</em> 室</span>
             </div>
 
@@ -1211,11 +1276,18 @@ def index():
 
     period_times = {p: f"{s}–{e}" for p, (s, e) in PERIODS.items()}
 
+    # 年度・学期は選べる。未指定なら「いまの年度・いまの学期」を既定にする
+    available_years = get_available_years()
+    year = resolve_year(None, available_years)
+    term = get_current_term_label()
+
     if request.method == 'POST':
         searched = True
         day = request.form.get('day')
         period = int(request.form.get('period'))
         building = request.form.get('building')
+        year = resolve_year(request.form.get('year'), available_years)
+        term = resolve_term(request.form.get('term'))
 
     try:
         if not os.path.exists(DB_NAME):
@@ -1224,25 +1296,25 @@ def index():
         conn = sqlite3.connect(DB_NAME)
         cur = conn.cursor()
 
-        # 学期は日付で切り替える（4/1〜9/20 が前期、それ以外は後期）。
-        # 以前は定数で常に前期を見ていたため、後期は表示だけ「後期」で検索は前期の時間割になっていた
-        active_terms = get_active_terms()
-        placeholders = ','.join(['?'] * len(active_terms))
-        cur.execute(
-            f"SELECT 教室 FROM schedules WHERE 曜日=? AND 時限=? AND 履修期名 IN ({placeholders})",
-            [day, period] + active_terms
-        )
+        # 年度と学期は利用者が選ぶ。既定は「いまの年度・いまの学期」。
+        # 以前は日付から決め打ちしていて、他の学期・年度を見る手段が無かった。
+        where, params = ["曜日=?", "時限=?", "履修期名=?"], [day, period, term]
+        room_where, room_params = [], []
+        if year is not None:
+            where.append("年度=?"); params.append(year)
+            room_where.append("年度=?"); room_params.append(year)
+        cur.execute(f"SELECT 教室 FROM schedules WHERE {' AND '.join(where)}", params)
         occupied = {str(row[0]) for row in cur.fetchall()}
 
+        building_name = {"tower": "タワースコラ", "main": "駿河台校舎",
+                         "funabashi": "船橋校舎"}.get(building)
+        if building_name:
+            room_where.append("building = ?"); room_params.append(building_name)
         q_all = "SELECT name, building FROM classrooms"
-        if building == "tower":
-            q_all += " WHERE building = 'タワースコラ'"
-        elif building == "main":
-            q_all += " WHERE building = '駿河台校舎'"
-        elif building == "funabashi":
-            q_all += " WHERE building = '船橋校舎'"
+        if room_where:
+            q_all += " WHERE " + " AND ".join(room_where)
 
-        cur.execute(q_all)
+        cur.execute(q_all, room_params)
         all_rooms = cur.fetchall()
         conn.close()
 
@@ -1281,7 +1353,13 @@ def index():
         report_counts=report_counts,
         report_threshold=REPORT_THRESHOLD,
         reserve_counts=reserve_counts,
-        current_term=get_current_term_label()
+        current_term=get_current_term_label(),
+        selected_year=year, selected_term=term,
+        available_years=available_years,
+        available_terms=VALID_TERMS,
+        # いま（実時間）と違う年度・学期を見ているときに注意を出すための材料
+        is_current_view=(year in (None, get_current_year()) and term == get_current_term_label()),
+        current_year=get_current_year(),
     )
 
 if __name__ == '__main__':

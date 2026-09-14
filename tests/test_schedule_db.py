@@ -81,10 +81,31 @@ class ScheduleDbTests(unittest.TestCase):
 
     def test_classrooms_master_is_sane(self):
         self.assertEqual({r[0] for r in self.q("SELECT DISTINCT building FROM classrooms")}, BUILDINGS)
-        self.assertGreater(self.q("SELECT COUNT(*) FROM classrooms")[0][0], 150)
         self.assertEqual(self.q("SELECT COUNT(*) FROM classrooms WHERE name IS NULL OR TRIM(name) = ''")[0][0], 0)
-        dup = self.q("SELECT name FROM classrooms GROUP BY name HAVING COUNT(*) > 1")
+        # 教室名の一意性は年度ごと。年度をまたいで同じ教室があるのは当たり前
+        dup = self.q("SELECT 年度, name FROM classrooms GROUP BY 年度, name HAVING COUNT(*) > 1")
         self.assertEqual(dup, [])
+        for (year,) in self.q("SELECT DISTINCT 年度 FROM classrooms"):
+            n = self.q("SELECT COUNT(*) FROM classrooms WHERE 年度=?", year)[0][0]
+            self.assertGreater(n, 150, f"{year}年度の教室が少なすぎる")
+
+    def test_every_year_is_self_contained(self):
+        """年度ごとに、その年度の授業が使う教室がその年度のマスタに載っていること
+
+        年度をまたいで混ざると、無くなった教室を「空き」として出してしまう。
+        """
+        for (year,) in self.q("SELECT DISTINCT 年度 FROM schedules ORDER BY 年度"):
+            missing = {r[0] for r in self.q(
+                "SELECT DISTINCT 教室 FROM schedules WHERE 年度=? AND 学科 NOT LIKE '短大 %' "
+                "AND 教室 NOT IN (SELECT name FROM classrooms WHERE 年度=?)", year, year)}
+            self.assertEqual(missing - PLACEHOLDER_ROOMS, set(), f"{year}年度")
+
+    def test_schedules_have_a_year(self):
+        self.assertEqual(self.q("SELECT COUNT(*) FROM schedules WHERE 年度 IS NULL")[0][0], 0)
+        years = [r[0] for r in self.q("SELECT DISTINCT 年度 FROM schedules")]
+        self.assertTrue(years, "年度が1つも入っていない")
+        for y in years:
+            self.assertTrue(2000 < y < 2100, f"年度が不正: {y}")
 
     # 船橋と駿河台に同じ番号の部屋があり、DB は教室名だけで束ねている（2026-09-11 時点で判明）。
     # 駿河台側の授業が船橋の同名教室を「使用中」にするが、空きを埋まって見せる方向なので安全側。
