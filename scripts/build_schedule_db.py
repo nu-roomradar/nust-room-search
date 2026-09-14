@@ -801,7 +801,7 @@ def main(argv=None):
         years = sorted({m["year"] for m, _ in metas})
         print(f"原本: {len(metas)} ファイル（{src_dir}）  年度: {'/'.join(str(y) for y in years)}")
         if len(years) > 1:
-            print(f"  ※ 年度が混ざっています: {years}。意図した組み合わせか確認してください")
+            print(f"  {len(years)} 年度分を 1 つの DB に入れます（アプリ側で選べる）")
         rows, master_rows = build_rows(metas, stats)
         # 教室マスタは短大を除いた行から作る（短大専用教室を検索対象に増やさないため）
         classrooms = build_classrooms(master_rows, stats)

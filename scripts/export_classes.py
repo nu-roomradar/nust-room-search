@@ -120,17 +120,18 @@ def main(argv=None):
         return 0
 
     years = sorted({r["年度"] for r in rows})
-    out_path = Path(args.out) if args.out else REPO / "data" / f"classes_{years[0]}.csv"
-    if len(years) > 1:
-        print(f"※ 年度が混ざっています: {years}。意図した組み合わせか確認してください")
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    # Excel で開いたときに文字化けしないよう BOM 付き UTF-8
-    with out_path.open("w", encoding="utf-8-sig", newline="") as fp:
-        w = csv.DictWriter(fp, fieldnames=FIELDS)
-        w.writeheader()
-        w.writerows(rows)
-
-    print(f"書き出しました: {out_path}（{out_path.stat().st_size:,} bytes）")
+    # --out を明示したときは1ファイルにまとめる。既定は年度ごとに分ける
+    # （年度を混ぜた1枚は、どの年度の行か見分けづらく差分も取りにくいため）
+    groups = ({Path(args.out): rows} if args.out else
+              {REPO / "data" / f"classes_{y}.csv": [r for r in rows if r["年度"] == y] for y in years})
+    for out_path, group in groups.items():
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        # Excel で開いたときに文字化けしないよう BOM 付き UTF-8
+        with out_path.open("w", encoding="utf-8-sig", newline="") as fp:
+            w = csv.DictWriter(fp, fieldnames=FIELDS)
+            w.writeheader()
+            w.writerows(group)
+        print(f"書き出しました: {out_path}（{out_path.stat().st_size:,} bytes / {len(group):,} 行）")
     summarize(rows, sys.stdout)
     if stats.warnings:
         print(f"\n  ※ 読み取り時の警告 {len(stats.warnings)} 件"

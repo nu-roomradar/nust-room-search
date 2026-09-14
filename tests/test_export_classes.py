@@ -96,11 +96,31 @@ class ExportTests(unittest.TestCase):
         self.assertNotIn("短期大学部", {r["区分"] for r in rows2})
 
     def test_committed_csv_is_up_to_date(self):
-        """コミット済みの CSV が原本とずれていないこと（原本を入れ替えたら再生成する）"""
-        if not COMMITTED_CSV.exists():
-            self.skipTest("data/classes_2026.csv が無い")
-        self.assertEqual(read_csv(COMMITTED_CSV), self.rows,
-                         "data/classes_2026.csv が古い。python scripts/export_classes.py で再生成する")
+        """コミット済みの年度別 CSV が原本とずれていないこと（原本を入れ替えたら再生成する）
+
+        既定の出力は年度ごとに 1 ファイル（data/classes_<年度>.csv）。
+        """
+        years = sorted({r["年度"] for r in self.rows})
+        checked = 0
+        for year in years:
+            path = ROOT / "data" / f"classes_{year}.csv"
+            if not path.exists():
+                continue
+            expected = [r for r in self.rows if r["年度"] == year]
+            self.assertEqual(read_csv(path), expected,
+                             f"data/classes_{year}.csv が古い。"
+                             f"python scripts/export_classes.py で再生成する")
+            checked += 1
+        self.assertGreater(checked, 0, "コミット済みの CSV が 1 つも無い")
+
+    def test_default_output_is_split_per_year(self):
+        """年度を混ぜた 1 枚にしない（どの年度の行か見分けづらく、差分も取りにくい）"""
+        years = sorted({r["年度"] for r in self.rows})
+        for year in years:
+            path = ROOT / "data" / f"classes_{year}.csv"
+            if path.exists():
+                self.assertEqual({r["年度"] for r in read_csv(path)}, {year},
+                                 f"classes_{year}.csv に他の年度が混ざっている")
 
 
 if __name__ == "__main__":
