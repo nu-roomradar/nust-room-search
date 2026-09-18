@@ -1,7 +1,7 @@
 # RoomRadar 📡
 
 日本大学理工学部の**空き教室リアルタイム検索サービス**。
-曜日・時限・校舎を選ぶだけで、時間割データをもとに授業が入っていない教室を表示します。
+年度・学期・曜日・時限・校舎を選ぶだけで、時間割データをもとに授業が入っていない教室を表示します。
 
 > ⚠️ 本サービスは**テスト運用中の非公式サービス**です。日本大学「自主創造プロジェクト」の一環として学生が開発・運営しており、大学公式のものではありません。
 
@@ -19,23 +19,23 @@
 ├── app.py                  # 検索アプリ本体（Flask・Render でホスティング）
 ├── index.html              # ランディングページ（GitHub Pages）
 ├── dashboard.html          # 運営チーム用アナリティクス画面（GitHub Pages）
-├── schedule_final.db       # 時間割データベース（検索の元データ）
+├── schedule_final.db       # 時間割データベース（複数年度・検索の元データ）
 ├── rr_logo.png             # ロゴ（LP から参照）
 ├── requirements.txt
 │
 ├── data/
 │   ├── source/             # 時間割の原本 ※ source/README.md 参照
-│   │   ├── 2026/           # いま使っている年度（49ファイル）
-│   │   ├── 2027/           # 翌年度の置き場（公開されたらここへ）
-│   │   └── archive/        # 使わない古いエクスポート・集計
+│   │   ├── 2025/           # 過去年度（サイト上で切り替えて見られる）
+│   │   ├── 2026/           # いま使っている年度
+│   │   └── 2027/           # 翌年度の置き場（公開されたらここへ）
 │   ├── classes_2025.csv    # 授業の生データ一覧（年度ごと。教員名・単位・対象学年も含む）
 │   ├── classes_2026.csv
 │   ├── instagram_*.json    # Instagram インサイト集計（2026-08 で収集終了・ダッシュボード表示用に凍結）
 │   └── ga4_*.json          # GA4 サイト分析集計（同上）
 │
 ├── assets/
-│   ├── instagram/          # Instagram 投稿・ストーリーズ用画像
-│   │   └── auto/           # 自動生成されたプロモストーリー画像
+│   ├── instagram/          # Instagram 投稿用画像（弔事ストーリーの雛形）
+│   │   └── auto/           # 投稿ワークフローが生成する告知ストーリー
 │   ├── posters/            # 学内掲示用ポスター（PNG / PDF / PPTX）
 │   │   └── handoff/        # 外部デザインツール用素材（ロゴ・QR）
 │   └── instagram-qr.png    # LP に表示する Instagram QR
@@ -44,6 +44,7 @@
 │   ├── post_to_instagram.py        # フィード / ストーリーズ投稿（必須タグ自動付与）
 │   ├── make_poster.py              # 学内掲示ポスター生成（PNG/PDF/PPTX・variant切替）
 │   ├── make_story_promo.py         # 新規投稿の告知ストーリー画像生成
+│   ├── make_condolence_story.py    # 弔事ストーリー（文面を差し替えて使う雛形）
 │   ├── build_schedule_db.py        # 原本の時間割表(.xls) → schedule_final.db を再構築
 │   ├── export_classes.py           # 原本 → 授業の生データ一覧 CSV
 │   ├── refresh_ig_token.py         # Instagramトークンを60日延長して Secret を更新
@@ -67,7 +68,7 @@
 - Instagram 投稿キャプションには規定の共通ハッシュタグ `#日大生プロジェクト` がスクリプトで自動付与されます。
 - ポスターは `python scripts/make_poster.py --print-files` で再生成できます（A4縦・約392dpi、PDF/PPTX同時出力）。
 - Claude Code on the web では `.claude/hooks/session-start.sh` がセッション開始時に依存パッケージを自動インストールします。
-- テストは `python -m unittest discover -s tests -v`（`pip install -r requirements.txt requests` が必要）。push / PR ごとに CI が同じものを回します。
+- テストは `python -m unittest discover -s tests -v`（`pip install -r requirements.txt -r requirements-dev.txt` が必要）。push / PR ごとに CI が同じものを回します。
 - 運用ヘルスチェックは毎週月曜 09:00 JST に動き、本番 URL の応答と必須表記・Actions の失敗・Instagram トークンの有効性を検査します。異常があると「【運用ヘルスチェック】異常を検知しました」という Issue が開き、復旧すると自動で閉じます。
 - Instagram 投稿・ポスター生成・画面検証の手順書は `.claude/skills/` にあります（Claude Code から `/instagram-post` `/make-poster` `/verify-ui`）。
 - 引き継ぎ・定期作業・障害対応は `docs/OPERATIONS.md`（運営ハンドブック）にまとめています。

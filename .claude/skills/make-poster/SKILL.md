@@ -20,7 +20,7 @@ Claude Code on the web のセッション内（Bash）で完結する。ポス�
 | Instagram QR（ブランドQR・静的画像を埋め込み） | `assets/posters/handoff/qr-instagram-branded.png` |
 | LP QR | 静的画像は無い。`make_poster.py` の `LP_URL`（`https://nu-roomradar.github.io/nust-room-search/`）から実行時に動的生成 |
 
-成果物は必ず `assets/posters/` に置く。`handoff/` の `qr-lp.png` / `qr-instagram.png` は `make_poster.py` から参照されない旧素材。
+成果物は必ず `assets/posters/` に置く。
 
 ## 手順
 

@@ -1,5 +1,4 @@
 import os
-import re
 import sqlite3
 import datetime
 import random
@@ -67,12 +66,13 @@ def is_rate_limited(ip):
     _rate_store[ip].append(now)
     return False
 
-def get_active_terms():
-    now = datetime.datetime.now(JST)
-    return ['前期','通年'] if (4,1) <= (now.month,now.day) <= (9,20) else ['後期','通年']
-
 def get_current_term_label():
-    return '前期' if '前期' in get_active_terms() else '後期'
+    """いまの学期。4/1〜9/20 が前期、それ以外は後期
+
+    DB の履修期名は前期/後期の2種に正規化済み（通年の授業は両方に展開されている）。
+    """
+    now = datetime.datetime.now(JST)
+    return '前期' if (4, 1) <= (now.month, now.day) <= (9, 20) else '後期'
 
 def get_current_year():
     """いまの年度。日本の年度は 4/1 始まりなので 1〜3月は前年扱い"""
@@ -1324,7 +1324,7 @@ def index():
         )
 
     except Exception as e:
-        import logging; logging.error(f"RoomRadar error: {e}")
+        logging.error(f"RoomRadar error: {e}")
         error_message = "検索中にエラーが発生しました。時間をおいて再試行してください。"
         empty_rooms = []
 

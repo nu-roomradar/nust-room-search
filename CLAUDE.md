@@ -9,7 +9,6 @@
 - `index.html` / `dashboard.html` — LPと運営用アナリティクス。**GitHub Pages**（https://nu-roomradar.github.io/nust-room-search/ ）で配信。
 - `schedule_final.db` — 時間割DB。**複数年度を同居させ、`年度` 列を持つ**（`schedules.年度` / `classrooms.年度`）。教室は年度で増減するので、教室マスタも年度ごと。アプリは年度と学期を利用者に選ばせ、既定は「いまの年度・いまの学期」。原本は `data/source/<年度>/` の `<区分>_<学部>_<学科>_..._時間割表N面_*.xls`（教務ページ配布の時間割表。区分 1=理工学部 2=短期大学部 3=博士前期 4=博士後期）。原本が入っている年度フォルダを**全部**読む（`--year` で1年度に絞れる）。`python scripts/build_schedule_db.py --report` で原本から作り直せる。既定では本番DBを上書きせず `schedule_final.new.db` に出す。`--divisions 1,3,4`（短大を外す）で現行DBを全7列完全再現することを確認済み。差し替え時は `tests/test_schedule_db.py` と `tests/test_build_schedule_db.py` が検査する。手順は `docs/OPERATIONS.md`。
 - **短期大学部は船橋校舎を理工学部と共用している。** 短大の授業が入った教室を「空き」と出さないよう schedules には取り込むが、**教室マスタ（検索結果に出る教室）は理工学部・大学院からだけ作る**（短大専用教室は行っても使えるとは限らないため安全側に倒す）。この方針を変えると空き判定の意味が変わるので、変更前にユーザーに確認する。
-- `data/source/archive/` は令和7年度の**古い別形式のエクスポートと集計**。原本ではないので変換には使わない。`data/source/README.md` 参照。
 - `data/classes_<年度>.csv` — 授業の生データ一覧（`python scripts/export_classes.py` で年度ごとに生成）。DB が捨てている **時間割CD・単位・対象学年・教員名** も入っている。アプリは読まない（検索が使うのは `schedule_final.db` だけ）。
 - `reservations.db` / `reports.db` — 実行時に自動生成される揮発データ。**コミットしない**（.gitignore済み）。
 - `data/*.json` — Instagram/GA4 の集計。**2026-08 で収集を終了**し、ダッシュボード表示用に凍結（更新しない。収集用のワークフロー・スクリプトは撤去済み）。

@@ -87,7 +87,6 @@ data/source/ に置かれた `<区分番号>_<区分名>_<学科番号>_<学科�
 """
 import argparse
 import collections
-import os
 import re
 import shutil
 import sqlite3

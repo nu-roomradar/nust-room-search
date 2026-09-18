@@ -40,7 +40,7 @@ def tearDownModule():
 
 
 def _fixed_now(month, day):
-    """get_active_terms などが見る「今」を固定する"""
+    """get_current_term_label などが見る「今」を固定する"""
     fixed = datetime.datetime(2026, month, day, 12, 0, tzinfo=datetime.timezone(datetime.timedelta(hours=9)))
 
     class FakeDT(datetime.datetime):
@@ -59,15 +59,12 @@ class PureLogicTests(unittest.TestCase):
             self.assertEqual(dt.utcoffset(), datetime.timedelta(hours=9))
             self.assertGreaterEqual(dt.date(), datetime.datetime.now(rr.JST).date())
 
-    def test_active_terms_switch_on_sep_20(self):
-        with _fixed_now(4, 1):
-            self.assertEqual(rr.get_active_terms(), ['前期', '通年'])
-        with _fixed_now(9, 20):
-            self.assertEqual(rr.get_current_term_label(), '前期')
-        with _fixed_now(9, 21):
-            self.assertEqual(rr.get_active_terms(), ['後期', '通年'])
-        with _fixed_now(3, 31):
-            self.assertEqual(rr.get_current_term_label(), '後期')
+    def test_current_term_switches_on_sep_20(self):
+        """4/1〜9/20 が前期、それ以外は後期。境界の両側を押さえる"""
+        for month, day, expected in [(4, 1, '前期'), (9, 20, '前期'),
+                                     (9, 21, '後期'), (3, 31, '後期')]:
+            with _fixed_now(month, day):
+                self.assertEqual(rr.get_current_term_label(), expected, f"{month}/{day}")
 
     def test_rate_limit_blocks_after_limit_and_recovers_after_window(self):
         rr._rate_store.clear()
