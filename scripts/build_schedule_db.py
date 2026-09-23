@@ -190,6 +190,7 @@ class Stats:
         self.rule_b = collections.Counter()         # X(Y) → Y を展開
         self.paren_kept = collections.Counter()     # 規則C だがカッコ付き = 要目視
         self.building_inherited = collections.Counter()
+        self.duplicates = 0                         # 同じ行が重なって1行にまとめた数
         self.tandai_rows = 0       # 短期大学部由来の行（教室マスタには入れない）
         self.warnings = []
 
@@ -542,6 +543,9 @@ def build_rows(metas, stats):
     短大が使っている教室は占有として残しつつ、検索対象の教室一覧は増やさない。
     """
     rows, master_rows = [], []
+    # 原本には教員ごと・対象学年ごとに同じ授業が複数行ある。DB は教員名などを持たないので
+    # 完全に同じ行になる。空き判定には影響しないが、件数を水増しするので1行にまとめる。
+    seen = set()
     for meta, path in metas:
         stats.files += 1
         is_tandai = meta["division_no"] == TANDAI_DIVISION
@@ -552,6 +556,10 @@ def build_rows(metas, stats):
             for room, building in zip(rooms, buildings):
                 row = (rec["year"], rec["dept"], rec["term"], rec["day"], rec["period"],
                        room, building, rec["subject"])
+                if row in seen:
+                    stats.duplicates += 1
+                    continue
+                seen.add(row)
                 rows.append(row)
                 if is_tandai:
                     stats.tandai_rows += 1
@@ -654,6 +662,8 @@ def report_build(stats):
     print(f"教室名セル（非空）      : {stats.room_cells:,}")
     print(f"分割後トークン          : {stats.tokens:,}")
     print(f"schedules 行            : {stats.rows:,}")
+    if stats.duplicates:
+        print(f"  重複をまとめた行      : {stats.duplicates:,}")
     if stats.tandai_rows:
         print(f"  うち短期大学部        : {stats.tandai_rows:,}"
               f"（占有判定には入れるが、教室マスタ＝検索対象には加えない）")
