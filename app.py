@@ -375,23 +375,31 @@ def api_report_cancel():
     return jsonify({'ok': deleted > 0})
 
 
+def upcoming_period(now):
+    """いまの授業時限。休み時間なら次の時限。1限の前も1限を返す。最終時限の後は None。"""
+    c_time = now.strftime("%H:%M")
+    for p, (s, e) in PERIODS.items():
+        if c_time <= e:
+            return p
+    return None
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     now = datetime.datetime.now(JST)
     day = ["月", "火", "水", "木", "金", "土", "日"][now.weekday()]
     if day == "日": day = "月"
 
-    c_time = now.strftime("%H:%M")
-    period = 1
-    for p, (s, e) in PERIODS.items():
-        if s <= c_time <= e:
-            period = p
-            break
+    # 開いた瞬間に「いま／このあと空いている教室」を出す。授業時間帯と休み時間なら自動で検索する
+    auto_period = upcoming_period(now)
+    period = auto_period or 1
 
     building = "all"
     empty_rooms = None
     error_message = None
     searched = False
+    auto = request.method == 'GET' and auto_period is not None and now.weekday() != 6
+    if auto:
+        searched = True
 
     period_times = {p: f"{s}–{e}" for p, (s, e) in PERIODS.items()}
 
@@ -474,7 +482,7 @@ def index():
     # static/app.js が読む設定。テンプレート内の JS に Jinja を埋め込まないための受け渡し口
     rr_config = {
         'day': day, 'period': period,
-        'searched': searched, 'error': bool(error_message),
+        'searched': searched, 'auto': auto, 'error': bool(error_message),
         'count': len(empty_rooms),
         'periods': {p: [s, e] for p, (s, e) in PERIODS.items()},
     }
@@ -482,6 +490,7 @@ def index():
     return render_template(
         'index.html',
         rr_config=rr_config,
+        auto=auto,
         asset_version=ASSET_VERSION,
         empty_rooms=empty_rooms,
         selected_day=day, selected_period=period,

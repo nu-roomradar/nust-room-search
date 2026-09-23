@@ -507,5 +507,38 @@ class YearAndTermSelectionTests(unittest.TestCase):
                          "画面の空き教室が「その年度の教室マスタ − その年度の占有」と一致しない")
 
 
+class UpcomingPeriodTests(unittest.TestCase):
+    """開いた瞬間に「いま／このあと」の時限で結果を出す"""
+    JST_ = datetime.timezone(datetime.timedelta(hours=9))
+
+    def at(self, h, m, day=16):  # 2026-09-16 は水曜
+        return datetime.datetime(2026, 9, day, h, m, tzinfo=self.JST_)
+
+    def test_in_class_and_break_and_after_hours(self):
+        self.assertEqual(rr.upcoming_period(self.at(7, 0)), 1)
+        self.assertEqual(rr.upcoming_period(self.at(9, 30)), 1)
+        self.assertEqual(rr.upcoming_period(self.at(12, 50)), 3)   # 昼休みは3限
+        self.assertEqual(rr.upcoming_period(self.at(20, 30)), rr.MAX_PERIOD)
+        self.assertIsNone(rr.upcoming_period(self.at(21, 0)))
+
+    def _get(self, when):
+        class FakeDT(datetime.datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return when
+        with mock.patch.object(rr.datetime, "datetime", FakeDT):
+            return rr.app.test_client().get("/").get_data(as_text=True)
+
+    def test_get_during_lunch_shows_period3_results(self):
+        html = self._get(self.at(12, 50))
+        self.assertIn("いまから使える", html)
+        self.assertIn("水曜 3限", html)
+        self.assertIn('"auto": true', html)
+
+    def test_get_after_hours_and_sunday_do_not_autosearch(self):
+        self.assertNotIn("いまから使える", self._get(self.at(22, 0)))
+        self.assertNotIn("いまから使える", self._get(self.at(12, 0, day=20)))  # 日曜
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -64,7 +64,7 @@ if (!RR.searched) (function() {
 })();
 
 // ── 検索後：結果へスクロール＋強調＋トースト（更新に気づけるように） ──
-if (RR.searched && !RR.error) window.addEventListener('load', function() {
+if (RR.searched && !RR.auto && !RR.error) window.addEventListener('load', function() {
     const meta = document.getElementById('result-meta');
     if (meta) {
         meta.scrollIntoView({ behavior: 'smooth', block: 'center' });
