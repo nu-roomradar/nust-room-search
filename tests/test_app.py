@@ -39,6 +39,11 @@ def tearDownModule():
     shutil.rmtree(_tmp, ignore_errors=True)
 
 
+def as_ip(ip):
+    """Render のロードバランサが付け足す形で接続元 IP を名乗るヘッダ"""
+    return {"X-Forwarded-For": ip}
+
+
 def _fixed_now(month, day):
     """get_current_term_label などが見る「今」を固定する"""
     fixed = datetime.datetime(2026, month, day, 12, 0, tzinfo=datetime.timezone(datetime.timedelta(hours=9)))
@@ -146,8 +151,9 @@ class ApiTests(unittest.TestCase):
 
     def test_report_counts_and_cancel(self):
         body = {"room": "1041", "day": "月", "period": 2}
-        first = self.c.post("/api/report", json=body).get_json()
-        second = self.c.post("/api/report", json=body).get_json()
+        # 報告は「人数」で数えるので、別々の人（接続元IP）から出す
+        first = self.c.post("/api/report", json=body, headers=as_ip("10.0.0.1")).get_json()
+        second = self.c.post("/api/report", json=body, headers=as_ip("10.0.0.2")).get_json()
         self.assertEqual((first["count"], second["count"]), (1, 2))
         self.assertEqual(rr.get_report_counts("月", 2), {"1041": 2})
         self.assertEqual(rr.get_report_counts("火", 2), {})
@@ -189,8 +195,9 @@ class PageTests(unittest.TestCase):
     def test_reported_room_is_greyed_out_after_threshold(self):
         html = self.c.post("/", data={"day": "月", "period": "2", "building": "all"}).get_data(as_text=True)
         room = re.findall(r"openModal\('([^']+)'", html)[0]
-        for _ in range(rr.REPORT_THRESHOLD):
-            self.c.post("/api/report", json={"room": room, "day": "月", "period": 2})
+        for i in range(rr.REPORT_THRESHOLD):
+            self.c.post("/api/report", json={"room": room, "day": "月", "period": 2},
+                        headers=as_ip(f"10.0.1.{i + 1}"))
         html = self.c.post("/", data={"day": "月", "period": "2", "building": "all"}).get_data(as_text=True)
         self.assertIn("使用中の可能性", html)
         self.assertRegex(html, r'class="room-card \w+ reported')
@@ -227,6 +234,105 @@ class TermFilterTests(unittest.TestCase):
         with _fixed_now(10, 1):
             rooms, html = self.rooms()
             self.assertNotIn(self.room, rooms)
+
+
+class AbuseResistanceTests(unittest.TestCase):
+    """レート制限と「使用中」報告を、1人で操作できないこと"""
+
+    def setUp(self):
+        self.c = rr.app.test_client()
+        rr._rate_store.clear()
+        for db, table in ((rr.RESERVE_DB, "reservations"), (rr.REPORTS_DB, "reports")):
+            conn = sqlite3.connect(db); conn.execute(f"DELETE FROM {table}"); conn.commit(); conn.close()
+
+    def ip_for(self, xff, remote="127.0.0.1"):
+        with rr.app.test_request_context("/", headers={"X-Forwarded-For": xff} if xff else {},
+                                         environ_base={"REMOTE_ADDR": remote}):
+            return rr.client_ip()
+
+    def test_client_ip_uses_the_hop_added_by_the_proxy(self):
+        # 末尾はロードバランサが付け足した値。先頭は利用者が自由に書ける
+        self.assertEqual(self.ip_for("6.6.6.6, 203.0.113.9"), "203.0.113.9")
+        self.assertEqual(self.ip_for("203.0.113.9"), "203.0.113.9")
+        self.assertEqual(self.ip_for(None, remote="198.51.100.4"), "198.51.100.4")
+
+    def test_client_ip_respects_configured_hops(self):
+        with mock.patch.object(rr, "TRUSTED_PROXY_HOPS", 2):
+            self.assertEqual(self.ip_for("6.6.6.6, 203.0.113.9, 10.0.0.1"), "203.0.113.9")
+            # 想定より段数が少ない（プロキシを通っていない）ときは接続元そのもの
+            self.assertEqual(self.ip_for("203.0.113.9", remote="198.51.100.4"), "198.51.100.4")
+
+    def test_spoofed_header_does_not_bypass_rate_limit(self):
+        """先頭を毎回変えても、末尾（本当の接続元）が同じなら制限される"""
+        body = {"room": "1041", "building": "船橋校舎", "day": "月", "period": 2, "name": "x"}
+        codes = []
+        with mock.patch.object(rr, "RATE_LIMIT", 3):
+            for i in range(5):
+                r = self.c.post("/api/reserve", json=body,
+                                headers={"X-Forwarded-For": f"6.6.6.{i}, 203.0.113.9"})
+                codes.append(r.status_code)
+        self.assertEqual(codes, [200, 200, 200, 429, 429])
+
+    def test_one_person_cannot_report_twice(self):
+        body = {"room": "1041", "day": "月", "period": 2}
+        first = self.c.post("/api/report", json=body, headers=as_ip("203.0.113.9"))
+        again = self.c.post("/api/report", json=body, headers=as_ip("203.0.113.9"))
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(again.status_code, 409)
+        self.assertEqual(again.get_json()["error"], "already_reported")
+        self.assertEqual(rr.get_report_counts("月", 2), {"1041": 1})
+
+    def test_one_person_alone_cannot_grey_out_a_room(self):
+        """しきい値は人数。1人がどれだけ押しても「使用中の可能性」にならない"""
+        for _ in range(rr.REPORT_THRESHOLD + 2):
+            self.c.post("/api/report", json={"room": "1041", "day": "月", "period": 2},
+                        headers=as_ip("203.0.113.9"))
+        self.assertLess(rr.get_report_counts("月", 2).get("1041", 0), rr.REPORT_THRESHOLD)
+
+    def test_same_person_can_report_different_rooms(self):
+        for room in ("1041", "1042"):
+            r = self.c.post("/api/report", json={"room": room, "day": "月", "period": 2},
+                            headers=as_ip("203.0.113.9"))
+            self.assertEqual(r.status_code, 200, room)
+
+    def test_raw_ip_is_not_stored(self):
+        self.c.post("/api/report", json={"room": "1041", "day": "月", "period": 2},
+                    headers=as_ip("203.0.113.9"))
+        conn = sqlite3.connect(rr.REPORTS_DB)
+        try:
+            dump = "\n".join(conn.iterdump())
+        finally:
+            conn.close()
+        self.assertNotIn("203.0.113.9", dump)
+
+    def test_old_reports_db_is_migrated(self):
+        """reporter 列が無い頃の reports.db でも起動時に列が足され、古い行も数えられる"""
+        path = os.path.join(tempfile.mkdtemp(prefix="rr-old-"), "reports.db")
+        conn = sqlite3.connect(path)
+        conn.execute("CREATE TABLE reports (id INTEGER PRIMARY KEY AUTOINCREMENT, room TEXT NOT NULL, "
+                     "day TEXT NOT NULL, period INTEGER NOT NULL, cancel_code TEXT NOT NULL, expires_at TEXT NOT NULL)")
+        far = (datetime.datetime.now(rr.JST) + datetime.timedelta(days=3)).isoformat()
+        conn.executemany("INSERT INTO reports (room, day, period, cancel_code, expires_at) VALUES (?,?,?,?,?)",
+                         [("1041", "月", 2, "AAAAAA", far), ("1041", "月", 2, "BBBBBB", far)])
+        conn.commit(); conn.close()
+        with mock.patch.object(rr, "REPORTS_DB", path):
+            rr.init_reports_db()
+            cols = {r[1] for r in sqlite3.connect(path).execute("PRAGMA table_info(reports)")}
+            self.assertIn("reporter", cols)
+            self.assertEqual(rr.get_report_counts("月", 2), {"1041": 2})   # 古い行は1行1人
+
+    def test_cancel_endpoints_are_rate_limited(self):
+        """キャンセルコードの総当たりを防ぐ"""
+        for path in ("/api/report/cancel", "/api/reserve/cancel"):
+            rr._rate_store.clear()
+            codes = []
+            with mock.patch.object(rr, "RATE_LIMIT", 2):
+                for i in range(4):
+                    r = self.c.post(path, json={"room": "1041", "day": "月", "period": 2,
+                                                "cancel_code": f"ZZZZ{i:02d}"},
+                                    headers=as_ip("203.0.113.9"))
+                    codes.append(r.status_code)
+            self.assertEqual(codes[-1], 429, path)
 
 
 class YearAndTermSelectionTests(unittest.TestCase):

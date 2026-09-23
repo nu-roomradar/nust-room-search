@@ -1,7 +1,9 @@
 import os
 import sqlite3
 import datetime
+import hashlib
 import random
+import secrets
 import string
 import collections
 import time
@@ -27,10 +29,17 @@ def init_reports_db():
             day         TEXT NOT NULL,
             period      INTEGER NOT NULL,
             cancel_code TEXT NOT NULL,
-            expires_at  TEXT NOT NULL
+            expires_at  TEXT NOT NULL,
+            reporter    TEXT
         )
     """)
+    # 既存の DB（reporter 列が無い頃のもの）にも列を足す
+    if "reporter" not in {r[1] for r in conn.execute("PRAGMA table_info(reports)")}:
+        conn.execute("ALTER TABLE reports ADD COLUMN reporter TEXT")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_rep ON reports (room, day, period)")
+    # 1人が同じコマの同じ教室を2回報告できないようにする（しきい値は「人数」で数える）
+    conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_rep_once ON reports (room, day, period, reporter)")
+    conn.execute("CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT NOT NULL)")
     conn.commit(); conn.close()
 
 def cleanup_reports():
@@ -40,14 +49,36 @@ def cleanup_reports():
     conn.commit(); conn.close()
 
 def get_report_counts(day, period):
-    """指定曜日・時限の教室ごとの報告数を返す {room: count}"""
+    """指定曜日・時限の教室ごとの報告**人数**を返す {room: count}
+
+    以前は行数を数えていたため、1人が2回押すだけでしきい値（2件）に達して
+    「使用中の可能性」にできた。reporter ごとに1人と数える。
+    reporter が無い古い行は1行1人として数える。
+    """
     conn = sqlite3.connect(REPORTS_DB)
     rows = conn.execute(
-        "SELECT room, COUNT(*) FROM reports WHERE day=? AND period=? GROUP BY room",
+        "SELECT room, COUNT(DISTINCT COALESCE(reporter, 'legacy:' || id)) "
+        "FROM reports WHERE day=? AND period=? GROUP BY room",
         (day, period)
     ).fetchall()
     conn.close()
     return {r[0]: r[1] for r in rows}
+
+def reporter_id(ip):
+    """報告者の識別子。IP をそのまま保存しないよう、DB ごとの秘密の塩でハッシュ化する
+
+    塩は reports.db 自体に置く（gunicorn のワーカーが複数でも同じ値になるように）。
+    報告は時限終了で消えるので、識別子もそれ以上は残らない。
+    """
+    conn = sqlite3.connect(REPORTS_DB)
+    try:
+        conn.execute("INSERT OR IGNORE INTO meta (k, v) VALUES ('reporter_salt', ?)",
+                     (secrets.token_hex(16),))
+        conn.commit()
+        salt = conn.execute("SELECT v FROM meta WHERE k='reporter_salt'").fetchone()[0]
+    finally:
+        conn.close()
+    return hashlib.sha256(f"{salt}:{ip}".encode()).hexdigest()[:16]
 
 init_reports_db()
 
@@ -58,6 +89,22 @@ VALID_BUILDINGS = {'all','tower','main','funabashi'}
 VALID_TERMS     = ('前期','後期')
 _rate_store = collections.defaultdict(list)
 RATE_LIMIT, RATE_WINDOW = 30, 60
+
+# 手前にいる信頼できるプロキシの段数。Render は1段（ロードバランサ）が
+# X-Forwarded-For の末尾に接続元 IP を付け足す。段数が違う環境では環境変数で変える。
+TRUSTED_PROXY_HOPS = int(os.environ.get("TRUSTED_PROXY_HOPS", "1"))
+
+def client_ip():
+    """レート制限・報告者識別に使う接続元 IP
+
+    X-Forwarded-For は「利用者が自分で書いた値, …, プロキシが付け足した値」の順に並ぶ。
+    以前は**先頭**を使っていたため、利用者がヘッダを自分で付ければ好きな IP を名乗れ、
+    レート制限をすり抜けられた。信頼できるプロキシが付け足した**末尾側**を使う。
+    """
+    hops = [h.strip() for h in request.headers.get("X-Forwarded-For", "").split(",") if h.strip()]
+    if TRUSTED_PROXY_HOPS > 0 and len(hops) >= TRUSTED_PROXY_HOPS:
+        return hops[-TRUSTED_PROXY_HOPS]
+    return request.remote_addr or ""
 
 def is_rate_limited(ip):
     now = time.time()
@@ -1083,6 +1130,12 @@ async function submitReport() {
         body: JSON.stringify({room: currentRoom, day: '{{ selected_day }}', period: {{ selected_period }}})
     });
     const data = await res.json();
+    if (!data.ok) {
+        showToast(data.error === 'already_reported' ? 'この教室はすでに報告済みです'
+                : data.error === 'rate_limited' ? '操作が続いたため少し待ってからお試しください'
+                : '報告できませんでした');
+        return;
+    }
     if (data.ok) {
         localStorage.setItem(`report_${currentRoom}_{{ selected_day }}_{{ selected_period }}`, data.cancel_code);
         if (typeof gtag === 'function') {
@@ -1149,7 +1202,7 @@ def api_reserve():
     if not room or not name or day not in VALID_DAYS or period not in VALID_PERIODS:
         return jsonify({'ok': False, 'error': 'invalid'}), 400
 
-    ip = request.headers.get('X-Forwarded-For', request.remote_addr or '').split(',')[0].strip()
+    ip = client_ip()
     if is_rate_limited(ip):
         return jsonify({'ok': False, 'error': 'rate_limited'}), 429
 
@@ -1181,6 +1234,9 @@ def api_reserve_cancel():
     cancel_code = str(data.get('cancel_code', '')).strip()[:10]
     if not room or not cancel_code:
         return jsonify({'ok': False}), 400
+    # キャンセルコードの総当たりを防ぐため、取り消しにもレート制限をかける
+    if is_rate_limited(client_ip()):
+        return jsonify({'ok': False, 'error': 'rate_limited'}), 429
 
     conn = sqlite3.connect(RESERVE_DB)
     cur  = conn.cursor()
@@ -1212,25 +1268,28 @@ def api_report():
     if not room or day not in VALID_DAYS or period not in VALID_PERIODS:
         return jsonify({'ok': False, 'error': 'invalid'}), 400
 
-    ip = request.headers.get('X-Forwarded-For', request.remote_addr or '').split(',')[0].strip()
+    ip = client_ip()
     if is_rate_limited(ip):
         return jsonify({'ok': False, 'error': 'rate_limited'}), 429
 
     cleanup_reports()
     expires = period_end_dt(day, period).isoformat()
     cancel_code = make_cancel_code()
+    reporter = reporter_id(ip)
 
     conn = sqlite3.connect(REPORTS_DB)
-    conn.execute(
-        "INSERT INTO reports (room, day, period, cancel_code, expires_at) VALUES (?,?,?,?,?)",
-        (room, day, period, cancel_code, expires)
-    )
-    conn.commit()
-    count = conn.execute(
-        "SELECT COUNT(*) FROM reports WHERE room=? AND day=? AND period=?",
-        (room, day, period)
-    ).fetchone()[0]
+    try:
+        conn.execute(
+            "INSERT INTO reports (room, day, period, cancel_code, expires_at, reporter) VALUES (?,?,?,?,?,?)",
+            (room, day, period, cancel_code, expires, reporter)
+        )
+        conn.commit()
+    except sqlite3.IntegrityError:
+        # 同じ人が同じコマの同じ教室をもう報告している。1人で「使用中の可能性」にさせない
+        conn.close()
+        return jsonify({'ok': False, 'error': 'already_reported'}), 409
     conn.close()
+    count = get_report_counts(day, period).get(room, 0)
 
     return jsonify({'ok': True, 'cancel_code': cancel_code, 'count': count})
 
@@ -1244,6 +1303,9 @@ def api_report_cancel():
     cancel_code = str(data.get('cancel_code', '')).strip()[:10]
     if not room or not cancel_code:
         return jsonify({'ok': False}), 400
+    # キャンセルコードの総当たりを防ぐため、取り消しにもレート制限をかける
+    if is_rate_limited(client_ip()):
+        return jsonify({'ok': False, 'error': 'rate_limited'}), 429
 
     conn = sqlite3.connect(REPORTS_DB)
     cur = conn.cursor()
