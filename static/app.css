@@ -435,3 +435,10 @@ select:focus { outline: none; border-color: var(--accent); }
 /* ── エラー ── */
 .error-card { background: rgba(255,80,80,0.08); border: 1px solid rgba(255,80,80,0.2); border-radius: var(--radius); padding: 16px; color: #ff6060; font-size: 0.85rem; }
 .modal-week-link { display: inline-block; margin: -6px 0 14px; font-size: 13px; color: var(--accent); text-decoration: none; }
+.biweekly { margin-top: 18px; border: 1px dashed var(--border); border-radius: var(--radius); padding: 12px 14px; font-size: 13px; color: var(--muted); }
+.biweekly summary { cursor: pointer; color: var(--text); }
+.biweekly summary em { font-style: normal; color: var(--accent); font-weight: 700; }
+.biweekly p { margin: 8px 0; line-height: 1.6; }
+.biweekly-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.biweekly-list a { padding: 6px 10px; border-radius: 10px; background: var(--surface2); color: var(--text); text-decoration: none; font-weight: 700; }
+.biweekly-list small { margin-left: 6px; color: var(--muted); font-weight: 400; font-size: 11px; }

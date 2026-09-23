@@ -13,6 +13,7 @@ import sys
 import tempfile
 import time
 import unittest
+import urllib.parse
 from pathlib import Path
 from unittest import mock
 
@@ -560,6 +561,36 @@ class RoomWeekTests(unittest.TestCase):
 
     def test_unknown_room_is_404(self):
         self.assertEqual(self.c.get("/room/存在しない教室").status_code, 404)
+
+
+class BiweeklyTests(unittest.TestCase):
+    def test_is_biweekly(self):
+        self.assertTrue(rr.is_biweekly("物理実験Ⅰ↓連続２時限【前期隔週】"))
+        self.assertTrue(rr.is_biweekly("{A}{後隔}"))
+        self.assertFalse(rr.is_biweekly("英語ⅢB"))
+
+    def test_biweekly_rooms_are_separate_and_never_in_main_results(self):
+        c = rr.app.test_client()
+        conn = sqlite3.connect(rr.DB_NAME)
+        found = 0
+        for day in ["月", "火", "水", "木", "金"]:
+            for period in range(1, 7):
+                html = c.post("/", data={"year": "2026", "term": "前期", "day": day,
+                                         "period": str(period), "building": "all"}).get_data(as_text=True)
+                if 'class="biweekly"' not in html:
+                    continue
+                main, extra = html.split('class="biweekly"', 1)
+                for room in re.findall(r'/room/([^?"]+)\?', extra):
+                    room = urllib.parse.unquote(room)
+                    found += 1
+                    self.assertNotIn(f"openModal('{room}'", main)
+                    subs = {r[0] for r in conn.execute(
+                        "SELECT 科目名 FROM schedules WHERE 年度=2026 AND 履修期名='前期' AND 曜日=? AND 時限=? AND 教室=?",
+                        (day, period, room))}
+                    self.assertEqual(len(subs), 1)
+                    self.assertTrue(rr.is_biweekly(subs.pop()))
+        conn.close()
+        self.assertGreater(found, 0)
 
 
 if __name__ == "__main__":

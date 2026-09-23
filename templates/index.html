@@ -188,7 +188,19 @@
                 </div>
                 {% endif %}
 
-            {% else %}
+            {% endif %}
+
+            {% if biweekly_rooms %}
+            <details class="biweekly">
+                <summary>週によっては空き（隔週の授業） <em>{{ biweekly_rooms|length }}</em> 室</summary>
+                <p>隔週の授業が入っている教室です。<strong>授業がある週は使えません。</strong>今週どちらかは時間割からは分からないので、必ずドア越しに確認してください。</p>
+                <div class="biweekly-list">
+                {% for room in biweekly_rooms %}<a href="{{ url_for('room_week', name=room.name, year=selected_year, term=selected_term) }}">{{ room.name }}<small>{{ room.building }}</small></a>{% endfor %}
+                </div>
+            </details>
+            {% endif %}
+
+            {% if not empty_rooms %}
             <div class="empty-state">
                 <span class="icon">🔍</span>
                 条件に合う空き教室はありませんでした。

@@ -162,6 +162,10 @@ def resolve_term(requested):
 
 MAX_PERIOD = max(PERIODS)
 
+def is_biweekly(subject):
+    """時間割表の授業名に付く「【前期隔週】」「{後隔}」などの印で隔週の授業を見分ける"""
+    return "隔週" in subject or "後隔" in subject or "前隔" in subject
+
 def resolve_span(requested):
     """「続けて使う」コマ数。1〜3。不正な値は1（絞り込みなし）"""
     try:
@@ -400,6 +404,7 @@ def index():
 
     building = "all"
     empty_rooms = None
+    biweekly_rooms = []
     error_message = None
     searched = False
     auto = request.method == 'GET' and auto_period is not None and now.weekday() != 6
@@ -438,10 +443,13 @@ def index():
         if year is not None:
             where.append("年度=?"); params.append(year)
             room_where.append("年度=?"); room_params.append(year)
-        cur.execute(f"SELECT 時限, 教室 FROM schedules WHERE {' AND '.join(where)}", params)
+        cur.execute(f"SELECT 時限, 教室, 科目名 FROM schedules WHERE {' AND '.join(where)}", params)
         occupied_at = collections.defaultdict(set)
-        for p_, room_ in cur.fetchall():
+        subjects_here = collections.defaultdict(set)   # この時限に入っている授業名（隔週判定用）
+        for p_, room_, subj in cur.fetchall():
             occupied_at[int(p_)].add(str(room_))
+            if int(p_) == period:
+                subjects_here[str(room_)].add(subj or "")
         occupied = occupied_at[period]
 
         building_name = {"tower": "タワースコラ", "main": "駿河台校舎",
@@ -465,10 +473,21 @@ def index():
         # 「続けて使う」で絞る。span=2 なら、この時限と次の時限の両方が空いている教室だけ
         empty_rooms = [r for r in empty_rooms if r["free_until"] - period + 1 >= span]
 
+        # 隔週の授業1つだけで埋まっている教室は、週によっては空いている。
+        # 何週目に授業があるかは授業カレンダーが無いと分からないので、本体の結果には混ぜず別枠で出す。
+        # 隔週の授業が2つ以上ある（A週・B週で交互に使う等）教室は毎週埋まりうるので出さない。
+        biweekly_rooms = sorted(
+            [{"name": r[0], "building": r[1]} for r in all_rooms
+             if len(subjects_here.get(str(r[0]), ())) == 1
+             and is_biweekly(next(iter(subjects_here[str(r[0])])))],
+            key=lambda x: (x['building'] != 'タワースコラ', x['building'] != '駿河台校舎', x['name'])
+        ) if span == 1 else []
+
     except Exception as e:
         logging.error(f"RoomRadar error: {e}")
         error_message = "検索中にエラーが発生しました。時間をおいて再試行してください。"
         empty_rooms = []
+        biweekly_rooms = []
 
     # 報告数・予約数を取得（検索済みの場合のみ）
     cleanup_reports()
@@ -496,6 +515,7 @@ def index():
     return render_template(
         'index.html',
         rr_config=rr_config,
+        biweekly_rooms=biweekly_rooms,
         auto=auto,
         asset_version=ASSET_VERSION,
         empty_rooms=empty_rooms,
