@@ -155,6 +155,25 @@ def resolve_year(requested, available):
 def resolve_term(requested):
     return requested if requested in VALID_TERMS else get_current_term_label()
 
+MAX_PERIOD = max(PERIODS)
+
+def resolve_span(requested):
+    """「続けて使う」コマ数。1〜3。不正な値は1（絞り込みなし）"""
+    try:
+        n = int(requested)
+    except (TypeError, ValueError):
+        return 1
+    return n if n in (1, 2, 3) else 1
+
+def free_until(room, period, occupied_at):
+    """room が period から続けて空いている最後の時限。period 自体が埋まっていれば period - 1"""
+    last = period - 1
+    for p in range(period, MAX_PERIOD + 1):
+        if room in occupied_at.get(p, ()):
+            break
+        last = p
+    return last
+
 def period_end_dt(day_str, period_num):
     """指定の曜日・時限の終了日時（今週分）を返す"""
     day_map = {'月':0,'火':1,'水':2,'木':3,'金':4,'土':5}
@@ -488,6 +507,13 @@ HTML_TEMPLATE = """
         .room-card.funabashi .room-number { color: var(--funabashi-color); }
 
         .room-bldg { font-size: 0.65rem; color: var(--muted); margin-top: 3px; display: block; overflow-wrap: anywhere; }
+        /* 何限まで続けて空いているか。空き時間が長い教室ほど使いやすいので目に入る位置に */
+        .room-span {
+            display: inline-block; margin-top: 4px;
+            font-size: 0.62rem; font-weight: 700; letter-spacing: 0.02em;
+            padding: 1px 7px; border-radius: 99px;
+            background: rgba(255,255,255,0.08); color: var(--text);
+        }
 
         /* 予約中バッジ */
         .room-card.reserved::after {
@@ -725,13 +751,21 @@ HTML_TEMPLATE = """
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="form-full">
+                        <div>
                             <label>校舎</label>
                             <select name="building">
                                 <option value="all">すべての校舎</option>
                                 <option value="tower"     {% if selected_building == 'tower'     %}selected{% endif %}>🏢 タワースコラ</option>
                                 <option value="main"      {% if selected_building == 'main'      %}selected{% endif %}>🏫 駿河台校舎</option>
                                 <option value="funabashi" {% if selected_building == 'funabashi' %}selected{% endif %}>🏛 船橋校舎</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>続けて使う</label>
+                            <select name="span" id="sel-span">
+                                <option value="1" {% if selected_span == 1 %}selected{% endif %}>1コマ</option>
+                                <option value="2" {% if selected_span == 2 %}selected{% endif %}>2コマ以上</option>
+                                <option value="3" {% if selected_span == 3 %}selected{% endif %}>3コマ以上</option>
                             </select>
                         </div>
                     </div>
@@ -761,7 +795,7 @@ HTML_TEMPLATE = """
                 <span>時間割に登録されていないゲリラ授業・急遽変更が行われている場合があります。実際に教室を使用する前に、ドア越しに確認することをおすすめします。</span>
             </div>
             <div class="result-meta" id="result-meta">
-                <span class="result-label">{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }} {{ selected_day }}曜 {{ selected_period }}限 の空き教室</span>
+                <span class="result-label">{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }} {{ selected_day }}曜 {{ selected_period }}限{% if selected_span > 1 %}から{{ selected_span }}コマ続けて{% endif %} の空き教室</span>
                 <span class="count-chip" id="count-chip"><em>{{ empty_rooms|length }}</em> 室</span>
             </div>
 
@@ -784,6 +818,7 @@ HTML_TEMPLATE = """
                              onclick="{% if not is_reported %}openModal('{{ room.name }}', 'タワースコラ'){% endif %}">
                             {% if is_reported %}<span class="reported-badge">使用中の可能性</span>{% endif %}
                             <span class="room-number">{{ room.name }}</span>
+                            {% if room.free_until > selected_period %}<span class="room-span">〜{{ room.free_until }}限</span>{% endif %}
                             <span class="room-bldg">
                                 {%- set rcnt = reserve_counts.get(room.name, 0) -%}
                                 {%- if rcnt > 0 -%}📋{{ rcnt }}件予約中　{%- endif -%}
@@ -810,6 +845,7 @@ HTML_TEMPLATE = """
                              onclick="{% if not is_reported %}openModal('{{ room.name }}', '駿河台校舎'){% endif %}">
                             {% if is_reported %}<span class="reported-badge">使用中の可能性</span>{% endif %}
                             <span class="room-number">{{ room.name }}</span>
+                            {% if room.free_until > selected_period %}<span class="room-span">〜{{ room.free_until }}限</span>{% endif %}
                             <span class="room-bldg">
                                 {%- set rcnt = reserve_counts.get(room.name, 0) -%}
                                 {%- if rcnt > 0 -%}📋{{ rcnt }}件予約中　{%- endif -%}
@@ -836,6 +872,7 @@ HTML_TEMPLATE = """
                              onclick="{% if not is_reported %}openModal('{{ room.name }}', '船橋校舎'){% endif %}">
                             {% if is_reported %}<span class="reported-badge">使用中の可能性</span>{% endif %}
                             <span class="room-number">{{ room.name }}</span>
+                            {% if room.free_until > selected_period %}<span class="room-span">〜{{ room.free_until }}限</span>{% endif %}
                             <span class="room-bldg">
                                 {%- set rcnt = reserve_counts.get(room.name, 0) -%}
                                 {%- if rcnt > 0 -%}📋{{ rcnt }}件予約中　{%- endif -%}
@@ -1348,6 +1385,7 @@ def index():
     available_years = get_available_years()
     year = resolve_year(None, available_years)
     term = get_current_term_label()
+    span = 1
 
     if request.method == 'POST':
         searched = True
@@ -1356,6 +1394,7 @@ def index():
         building = request.form.get('building')
         year = resolve_year(request.form.get('year'), available_years)
         term = resolve_term(request.form.get('term'))
+        span = resolve_span(request.form.get('span'))
 
     try:
         if not os.path.exists(DB_NAME):
@@ -1366,13 +1405,17 @@ def index():
 
         # 年度と学期は利用者が選ぶ。既定は「いまの年度・いまの学期」。
         # 以前は日付から決め打ちしていて、他の学期・年度を見る手段が無かった。
-        where, params = ["曜日=?", "時限=?", "履修期名=?"], [day, period, term]
+        # その日の全時限の占有をまとめて引く。「何限まで続けて空いているか」を出すため
+        where, params = ["曜日=?", "履修期名=?"], [day, term]
         room_where, room_params = [], []
         if year is not None:
             where.append("年度=?"); params.append(year)
             room_where.append("年度=?"); room_params.append(year)
-        cur.execute(f"SELECT 教室 FROM schedules WHERE {' AND '.join(where)}", params)
-        occupied = {str(row[0]) for row in cur.fetchall()}
+        cur.execute(f"SELECT 時限, 教室 FROM schedules WHERE {' AND '.join(where)}", params)
+        occupied_at = collections.defaultdict(set)
+        for p_, room_ in cur.fetchall():
+            occupied_at[int(p_)].add(str(room_))
+        occupied = occupied_at[period]
 
         building_name = {"tower": "タワースコラ", "main": "駿河台校舎",
                          "funabashi": "船橋校舎"}.get(building)
@@ -1387,9 +1430,13 @@ def index():
         conn.close()
 
         empty_rooms = sorted(
-            [{"name": r[0], "building": r[1]} for r in all_rooms if str(r[0]) not in occupied],
+            [{"name": r[0], "building": r[1],
+              "free_until": free_until(str(r[0]), period, occupied_at)}
+             for r in all_rooms if str(r[0]) not in occupied],
             key=lambda x: (x['building'] != 'タワースコラ', x['building'] != '駿河台校舎', x['name'])
         )
+        # 「続けて使う」で絞る。span=2 なら、この時限と次の時限の両方が空いている教室だけ
+        empty_rooms = [r for r in empty_rooms if r["free_until"] - period + 1 >= span]
 
     except Exception as e:
         logging.error(f"RoomRadar error: {e}")
@@ -1422,7 +1469,8 @@ def index():
         report_threshold=REPORT_THRESHOLD,
         reserve_counts=reserve_counts,
         current_term=get_current_term_label(),
-        selected_year=year, selected_term=term,
+        selected_year=year, selected_term=term, selected_span=span,
+        max_period=MAX_PERIOD,
         available_years=available_years,
         available_terms=VALID_TERMS,
         # いま（実時間）と違う年度・学期を見ているときに注意を出すための材料

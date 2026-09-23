@@ -350,6 +350,72 @@ class AbuseResistanceTests(unittest.TestCase):
             self.assertEqual(codes[-1], 429, path)
 
 
+class ConsecutiveFreeTests(unittest.TestCase):
+    """「何限まで続けて空いているか」と「続けて使う」絞り込み"""
+
+    def setUp(self):
+        self.c = rr.app.test_client()
+        rr._rate_store.clear()
+        conn = sqlite3.connect(rr.REPORTS_DB); conn.execute("DELETE FROM reports"); conn.commit(); conn.close()
+
+    def rooms(self, html):
+        return set(re.findall(r"openModal\('([^']+)'", html))
+
+    def search(self, **over):
+        year = rr.get_available_years()[0]
+        body = {"year": str(year), "term": "前期", "day": "水", "period": "2", "building": "all"}
+        body.update(over)
+        return self.c.post("/", data=body).get_data(as_text=True)
+
+    def test_free_until(self):
+        occ = {2: {"A"}, 4: {"B"}, 5: {"A"}}
+        self.assertEqual(rr.free_until("A", 1, occ), 1)    # 2限で埋まる
+        self.assertEqual(rr.free_until("B", 1, occ), 3)    # 4限で埋まる
+        self.assertEqual(rr.free_until("C", 1, occ), rr.MAX_PERIOD)
+        self.assertEqual(rr.free_until("A", 2, occ), 1)    # その時限自体が埋まっている
+        self.assertEqual(rr.free_until("C", rr.MAX_PERIOD, occ), rr.MAX_PERIOD)
+
+    def test_resolve_span(self):
+        for raw, want in (("1", 1), ("2", 2), ("3", 3), ("4", 1), ("0", 1), ("x", 1), (None, 1)):
+            self.assertEqual(rr.resolve_span(raw), want, raw)
+
+    def test_form_offers_span(self):
+        html = self.c.get("/").get_data(as_text=True)
+        self.assertIn('name="span"', html)
+        for v in ("1", "2", "3"):
+            self.assertIn(f'<option value="{v}"', html)
+
+    def test_span_filter_matches_the_database(self):
+        year = rr.get_available_years()[0]
+        conn = sqlite3.connect(f"file:{rr.DB_NAME}?mode=ro", uri=True)
+        try:
+            occ = {(p, r) for p, r in conn.execute(
+                "SELECT 時限, 教室 FROM schedules WHERE 年度=? AND 履修期名='前期' AND 曜日='水'", (year,))}
+            master = {r for (r,) in conn.execute("SELECT name FROM classrooms WHERE 年度=?", (year,))}
+        finally:
+            conn.close()
+        for span in (1, 2, 3):
+            want = {r for r in master if all((p, r) not in occ for p in range(2, 2 + span))}
+            self.assertEqual(self.rooms(self.search(span=str(span))), want, f"span={span}")
+
+    def test_longer_span_never_adds_rooms(self):
+        a, b, c = (self.rooms(self.search(span=str(n))) for n in (1, 2, 3))
+        self.assertTrue(c <= b <= a)
+
+    def test_span_past_the_last_period_is_empty(self):
+        self.assertEqual(self.rooms(self.search(period=str(rr.MAX_PERIOD), span="2")), set())
+
+    def test_badge_shows_how_long_it_stays_free(self):
+        html = self.search(span="2")
+        badges = re.findall(r'room-span">〜(\d)限', html)
+        self.assertTrue(badges)
+        self.assertTrue(all(int(b) >= 3 for b in badges))   # 2限から2コマ以上 → 3限以降まで
+
+    def test_heading_mentions_span(self):
+        self.assertIn("2限から2コマ続けて", self.search(span="2"))
+        self.assertNotIn("コマ続けて", self.search(span="1"))
+
+
 class YearAndTermSelectionTests(unittest.TestCase):
     """年度と学期をサイト上で選べること。以前は日付から決め打ちで、他を見る手段が無かった"""
 
