@@ -434,3 +434,4 @@ select:focus { outline: none; border-color: var(--accent); }
 
 /* ── エラー ── */
 .error-card { background: rgba(255,80,80,0.08); border: 1px solid rgba(255,80,80,0.2); border-radius: var(--radius); padding: 16px; color: #ff6060; font-size: 0.85rem; }
+.modal-week-link { display: inline-block; margin: -6px 0 14px; font-size: 13px; color: var(--accent); text-decoration: none; }

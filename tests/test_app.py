@@ -540,5 +540,27 @@ class UpcomingPeriodTests(unittest.TestCase):
         self.assertNotIn("いまから使える", self._get(self.at(12, 0, day=20)))  # 日曜
 
 
+class RoomWeekTests(unittest.TestCase):
+    def setUp(self):
+        self.c = rr.app.test_client()
+
+    def test_week_grid_matches_search(self):
+        conn = sqlite3.connect(rr.DB_NAME)
+        room, day, period = conn.execute(
+            "SELECT 教室, 曜日, 時限 FROM schedules s WHERE 年度=2026 AND 履修期名='前期' AND 曜日 IN ('月','火','水','木','金','土') "
+            "AND EXISTS (SELECT 1 FROM classrooms c WHERE c.name=s.教室 AND c.年度=2026) LIMIT 1").fetchone()
+        busy = {(d, int(p)) for d, p in conn.execute(
+            "SELECT 曜日, 時限 FROM schedules WHERE 年度=2026 AND 履修期名='前期' AND 教室=?", (room,))}
+        conn.close()
+        html = self.c.get(f"/room/{room}?year=2026&term=前期").get_data(as_text=True)
+        self.assertIn("テスト運用中", html)
+        self.assertIn("大学公式", html)
+        cells = sum(1 for d in rr.WEEK_DAYS for p in rr.PERIODS if (d, p) not in busy)
+        self.assertEqual(html.count('class="free"'), cells)
+
+    def test_unknown_room_is_404(self):
+        self.assertEqual(self.c.get("/room/存在しない教室").status_code, 404)
+
+
 if __name__ == "__main__":
     unittest.main()

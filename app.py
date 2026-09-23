@@ -1,4 +1,5 @@
 import os
+import re
 import sqlite3
 import datetime
 import hashlib
@@ -483,7 +484,8 @@ def index():
     rr_config = {
         'day': day, 'period': period,
         'searched': searched, 'auto': auto, 'error': bool(error_message),
-        'count': len(empty_rooms),
+        'count': len(empty_rooms or []),
+        'year': year, 'term': term,
         'periods': {p: [s, e] for p, (s, e) in PERIODS.items()},
     }
 
@@ -509,6 +511,38 @@ def index():
         # いま（実時間）と違う年度・学期を見ているときに注意を出すための材料
         is_current_view=(year in (None, get_current_year()) and term == get_current_term_label()),
         current_year=get_current_year(),
+    )
+
+WEEK_DAYS = ["月", "火", "水", "木", "金", "土"]
+
+@app.route('/room/<path:name>')
+def room_week(name):
+    """教室ごとの1週間。どの曜日・時限が空いているかを一目で見る"""
+    available_years = get_available_years()
+    year = resolve_year(request.args.get('year'), available_years)
+    term = resolve_term(request.args.get('term'))
+    conn = sqlite3.connect(f"file:{DB_NAME}?mode=ro", uri=True)
+    try:
+        room_q, room_p = "SELECT building FROM classrooms WHERE name=?", [name]
+        where, params = ["教室=?", "履修期名=?"], [name, term]
+        if year is not None:
+            room_q += " AND 年度=?"; room_p.append(year)
+            where.append("年度=?"); params.append(year)
+        row = conn.execute(room_q, room_p).fetchone()
+        if row is None:
+            return "教室が見つかりません", 404
+        grid = collections.defaultdict(list)
+        for d, p, subj in conn.execute(
+                f"SELECT 曜日, 時限, 科目名 FROM schedules WHERE {' AND '.join(where)} ORDER BY id", params):
+            subj = re.split(r"[↓{【]", subj or "")[0].strip()
+            if subj and subj not in grid[(d, int(p))]:
+                grid[(d, int(p))].append(subj)
+    finally:
+        conn.close()
+    return render_template(
+        'room.html', room=name, building=row[0], grid=grid,
+        days=WEEK_DAYS, periods=PERIODS, year=year, term=term,
+        asset_version=ASSET_VERSION,
     )
 
 if __name__ == '__main__':

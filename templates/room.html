@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>{{ room }} の1週間 — RoomRadar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}?v={{ asset_version }}">
+    <style>
+        .week { width: 100%; border-collapse: separate; border-spacing: 3px; table-layout: fixed; font-size: 11px; }
+        .week th { color: var(--muted); font-weight: 500; padding: 4px 0; }
+        .week td { height: 52px; border-radius: 8px; text-align: center; vertical-align: middle; padding: 2px; overflow: hidden; }
+        .week td.free { background: rgba(77,217,160,0.12); color: #4dd9a0; font-weight: 700; }
+        .week td.busy { background: var(--surface2); color: var(--muted); line-height: 1.25; word-break: break-all; }
+        .week th.p { width: 34px; }
+        .week th.p small { display: block; font-size: 9px; }
+        .back { color: var(--accent); text-decoration: none; font-size: 14px; }
+        h1 { font-size: 22px; margin: 14px 0 2px; }
+        .sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="test-banner">
+        <span class="test-tag">TEST</span>
+        <span><strong>テスト運用中</strong>の非公式サービスです（学生開発・大学公式ではありません）。</span>
+    </div>
+    <a class="back" href="{{ url_for('index') }}">← 空き教室検索へ</a>
+    <h1>{{ room }}</h1>
+    <div class="sub">{{ building }} · {% if year %}{{ year }}年度 {% endif %}{{ term }}の1週間</div>
+    <table class="week">
+        <tr><th class="p"></th>{% for d in days %}<th>{{ d }}</th>{% endfor %}</tr>
+        {% for p, (s, e) in periods.items() %}
+        <tr>
+            <th class="p">{{ p }}<small>{{ s }}</small></th>
+            {% for d in days %}
+            {% set subj = grid.get((d, p)) %}
+            {% if subj %}<td class="busy" title="{{ subj|join('、') }}">{{ subj[0][:14] }}{% if subj|length > 1 %} 他{% endif %}</td>
+            {% else %}<td class="free">空き</td>{% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    <div class="disclaimer" style="margin-top:14px">
+        <span class="disclaimer-icon">⚠</span>
+        <span>時間割に登録されていない授業・急な変更がある場合があります。隔週の授業も毎週あるものとして表示しています。</span>
+    </div>
+</div>
+</body>
+</html>

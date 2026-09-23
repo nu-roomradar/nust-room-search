@@ -84,6 +84,9 @@ function openModal(room, building) {
     currentRoom = room;
     currentBuilding = building;
     document.getElementById('modal-title').textContent = room;
+    const q = new URLSearchParams({term: RR.term});
+    if (RR.year) q.set('year', RR.year);
+    document.getElementById('modal-week').href = '/room/' + encodeURIComponent(room) + '?' + q;
     document.getElementById('modal-info').textContent =
         building + ' · ' + RR.day + '曜 ' + RR.period + '限';
     document.getElementById('reserve-name').value = '';
