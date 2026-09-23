@@ -78,6 +78,15 @@
   .bar-row .v{text-align:right;font-family:'Syne',sans-serif;font-weight:800;font-size:0.9rem;}
   a.back{display:inline-block;margin-bottom:24px;color:var(--accent);text-decoration:none;
     font-size:0.85rem;font-family:'DM Mono',monospace;}
+  .occ-lead{font-size:0.82rem;color:#6b6760;line-height:1.7;margin:-6px 0 12px;}
+  .occ-filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .occ-filters select{font:inherit;font-size:0.85rem;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);}
+  table.occ{width:100%;border-collapse:separate;border-spacing:2px;table-layout:fixed;font-size:0.78rem;}
+  table.occ th{font-weight:500;color:#6b6760;padding:4px 0;}
+  table.occ td{height:40px;text-align:center;border-radius:4px;font-variant-numeric:tabular-nums;}
+  .occ-legend{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:0.75rem;color:#6b6760;flex-wrap:wrap;}
+  .occ-ramp{width:120px;height:8px;border-radius:4px;background:linear-gradient(90deg,rgba(37,99,235,0.04),rgba(37,99,235,1));}
+  .occ-note{margin-left:auto;}
 </style>
 </head>
 <body>
@@ -95,6 +104,17 @@
     <span>Instagram・GA4 の集計は 2026年8月で終了しました。以下は最終取得時点のデータで、今後更新されません。</span>
   </div>
   <div class="updated" id="updated">データ読み込み中…</div>
+
+  <!-- ════════ 時間割から見た教室の混み具合 ════════ -->
+  <h2>教室の混み具合（時間割から）</h2>
+  <p class="occ-lead">曜日×時限ごとに、検索対象の教室のうち授業が入っている割合。濃いほど空き教室が少ない。<br>元データは時間割 DB（<code>python scripts/export_occupancy.py</code> で更新）。隔週の授業も毎週ある扱い。</p>
+  <div class="occ-filters">
+    <select id="occ-term" aria-label="年度・学期"></select>
+    <select id="occ-bldg" aria-label="校舎"></select>
+  </div>
+  <div class="card"><table class="occ" id="occ-table"></table>
+    <div class="occ-legend"><span>0%</span><span class="occ-ramp"></span><span>100%</span><span class="occ-note" id="occ-note"></span></div>
+  </div>
 
   <!-- ════════ Instagram ════════ -->
   <h2><span class="ig-dot"></span>Instagram</h2>
@@ -300,6 +320,35 @@ function deltaHTML(cur, prev){
   miscEl.className = 'card barlist';
   miscEl.innerHTML = mParts.join('') ||
     '<div class="empty">流入/イベントデータがまだありません</div>';
+})();
+
+// ── 教室の混み具合（data/occupancy.json） ──
+(async function(){
+  const occ = await load('data/occupancy.json');
+  const selT = document.getElementById('occ-term'), selB = document.getElementById('occ-bldg');
+  if(!occ){ document.getElementById('occ-table').innerHTML = '<tr><td>データを読み込めませんでした</td></tr>'; return; }
+  const terms = [...new Set(occ.views.map(v => v.year + '|' + v.term))];
+  selT.innerHTML = terms.map(k => { const [y,t] = k.split('|'); return `<option value="${k}">${y}年度 ${t}</option>`; }).join('');
+  const bl = {all:'全校舎', 'タワースコラ':'タワースコラ', '駿河台校舎':'駿河台校舎', '船橋校舎':'船橋校舎'};
+  selB.innerHTML = Object.entries(bl).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+  function draw(){
+    const [y,t] = selT.value.split('|');
+    const v = occ.views.find(v => String(v.year) === y && v.term === t && v.building === selB.value);
+    const tbl = document.getElementById('occ-table');
+    if(!v){ tbl.innerHTML = '<tr><td>この校舎の教室はありません</td></tr>'; return; }
+    let h = '<tr><th></th>' + occ.periods.map(p => `<th>${p}限</th>`).join('') + '</tr>';
+    occ.days.forEach((d, i) => {
+      h += `<tr><th>${d}</th>` + v.busy[i].map((n, j) => {
+        const r = n / v.rooms, pct = Math.round(r * 100);
+        const ink = r > 0.55 ? '#fff' : 'var(--ink, #1a1814)';
+        return `<td style="background:rgba(37,99,235,${(0.04 + r * 0.96).toFixed(3)});color:${ink}" title="${d}曜 ${occ.periods[j]}限: ${v.rooms}室中 ${n}室で授業（空き ${v.rooms - n}室）">${pct}%</td>`;
+      }).join('') + '</tr>';
+    });
+    tbl.innerHTML = h;
+    document.getElementById('occ-note').textContent = `対象 ${v.rooms}室`;
+  }
+  selT.onchange = selB.onchange = draw;
+  draw();
 })();
 </script>
 </body>

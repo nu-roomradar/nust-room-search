@@ -48,7 +48,7 @@ DB は複数年度を同居させ、サイト上で年度を選べるように�
 2. `python scripts/build_schedule_db.py --report` で差分を確認
 3. `python -m unittest discover -s tests` が通ることを確認
 4. `python scripts/build_schedule_db.py --replace` で差し替え（`.bak` が自動で作られる）
-5. `python scripts/export_classes.py` で生データ一覧も更新（`data/classes_<年度>.csv` が増える）
+5. `python scripts/export_classes.py` で生データ一覧も、`python scripts/export_occupancy.py` でダッシュボードの混み具合も更新
 6. コミットして push（Render が自動デプロイ）
 
 詳しい手順と注意点は `docs/OPERATIONS.md` の 6.
