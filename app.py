@@ -395,21 +395,28 @@ def upcoming_period(now):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     now = datetime.datetime.now(JST)
-    day = ["月", "火", "水", "木", "金", "土", "日"][now.weekday()]
-    if day == "日": day = "月"
+    DAY_NAMES = ["月", "火", "水", "木", "金", "土", "日"]
+    day = DAY_NAMES[now.weekday()]
 
-    # 開いた瞬間に「いま／このあと空いている教室」を出す。授業時間帯と休み時間なら自動で検索する
+    # 開いた瞬間に「いま／このあと空いている教室」を出す。
+    # 授業時間帯と休み時間はその日の時限。授業が終わった後と日曜は、次に授業がある日の1限を出す
     auto_period = upcoming_period(now)
     period = auto_period or 1
+    auto_note = None
+    if now.weekday() == 6:
+        day, period, auto_note = "月", 1, "本日は授業がありません · 次は"
+    elif auto_period is None:
+        day = "月" if now.weekday() == 5 else DAY_NAMES[now.weekday() + 1]
+        auto_note = "本日の授業は終了しました · 次は"
 
     building = "all"
     empty_rooms = None
     biweekly_rooms = []
     error_message = None
-    searched = False
-    auto = request.method == 'GET' and auto_period is not None and now.weekday() != 6
-    if auto:
-        searched = True
+    auto = request.method == 'GET'
+    searched = auto
+    if not auto:
+        auto_note = None
 
     period_times = {p: f"{s}–{e}" for p, (s, e) in PERIODS.items()}
 
@@ -516,7 +523,7 @@ def index():
         'index.html',
         rr_config=rr_config,
         biweekly_rooms=biweekly_rooms,
-        auto=auto,
+        auto=auto, auto_note=auto_note,
         asset_version=ASSET_VERSION,
         empty_rooms=empty_rooms,
         selected_day=day, selected_period=period,

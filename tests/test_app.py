@@ -536,9 +536,15 @@ class UpcomingPeriodTests(unittest.TestCase):
         self.assertIn("水曜 3限", html)
         self.assertIn('"auto": true', html)
 
-    def test_get_after_hours_and_sunday_do_not_autosearch(self):
-        self.assertNotIn("いまから使える", self._get(self.at(22, 0)))
-        self.assertNotIn("いまから使える", self._get(self.at(12, 0, day=20)))  # 日曜
+    def test_get_after_hours_shows_next_class_day(self):
+        html = self._get(self.at(22, 0))                     # 水曜の夜 → 木曜1限
+        self.assertIn("本日の授業は終了しました", html)
+        self.assertIn("木曜 1限", html)
+        self.assertNotIn("いまから使える", html)
+        self.assertIn("月曜 1限", self._get(self.at(22, 0, day=19)))   # 土曜の夜 → 月曜
+        html = self._get(self.at(12, 0, day=20))              # 日曜 → 月曜
+        self.assertIn("本日は授業がありません", html)
+        self.assertIn("月曜 1限", html)
 
 
 class RoomWeekTests(unittest.TestCase):
