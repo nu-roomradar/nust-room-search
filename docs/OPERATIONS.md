@@ -4,7 +4,9 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 コードの読み方や手順の詳細は README と `.claude/skills/` にあり、守るべきルールは `CLAUDE.md` にある。
 `[要記入]` はこの文書を書いた時点で分からなかった箇所。引き継ぎ時に埋めること。
 
-最終更新: 2026-09-11
+最終更新: 2026-09-23
+
+初めて参加する人は先に [`ONBOARDING.md`](ONBOARDING.md) を読む。
 
 ---
 
@@ -14,7 +16,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 |---|---|---|
 | 検索アプリ（`app.py`） | Render https://nust-room-search.onrender.com | `main` に push すると自動デプロイ（数分） |
 | LP（`index.html`）・運営用ダッシュボード（`dashboard.html`） | GitHub Pages https://nu-roomradar.github.io/nust-room-search/ | `main` に push すると自動反映 |
-| 時間割 DB（`schedule_final.db`） | リポジトリ内 | 2026年度（令和8年度）。前期 6,897 行・後期 6,717 行・教室 181。**`python scripts/build_schedule_db.py` で原本から再現できる**（6.） |
+| 時間割 DB（`schedule_final.db`） | リポジトリ内 | 2025・2026年度を同居（2026年度: 前期 6,437 行・後期 6,260 行・教室 180）。**`python scripts/build_schedule_db.py` で原本から再現できる**（6.） |
 | 仮予約・使用中報告（`reservations.db` / `reports.db`） | Render の実行環境 | 実行時に自動生成。**再起動・再デプロイで消える**。環境変数 `DATA_DIR` を永続ディスクに向ければ残る（6. 参照） |
 | Instagram @roomradar_nust | Meta | `instagram-post.yml` を手動起動して投稿 |
 | ソースコード | GitHub Organization `nu-roomradar` / `nust-room-search` | 現状は `main` へ直接 push（ひとり運用のため） |
