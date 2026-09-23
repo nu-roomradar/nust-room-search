@@ -86,6 +86,21 @@ class PureLogicTests(unittest.TestCase):
             code = rr.make_cancel_code()
             self.assertRegex(code, r"^[A-Z0-9]{6}$")
 
+    def test_cancel_code_uses_a_secure_random_source(self):
+        """random（疑似乱数）ではなく secrets を使っていること
+
+        random のシードを固定しても、コードの並びが再現されないことで確かめる。
+        """
+        import random
+        random.seed(1234); a = [rr.make_cancel_code() for _ in range(5)]
+        random.seed(1234); b = [rr.make_cancel_code() for _ in range(5)]
+        self.assertNotEqual(a, b, "random のシードでコードが再現できてしまう")
+        self.assertNotIn("import random", Path(rr.__file__).read_text(encoding="utf-8"))
+
+    def test_cancel_codes_do_not_repeat_in_practice(self):
+        codes = {rr.make_cancel_code() for _ in range(2000)}
+        self.assertGreater(len(codes), 1990)
+
 
 class ApiTests(unittest.TestCase):
     def setUp(self):

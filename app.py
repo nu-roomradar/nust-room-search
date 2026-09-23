@@ -2,7 +2,6 @@ import os
 import sqlite3
 import datetime
 import hashlib
-import random
 import secrets
 import string
 import collections
@@ -194,8 +193,15 @@ def cleanup_expired():
     conn.execute("DELETE FROM reservations WHERE expires_at < ?", (now,))
     conn.commit(); conn.close()
 
+CANCEL_CODE_ALPHABET = string.ascii_uppercase + string.digits
+
 def make_cancel_code():
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    """仮予約・報告を取り消すための6文字のコード
+
+    random は疑似乱数で、出力を観察すると続きを予測できる。他人の仮予約を勝手に
+    取り消せないよう、暗号論的に安全な secrets を使う（36^6 ≒ 21億通り）。
+    """
+    return ''.join(secrets.choice(CANCEL_CODE_ALPHABET) for _ in range(6))
 
 def get_reservations(day, period):
     """指定曜日・時限の予約一覧を返す"""
