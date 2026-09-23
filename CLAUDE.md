@@ -15,7 +15,7 @@
 
 ## 守るべきルール
 
-1. **「テスト運用中・非公式」表記を消さない**: app.py・index.html・dashboard.html・ポスターに常設。学生課/教務課と協議中のため誤認防止が必須。
+1. **「テスト運用中・非公式」表記を消さない**: 検索アプリの画面（`templates/index.html`）・LP（`index.html`）・dashboard.html・ポスターに常設。学生課/教務課と協議中のため誤認防止が必須。
 2. **Instagram投稿キャプションには `#日大生プロジェクト` が必須**（自主創造プロジェクトの規定）。`scripts/post_to_instagram.py` が自動付与するので、この機構を壊さない。ストーリーズにはキャプション自体が無いので対象外。
 3. **公開文言では「予約」と言い切らない**: アプリの仮予約は非公式であり教室の使用権を保証しない旨を必ず併記。
 4. コミットは `git config user.email noreply@anthropic.com && git config user.name Claude` で行う（Verified表示のため）。

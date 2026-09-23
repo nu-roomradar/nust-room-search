@@ -33,7 +33,8 @@ from pathlib import Path
 
 # ファイル（リポジトリルート基準）→ 必ず含まれていなければならない文字列
 GUARDED = {
-    "app.py":                       ["テスト運用中", "大学公式"],
+    # 検索アプリの画面は templates/index.html にある（2026-09 に app.py から分割）
+    "templates/index.html":         ["テスト運用中", "大学公式"],
     "index.html":                   ["テスト運用中", "大学公式"],
     "dashboard.html":               ["テスト運用中", "大学公式"],
     "scripts/post_to_instagram.py": ["#日大生プロジェクト", "REQUIRED_TAGS", "ensure_required_tags"],
@@ -41,7 +42,7 @@ GUARDED = {
 }
 
 RULE_OF = {
-    "app.py": "ルール1（テスト運用中・非公式表記）",
+    "templates/index.html": "ルール1（テスト運用中・非公式表記）",
     "index.html": "ルール1（テスト運用中・非公式表記）",
     "dashboard.html": "ルール1（テスト運用中・非公式表記）",
     "scripts/post_to_instagram.py": "ルール2（#日大生プロジェクト の自動付与）",

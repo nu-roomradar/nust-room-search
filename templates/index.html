@@ -1,0 +1,297 @@
+{% macro room_card(room, cls, bname) %}
+{% set cnt = report_counts.get(room.name, 0) %}
+{% set is_reported = cnt >= report_threshold %}
+<div class="room-card {{ cls }} {% if is_reported %}reported{% endif %} has-report"
+     onclick="{% if not is_reported %}openModal('{{ room.name }}', '{{ bname }}'){% endif %}">
+    {% if is_reported %}<span class="reported-badge">使用中の可能性</span>{% endif %}
+    <span class="room-number">{{ room.name }}</span>
+    {% if room.free_until > selected_period %}<span class="room-span">〜{{ room.free_until }}限</span>{% endif %}
+    <span class="room-bldg">
+        {%- set rcnt = reserve_counts.get(room.name, 0) -%}
+        {%- if rcnt > 0 -%}📋{{ rcnt }}件予約中　{%- endif -%}
+        {%- if cnt > 0 -%}⚠{{ cnt }}件報告{%- endif -%}
+        {%- if rcnt == 0 and cnt == 0 -%}{{ bname }}{%- endif -%}
+    </span>
+</div>
+{% endmacro -%}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-L1T1CDZ05N"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-L1T1CDZ05N');
+    </script>
+    <title>RoomRadar — 日大理工 空き教室</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}?v={{ asset_version }}">
+</head>
+<body>
+<div class="wrap">
+
+    <!-- テスト運用・非公式の明示（誤認防止・控えめ表記） -->
+    <div class="test-banner">
+        <span class="test-tag">TEST</span>
+        <span><strong>テスト運用中</strong>の非公式サービスです（学生開発・大学公式ではありません）。</span>
+    </div>
+
+    <!-- ヘッダー -->
+    <header>
+        <a href="https://nu-roomradar.github.io/nust-room-search/" class="logo-link"><div class="logo">RoomRadar <span>β</span></div></a>
+        <div class="subtitle">日大理工学部 · 空き教室リアルタイム検索</div>
+        <div class="now-badge">
+            <span class="dot"></span>
+            <span id="clock">--:--</span>
+            <span>·</span>
+            <span id="now-period">現在時限 検出中…</span>
+        </div>
+    </header>
+
+    <!-- PC: 2カラム / スマホ・タブレット: 1カラム -->
+    <div class="page-cols">
+
+        <!-- 左サイドバー（PC）/ 上部（スマホ） -->
+        <div class="sidebar">
+            <div class="card">
+                <form method="POST" id="search-form">
+                    <div class="form-grid">
+                        <div>
+                            <label>年度</label>
+                            <select name="year" id="sel-year">
+                                {% for y in available_years %}
+                                <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>{{ y }}年度</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label>学期</label>
+                            <select name="term" id="sel-term">
+                                {% for t in available_terms %}
+                                <option value="{{ t }}" {% if selected_term == t %}selected{% endif %}>{{ t }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label>曜日</label>
+                            <select name="day" id="sel-day">
+                                {% for d in ["月", "火", "水", "木", "金", "土"] %}
+                                <option value="{{ d }}" {% if selected_day == d %}selected{% endif %}>{{ d }}曜日</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label>時限</label>
+                            <select name="period" id="sel-period">
+                                {% for p in range(1, 7) %}
+                                <option value="{{ p }}" {% if selected_period == p %}selected{% endif %}>{{ p }}限 ({{ period_times[p] }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label>校舎</label>
+                            <select name="building">
+                                <option value="all">すべての校舎</option>
+                                <option value="tower"     {% if selected_building == 'tower'     %}selected{% endif %}>🏢 タワースコラ</option>
+                                <option value="main"      {% if selected_building == 'main'      %}selected{% endif %}>🏫 駿河台校舎</option>
+                                <option value="funabashi" {% if selected_building == 'funabashi' %}selected{% endif %}>🏛 船橋校舎</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>続けて使う</label>
+                            <select name="span" id="sel-span">
+                                <option value="1" {% if selected_span == 1 %}selected{% endif %}>1コマ</option>
+                                <option value="2" {% if selected_span == 2 %}selected{% endif %}>2コマ以上</option>
+                                <option value="3" {% if selected_span == 3 %}selected{% endif %}>3コマ以上</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-search" id="btn-search"><span class="btn-in"><span class="spinner"></span><span class="btn-text">空き教室を検索</span></span></button>
+                </form>
+            </div>
+        </div><!-- /sidebar -->
+
+        <!-- 右: 結果エリア（PC）/ 下部（スマホ） -->
+        <div class="results-area">
+
+            <!-- エラー -->
+            {% if error_message %}
+            <div class="error-card">⚠ {{ error_message }}</div>
+            {% endif %}
+
+            <!-- 結果 -->
+            {% if empty_rooms is not none and not error_message %}
+            {% if not is_current_view %}
+            <div class="disclaimer past-view">
+                <span class="disclaimer-icon">🗓</span>
+                <span><strong>{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }}</strong>の時間割を表示しています（現在は{{ current_year }}年度 {{ current_term }}）。いま空いている教室を探す場合は、年度と学期を戻してください。</span>
+            </div>
+            {% endif %}
+            <div class="disclaimer">
+                <span class="disclaimer-icon">⚠</span>
+                <span>時間割に登録されていないゲリラ授業・急遽変更が行われている場合があります。実際に教室を使用する前に、ドア越しに確認することをおすすめします。</span>
+            </div>
+            <div class="result-meta" id="result-meta">
+                <span class="result-label">{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }} {{ selected_day }}曜 {{ selected_period }}限{% if selected_span > 1 %}から{{ selected_span }}コマ続けて{% endif %} の空き教室</span>
+                <span class="count-chip" id="count-chip"><em>{{ empty_rooms|length }}</em> 室</span>
+            </div>
+
+            {% if empty_rooms %}
+                {% set tower_rooms     = empty_rooms | selectattr('building', 'equalto', 'タワースコラ') | list %}
+                {% set surugadai_rooms = empty_rooms | selectattr('building', 'equalto', '駿河台校舎') | list %}
+                {% set funabashi_rooms = empty_rooms | selectattr('building', 'equalto', '船橋校舎') | list %}
+
+                {% if tower_rooms %}
+                <div class="building-section">
+                    <div class="building-label">
+                        <span class="badge badge-tower">タワースコラ</span>
+                        {{ tower_rooms|length }}室
+                    </div>
+                    <div class="room-grid">
+                    {% for room in tower_rooms %}
+                        {{ room_card(room, 'tower', 'タワースコラ') }}
+                    {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if surugadai_rooms %}
+                <div class="building-section">
+                    <div class="building-label">
+                        <span class="badge badge-surugadai">駿河台校舎</span>
+                        {{ surugadai_rooms|length }}室
+                    </div>
+                    <div class="room-grid">
+                    {% for room in surugadai_rooms %}
+                        {{ room_card(room, 'surugadai', '駿河台校舎') }}
+                    {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if funabashi_rooms %}
+                <div class="building-section">
+                    <div class="building-label">
+                        <span class="badge badge-funabashi">船橋校舎</span>
+                        {{ funabashi_rooms|length }}室
+                    </div>
+                    <div class="room-grid">
+                    {% for room in funabashi_rooms %}
+                        {{ room_card(room, 'funabashi', '船橋校舎') }}
+                    {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+            {% else %}
+            <div class="empty-state">
+                <span class="icon">🔍</span>
+                条件に合う空き教室はありませんでした。
+            </div>
+            {% endif %}
+            {% endif %}
+
+        </div><!-- /results-area -->
+    </div><!-- /page-cols -->
+
+    <!-- 使い方フッター -->
+    <div class="wrap">
+        <div class="help-footer">
+            <div class="help-title">💡 使い方・機能説明</div>
+
+            <div class="help-item">
+                <div class="help-icon blue">🔍</div>
+                <div>
+                    <div class="help-text-title">空き教室を検索する</div>
+                    <div class="help-text-desc">曜日・時限・校舎を選んで「空き教室を検索」を押すと、授業が入っていない教室を一覧表示します。現在の曜日・時限は自動で選択されます。</div>
+                </div>
+            </div>
+
+            <div class="help-item">
+                <div class="help-icon green">📋</div>
+                <div>
+                    <div class="help-text-title">仮予約する（RoomRadar上のみ）</div>
+                    <div class="help-text-desc">教室カードをタップするとモーダルが開きます。お名前と利用目的を入力して「仮予約する」を押すと、他のユーザーに共有されます。<br>⚠ 大学公式の予約ではなく、使用権を保証するものではありません。</div>
+                </div>
+            </div>
+
+            <div class="help-item">
+                <div class="help-icon red">⚠</div>
+                <div>
+                    <div class="help-text-title">「実は使われていた」を報告する</div>
+                    <div class="help-text-desc">教室カードをタップして「⚠ 実は使われていた」ボタンを押すと報告できます。<strong style="color:var(--text)">2件以上</strong>の報告が集まった教室はグレーアウトされ「使用中の可能性」と表示されます。報告は本人がいつでも取り消せます。また、時限終了後に自動でリセットされます。</div>
+                </div>
+            </div>
+
+            <div class="help-item">
+                <div class="help-icon yellow">🏢</div>
+                <div>
+                    <div class="help-text-title">校舎の色分けについて</div>
+                    <div class="help-text-desc">
+                        <span style="color:var(--tower-color)">■ 青：タワースコラ</span>　
+                        <span style="color:var(--surugadai-color)">■ 緑：駿河台校舎</span>　
+                        <span style="color:var(--funabashi-color)">■ オレンジ：船橋校舎</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="help-item">
+                <div class="help-icon yellow">⚡</div>
+                <div>
+                    <div class="help-text-title">注意事項</div>
+                    <div class="help-text-desc">時間割に登録されていないゲリラ授業や急遽変更が行われている場合があります。実際に入室する前に、ドア越しに確認することをおすすめします。本システムは日大理工学部の学生が自主的に開発・運営しています。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 公式サービスとの誤認防止のための常設表記 -->
+    <div class="wrap">
+        <div class="compliance-footer">
+            © 2026 RoomRadar — 日本大学「自主創造プロジェクト」の一環として理工学部の学生が開発・運営しています。本サービスは大学公式のものではなく、現在テスト運用中です。学内での正式な提供については調整中です。
+        </div>
+    </div>
+
+</div><!-- /wrap -->
+
+<!-- 仮予約モーダル -->
+<div class="modal-overlay" id="modal" onclick="handleOverlayClick(event)">
+    <div class="modal">
+        <div class="modal-handle"></div>
+        <div class="modal-title" id="modal-title">教室名</div>
+        <div class="modal-room-info" id="modal-info">校舎 · 現在検索中の時間帯</div>
+
+        <div class="modal-notice">
+            <strong>⚠ これはRoomRadar上の仮予約です</strong>
+            大学公式の予約システムではありません。教室の使用権を保証するものではなく、
+            他の利用者への情報共有を目的としています。
+        </div>
+
+        <div class="modal-form">
+            <label>お名前 / グループ名</label>
+            <input type="text" id="reserve-name" placeholder="例: 二川・物理学科" maxlength="30">
+            <label>利用目的（任意）</label>
+            <textarea id="reserve-note" placeholder="例: グループ課題の打ち合わせ"></textarea>
+        </div>
+
+        <button class="btn-report" onclick="submitReport()">⚠ 実は使われていた</button>
+        <div class="report-count-note" id="report-note"></div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
+            <button class="btn-reserve" onclick="submitReserve()">仮予約する</button>
+        </div>
+    </div>
+</div>
+
+<!-- トースト -->
+<div class="toast" id="toast"></div>
+
+<script>window.RR = {{ rr_config|tojson }};</script>
+<script src="{{ url_for('static', filename='app.js') }}?v={{ asset_version }}"></script>
+</body>
+</html>

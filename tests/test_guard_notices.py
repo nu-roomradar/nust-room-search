@@ -27,7 +27,8 @@ class GuardNoticesTests(unittest.TestCase):
         self.tmp = Path(tempfile.mkdtemp(prefix="guard-"))
         (self.tmp / "scripts").mkdir()
         (self.tmp / ".claude").mkdir()
-        self.write("app.py", APP)
+        (self.tmp / "templates").mkdir()
+        self.write("templates/index.html", APP)
         self.write("index.html", INDEX)
         self.write("dashboard.html", DASH)
         self.write("scripts/post_to_instagram.py", POST)
@@ -94,13 +95,13 @@ class GuardNoticesTests(unittest.TestCase):
     # --- edit ----------------------------------------------------------------
 
     def test_edit_reducing_count_is_blocked(self):
-        rc, err = self.hook("edit", self.edit("app.py", "<strong>テスト運用中</strong>の非公式サービスです",
+        rc, err = self.hook("edit", self.edit("templates/index.html", "<strong>テスト運用中</strong>の非公式サービスです",
                                               "<strong>正式公開</strong>の公式サービスです"))
         self.assertEqual(rc, 2)
         self.assertIn("1 箇所（必要 2）", err)
 
     def test_edit_keeping_count_passes(self):
-        rc, _ = self.hook("edit", self.edit("app.py", "<strong>テスト運用中</strong>の非公式サービスです",
+        rc, _ = self.hook("edit", self.edit("templates/index.html", "<strong>テスト運用中</strong>の非公式サービスです",
                                             "<strong>テスト運用中</strong>の非公式サービスです（β）"))
         self.assertEqual(rc, 0)
 
@@ -132,21 +133,21 @@ class GuardNoticesTests(unittest.TestCase):
         self.assertEqual(rc, 2)
 
     def test_edit_whose_old_string_is_absent_is_left_to_tool(self):
-        rc, _ = self.hook("edit", self.edit("app.py", "存在しない文字列", "x"))
+        rc, _ = self.hook("edit", self.edit("templates/index.html", "存在しない文字列", "x"))
         self.assertEqual(rc, 0)
 
     # --- relax ---------------------------------------------------------------
 
     def test_relax_marker_allows_reduction_but_not_removal(self):
         (self.tmp / ".claude" / "guard-relax").touch()
-        rc, _ = self.hook("edit", self.edit("app.py", "<strong>テスト運用中</strong>の非公式サービスです",
+        rc, _ = self.hook("edit", self.edit("templates/index.html", "<strong>テスト運用中</strong>の非公式サービスです",
                                             "<strong>正式公開</strong>の公式サービスです"))
         self.assertEqual(rc, 0)
         rc, _ = self.hook("edit", {"tool_name": "Write", "tool_input": {"file_path": "dashboard.html", "content": "<html/>"}})
         self.assertEqual(rc, 2)
 
     def test_relax_env_allows_reduction(self):
-        rc, _ = self.hook("edit", self.edit("app.py", "<strong>テスト運用中</strong>の非公式サービスです",
+        rc, _ = self.hook("edit", self.edit("templates/index.html", "<strong>テスト運用中</strong>の非公式サービスです",
                                             "<strong>正式公開</strong>の公式サービスです"),
                           env={"ROOMRADAR_GUARD_RELAX": "1"})
         self.assertEqual(rc, 0)

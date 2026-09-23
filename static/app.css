@@ -1,0 +1,436 @@
+:root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f0f5;
+    --muted: #6b6b80;
+    --tower-color: #6c8fff;
+    --tower-bg: rgba(108,143,255,0.08);
+    --tower-border: rgba(108,143,255,0.3);
+    --surugadai-color: #4dd9a0;
+    --surugadai-bg: rgba(77,217,160,0.08);
+    --surugadai-border: rgba(77,217,160,0.3);
+    --funabashi-color: #ff8c5a;
+    --funabashi-bg: rgba(255,140,90,0.08);
+    --funabashi-border: rgba(255,140,90,0.3);
+    --accent: #6c8fff;
+    --radius: 14px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 env(safe-area-inset-bottom) 0;
+}
+
+/* ── ノイズ背景 ── */
+body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0;
+}
+
+.wrap { max-width: 480px; margin: 0 auto; padding: 24px 16px; position: relative; z-index: 1; }
+
+/* ── レスポンシブ ── */
+@media (min-width: 768px) {
+    .wrap { max-width: 760px; padding: 40px 32px; }
+    .logo { font-size: 2.6rem; }
+    .subtitle { font-size: 0.92rem; }
+    .card { padding: 28px; }
+    .form-grid { grid-template-columns: 1fr 1fr 2fr; }
+    .form-full { grid-column: auto; }
+    /* .room-grid の列数は「教室カード」節の末尾で定義（基本ルールより後に置かないと負ける） */
+}
+@media (min-width: 1100px) {
+    .wrap { max-width: 1100px; padding: 48px 40px; }
+    .page-cols { display: grid; grid-template-columns: 320px 1fr; gap: 32px; align-items: start; }
+    .sidebar { position: sticky; top: 28px; }
+    .logo { font-size: 2.8rem; }
+    /* .room-grid の列数は「教室カード」節の末尾で定義 */
+    .modal { border-radius: 20px; max-width: 460px; margin: auto; }
+    .modal-overlay { align-items: center; }
+}
+
+/* ── ヘッダー ── */
+header { margin-bottom: 28px; }
+.logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem; font-weight: 800;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.logo span { font-weight: 700; opacity: 0.5; font-size: 1.1rem; }
+.logo-link { text-decoration: none; display: inline-block; }
+.subtitle { color: var(--muted); font-size: 0.82rem; margin-top: 4px; letter-spacing: 0.03em; }
+
+/* ── 現在時刻バッジ ── */
+.now-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 99px; padding: 5px 12px; font-size: 0.78rem;
+    color: var(--muted); margin-top: 10px;
+}
+.now-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #4dd9a0; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* ── 検索フォーム ── */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.form-full { grid-column: 1 / -1; }
+
+label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+
+select {
+    width: 100%; padding: 12px 14px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text); font-size: 0.95rem;
+    font-family: 'Noto Sans JP', sans-serif;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b80' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+    cursor: pointer; transition: border-color 0.2s;
+}
+select:focus { outline: none; border-color: var(--accent); }
+
+.btn-search {
+    width: 100%; padding: 15px;
+    background: var(--accent);
+    border: none; border-radius: 10px;
+    color: #fff; font-size: 1rem; font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer; letter-spacing: 0.04em;
+    transition: opacity 0.2s, transform 0.1s;
+    position: relative; overflow: hidden;
+}
+.btn-search:active { transform: scale(0.98); }
+.btn-search:hover { opacity: 0.88; }
+
+/* ── 報告済み教室スタイル ── */
+.room-card.reported {
+    opacity: 0.45;
+    filter: grayscale(0.6);
+    cursor: not-allowed;
+}
+.room-card.reported .room-number { text-decoration: line-through; }
+.reported-badge {
+    position: absolute; top: 6px; right: 6px;
+    font-size: 0.52rem; font-weight: 700; padding: 2px 5px;
+    border-radius: 4px; background: rgba(255,80,80,0.15);
+    color: #ff6060; border: 1px solid rgba(255,80,80,0.3);
+    line-height: 1.4;
+}
+.btn-report {
+    width: 100%; margin-top: 12px; padding: 11px;
+    background: rgba(255,80,80,0.08); border: 1px solid rgba(255,80,80,0.25);
+    border-radius: 10px; color: #ff6060; font-size: 0.85rem; font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif; cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-report:hover { background: rgba(255,80,80,0.15); }
+.report-count-note {
+    font-size: 0.72rem; color: var(--muted); text-align: center;
+    margin-top: 8px;
+}
+
+/* ── 免責事項バナー ── */
+.disclaimer {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: rgba(255,200,60,0.06);
+    border: 1px solid rgba(255,200,60,0.2);
+    border-radius: 10px; padding: 12px 14px;
+    font-size: 0.78rem; color: #b8a060;
+    line-height: 1.6; margin-bottom: 14px;
+}
+.disclaimer-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+/* いま以外の年度・学期を見ているときの注意。危険ではないので青系にする */
+.disclaimer.past-view {
+    background: rgba(108,143,255,0.07);
+    border-color: rgba(108,143,255,0.28);
+    color: #8ea6ff;
+}
+.disclaimer.past-view strong { color: var(--text); }
+
+/* ── 結果ヘッダー ── */
+.result-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+}
+.result-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+.count-chip {
+    font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700;
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 4px 12px; border-radius: 99px; color: var(--text);
+}
+.count-chip em { color: var(--accent); font-style: normal; }
+
+/* ── 検索フィードバック（更新が分かるように） ── */
+.btn-search.loading { pointer-events: none; }
+.btn-search .btn-in { display: inline-flex; align-items: center; justify-content: center; gap: 9px; }
+.btn-search .spinner {
+    width: 15px; height: 15px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.45); border-top-color: #fff;
+    display: none; animation: btnspin 0.7s linear infinite;
+}
+.btn-search.loading .spinner { display: inline-block; }
+@keyframes btnspin { to { transform: rotate(360deg); } }
+
+.result-meta { scroll-margin-top: 18px; border-radius: 12px; }
+@keyframes resultFlash {
+    0%   { box-shadow: 0 0 0 0 rgba(108,143,255,0); background: rgba(108,143,255,0); }
+    18%  { box-shadow: 0 0 0 3px rgba(108,143,255,0.45); background: rgba(108,143,255,0.14); }
+    100% { box-shadow: 0 0 0 0 rgba(108,143,255,0); background: rgba(108,143,255,0); }
+}
+.result-meta.flash { padding: 8px 12px; margin: -8px -12px 6px; animation: resultFlash 1.8s ease-out; }
+@keyframes chipPop {
+    0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(108,143,255,0); }
+    30%  { transform: scale(1.2);  box-shadow: 0 0 0 5px rgba(108,143,255,0.35); }
+    100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(108,143,255,0); }
+}
+.count-chip.pop { animation: chipPop 0.8s ease-out; }
+
+/* ── 校舎セクション ── */
+.building-section { margin-bottom: 20px; }
+.building-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 10px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.building-label .badge {
+    font-size: 0.68rem; padding: 2px 8px; border-radius: 99px; font-weight: 700;
+}
+.badge-tower    { background: var(--tower-bg);     color: var(--tower-color);     border: 1px solid var(--tower-border); }
+.badge-surugadai{ background: var(--surugadai-bg); color: var(--surugadai-color); border: 1px solid var(--surugadai-border); }
+.badge-funabashi{ background: var(--funabashi-bg); color: var(--funabashi-color); border: 1px solid var(--funabashi-border); }
+
+/* ── 教室カード ── */
+/* 列は minmax(0, 1fr)。1fr だけだと「S1704/07/13/16」「521/2/3/4/5/7/8/9/10」のような
+   折り返し位置のない教室名が列を押し広げ、スマホ幅で右にはみ出す */
+.room-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 340px)  { .room-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 768px)  { .room-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .room-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; } }
+
+.room-card {
+    border-radius: 10px; padding: 12px 8px;
+    text-align: center; cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+    border: 1px solid transparent;
+    position: relative;
+    min-width: 0;
+}
+.room-card:active { transform: scale(0.96); }
+
+.room-card.tower     { background: var(--tower-bg);     border-color: var(--tower-border); }
+.room-card.surugadai { background: var(--surugadai-bg); border-color: var(--surugadai-border); }
+.room-card.funabashi { background: var(--funabashi-bg); border-color: var(--funabashi-border); }
+
+.room-number {
+    font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700;
+    display: block; line-height: 1.2;
+    overflow-wrap: anywhere;  /* 長い教室名はカード内で折り返す */
+}
+.room-card.tower     .room-number { color: var(--tower-color); }
+.room-card.surugadai .room-number { color: var(--surugadai-color); }
+.room-card.funabashi .room-number { color: var(--funabashi-color); }
+
+.room-bldg { font-size: 0.65rem; color: var(--muted); margin-top: 3px; display: block; overflow-wrap: anywhere; }
+/* 何限まで続けて空いているか。空き時間が長い教室ほど使いやすいので目に入る位置に */
+.room-span {
+    display: inline-block; margin-top: 4px;
+    font-size: 0.62rem; font-weight: 700; letter-spacing: 0.02em;
+    padding: 1px 7px; border-radius: 99px;
+    background: rgba(255,255,255,0.08); color: var(--text);
+}
+
+/* 予約中バッジ */
+.room-card.reserved::after {
+    content: '予約中';
+    position: absolute; top: 5px; right: 5px;
+    font-size: 0.55rem; font-weight: 700;
+    background: rgba(255,255,255,0.1); color: var(--muted);
+    padding: 1px 5px; border-radius: 4px;
+}
+
+/* ── モーダル（仮予約） ── */
+.modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+    z-index: 100; align-items: flex-end; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px 20px 0 0;
+    padding: 28px 24px 36px;
+    width: 100%; max-width: 480px;
+    animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+.modal-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+.modal-room-info { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
+
+.modal-notice {
+    background: rgba(255,200,60,0.08); border: 1px solid rgba(255,200,60,0.2);
+    border-radius: 10px; padding: 12px 14px; font-size: 0.78rem;
+    color: #ffc83c; line-height: 1.6; margin-bottom: 20px;
+}
+.modal-notice strong { display: block; margin-bottom: 2px; }
+
+.modal-form label { color: var(--muted); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 6px; margin-top: 14px; }
+.modal-form input, .modal-form textarea {
+    width: 100%; padding: 12px 14px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text); font-size: 0.9rem;
+    font-family: 'Noto Sans JP', sans-serif;
+}
+.modal-form input:focus, .modal-form textarea:focus { outline: none; border-color: var(--accent); }
+.modal-form textarea { resize: none; height: 72px; }
+
+.modal-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: 18px; }
+.btn-cancel {
+    padding: 13px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--muted); font-size: 0.9rem; font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif; cursor: pointer;
+}
+.btn-reserve {
+    padding: 13px; background: var(--accent); border: none;
+    border-radius: 10px; color: #fff; font-size: 0.9rem; font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif; cursor: pointer;
+}
+
+/* ── 予約済みバッジ ── */
+.room-card.has-reserve { position: relative; }
+.reserve-badge {
+    position: absolute; top: 6px; right: 6px;
+    font-size: 0.55rem; font-weight: 700; padding: 2px 6px;
+    border-radius: 4px; background: rgba(255,200,60,0.15);
+    color: #ffc83c; border: 1px solid rgba(255,200,60,0.3);
+    line-height: 1.4;
+}
+
+/* ── 予約一覧パネル ── */
+.reserve-panel {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px; margin-top: 10px;
+    font-size: 0.82rem;
+}
+.reserve-panel-title {
+    font-size: 0.72rem; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
+}
+.reserve-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+}
+.reserve-item:last-child { border-bottom: none; }
+.reserve-item-name { font-weight: 700; color: var(--text); }
+.reserve-item-purpose { color: var(--muted); font-size: 0.75rem; margin-top: 2px; }
+.reserve-item-room {
+    font-size: 0.72rem; padding: 2px 8px; border-radius: 4px;
+    background: var(--surface); color: var(--muted);
+}
+
+/* ── キャンセルコード表示 ── */
+.cancel-code-box {
+    background: rgba(108,143,255,0.08); border: 1px solid rgba(108,143,255,0.3);
+    border-radius: 10px; padding: 14px; margin-top: 14px; text-align: center;
+}
+.cancel-code-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 6px; }
+.cancel-code-value {
+    font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800;
+    color: var(--tower-color); letter-spacing: 0.15em;
+}
+.cancel-code-note { font-size: 0.72rem; color: var(--muted); margin-top: 6px; }
+
+/* ── トースト ── */
+.toast {
+    display: none; position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 99px; padding: 10px 20px; font-size: 0.85rem;
+    color: var(--text); z-index: 200; white-space: nowrap;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.toast.show { display: block; animation: fadeInOut 2.5s ease forwards; }
+@keyframes fadeInOut {
+    0%{opacity:0;transform:translateX(-50%) translateY(10px)}
+    15%{opacity:1;transform:translateX(-50%) translateY(0)}
+    75%{opacity:1}
+    100%{opacity:0}
+}
+
+/* ── 空き無し ── */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 0.9rem; }
+.empty-state .icon { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+
+/* ── 公式サービスとの誤認防止のための常設表記 ── */
+.compliance-footer {
+    margin-top: 24px; padding: 16px 0 32px;
+    font-size: 0.7rem; color: var(--muted); text-align: center; line-height: 1.6;
+}
+
+/* ── テスト運用・非公式の控えめ表記 ── */
+.test-banner {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 20px;
+    font-size: 0.72rem; color: var(--muted); line-height: 1.5;
+}
+.test-tag {
+    flex-shrink: 0; font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 0.56rem; letter-spacing: 0.1em;
+    background: var(--surface2); color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 3px 7px; border-radius: 5px;
+}
+.test-banner strong { color: #9a9ab0; font-weight: 600; }
+
+/* ── 使い方フッター ── */
+.help-footer {
+    margin-top: 40px; padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+.help-title {
+    font-size: 0.72rem; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 14px;
+}
+.help-item {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.help-item:last-child { border-bottom: none; }
+.help-icon {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+}
+.help-icon.blue  { background: var(--tower-bg);     border: 1px solid var(--tower-border); }
+.help-icon.green { background: var(--surugadai-bg); border: 1px solid var(--surugadai-border); }
+.help-icon.red   { background: rgba(255,80,80,0.08); border: 1px solid rgba(255,80,80,0.25); }
+.help-icon.yellow{ background: rgba(255,200,60,0.08); border: 1px solid rgba(255,200,60,0.2); }
+.help-text-title { font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.help-text-desc  { font-size: 0.75rem; color: var(--muted); line-height: 1.6; }
+
+/* ── エラー ── */
+.error-card { background: rgba(255,80,80,0.08); border: 1px solid rgba(255,80,80,0.2); border-radius: var(--radius); padding: 16px; color: #ff6060; font-size: 0.85rem; }
