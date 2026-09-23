@@ -16,8 +16,12 @@ DB_NAME = "schedule_final.db"
 JST = datetime.timezone(datetime.timedelta(hours=9))
 PERIODS = {1: ("09:00", "10:40"), 2: ("10:50", "12:30"), 3: ("13:20", "15:00"),
            4: ("15:10", "16:50"), 5: ("17:00", "18:40"), 6: ("18:50", "20:30")}
-RESERVE_DB  = "reservations.db"
-REPORTS_DB  = "reports.db"
+# 仮予約・報告の置き場所。Render の通常ディスクは再デプロイ・再起動で消えるので、
+# 永続ディスク（Render Disk）を付けたら環境変数 DATA_DIR にそのマウント先を入れる。未設定なら従来どおりカレント。
+DATA_DIR    = os.environ.get("DATA_DIR", ".")
+os.makedirs(DATA_DIR, exist_ok=True)
+RESERVE_DB  = os.path.join(DATA_DIR, "reservations.db")
+REPORTS_DB  = os.path.join(DATA_DIR, "reports.db")
 REPORT_THRESHOLD = 2  # 何人報告でグレーアウトするか
 
 def init_reports_db():

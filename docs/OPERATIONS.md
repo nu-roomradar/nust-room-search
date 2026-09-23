@@ -15,7 +15,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 | 検索アプリ（`app.py`） | Render https://nust-room-search.onrender.com | `main` に push すると自動デプロイ（数分） |
 | LP（`index.html`）・運営用ダッシュボード（`dashboard.html`） | GitHub Pages https://nu-roomradar.github.io/nust-room-search/ | `main` に push すると自動反映 |
 | 時間割 DB（`schedule_final.db`） | リポジトリ内 | 2026年度（令和8年度）。前期 6,897 行・後期 6,717 行・教室 181。**`python scripts/build_schedule_db.py` で原本から再現できる**（6.） |
-| 仮予約・使用中報告（`reservations.db` / `reports.db`） | Render の実行環境 | 実行時に自動生成。**再起動で消える**（仕様） |
+| 仮予約・使用中報告（`reservations.db` / `reports.db`） | Render の実行環境 | 実行時に自動生成。**再起動・再デプロイで消える**。環境変数 `DATA_DIR` を永続ディスクに向ければ残る（6. 参照） |
 | Instagram @roomradar_nust | Meta | `instagram-post.yml` を手動起動して投稿 |
 | ソースコード | GitHub Organization `nu-roomradar` / `nust-room-search` | 現状は `main` へ直接 push（ひとり運用のため） |
 
@@ -114,6 +114,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 
 - **短期大学部は船橋校舎を共用している。** 2026-09 に取り込むまで、短大の授業が入っている教室を「空き」と表示していた（既存181教室のうち20室・109スロット）。schedules には短大を入れるが、教室マスタ（検索結果に出る教室）は理工学部・大学院からだけ作る。短大専用教室は理工の学生が行っても使えるとは限らないため。
 - **教室名が校舎をまたいで衝突している。** 「134」「143」「144」は船橋と駿河台の両方に存在し、「まち製図室１～５」はタワースコラと駿河台にあるが、DB は教室名だけで束ねている（`classrooms.name` が一意）。駿河台側の授業があると船橋の同名教室が「使用中」と出る。**空きを埋まって見せる方向の誤りなので実害は小さい**が、原本を回収したら (校舎, 教室) で管理するよう直す。それまでは `tests/test_schedule_db.py` の `KNOWN_NAME_COLLISIONS` に既知として登録してある。
+- **仮予約・報告が再デプロイで消える。** Render の無料プランはディスクが揮発する。残したいときは Render の有料プラン（Starter 以上）で Disk を付け（例: マウント先 `/var/data`、1GB で足りる）、Environment に `DATA_DIR=/var/data` を追加する。コード側は対応済み。Disk を付けるとそのサービスはゼロダウンタイムデプロイができなくなる点に注意。
 - ブランチ運用・PR レビューが無い（ひとり運用のため）。2人以上になったら PR 運用に切り替える。
 - テストは最小限（運用スクリプト・hook・API・検索ページ）。UI の見た目は `/verify-ui` で目視。
 - Instagram・GA4 の集計は 2026-08 に終了。ダッシュボードは最終取得時点のデータを表示したまま（凍結）。
