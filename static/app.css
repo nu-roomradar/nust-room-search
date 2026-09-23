@@ -70,7 +70,12 @@ header { margin-bottom: 28px; }
     user-select: none;
     -webkit-user-select: none;
 }
-.logo span { font-weight: 700; opacity: 0.5; font-size: 1.1rem; }
+.logo span {
+    font-weight: 700; font-size: 1.1rem;
+    /* iOS Safari は background-clip:text の親の中で opacity を使った子要素を描かないことがある。
+       そのためスマホで「β」が消えていた。親のグラデーションに頼らず、自前の色を塗る */
+    -webkit-text-fill-color: rgba(108,143,255,0.6); color: rgba(108,143,255,0.6);
+}
 .logo-link { text-decoration: none; display: inline-block; }
 .subtitle { color: var(--muted); font-size: 0.82rem; margin-top: 4px; letter-spacing: 0.03em; }
 
@@ -442,3 +447,4 @@ select:focus { outline: none; border-color: var(--accent); }
 .biweekly-list { display: flex; flex-wrap: wrap; gap: 6px; }
 .biweekly-list a { padding: 6px 10px; border-radius: 10px; background: var(--surface2); color: var(--text); text-decoration: none; font-weight: 700; }
 .biweekly-list small { margin-left: 6px; color: var(--muted); font-weight: 400; font-size: 11px; }
+.result-note { display: block; color: var(--text); font-weight: 700; margin-bottom: 2px; }

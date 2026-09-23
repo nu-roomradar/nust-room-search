@@ -404,10 +404,10 @@ def index():
     period = auto_period or 1
     auto_note = None
     if now.weekday() == 6:
-        day, period, auto_note = "月", 1, "本日は授業がありません · 次は"
+        day, period, auto_note = "月", 1, "本日は授業がありません"
     elif auto_period is None:
         day = "月" if now.weekday() == 5 else DAY_NAMES[now.weekday() + 1]
-        auto_note = "本日の授業は終了しました · 次は"
+        auto_note = "本日の授業は終了しました"
 
     building = "all"
     empty_rooms = None

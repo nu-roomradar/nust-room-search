@@ -137,7 +137,7 @@
                 <span>時間割に登録されていないゲリラ授業・急遽変更が行われている場合があります。実際に教室を使用する前に、ドア越しに確認することをおすすめします。</span>
             </div>
             <div class="result-meta" id="result-meta">
-                <span class="result-label">{% if auto_note %}{{ auto_note }} {% elif auto %}いまから使える · {% endif %}{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }} {{ selected_day }}曜 {{ selected_period }}限{% if selected_span > 1 %}から{{ selected_span }}コマ続けて{% endif %} の空き教室</span>
+                <span class="result-label">{% if auto_note %}<span class="result-note">{{ auto_note }}</span>次は {% elif auto %}いまから使える · {% endif %}{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }} {{ selected_day }}曜 {{ selected_period }}限{% if selected_span > 1 %}から{{ selected_span }}コマ続けて{% endif %} の空き教室</span>
                 <span class="count-chip" id="count-chip"><em>{{ empty_rooms|length }}</em> 室</span>
             </div>
 
