@@ -12,9 +12,31 @@
   gtag('config', 'G-L1T1CDZ05N');
 </script>
 <title>RoomRadar — 日大理工 空き教室検索</title>
+<meta name="description" content="日大理工の空き教室を、開いた瞬間に一覧表示。時間割をもとに、いま使える教室・2コマ続けて使える教室・教室ごとの1週間がわかります。学生開発・テスト運用中の非公式サービスです（大学公式ではありません）。">
+<link rel="canonical" href="https://nu-roomradar.github.io/nust-room-search/">
+<meta name="theme-color" content="#f5f3ee">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/lp/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/lp/icon-180.png">
+<!-- LINE・Instagram などで共有したときのプレビュー。非公式であることを必ず入れる -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RoomRadar">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:url" content="https://nu-roomradar.github.io/nust-room-search/">
+<meta property="og:title" content="RoomRadar — 日大理工の空き教室が、開いた瞬間わかる（学生開発・非公式）">
+<meta property="og:description" content="時間割をもとに、いま使える教室を一覧表示。学生開発・テスト運用中の非公式サービスです（大学公式ではありません）。">
+<meta property="og:image" content="https://nu-roomradar.github.io/nust-room-search/assets/lp/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="RoomRadar 日大理工の空き教室が、開いた瞬間わかる。テスト運用中の非公式サービスです">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<noscript><style>
+  /* JS が動かなくても中身が見えるように（スクロールで出すアニメーションを止める） */
+  .reveal { opacity: 1 !important; transform: none !important; }
+  .step-num { transform: none !important; }
+</style></noscript>
 <style>
 /* ════════════════════════════════════════════
    CSS変数
@@ -22,7 +44,7 @@
 :root {
   --bg:      #f5f3ee;
   --ink:     #1a1814;
-  --muted:   #8a8577;
+  --muted:   #6b665a;
   --accent:  #2563eb;
   --accent2: #f97316;
   --card:    #ffffff;
@@ -38,7 +60,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Noto Sans CJK JP', 'Yu Gothic UI', 'Meiryo', sans-serif;
   background: var(--bg);
   color: var(--ink);
   overflow-x: hidden;
@@ -585,7 +607,7 @@ section { padding: 100px 24px; }
 .feedback-field textarea,
 .feedback-field input {
   width: 100%; border: 1.5px solid var(--border); border-radius: 12px;
-  padding: 12px 14px; font-family: 'Noto Sans JP', sans-serif;
+  padding: 12px 14px; font-family: inherit;
   font-size: 0.92rem; background: var(--bg); color: var(--ink);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -600,7 +622,7 @@ section { padding: 100px 24px; }
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
   width: 100%; border: none; cursor: pointer;
   background: var(--ink); color: #fff;
-  font-family: 'Noto Sans JP', sans-serif;
+  font-family: inherit;
   font-size: 1rem; font-weight: 700; padding: 16px 32px;
   border-radius: 99px; box-shadow: 0 4px 20px rgba(26,24,20,0.2);
   transition: transform 0.2s, box-shadow 0.2s;
@@ -880,6 +902,82 @@ footer {
 
   .cta-title { font-size: clamp(3.5rem, 5vw, 5rem); }
 }
+
+/* ════════════════════════════════════════════
+   2026-09 の改善（読みやすさ・軽さ・スマホ）
+════════════════════════════════════════════ */
+/* 必須の「テスト運用中・非公式」表記を読める大きさに */
+.hero-note { font-size: 0.82rem; }
+.hero-note-tag { font-size: 0.68rem; }
+footer { font-size: 0.8rem; line-height: 1.7; }
+.cta-desc { color: rgba(255,255,255,0.75); }
+.cta-badge { color: rgba(255,255,255,0.7); }
+.stat-note { margin-top: 14px; font-size: 0.72rem; color: var(--muted); }
+
+/* 重いアニメーションを軽く: 背景の方眼は background-position ではなく transform で動かす。
+   タイトルの流れる光と CTA の光る影は止める（毎フレーム描き直しになり、古いスマホで重い） */
+.hero::before { inset: -48px 0 0 -48px; animation: gridPanT 9s linear infinite; }
+@keyframes gridPanT { from { transform: translate(0, 0); } to { transform: translate(48px, 48px); } }
+.hero-title .title-radar { animation: none; background: none; color: var(--accent); -webkit-text-fill-color: var(--accent); }
+.cta-btn { animation: none; }
+
+/* 機能は6枚。PC は3列 */
+@media (min-width: 1100px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
+
+/* 実際のアプリ画面 */
+.app-shot { display: flex; flex-direction: column; align-items: center; margin: 0 auto 48px; }
+.app-shot .phone {
+  width: 260px; border-radius: 36px; padding: 10px; background: #1a1814;
+  box-shadow: 0 24px 60px rgba(26,24,20,0.25);
+}
+.app-shot img { display: block; width: 100%; height: auto; border-radius: 28px; }
+.app-shot figcaption { margin-top: 14px; font-size: 0.78rem; color: var(--muted); text-align: center; line-height: 1.6; }
+
+/* このサービスについて */
+.about { background: var(--bg); }
+.about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.about-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 24px; }
+.about-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+.about-card p { font-size: 0.86rem; color: var(--muted); line-height: 1.8; }
+
+/* 意見箱の送信失敗 */
+.feedback-error { display: none; margin-top: 12px; font-size: 0.85rem; color: #b42318; text-align: center; line-height: 1.6; }
+.feedback-error.show { display: block; }
+
+/* 言語ボタン: 「中文」が折れない・押しやすい */
+.lang-btn { white-space: nowrap; }
+
+/* スマホで、スクロール中も「RoomRadar を開く」を押せるように */
+.sticky-cta { display: none; }
+@media (max-width: 767px) {
+  .sticky-cta {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 98;
+    min-height: 52px; border-radius: 99px; text-decoration: none;
+    background: var(--ink); color: #fff; font-weight: 700; font-size: 0.98rem;
+    box-shadow: 0 8px 28px rgba(26,24,20,0.3);
+    transform: translateY(140%); transition: transform 0.25s ease;
+  }
+  .sticky-cta.show { transform: translateY(0); }
+
+  .lang-btn { min-height: 40px; }
+  /* 使い方: 番号の横に見出しと説明を並べる（見出しが「サイ／トを」と細切れに折れていた） */
+  .step { display: grid; grid-template-columns: 44px 1fr; gap: 4px 16px; align-items: start; }
+  .step-num { grid-row: span 2; }
+  .step-title, .step-desc { grid-column: 2; }
+  /* スマホで自分の画面の QR は読めないので隠し、フォローボタンだけにする */
+  .social-qr-wrap { display: none; }
+  /* iOS は 16px 未満の入力欄にフォーカスすると勝手に拡大する */
+  .feedback-field select, .feedback-field textarea, .feedback-field input { font-size: 16px; }
+  .feedback-card { padding: 28px 22px; }
+  .app-shot .phone { width: 230px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero::before { animation: none !important; }
+  .sticky-cta { transition: none; }
+}
+/* 「探しに行こ／う。」のように途中で折れないように */
+.cta-title .accent { display: inline-block; }
 </style>
 </head>
 <body>
@@ -887,7 +985,7 @@ footer {
 <!-- セクションナビバー（Apple風） -->
 <header class="section-nav" id="siteNav">
   <a class="nav-logo" href="#hero" aria-label="RoomRadar トップへ">
-    <img src="rr_logo.png" alt="RoomRadar Logo">
+    <img src="assets/lp/logo-nav.png" alt="RoomRadar" width="130" height="76">
   </a>
   <nav class="nav-links" id="navLinks">
     <a href="#social"><span class="ja">Instagram</span><span class="en">Instagram</span><span class="zh">Instagram</span></a>
@@ -899,9 +997,9 @@ footer {
   </nav>
   <div class="nav-right">
     <div class="lang-toggle">
-      <button class="lang-btn active" onclick="setLang('ja')">JP</button>
-      <button class="lang-btn" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" onclick="setLang('zh')">中文</button>
+      <button class="lang-btn active" onclick="setLang('ja')" aria-pressed="true" lang="ja">JP</button>
+      <button class="lang-btn" onclick="setLang('en')" aria-pressed="false" lang="en">EN</button>
+      <button class="lang-btn" onclick="setLang('zh')" aria-pressed="false" lang="zh-Hans">中文</button>
     </div>
   </div>
 </header>
@@ -909,6 +1007,7 @@ footer {
 <!-- ════════════════════════════════════════════
      Hero
 ════════════════════════════════════════════ -->
+<main id="main">
 <section class="hero" id="hero">
   <div class="bg-circle bg-circle-1"></div>
   <div class="bg-circle bg-circle-2"></div>
@@ -947,9 +1046,9 @@ footer {
     </h1>
 
     <p class="hero-desc">
-      <span class="ja">時間割データをもとに、曜日・時限・校舎から空き教室をリアルタイムで検索。もう歩き回らなくていい。</span>
-      <span class="en">Search available classrooms in real-time by day, period, and building — based on official timetable data. No more wandering the halls.</span>
-      <span class="zh">基于课程表数据，按星期、时段和楼栋实时搜索空教室。不用再到处乱找了。</span>
+      <span class="ja">時間割をもとに、開いた瞬間「いま使える教室」を一覧表示。曜日・時限を変えた検索や、教室ごとの1週間の確認もできます。</span>
+      <span class="en">Built on the published class timetables: open it and see the rooms that are free right now. You can also search other days and periods, or check any room's week.</span>
+      <span class="zh">基于公开的课程表，打开即可看到现在可用的教室。也可以按星期、时段搜索，或查看某个教室一周的空闲情况。</span>
     </p>
 
     <a href="https://nust-room-search.onrender.com" class="hero-cta" target="_blank">
@@ -962,47 +1061,52 @@ footer {
     <div class="hero-note">
       <span class="hero-note-tag">TEST</span>
       <span class="ja">現在テスト運用中の非公式サービスです（学生開発・大学公式ではありません）。</span>
-      <span class="en">Currently in test operation — an unofficial, student-built service, not affiliated with the university.</span>
+      <span class="en">Currently in test operation — an unofficial, student-built service (not an official university service).</span>
       <span class="zh">目前为测试运营中的非官方服务（学生开发，非大学官方）。</span>
     </div>
 
     <div class="hero-stats">
       <div class="stat">
-        <div class="stat-num" data-count="46"><span class="num">0</span><span>+</span></div>
+        <div class="stat-num" data-count="184" id="stat-rooms"><span class="num">184</span></div>
         <div class="stat-label">
-          <span class="ja">学科・専攻</span>
-          <span class="en">Departments</span>
-          <span class="zh">学科专业</span>
+          <span class="ja">教室（2026年度）</span>
+          <span class="en">Rooms (AY2026)</span>
+          <span class="zh">教室（2026学年）</span>
         </div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat">
-        <div class="stat-num" data-count="181"><span class="num">0</span></div>
+        <div class="stat-num" data-count="14"><span class="num">14</span></div>
         <div class="stat-label">
-          <span class="ja">登録教室数</span>
-          <span class="en">Classrooms</span>
-          <span class="zh">注册教室</span>
+          <span class="ja">学科＋大学院</span>
+          <span class="en">Depts + Grad</span>
+          <span class="zh">学科＋研究生院</span>
         </div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat">
-        <div class="stat-num" data-count="3"><span class="num">0</span><span>棟</span></div>
+        <div class="stat-num" data-count="3"><span class="num">3</span></div>
         <div class="stat-label">
           <span class="ja">対応校舎</span>
-          <span class="en">Buildings</span>
+          <span class="en">Campuses</span>
           <span class="zh">对应校区</span>
         </div>
       </div>
       <div class="stat-divider"></div>
       <div class="stat">
-        <div class="stat-num" data-count="88"><span class="num">0</span><span>%</span></div>
+        <div class="stat-num" data-count="88.9"><span class="num">88.9</span><span>%</span></div>
         <div class="stat-label">
-          <span class="ja">ニーズ調査回答率</span>
-          <span class="en">Students Need This</span>
-          <span class="zh">学生需求率</span>
+          <span class="ja">教室探しに不満※</span>
+          <span class="en">Unhappy hunting rooms*</span>
+          <span class="zh">对找教室不满*</span>
         </div>
       </div>
     </div>
+    <p class="stat-note">
+      <span class="ja">※ RoomRadar 運営学生による非公式の学内アンケートより</span>
+      <span class="en">* From an unofficial survey of students run by the RoomRadar team</span>
+      <span class="zh">* 来自RoomRadar运营学生进行的非官方问卷</span>
+    </p>
 
   </div>
 </section>
@@ -1016,7 +1120,7 @@ footer {
     <div class="social-card reveal">
       <div class="social-qr-wrap">
         <a class="social-qr" href="https://www.instagram.com/roomradar_nust/" target="_blank" rel="noopener">
-          <img src="assets/instagram-qr.png" alt="RoomRadar Instagram QRコード">
+          <img src="assets/lp/instagram-qr.png" alt="RoomRadar の Instagram（@roomradar_nust）の QR コード" width="410" height="410" loading="lazy">
         </a>
         <span class="social-qr-hint">SCAN ME</span>
       </div>
@@ -1075,9 +1179,9 @@ footer {
       <div class="problem-card reveal reveal-delay-3">
         <span class="problem-icon">⏱</span>
         <p class="problem-text">
-          <span class="ja">教室探しだけで平均10〜20分を毎回ロスしている。</span>
-          <span class="en">Wasting 10–20 minutes every time just to find a place to study.</span>
-          <span class="zh">每次光是找教室就要浪费10〜20分钟。</span>
+          <span class="ja">教室探しだけで、毎回15〜20分をロスしている（運営の非公式アンケートより）。</span>
+          <span class="en">Losing 15–20 minutes every time just to find a place to study (from our unofficial survey).</span>
+          <span class="zh">每次光是找教室就要浪费15〜20分钟（来自运营方的非官方问卷）。</span>
         </p>
       </div>
     </div>
@@ -1100,61 +1204,98 @@ footer {
       <span class="en">What RoomRadar does</span>
       <span class="zh">RoomRadar能做什么</span>
     </h2>
+    <figure class="app-shot reveal">
+      <div class="phone"><img src="assets/lp/app-screen.webp" width="600" height="1298" loading="lazy"
+        alt="RoomRadar の画面。いまから使える教室が校舎ごとに並んでいる"></div>
+      <figcaption>
+        <span class="ja">実際の画面（2026年度後期・水曜3限に開いた例）</span>
+        <span class="en">The actual app (opened on a Wednesday, 3rd period, AY2026 fall)</span>
+        <span class="zh">实际画面（2026学年后期·周三第3节打开时的示例）</span>
+      </figcaption>
+    </figure>
     <div class="features-grid">
       <div class="feature-card blue reveal reveal-delay-1">
         <span class="feature-num">01</span>
-        <span class="feature-icon">🔍</span>
-        <div class="feature-title">
-          <span class="ja">リアルタイム空き教室検索</span>
-          <span class="en">Real-Time Search</span>
-          <span class="zh">实时空教室搜索</span>
-        </div>
+        <span class="feature-icon" aria-hidden="true">⚡</span>
+        <h3 class="feature-title">
+          <span class="ja">開くだけで、いま使える教室</span>
+          <span class="en">Open it, see what's free</span>
+          <span class="zh">打开即看可用教室</span>
+        </h3>
         <p class="feature-desc">
-          <span class="ja">曜日・時限・校舎を選ぶだけ。大学公式の時間割データをもとに、授業が入っていない教室を瞬時に表示します。</span>
-          <span class="en">Just select day, period, and building. Instantly shows rooms with no scheduled class, based on the official timetable.</span>
-          <span class="zh">只需选择星期、时段和楼栋，即可立即显示没有课程的空教室。</span>
+          <span class="ja">検索ボタンを押さなくても、開いた瞬間に今の時限（休み時間なら次の時限）の空き教室が出ます。授業後・日曜は次の授業日の1限を表示します。</span>
+          <span class="en">No need to press Search: rooms free in the current period (or the next one during breaks) appear as soon as you open it. After classes and on Sundays, it shows the next class day's 1st period.</span>
+          <span class="zh">无需点击搜索，打开即显示当前时段（课间则为下一时段）的空教室。下课后和周日显示下一个上课日的第1节。</span>
         </p>
       </div>
       <div class="feature-card green reveal reveal-delay-2">
         <span class="feature-num">02</span>
-        <span class="feature-icon">📋</span>
-        <div class="feature-title">
-          <span class="ja">仮予約機能</span>
-          <span class="en">Room Reservation</span>
-          <span class="zh">临时预约功能</span>
-        </div>
+        <span class="feature-icon" aria-hidden="true">⏱</span>
+        <h3 class="feature-title">
+          <span class="ja">2コマ続けて使える教室</span>
+          <span class="en">Rooms free for 2+ periods</span>
+          <span class="zh">连续2节可用的教室</span>
+        </h3>
         <p class="feature-desc">
-          <span class="ja">教室をタップして名前と目的を入力するだけで、他のユーザーへ利用中を共有できます。※大学公式の予約ではありません。</span>
-          <span class="en">Tap a room, enter your name and purpose to let others know it's taken. (Not an official university reservation.)</span>
-          <span class="zh">点击教室，输入姓名和用途，即可告知其他用户该教室已被占用。※非大学官方预约。</span>
+          <span class="ja">「続けて使う」で2コマ・3コマを選ぶと、その間ずっと空いている教室だけに絞れます。「〜6限」バッジで何限まで空いているかも一目でわかります。</span>
+          <span class="en">Choose 2 or 3 periods under “Consecutive” to see only rooms free the whole time. A “until P6” badge shows how long each room stays free.</span>
+          <span class="zh">在“连续使用”中选择2节或3节，只显示这段时间一直空着的教室。“〜第6节”标签显示可用到第几节。</span>
         </p>
       </div>
       <div class="feature-card orange reveal reveal-delay-3">
         <span class="feature-num">03</span>
-        <span class="feature-icon">⚠</span>
-        <div class="feature-title">
-          <span class="ja">ゲリラ授業の報告</span>
-          <span class="en">Guerrilla Class Alert</span>
-          <span class="zh">临时授课举报</span>
-        </div>
+        <span class="feature-icon" aria-hidden="true">🏫</span>
+        <h3 class="feature-title">
+          <span class="ja">個別の教室を検索</span>
+          <span class="en">Look up any room</span>
+          <span class="zh">查询单个教室</span>
+        </h3>
         <p class="feature-desc">
-          <span class="ja">時間割外の授業が行われていたら報告できます。2件以上の報告でグレーアウト表示され、他のユーザーに注意を促します。</span>
-          <span class="en">Report a room that's actually in use. 2+ reports will grey it out and alert other users.</span>
-          <span class="zh">如发现课表外的临时授课，可进行举报。2条以上举报后该教室将变灰并提示其他用户注意。</span>
+          <span class="ja">教室名や番号（例: S303）で探すと、その教室の1週間の空きを月〜土×1〜6限の表で確かめられます。</span>
+          <span class="en">Search by room name or number (e.g. S303) to see that room's week at a glance, Mon–Sat × periods 1–6.</span>
+          <span class="zh">按教室名称或编号（如S303）搜索，即可用周一至周六×第1〜6节的表格查看该教室一周的空闲情况。</span>
         </p>
       </div>
-      <div class="feature-card purple reveal reveal-delay-4">
+      <div class="feature-card purple reveal reveal-delay-1">
         <span class="feature-num">04</span>
-        <span class="feature-icon">📱</span>
-        <div class="feature-title">
-          <span class="ja">スマホ・PC・iPad対応</span>
-          <span class="en">All Devices</span>
-          <span class="zh">支持手机・电脑・平板</span>
-        </div>
+        <span class="feature-icon" aria-hidden="true">📋</span>
+        <h3 class="feature-title">
+          <span class="ja">仮予約（目安の共有）</span>
+          <span class="en">Tentative hold (unofficial)</span>
+          <span class="zh">临时占用登记（非官方）</span>
+        </h3>
         <p class="feature-desc">
-          <span class="ja">スマートフォンに特化したUIで、現在の曜日・時限を自動選択。iPad・PCでも最適なレイアウトで表示されます。</span>
-          <span class="en">Mobile-first UI with auto-detected day and period. Fully responsive for iPad and desktop too.</span>
-          <span class="zh">以手机为主的界面设计，自动检测当前星期和时段。平板和电脑上同样显示最优布局。</span>
+          <span class="ja">教室をタップして名前と目的を入れると、「この教室を使う予定」を他の利用者に共有できます。※RoomRadar上の目安の共有です。大学公式の予約ではなく、教室の使用権も保証しません。</span>
+          <span class="en">Tap a room and enter a name and purpose to let others know you plan to use it. This is only a heads-up on RoomRadar — not an official university reservation, and it does not guarantee you can use the room.</span>
+          <span class="zh">点击教室并输入姓名和用途，即可告诉其他用户你打算使用该教室。※仅为RoomRadar上的信息共享，并非大学官方预约，也不保证教室使用权。</span>
+        </p>
+      </div>
+      <div class="feature-card orange reveal reveal-delay-2">
+        <span class="feature-num">05</span>
+        <span class="feature-icon" aria-hidden="true">⚠</span>
+        <h3 class="feature-title">
+          <span class="ja">使われていたら報告</span>
+          <span class="en">Report a busy room</span>
+          <span class="zh">教室被占用时举报</span>
+        </h3>
+        <p class="feature-desc">
+          <span class="ja">時間割にない授業などで使われていたら報告できます。2件以上の報告で「使用中の可能性」と表示され、他の利用者に知らせます。</span>
+          <span class="en">If a room turns out to be in use (e.g. an unscheduled class), report it. With 2+ reports it's marked “may be in use” for others.</span>
+          <span class="zh">如发现教室因课表外授课等被占用，可以举报。2条以上举报后会显示“可能正在使用”，提醒其他用户。</span>
+        </p>
+      </div>
+      <div class="feature-card blue reveal reveal-delay-3">
+        <span class="feature-num">06</span>
+        <span class="feature-icon" aria-hidden="true">🔁</span>
+        <h3 class="feature-title">
+          <span class="ja">隔週の授業・年度もわかる</span>
+          <span class="en">Alternate weeks & years</span>
+          <span class="zh">隔周课程与学年切换</span>
+        </h3>
+        <p class="feature-desc">
+          <span class="ja">隔週の授業だけが入っている教室は「週によっては空き」として別枠に表示。年度・学期も切り替えられます。</span>
+          <span class="en">Rooms with only alternate-week classes are listed separately as “free some weeks”. You can also switch the academic year and term.</span>
+          <span class="zh">只有隔周课程的教室会单独列为“部分周空闲”。还可以切换学年和学期。</span>
         </p>
       </div>
     </div>
@@ -1178,48 +1319,48 @@ footer {
       <span class="zh">使用方法</span>
     </div>
     <h2 class="section-title reveal">
-      <span class="ja">3ステップで完了</span>
+      <span class="ja">3ステップで使える</span>
       <span class="en">3 Simple Steps</span>
-      <span class="zh">三步完成</span>
+      <span class="zh">三步即可使用</span>
     </h2>
     <div class="steps reveal">
       <div class="step reveal reveal-delay-1">
         <div class="step-num">1</div>
-        <div class="step-title">
+        <h3 class="step-title">
           <span class="ja">サイトを開く</span>
           <span class="en">Open the site</span>
           <span class="zh">打开网站</span>
-        </div>
+        </h3>
         <p class="step-desc">
-          <span class="ja">ブラウザでRoomRadarにアクセス。現在の曜日・時限が自動で選択されます。</span>
-          <span class="en">Visit RoomRadar in your browser. Day and period are auto-selected.</span>
-          <span class="zh">用浏览器访问RoomRadar。当前星期和时段会自动选择。</span>
+          <span class="ja">開いた瞬間に、いま（休み時間なら次の時限）使える教室が出ます。登録やインストールは要りません。</span>
+          <span class="en">The rooms free now (or in the next period during breaks) appear right away. No sign-up or install.</span>
+          <span class="zh">打开后立即显示现在（课间则为下一节）可用的教室。无需注册或安装。</span>
         </p>
       </div>
       <div class="step reveal reveal-delay-2">
         <div class="step-num">2</div>
-        <div class="step-title">
-          <span class="ja">条件を選んで検索</span>
-          <span class="en">Select &amp; Search</span>
-          <span class="zh">选择条件并搜索</span>
-        </div>
+        <h3 class="step-title">
+          <span class="ja">必要なら条件を変える</span>
+          <span class="en">Change the search if needed</span>
+          <span class="zh">需要时更改条件</span>
+        </h3>
         <p class="step-desc">
-          <span class="ja">曜日・時限・校舎を選んで「検索」ボタンを押すだけ。</span>
-          <span class="en">Choose day, period, building and hit Search.</span>
-          <span class="zh">选择星期、时段、校区，点击"搜索"即可。</span>
+          <span class="ja">曜日・時限・校舎や「続けて使う」コマ数を選んで「空き教室を検索」。教室名から、その教室の1週間を見ることもできます。</span>
+          <span class="en">Pick the day, period, building or how many periods in a row, then tap Search. You can also look up a room by name to see its week.</span>
+          <span class="zh">选择星期、时段、校区或连续节数，点击“搜索空教室”。也可以按教室名查看该教室一周的情况。</span>
         </p>
       </div>
       <div class="step reveal reveal-delay-3">
         <div class="step-num">3</div>
-        <div class="step-title">
-          <span class="ja">教室に向かう</span>
-          <span class="en">Head to the room</span>
-          <span class="zh">前往教室</span>
-        </div>
+        <h3 class="step-title">
+          <span class="ja">ドア越しに確認して使う</span>
+          <span class="en">Check at the door, then use it</span>
+          <span class="zh">先在门口确认再使用</span>
+        </h3>
         <p class="step-desc">
-          <span class="ja">空き教室の一覧から選んで、そのまま移動！必要なら仮予約も可能です。</span>
-          <span class="en">Pick a room from the list and go! Optionally reserve it for others to see.</span>
-          <span class="zh">从列表中选择空教室，直接前往！如有需要，还可进行临时预约。</span>
+          <span class="ja">入る前にドア越しに確認を。必要なら仮予約（RoomRadar上の共有。大学公式ではなく、使用権の保証もありません）もできます。</span>
+          <span class="en">Check through the door before going in. If you like, add a tentative hold (a heads-up on RoomRadar only — not an official reservation and no guarantee you can use the room).</span>
+          <span class="zh">进门前请先在门口确认。如有需要可进行临时占用登记（仅为RoomRadar上的共享，非大学官方预约，也不保证使用权）。</span>
         </p>
       </div>
     </div>
@@ -1303,7 +1444,7 @@ footer {
     <div class="feedback-card reveal" id="feedbackCard">
       <form class="feedback-form" id="feedbackForm">
         <div class="feedback-field">
-          <label>
+          <label for="fbCategory">
             <span class="ja">種類</span>
             <span class="en">Category</span>
             <span class="zh">类型</span>
@@ -1316,22 +1457,22 @@ footer {
           </select>
         </div>
         <div class="feedback-field">
-          <label>
+          <label for="fbOpinion">
             <span class="ja">ご意見・ご要望 <span class="req">*</span></span>
             <span class="en">Your feedback <span class="req">*</span></span>
             <span class="zh">您的意见・要望 <span class="req">*</span></span>
           </label>
           <textarea name="opinion" id="fbOpinion" required
-            placeholder="例：◯◯校舎の△△教室が表示されない／こんな機能が欲しい など"></textarea>
+            placeholder="例: ◯◯教室が出ない／こんな機能が欲しい"></textarea>
         </div>
         <div class="feedback-field">
-          <label>
-            <span class="ja">連絡先（任意）</span>
-            <span class="en">Contact (optional)</span>
-            <span class="zh">联系方式（可选）</span>
+          <label for="fbContact">
+            <span class="ja">連絡先（任意・返信が必要なとき）</span>
+            <span class="en">Contact (optional, if you want a reply)</span>
+            <span class="zh">联系方式（可选，需要回复时）</span>
           </label>
           <input type="text" name="contact" id="fbContact"
-            placeholder="メール / Instagram など（返信が必要な場合）">
+            placeholder="メール / Instagram など">
         </div>
         <button type="submit" class="feedback-submit" id="fbSubmit">
           <span class="ja">送信する</span>
@@ -1339,6 +1480,11 @@ footer {
           <span class="zh">提交</span>
           <span class="arrow">→</span>
         </button>
+        <p class="feedback-error" id="fbError" role="alert">
+          <span class="ja">送信できませんでした。通信状態を確かめて、もう一度お試しください（入力した内容は残っています）。</span>
+          <span class="en">Couldn't send. Please check your connection and try again (your text is still here).</span>
+          <span class="zh">发送失败。请检查网络后重试（已输入的内容仍保留）。</span>
+        </p>
         <p class="feedback-note">
           <span class="ja">いただいた声は今後の改善に活用させていただきます。</span>
           <span class="en">Your feedback helps shape future updates.</span>
@@ -1357,14 +1503,12 @@ footer {
   </div>
 </section>
 
-<!-- Googleフォーム送信用の隠しiframe（ページ遷移を防ぐ） -->
-<iframe name="fbHiddenFrame" id="fbHiddenFrame" style="display:none;"></iframe>
 
 <!-- ════════════════════════════════════════════
      CTA
 ════════════════════════════════════════════ -->
 <div class="blend-band tall" style="background:linear-gradient(180deg,#eef2ff 0%,#2e3a55 100%)"><span class="glow" style="background:var(--accent);left:30%"></span></div>
-<section class="cta-section">
+<section class="cta-section" id="cta">
   <div class="cta-particles">
     <span style="width:8px; height:8px; top:20%; left:15%; animation-delay:0s;"></span>
     <span style="width:5px; height:5px; top:65%; left:80%; animation-delay:2s;"></span>
@@ -1398,6 +1542,54 @@ footer {
   </div>
 </section>
 
+<!-- ════════════════════════════════════════════
+     このサービスについて
+════════════════════════════════════════════ -->
+<section class="about" id="about">
+  <div class="section-inner">
+    <div class="section-eyebrow reveal">
+      <span class="ja">このサービスについて</span>
+      <span class="en">About</span>
+      <span class="zh">关于本服务</span>
+    </div>
+    <div class="about-grid">
+      <div class="about-card reveal">
+        <h3><span class="ja">運営</span><span class="en">Who runs it</span><span class="zh">运营</span></h3>
+        <p>
+          <span class="ja">日本大学「自主創造プロジェクト」の一環として、理工学部の学生が開発・運営しています。大学公式のサービスではなく、現在テスト運用中です。学内での正式な提供については調整中です。</span>
+          <span class="en">Developed and run by students of the College of Science and Technology as part of a Nihon University student project program. It is not an official university service and is currently in test operation.</span>
+          <span class="zh">作为日本大学学生项目的一部分，由理工学部的学生开发和运营。本服务并非大学官方服务，目前为测试运营中。</span>
+        </p>
+      </div>
+      <div class="about-card reveal">
+        <h3><span class="ja">データ</span><span class="en">Data</span><span class="zh">数据</span></h3>
+        <p>
+          <span class="ja">教務ページで公開されている時間割表（2025・2026年度）をもとに、授業が入っていない教室を表示しています。「空き」は時間割上の空きで、使ってよいという許可ではありません。休講・補講・教室変更・試験・時間割にない授業は反映されないので、入る前にドア越しに確認してください。</span>
+          <span class="en">Based on the published class timetables (AY2025–2026), it lists rooms with no scheduled class. “Free” means free on the timetable, not permission to use the room. Cancellations, make-up classes, room changes, exams and unscheduled use are not reflected — please check at the door.</span>
+          <span class="zh">根据公开的课程表（2025・2026学年）显示没有排课的教室。“空闲”仅指课表上空闲，并非使用许可。停课、补课、教室变更、考试及课表外使用不会反映，请在门口确认后再进入。</span>
+        </p>
+      </div>
+      <div class="about-card reveal">
+        <h3><span class="ja">情報の扱い</span><span class="en">Your data</span><span class="zh">信息处理</span></h3>
+        <p>
+          <span class="ja">仮予約と「使われていた」の報告は、その時限が終わると自動で消えます。仮予約の名前欄には、実名など個人が特定できる情報を入れないでください。意見箱の内容は、改善のために運営メンバーが確認します。このページと検索アプリでは、利用状況を知るために Google アナリティクス（Cookie）を使っています。</span>
+          <span class="en">Tentative holds and reports are deleted automatically when the period ends. Please don't put your real name or other personal details in a hold. Feedback is read by the team to improve the service. This page and the app use Google Analytics (cookies) to understand usage.</span>
+          <span class="zh">临时占用登记和举报会在该时段结束后自动删除。请不要在登记中填写真实姓名等个人信息。意见箱的内容由运营成员查看并用于改进。本页面和搜索应用使用Google Analytics（Cookie）了解使用情况。</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- スマホ用: スクロール中も押せる「開く」ボタン（ヒーローと最後の案内が見えている間は隠す） -->
+<a href="https://nust-room-search.onrender.com" class="sticky-cta" id="stickyCta" target="_blank" rel="noopener" aria-hidden="true" tabindex="-1">
+  <span class="ja">RoomRadar を開く</span>
+  <span class="en">Open RoomRadar</span>
+  <span class="zh">打开RoomRadar</span>
+  <span aria-hidden="true">→</span>
+</a>
+
 <!-- フッター -->
 <footer>
   <span class="ja">© 2026 RoomRadar — 日本大学理工学部 学生プロジェクト. このサービスは大学公式のものではなく、現在テスト運用中です。</span>
@@ -1411,9 +1603,15 @@ function setLang(lang) {
   document.body.classList.remove('lang-en', 'lang-zh');
   if (lang === 'en') document.body.classList.add('lang-en');
   if (lang === 'zh') document.body.classList.add('lang-zh');
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+  document.querySelectorAll('.lang-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
+  const btn = document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`);
+  btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true');
   document.documentElement.lang = lang === 'ja' ? 'ja' : lang === 'zh' ? 'zh-Hans' : 'en';
+  // 「動きを減らす」設定のときはタイプライターが止まっているので、ここで言語を差し替える
+  if (typeof reduceMotion !== 'undefined' && reduceMotion) {
+    const tw = document.querySelector('#heroTypewriter .tw-text');
+    if (tw) tw.textContent = TW_PHRASES[lang][0];
+  }
 }
 
 // スクロールアニメーション
@@ -1428,9 +1626,9 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 // ════════════════════════════════════════════
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const TW_PHRASES = {
-  ja: ['空き教室、3秒で見つかる。', '時間割と連動、リアルタイム検索。', '"教室、空いてないかな"を、なくす。'],
-  en: ['Find an empty room in 3 seconds.', 'Synced with the timetable, in real time.', 'No more wandering the halls.'],
-  zh: ['3秒找到空教室。', '与课程表实时同步。', '不用再到处乱找教室。'],
+  ja: ['開くだけで、いま使える教室。', '2コマ続けて空いている教室も。', '"教室、空いてないかな"を、なくす。'],
+  en: ['Open it. See what\'s free now.', 'Find rooms free for 2+ periods.', 'No more wandering the halls.'],
+  zh: ['打开即看，现在可用的教室。', '也能找连续2节空着的教室。', '不用再到处乱找教室。'],
 };
 (function () {
   const el = document.getElementById('heroTypewriter');
@@ -1479,14 +1677,17 @@ const TW_PHRASES = {
 (function () {
   const nums = document.querySelectorAll('.stat-num[data-count]');
   if (!nums.length) return;
+  // HTML には本当の数字を書いてある（JS が動かなくても見える）。動かせるときだけ 0 から数え上げる
+  if (!reduceMotion) nums.forEach(el => { el.querySelector('.num').textContent = '0'; });
   const countObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
       const el = entry.target;
-      const target = parseInt(el.dataset.count, 10);
+      const target = parseFloat(el.dataset.count);
+      const decimals = (el.dataset.count.split('.')[1] || '').length;   // 88.9 は小数1桁で数える
       const numEl = el.querySelector('.num');
       if (reduceMotion) {
-        numEl.textContent = target;
+        numEl.textContent = target.toFixed(decimals);
         countObserver.unobserve(el);
         return;
       }
@@ -1494,7 +1695,7 @@ const TW_PHRASES = {
       const start = performance.now();
       function frame(now) {
         const progress = Math.min((now - start) / duration, 1);
-        numEl.textContent = Math.round(target * (1 - Math.pow(1 - progress, 3)));
+        numEl.textContent = (target * (1 - Math.pow(1 - progress, 3))).toFixed(decimals);
         if (progress < 1) requestAnimationFrame(frame);
       }
       requestAnimationFrame(frame);
@@ -1507,7 +1708,7 @@ const TW_PHRASES = {
 // ════════════════════════════════════════════
 // 意見箱 — Googleフォームへ送信
 // ════════════════════════════════════════════
-// ↓ Googleフォーム作成後に以下3つを差し替えてください
+// 送信先の Google フォームと各設問の entry ID（フォームの設問を作り直したら取り直す）
 const GOOGLE_FORM = {
   action: 'https://docs.google.com/forms/d/e/1FAIpQLScI6WSyHjhWfAhJ_DfBMz_zXKGR5-DdKIzdAOO7lgpkT-DYHg/formResponse',
   entryOpinion:  'entry.1918772033',  // ご意見・ご要望
@@ -1518,14 +1719,17 @@ const GOOGLE_FORM = {
 (function () {
   const form = document.getElementById('feedbackForm');
   if (!form) return;
-  form.addEventListener('submit', function (e) {
+  const errorEl = document.getElementById('fbError');
+  const submitBtn = document.getElementById('fbSubmit');
+  form.addEventListener('submit', async function (e) {
     e.preventDefault();
+    errorEl.classList.remove('show');
 
-    const opinion = document.getElementById('fbOpinion').value.trim();
-    if (!opinion) return;
+    const opinionEl = document.getElementById('fbOpinion');
+    const opinion = opinionEl.value.trim();
+    if (!opinion) { opinionEl.value = ''; opinionEl.reportValidity(); return; }   // 空白だけの入力
 
     // ボタンにリップル効果
-    const submitBtn = document.getElementById('fbSubmit');
     const ripple = document.createElement('span');
     ripple.className = 'ripple';
     const rect = submitBtn.getBoundingClientRect();
@@ -1536,37 +1740,55 @@ const GOOGLE_FORM = {
     submitBtn.appendChild(ripple);
     setTimeout(() => ripple.remove(), 650);
 
-    // 隠しiframeをターゲットにGoogleフォームへPOST（ページ遷移なし）
-    const gForm = document.createElement('form');
-    gForm.action = GOOGLE_FORM.action;
-    gForm.method = 'POST';
-    gForm.target = 'fbHiddenFrame';
-    gForm.style.display = 'none';
+    const category = document.getElementById('fbCategory').value;
+    const body = new URLSearchParams();
+    body.set(GOOGLE_FORM.entryOpinion, opinion);
+    body.set(GOOGLE_FORM.entryCategory, category);
+    body.set(GOOGLE_FORM.entryContact, document.getElementById('fbContact').value.trim());
 
-    const add = (name, value) => {
-      if (!name || name.indexOf('__') !== -1) return; // 未設定のentryはスキップ
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = name;
-      input.value = value;
-      gForm.appendChild(input);
-    };
-    add(GOOGLE_FORM.entryOpinion,  opinion);
-    add(GOOGLE_FORM.entryCategory, document.getElementById('fbCategory').value);
-    add(GOOGLE_FORM.entryContact,  document.getElementById('fbContact').value.trim());
-
-    document.body.appendChild(gForm);
-    gForm.submit();
-    document.body.removeChild(gForm);
-
-    // GA4イベント（任意）
-    if (typeof gtag === 'function') {
-      gtag('event', 'feedback_submit', { category: document.getElementById('fbCategory').value });
+    // Google フォームは別オリジンなので no-cors で送る。中身の成否は読めないが、
+    // 通信そのものの失敗（圏外・遮断・タイムアウト）は分かるので、そのときは入力を残して知らせる
+    submitBtn.disabled = true;
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 15000);
+    try {
+      await fetch(GOOGLE_FORM.action, { method: 'POST', mode: 'no-cors', body, signal: ctrl.signal });
+    } catch (err) {
+      errorEl.classList.add('show');
+      return;
+    } finally {
+      clearTimeout(timer);
+      submitBtn.disabled = false;
     }
 
-    // 完了表示に切り替え
+    if (typeof gtag === 'function') gtag('event', 'feedback_submit', { category });
     document.getElementById('feedbackCard').classList.add('sent');
   });
+})();
+
+// ════════════════════════════════════════════
+// スマホ用の「開く」ボタン: ヒーローの「今すぐ使う」と最後の案内・意見箱が見えている間は隠す
+// ════════════════════════════════════════════
+(function () {
+  const btn = document.getElementById('stickyCta');
+  if (!btn || !('IntersectionObserver' in window)) return;
+  const watch = ['.hero-cta', '#cta', '#feedback'].map(q => document.querySelector(q)).filter(Boolean);
+  const visible = new Set();
+  let typing = false;
+  function update() {
+    const show = visible.size === 0 && !typing;
+    btn.classList.toggle('show', show);
+    btn.setAttribute('aria-hidden', show ? 'false' : 'true');
+    btn.tabIndex = show ? 0 : -1;
+  }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => en.isIntersecting ? visible.add(en.target) : visible.delete(en.target));
+    update();
+  });
+  watch.forEach(el => io.observe(el));
+  // 入力中はキーボードやボタンに重ならないよう隠す
+  document.addEventListener('focusin', e => { typing = !!e.target.closest('input, textarea, select'); update(); });
+  document.addEventListener('focusout', () => { typing = false; update(); });
 })();
 </script>
 </body>
