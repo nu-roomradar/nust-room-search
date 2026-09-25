@@ -2,7 +2,7 @@
 """
 必須表記ガード — CLAUDE.md の「守るべきルール」1・2を機械的に守る hook。
 
-  ルール1: 「テスト運用中・非公式」表記を app.py / index.html / dashboard.html から消さない
+  ルール1: 「テスト運用中・非公式」表記を検索アプリの画面（templates/）・LP（index.html）・dashboard.html から消さない
           （学生課・教務課と協議中のため、誤認防止に必須）
   ルール2: Instagram 投稿への #日大生プロジェクト 自動付与（scripts/post_to_instagram.py）を壊さない
           ポスター（scripts/make_poster.py）にも #日大生プロジェクト が必須
@@ -35,6 +35,8 @@ from pathlib import Path
 GUARDED = {
     # 検索アプリの画面は templates/index.html にある（2026-09 に app.py から分割）
     "templates/index.html":         ["テスト運用中", "大学公式"],
+    "templates/room.html":          ["テスト運用中", "大学公式"],   # 教室の1週間
+    "templates/room_search.html":   ["テスト運用中", "大学公式"],   # 教室から探す
     "index.html":                   ["テスト運用中", "大学公式"],
     "dashboard.html":               ["テスト運用中", "大学公式"],
     "scripts/post_to_instagram.py": ["#日大生プロジェクト", "REQUIRED_TAGS", "ensure_required_tags"],
@@ -43,6 +45,8 @@ GUARDED = {
 
 RULE_OF = {
     "templates/index.html": "ルール1（テスト運用中・非公式表記）",
+    "templates/room.html": "ルール1（テスト運用中・非公式表記）",
+    "templates/room_search.html": "ルール1（テスト運用中・非公式表記）",
     "index.html": "ルール1（テスト運用中・非公式表記）",
     "dashboard.html": "ルール1（テスト運用中・非公式表記）",
     "scripts/post_to_instagram.py": "ルール2（#日大生プロジェクト の自動付与）",

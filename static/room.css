@@ -1,5 +1,6 @@
 /* 教室の1週間ページ・教室から探すページ */
-.room-page .back { color: var(--accent); text-decoration: none; font-size: 14px; display: inline-block; margin: 4px 0 6px; }
+/* 戻るリンクは指で押しやすいよう上下の当たり判定だけ広げる（見た目の位置は変えない） */
+.room-page .back { color: var(--accent); text-decoration: none; font-size: 14px; display: inline-block; padding: 13px 0; margin: -9px 0 -7px; }
 .room-page .card { margin-top: 18px; }
 .room-page .disclaimer { margin-top: 14px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -28,6 +29,10 @@
 .week td .bw-tag { display: inline-block; margin-top: 2px; padding: 0 5px; border-radius: 4px; font-size: 9px; font-weight: 700; color: #ffc85a; border: 1px solid rgba(255,200,90,0.5); }
 .week td.today { box-shadow: inset 0 0 0 1px rgba(108,143,255,0.35); }
 .week td.now { box-shadow: inset 0 0 0 2px var(--accent); }
+.week td[data-slot] { cursor: pointer; }
+.week td.picked { outline: 2px solid var(--text); outline-offset: -2px; }
+.week td:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.cell-detail { margin-top: 8px; min-height: 1.6em; padding: 8px 12px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); font-size: 0.82rem; color: var(--text); line-height: 1.5; }
 .week td .now-tag { display: block; font-size: 9px; font-weight: 700; color: var(--accent); }
 
 .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 0.75rem; color: var(--muted); }
@@ -37,12 +42,13 @@
 .legend .lg.biweekly { background: repeating-linear-gradient(135deg, rgba(255,200,90,0.55) 0 3px, var(--surface2) 3px 6px); }
 
 .search-title { font-size: 1.5rem; font-weight: 800; margin: 12px 0 2px; }
-.room-page .sub { color: var(--muted); font-size: 0.82rem; }
+.room-page .sub { color: var(--muted); font-size: 0.82rem; margin-bottom: 12px; }
 .list-title { font-size: 0.9rem; color: var(--muted); font-weight: 700; margin: 18px 0 10px; }
 a.room-card.room-link { display: block; text-decoration: none; }
 a.room-card.room-link:active { transform: scale(0.96); }
 .room-page .empty-state { margin: 16px 0; }
 .room-page .empty-state small { color: var(--muted); }
+.room-page .empty-state { overflow-wrap: anywhere; }
 
 @media (min-width: 768px) {
     .week { font-size: 12px; }

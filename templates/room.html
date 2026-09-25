@@ -48,13 +48,15 @@
             {% set is_now = (d == today and p == now_period) %}
             {% if cell %}
             <td class="busy{% if cell.biweekly %} biweekly{% endif %}{% if d == today %} today{% endif %}{% if is_now %} now{% endif %}"
-                title="{{ cell.names|join('、') }}">
+                title="{{ cell.names|join('、') }}" tabindex="0" role="button"
+                data-slot="{{ d }}{{ p }}限" data-detail="{{ cell.names|join('、') }}{% if cell.biweekly %}（隔週の授業。授業がない週は空き）{% endif %}">
                 {% if is_now %}<span class="now-tag">いま</span>{% endif %}
                 <span class="subj">{{ cell.names[0] }}</span>{% if cell.names|length > 1 %}<span class="more">他{{ cell.names|length - 1 }}</span>{% endif %}
                 {% if cell.biweekly %}<span class="bw-tag">隔週</span>{% endif %}
             </td>
             {% else %}
-            <td class="free{% if d == today %} today{% endif %}{% if is_now %} now{% endif %}">
+            <td class="free{% if d == today %} today{% endif %}{% if is_now %} now{% endif %}"
+                tabindex="0" role="button" data-slot="{{ d }}{{ p }}限" data-detail="時間割上は空き">
                 {% if is_now %}<span class="now-tag">いま</span>{% endif %}空き
             </td>
             {% endif %}
@@ -64,6 +66,7 @@
         </tbody>
     </table>
     </div>
+    <div class="cell-detail" id="cell-detail" aria-live="polite">コマをタップすると授業名が出ます</div>
 
     <div class="legend">
         <span><i class="lg free"></i>空き</span>
@@ -81,5 +84,21 @@
     </div>
 </div>
 <script src="{{ url_for('static', filename='rooms.js') }}?v={{ asset_version }}"></script>
+<script>
+// 省略された授業名は、タップ（キーボードなら Enter）で表の下に全文を出す。スマホでは title が見られないため
+(function () {
+    var out = document.getElementById('cell-detail');
+    var current = null;
+    function show(td) {
+        if (current) current.classList.remove('picked');
+        current = td; td.classList.add('picked');
+        out.textContent = td.getAttribute('data-slot') + ' · ' + td.getAttribute('data-detail');
+    }
+    document.querySelectorAll('.week td[data-slot]').forEach(function (td) {
+        td.addEventListener('click', function () { show(td); });
+        td.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(td); } });
+    });
+})();
+</script>
 </body>
 </html>

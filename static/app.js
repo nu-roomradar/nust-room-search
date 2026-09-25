@@ -84,10 +84,7 @@ function openModal(room, building) {
     currentRoom = room;
     currentBuilding = building;
     document.getElementById('modal-title').textContent = room;
-    const q = new URLSearchParams({term: RR.term});
-    if (RR.year) q.set('year', RR.year);
-    // 教室名に「/」を含むもの（S1704/07/13/16 など）があるので、区切りごとにエンコードする
-    document.getElementById('modal-week').href = '/room/' + room.split('/').map(encodeURIComponent).join('/') + '?' + q;
+    document.getElementById('modal-week').href = window.roomWeekUrl(room, RR.year, RR.term);  // static/rooms.js
     document.getElementById('modal-info').textContent =
         building + ' · ' + RR.day + '曜 ' + RR.period + '限';
     document.getElementById('reserve-name').value = '';

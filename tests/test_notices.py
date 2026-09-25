@@ -13,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 # ルール1: 「テスト運用中・非公式」表記（学生課/教務課と協議中のため誤認防止が必須）
 NOTICE_FILES = {
     "templates/index.html": ["テスト運用中", "大学公式"],
+    "templates/room.html": ["テスト運用中", "大学公式"],
+    "templates/room_search.html": ["テスト運用中", "大学公式"],
     "index.html": ["テスト運用中", "大学公式"],
     "dashboard.html": ["テスト運用中", "大学公式"],
 }

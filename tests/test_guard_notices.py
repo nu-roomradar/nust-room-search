@@ -29,6 +29,8 @@ class GuardNoticesTests(unittest.TestCase):
         (self.tmp / ".claude").mkdir()
         (self.tmp / "templates").mkdir()
         self.write("templates/index.html", APP)
+        self.write("templates/room.html", APP)          # 教室の1週間
+        self.write("templates/room_search.html", APP)   # 教室から探す
         self.write("index.html", INDEX)
         self.write("dashboard.html", DASH)
         self.write("scripts/post_to_instagram.py", POST)
@@ -72,6 +74,14 @@ class GuardNoticesTests(unittest.TestCase):
         self.assertEqual(rc, 2)
         self.assertIn("dashboard.html", err)
         self.assertIn("'テスト運用中'", err)
+
+    def test_tree_guards_room_pages_too(self):
+        for rel in ("templates/room.html", "templates/room_search.html"):
+            self.write(rel, APP.replace("大学公式", "公式"))
+            rc, err = self.hook("tree", {"stop_hook_active": False})
+            self.assertEqual(rc, 2, rel)
+            self.assertIn(rel, err)
+            self.write(rel, APP)
 
     def test_stop_does_not_reblock_when_already_continued(self):
         self.write("dashboard.html", "x")

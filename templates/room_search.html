@@ -15,7 +15,18 @@
     </div>
     <a class="back" href="{{ url_for('index') }}">← 空き教室検索へ</a>
     <h1 class="search-title">教室から探す</h1>
-    <div class="sub">{% if year %}{{ year }}年度 {% endif %}{{ term }} · 教室をタップすると1週間の空きが見られます</div>
+    <div class="sub">教室をタップすると、その教室の1週間の空きが見られます</div>
+
+    <form class="view-switch" method="GET" action="">
+        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+        <select name="year" aria-label="年度" onchange="this.form.submit()">
+            {% for y in available_years %}<option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}年度</option>{% endfor %}
+        </select>
+        <select name="term" aria-label="学期" onchange="this.form.submit()">
+            {% for t in available_terms %}<option value="{{ t }}" {% if t == term %}selected{% endif %}>{{ t }}</option>{% endfor %}
+        </select>
+        <noscript><button type="submit">切り替え</button></noscript>
+    </form>
 
     <div class="card">
         {% with room_query=query %}{% include '_room_search_box.html' %}{% endwith %}
@@ -27,7 +38,7 @@
         {% else %}
         <div class="empty-state">
             <span class="icon">🔍</span>
-            {% if not_found is defined and not_found %}{% if year %}{{ year }}年度の{% endif %}時間割に「{{ query }}」という教室はありません。{% else %}「{{ query }}」に当てはまる教室は見つかりませんでした。{% endif %}<br>
+            {% if not_found %}{% if year %}{{ year }}年度の{% endif %}時間割に「{{ query }}」という教室はありません。{% else %}「{{ query }}」に当てはまる教室は見つかりませんでした。{% endif %}<br>
             <small>教室番号の一部（例: 303）でも探せます。下の一覧からも選べます。</small>
         </div>
         {% endif %}

@@ -564,7 +564,7 @@ class RoomWeekTests(unittest.TestCase):
         self.assertIn("テスト運用中", html)
         self.assertIn("大学公式", html)
         cells = sum(1 for d in rr.WEEK_DAYS for p in rr.PERIODS if (d, p) not in busy)
-        self.assertEqual(html.count('class="free"'), cells)
+        self.assertEqual(len(re.findall(r'<td class="free[ "]', html)), cells)   # 今日の列は class="free today"
 
     def test_unknown_room_is_404(self):
         self.assertEqual(self.c.get("/room/存在しない教室").status_code, 404)
@@ -649,11 +649,28 @@ class RoomSearchTests(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertIn(slash[0], r.get_data(as_text=True))
 
-    def test_search_page_has_room_search_box(self):
+    def test_search_page_links_to_room_search_without_changing_layout(self):
         html = self.c.get("/").get_data(as_text=True)
-        self.assertIn('action="/room"', html)
+        self.assertIn('id="room-search-link"', html)
+        self.assertIn('href="/room?', html)
+        self.assertNotIn('<datalist id="room-list">', html)   # 検索画面そのものには入力欄を置かない
+
+    def test_room_search_page_has_box_and_year_switch(self):
+        html = self.c.get("/room?year=2026&term=後期").get_data(as_text=True)
         self.assertIn('<datalist id="room-list">', html)
         self.assertIn('<option value="S303">', html)
+        self.assertIn('class="view-switch"', html)
+
+    def test_unknown_room_url_does_not_echo_long_text(self):
+        long_name = "大学公式の案内です" * 20
+        r = self.c.get("/room/" + long_name)
+        self.assertEqual(r.status_code, 404)
+        self.assertNotIn(long_name[:41], r.get_data(as_text=True))
+
+    def test_week_cells_carry_full_subject_names(self):
+        html = self.c.get("/room/S303?year=2026&term=前期").get_data(as_text=True)
+        self.assertIn('id="cell-detail"', html)
+        self.assertEqual(html.count('data-slot="'), len(rr.WEEK_DAYS) * len(rr.PERIODS))
 
     def test_week_page_marks_biweekly_slots(self):
         conn = sqlite3.connect(rr.DB_NAME)

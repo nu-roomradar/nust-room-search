@@ -539,16 +539,16 @@ def index():
         selected_year=year, selected_term=term, selected_span=span,
         max_period=MAX_PERIOD,
         available_years=available_years,
-        room_list=list_rooms(year),
         available_terms=VALID_TERMS,
         # いま（実時間）と違う年度・学期を見ているときに注意を出すための材料
-        is_current_view=(year in (None, get_current_year()) and term == get_current_term_label()),
+        is_current_view=is_current_view(year, term),
         current_year=get_current_year(),
     )
 
 WEEK_DAYS = ["月", "火", "水", "木", "金", "土"]
 BUILDING_ORDER = ["タワースコラ", "駿河台校舎", "船橋校舎"]
 BUILDING_CLASS = {"タワースコラ": "tower", "駿河台校舎": "surugadai", "船橋校舎": "funabashi"}
+ROOM_QUERY_MAX = 40
 
 
 def normalize_room(text):
@@ -589,6 +589,11 @@ def find_rooms(query, rooms):
     return [r for r in rooms if q in normalize_room(r["name"])]
 
 
+def is_current_view(year, term):
+    """いま（実時間）の年度・学期を見ているか"""
+    return year in (None, get_current_year()) and term == get_current_term_label()
+
+
 def group_by_building(rooms):
     groups = collections.OrderedDict()
     for r in sorted(rooms, key=room_sort_key):
@@ -596,23 +601,26 @@ def group_by_building(rooms):
     return groups
 
 
+def _render_room_search(query, rooms, year, term, matches=(), not_found=False):
+    return render_template(
+        'room_search.html', query=query, matches=group_by_building(matches), match_count=len(matches),
+        not_found=not_found, all_rooms=group_by_building(rooms), room_list=rooms,
+        year=year, term=term, available_years=get_available_years(), available_terms=VALID_TERMS,
+        building_class=BUILDING_CLASS, asset_version=ASSET_VERSION,
+    )
+
+
 @app.route('/room')
 def room_search():
     """教室名から、その教室の1週間を探す。1件に決まればそのまま1週間のページへ"""
-    available_years = get_available_years()
-    year = resolve_year(request.args.get('year'), available_years)
+    year = resolve_year(request.args.get('year'), get_available_years())
     term = resolve_term(request.args.get('term'))
-    query = (request.args.get('q') or '').strip()[:40]
+    query = (request.args.get('q') or '').strip()[:ROOM_QUERY_MAX]
     rooms = list_rooms(year)
     matches = find_rooms(query, rooms)
     if len(matches) == 1:
         return redirect(url_for('room_week', name=matches[0]["name"], year=year, term=term))
-    return render_template(
-        'room_search.html', query=query, matches=group_by_building(matches),
-        match_count=len(matches), all_rooms=group_by_building(rooms), room_list=rooms,
-        year=year, term=term, available_years=available_years, available_terms=VALID_TERMS,
-        building_class=BUILDING_CLASS, asset_version=ASSET_VERSION,
-    )
+    return _render_room_search(query, rooms, year, term, matches)
 
 
 @app.route('/room/<path:name>')
@@ -624,13 +632,9 @@ def room_week(name):
     rooms = list_rooms(year)
     room = next((r for r in rooms if r["name"] == name), None)
     if room is None:
-        # 年度を切り替えたらその年度には無い教室だった、URL を手で打った、などは探す画面に回す
-        return render_template(
-            'room_search.html', query=name, matches={}, match_count=0, not_found=True,
-            all_rooms=group_by_building(rooms), room_list=rooms,
-            year=year, term=term, available_years=available_years, available_terms=VALID_TERMS,
-            building_class=BUILDING_CLASS, asset_version=ASSET_VERSION,
-        ), 404
+        # 年度を切り替えたらその年度には無い教室だった、URL を手で打った、などは探す画面に回す。
+        # URL の文字列をそのまま長々と画面に出さない（第三者が作ったリンクで好きな文を出させない）
+        return _render_room_search(name[:ROOM_QUERY_MAX], rooms, year, term, not_found=True), 404
 
     where, params = ["教室=?", "履修期名=?"], [name, term]
     if year is not None:
@@ -661,8 +665,7 @@ def room_week(name):
 
     # いまの年度・学期を見ているときだけ、今日の列といまの時限を示す
     now = datetime.datetime.now(JST)
-    is_current_view = (year in (None, get_current_year()) and term == get_current_term_label())
-    today = WEEK_DAYS[now.weekday()] if is_current_view and now.weekday() < 6 else None
+    today = WEEK_DAYS[now.weekday()] if is_current_view(year, term) and now.weekday() < 6 else None
     c_time = now.strftime("%H:%M")
     now_period = next((p for p, (s, e) in PERIODS.items() if s <= c_time <= e), None) if today else None
 
