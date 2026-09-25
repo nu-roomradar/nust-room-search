@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>教室から探す — RoomRadar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}?v={{ asset_version }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='room.css') }}?v={{ asset_version }}">
+</head>
+<body>
+<div class="wrap room-page">
+    <div class="test-banner">
+        <span class="test-tag">TEST</span>
+        <span><strong>テスト運用中</strong>の非公式サービスです（学生開発・大学公式ではありません）。</span>
+    </div>
+    <a class="back" href="{{ url_for('index') }}">← 空き教室検索へ</a>
+    <h1 class="search-title">教室から探す</h1>
+    <div class="sub">{% if year %}{{ year }}年度 {% endif %}{{ term }} · 教室をタップすると1週間の空きが見られます</div>
+
+    <div class="card">
+        {% with room_query=query %}{% include '_room_search_box.html' %}{% endwith %}
+    </div>
+
+    {% if query %}
+        {% if match_count %}
+        <div class="result-meta"><span class="result-label">「{{ query }}」に当てはまる教室</span><span class="count-chip"><em>{{ match_count }}</em> 室</span></div>
+        {% else %}
+        <div class="empty-state">
+            <span class="icon">🔍</span>
+            {% if not_found is defined and not_found %}{% if year %}{{ year }}年度の{% endif %}時間割に「{{ query }}」という教室はありません。{% else %}「{{ query }}」に当てはまる教室は見つかりませんでした。{% endif %}<br>
+            <small>教室番号の一部（例: 303）でも探せます。下の一覧からも選べます。</small>
+        </div>
+        {% endif %}
+    {% endif %}
+
+    {% set groups = matches if match_count else all_rooms %}
+    {% if not match_count %}<h2 class="list-title">すべての教室</h2>{% endif %}
+    {% for building, rooms in groups.items() %}
+    <div class="building-section">
+        <div class="building-label">
+            <span class="badge badge-{{ building_class.get(building, '') }}">{{ building }}</span>
+            {{ rooms|length }}室
+        </div>
+        <div class="room-grid">
+            {% for r in rooms %}
+            <a class="room-card room-link {{ building_class.get(building, '') }}"
+               href="{{ url_for('room_week', name=r.name, year=year, term=term) }}">
+                <span class="room-number">{{ r.name }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<script src="{{ url_for('static', filename='rooms.js') }}?v={{ asset_version }}"></script>
+</body>
+</html>

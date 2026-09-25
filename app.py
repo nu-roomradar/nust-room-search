@@ -8,7 +8,8 @@ import string
 import collections
 import time
 import logging
-from flask import Flask, render_template, request, jsonify
+import unicodedata
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 
 app = Flask(__name__)
 
@@ -538,6 +539,7 @@ def index():
         selected_year=year, selected_term=term, selected_span=span,
         max_period=MAX_PERIOD,
         available_years=available_years,
+        room_list=list_rooms(year),
         available_terms=VALID_TERMS,
         # いま（実時間）と違う年度・学期を見ているときに注意を出すための材料
         is_current_view=(year in (None, get_current_year()) and term == get_current_term_label()),
@@ -545,6 +547,73 @@ def index():
     )
 
 WEEK_DAYS = ["月", "火", "水", "木", "金", "土"]
+BUILDING_ORDER = ["タワースコラ", "駿河台校舎", "船橋校舎"]
+BUILDING_CLASS = {"タワースコラ": "tower", "駿河台校舎": "surugadai", "船橋校舎": "funabashi"}
+
+
+def normalize_room(text):
+    """教室名の表記ゆれを吸収する。全角/半角・大文字/小文字・空白の違いを無視する（「ｓ３０３」→「s303」）"""
+    return re.sub(r"\s+", "", unicodedata.normalize("NFKC", text or "")).lower()
+
+
+def room_sort_key(room):
+    b = room["building"]
+    return (BUILDING_ORDER.index(b) if b in BUILDING_ORDER else len(BUILDING_ORDER), room["name"])
+
+
+def list_rooms(year):
+    """検索対象の教室（教室マスタ）を校舎順に。年度が無い古い DB なら全件。DB が読めなければ空"""
+    try:
+        conn = sqlite3.connect(f"file:{DB_NAME}?mode=ro", uri=True)
+        try:
+            if year is None:
+                rows = conn.execute("SELECT DISTINCT name, building FROM classrooms").fetchall()
+            else:
+                rows = conn.execute("SELECT name, building FROM classrooms WHERE 年度=?", (year,)).fetchall()
+        finally:
+            conn.close()
+    except sqlite3.Error as e:
+        logging.error(f"RoomRadar list_rooms error: {e}")
+        return []
+    return sorted(({"name": str(n), "building": b} for n, b in rows), key=room_sort_key)
+
+
+def find_rooms(query, rooms):
+    """教室名で探す。表記ゆれを吸収して完全一致があればそれだけ、無ければ部分一致を全部返す"""
+    q = normalize_room(query)
+    if not q:
+        return []
+    exact = [r for r in rooms if normalize_room(r["name"]) == q]
+    if exact:
+        return exact
+    return [r for r in rooms if q in normalize_room(r["name"])]
+
+
+def group_by_building(rooms):
+    groups = collections.OrderedDict()
+    for r in sorted(rooms, key=room_sort_key):
+        groups.setdefault(r["building"], []).append(r)
+    return groups
+
+
+@app.route('/room')
+def room_search():
+    """教室名から、その教室の1週間を探す。1件に決まればそのまま1週間のページへ"""
+    available_years = get_available_years()
+    year = resolve_year(request.args.get('year'), available_years)
+    term = resolve_term(request.args.get('term'))
+    query = (request.args.get('q') or '').strip()[:40]
+    rooms = list_rooms(year)
+    matches = find_rooms(query, rooms)
+    if len(matches) == 1:
+        return redirect(url_for('room_week', name=matches[0]["name"], year=year, term=term))
+    return render_template(
+        'room_search.html', query=query, matches=group_by_building(matches),
+        match_count=len(matches), all_rooms=group_by_building(rooms), room_list=rooms,
+        year=year, term=term, available_years=available_years, available_terms=VALID_TERMS,
+        building_class=BUILDING_CLASS, asset_version=ASSET_VERSION,
+    )
+
 
 @app.route('/room/<path:name>')
 def room_week(name):
@@ -552,28 +621,59 @@ def room_week(name):
     available_years = get_available_years()
     year = resolve_year(request.args.get('year'), available_years)
     term = resolve_term(request.args.get('term'))
+    rooms = list_rooms(year)
+    room = next((r for r in rooms if r["name"] == name), None)
+    if room is None:
+        # 年度を切り替えたらその年度には無い教室だった、URL を手で打った、などは探す画面に回す
+        return render_template(
+            'room_search.html', query=name, matches={}, match_count=0, not_found=True,
+            all_rooms=group_by_building(rooms), room_list=rooms,
+            year=year, term=term, available_years=available_years, available_terms=VALID_TERMS,
+            building_class=BUILDING_CLASS, asset_version=ASSET_VERSION,
+        ), 404
+
+    where, params = ["教室=?", "履修期名=?"], [name, term]
+    if year is not None:
+        where.append("年度=?"); params.append(year)
     conn = sqlite3.connect(f"file:{DB_NAME}?mode=ro", uri=True)
     try:
-        room_q, room_p = "SELECT building FROM classrooms WHERE name=?", [name]
-        where, params = ["教室=?", "履修期名=?"], [name, term]
-        if year is not None:
-            room_q += " AND 年度=?"; room_p.append(year)
-            where.append("年度=?"); params.append(year)
-        row = conn.execute(room_q, room_p).fetchone()
-        if row is None:
-            return "教室が見つかりません", 404
-        grid = collections.defaultdict(list)
+        raw = collections.defaultdict(list)
         for d, p, subj in conn.execute(
                 f"SELECT 曜日, 時限, 科目名 FROM schedules WHERE {' AND '.join(where)} ORDER BY id", params):
-            subj = re.split(r"[↓{【]", subj or "")[0].strip()
-            if subj and subj not in grid[(d, int(p))]:
-                grid[(d, int(p))].append(subj)
+            raw[(d, int(p))].append(subj or "")
     finally:
         conn.close()
+
+    # 表示用に授業名を整える（「↓連続２時限【前期隔週】」などの印は落とす）。
+    # 隔週の授業だけで埋まっているコマは「隔週」と示す（検索結果の「週によっては空き」と同じ判定）
+    grid = {}
+    for key, subjects in raw.items():
+        names = []
+        for subj in subjects:
+            name_ = re.split(r"[↓{【]", subj)[0].strip()
+            if name_ and name_ not in names:
+                names.append(name_)
+        distinct = set(subjects)
+        grid[key] = {
+            "names": names or ["授業"],
+            "biweekly": len(distinct) == 1 and is_biweekly(next(iter(distinct))),
+        }
+
+    # いまの年度・学期を見ているときだけ、今日の列といまの時限を示す
+    now = datetime.datetime.now(JST)
+    is_current_view = (year in (None, get_current_year()) and term == get_current_term_label())
+    today = WEEK_DAYS[now.weekday()] if is_current_view and now.weekday() < 6 else None
+    c_time = now.strftime("%H:%M")
+    now_period = next((p for p, (s, e) in PERIODS.items() if s <= c_time <= e), None) if today else None
+
+    free_count = sum(1 for d in WEEK_DAYS for p in PERIODS if (d, p) not in grid)
     return render_template(
-        'room.html', room=name, building=row[0], grid=grid,
+        'room.html', room=name, building=room["building"],
+        building_cls=BUILDING_CLASS.get(room["building"], ""), grid=grid,
         days=WEEK_DAYS, periods=PERIODS, year=year, term=term,
-        asset_version=ASSET_VERSION,
+        available_years=available_years, available_terms=VALID_TERMS, room_list=rooms,
+        today=today, now_period=now_period, free_count=free_count,
+        total_slots=len(WEEK_DAYS) * len(PERIODS), asset_version=ASSET_VERSION,
     )
 
 if __name__ == '__main__':

@@ -114,6 +114,9 @@
                     <button type="submit" class="btn-search" id="btn-search"><span class="btn-in"><span class="spinner"></span><span class="btn-text">空き教室を検索</span></span></button>
                 </form>
             </div>
+            <div class="card">
+                {% with year=selected_year, term=selected_term %}{% include '_room_search_box.html' %}{% endwith %}
+            </div>
         </div><!-- /sidebar -->
 
         <!-- 右: 結果エリア（PC）/ 下部（スマホ） -->
@@ -306,5 +309,6 @@
 
 <script>window.RR = {{ rr_config|tojson }};</script>
 <script src="{{ url_for('static', filename='app.js') }}?v={{ asset_version }}"></script>
+<script src="{{ url_for('static', filename='rooms.js') }}?v={{ asset_version }}"></script>
 </body>
 </html>

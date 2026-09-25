@@ -448,3 +448,31 @@ select:focus { outline: none; border-color: var(--accent); }
 .biweekly-list a { padding: 6px 10px; border-radius: 10px; background: var(--surface2); color: var(--text); text-decoration: none; font-weight: 700; }
 .biweekly-list small { margin-left: 6px; color: var(--muted); font-weight: 400; font-size: 11px; }
 .result-note { display: block; color: var(--text); font-weight: 700; margin-bottom: 2px; }
+
+/* ── 教室から探す ── */
+.room-search label { margin-bottom: 8px; }
+.room-search-row { display: flex; gap: 8px; }
+.room-search input[type=search] {
+    flex: 1; min-width: 0; padding: 12px 14px;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-size: 16px; /* 16px 未満だと iPhone が勝手に拡大する */
+    font-family: 'Noto Sans JP', sans-serif; -webkit-appearance: none; appearance: none;
+}
+.room-search input[type=search]:focus { outline: none; border-color: var(--accent); }
+.room-search-btn {
+    flex: none; padding: 0 14px; border-radius: 10px; border: 1px solid var(--accent);
+    background: transparent; color: var(--accent); font-weight: 700; font-size: 0.88rem;
+    font-family: 'Noto Sans JP', sans-serif; cursor: pointer; white-space: nowrap;
+}
+.room-search-btn:active { transform: scale(0.97); }
+.room-recent { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.room-recent[hidden] { display: none; }
+.room-recent-label { font-size: 0.72rem; color: var(--muted); margin-right: 2px; }
+.room-recent-chips { display: contents; }
+.room-chip {
+    display: inline-block; padding: 6px 11px; border-radius: 99px; font-size: 0.82rem; font-weight: 700;
+    text-decoration: none; color: var(--text); background: var(--surface2); border: 1px solid var(--border);
+}
+.room-chip.tower     { color: var(--tower-color);     border-color: var(--tower-border); }
+.room-chip.surugadai { color: var(--surugadai-color); border-color: var(--surugadai-border); }
+.room-chip.funabashi { color: var(--funabashi-color); border-color: var(--funabashi-border); }

@@ -4,6 +4,7 @@ app.py（検索アプリ）の最小テスト。
 一時ディレクトリに作る。app.py は cwd 直下の DB ファイルを使うため、import 前に chdir する。
 実行: python -m unittest discover -s tests -v
 """
+import collections
 import datetime
 import os
 import re
@@ -597,6 +598,91 @@ class BiweeklyTests(unittest.TestCase):
                     self.assertTrue(rr.is_biweekly(subs.pop()))
         conn.close()
         self.assertGreater(found, 0)
+
+
+class RoomSearchTests(unittest.TestCase):
+    """教室名から、その教室の1週間を探す"""
+    def setUp(self):
+        self.c = rr.app.test_client()
+
+    def test_normalize_absorbs_width_case_and_spaces(self):
+        self.assertEqual(rr.normalize_room("ｓ３０３"), "s303")
+        self.assertEqual(rr.normalize_room(" S 303 "), "s303")
+        self.assertEqual(rr.normalize_room("CSTﾎｰﾙ"), rr.normalize_room("CSTホール"))
+
+    def test_exact_match_redirects_to_week_page(self):
+        for q in ("S303", "s303", "ｓ３０３", " S303 "):
+            r = self.c.get("/room", query_string={"q": q, "year": "2026", "term": "後期"})
+            self.assertEqual(r.status_code, 302, q)
+            self.assertIn("/room/S303?", r.headers["Location"])
+            self.assertIn("year=2026", r.headers["Location"])
+
+    def test_partial_match_lists_candidates(self):
+        rooms = rr.list_rooms(2026)
+        expect = [r["name"] for r in rooms if "30" in rr.normalize_room(r["name"])]
+        self.assertGreater(len(expect), 1)
+        html = self.c.get("/room", query_string={"q": "30", "year": "2026", "term": "後期"}).get_data(as_text=True)
+        self.assertIn(f"<em>{len(expect)}</em>", html)
+        for name in expect:
+            self.assertIn(f">{name}</span>", html)
+
+    def test_no_match_shows_message_and_all_rooms(self):
+        html = self.c.get("/room", query_string={"q": "存在しない教室", "year": "2026"}).get_data(as_text=True)
+        self.assertIn("見つかりませんでした", html)
+        self.assertIn("すべての教室", html)
+        self.assertEqual(html.count('class="room-card room-link'), len(rr.list_rooms(2026)))
+
+    def test_empty_query_lists_every_room(self):
+        html = self.c.get("/room?year=2025").get_data(as_text=True)
+        self.assertEqual(html.count('class="room-card room-link'), len(rr.list_rooms(2025)))
+
+    def test_pages_keep_the_notice(self):
+        for url in ("/room?q=30", "/room/S303", "/room/存在しない"):
+            html = self.c.get(url).get_data(as_text=True)
+            self.assertIn("テスト運用中", html, url)
+            self.assertIn("大学公式", html, url)
+
+    def test_room_name_with_slash_opens(self):
+        slash = [r["name"] for r in rr.list_rooms(2026) if "/" in r["name"]]
+        self.assertTrue(slash)
+        r = self.c.get("/room/" + slash[0] + "?year=2026&term=前期")
+        self.assertEqual(r.status_code, 200)
+        self.assertIn(slash[0], r.get_data(as_text=True))
+
+    def test_search_page_has_room_search_box(self):
+        html = self.c.get("/").get_data(as_text=True)
+        self.assertIn('action="/room"', html)
+        self.assertIn('<datalist id="room-list">', html)
+        self.assertIn('<option value="S303">', html)
+
+    def test_week_page_marks_biweekly_slots(self):
+        conn = sqlite3.connect(rr.DB_NAME)
+        rows = conn.execute("SELECT 教室, 曜日, 時限, 科目名 FROM schedules WHERE 年度=2026 AND 履修期名='前期'").fetchall()
+        conn.close()
+        masters = {r["name"] for r in rr.list_rooms(2026)}
+        slots = collections.defaultdict(set)
+        for room, d, p, subj in rows:
+            slots[(room, d, int(p))].add(subj)
+        target = next(k for k, v in slots.items()
+                      if k[0] in masters and len(v) == 1 and rr.is_biweekly(next(iter(v))) and "/" not in k[0])
+        expect = sum(1 for (room, d, p), v in slots.items()
+                     if room == target[0] and len(v) == 1 and rr.is_biweekly(next(iter(v))) and d in rr.WEEK_DAYS)
+        html = self.c.get(f"/room/{target[0]}?year=2026&term=前期").get_data(as_text=True)
+        self.assertEqual(html.count('class="bw-tag"'), expect)
+
+    def test_week_page_marks_today_and_now_only_for_current_term(self):
+        when = datetime.datetime(2026, 10, 7, 13, 30, tzinfo=rr.JST)   # 水曜3限・後期
+        class FakeDT(datetime.datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return when
+        with mock.patch.object(rr.datetime, "datetime", FakeDT):
+            now_html = self.c.get("/room/S303?year=2026&term=後期").get_data(as_text=True)
+            past_html = self.c.get("/room/S303?year=2026&term=前期").get_data(as_text=True)
+        self.assertIn("<small>今日</small>", now_html)
+        self.assertEqual(now_html.count('class="now-tag"'), 1)
+        self.assertNotIn("<small>今日</small>", past_html)
+        self.assertNotIn('class="now-tag"', past_html)
 
 
 if __name__ == "__main__":
