@@ -632,6 +632,11 @@ def room_week(name):
     rooms = list_rooms(year)
     room = next((r for r in rooms if r["name"] == name), None)
     if room is None:
+        # 表記ゆれ（全角/半角など）で1室に決まるなら、その教室へ転送する。
+        # 2026-09 に DB の教室名を NFKC に揃えたので、それ以前のリンク（階段教室（大）等）もここで拾う
+        same = [r for r in rooms if normalize_room(r["name"]) == normalize_room(name)]
+        if len(same) == 1:
+            return redirect(url_for('room_week', name=same[0]["name"], year=year, term=term))
         # 年度を切り替えたらその年度には無い教室だった、URL を手で打った、などは探す画面に回す。
         # URL の文字列をそのまま長々と画面に出さない（第三者が作ったリンクで好きな文を出させない）
         return _render_room_search(name[:ROOM_QUERY_MAX], rooms, year, term, not_found=True), 404

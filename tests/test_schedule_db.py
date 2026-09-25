@@ -110,7 +110,7 @@ class ScheduleDbTests(unittest.TestCase):
     # 船橋と駿河台に同じ番号の部屋があり、DB は教室名だけで束ねている（2026-09-11 時点で判明）。
     # 駿河台側の授業が船橋の同名教室を「使用中」にするが、空きを埋まって見せる方向なので安全側。
     # 原本を回収して校舎ごとに分けるまでは既知として許容し、これ以外が増えたら検知する。
-    KNOWN_NAME_COLLISIONS = {"134", "143", "144", "まち製図室１～５"}
+    KNOWN_NAME_COLLISIONS = {"134", "143", "144", "まち製図室1～5"}
 
     def test_room_building_is_consistent_between_tables(self):
         bad = {r[0] for r in self.q("""

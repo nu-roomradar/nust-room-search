@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>教室から探す — RoomRadar</title>
+    <title>個別の教室を検索 — RoomRadar</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}?v={{ asset_version }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='room.css') }}?v={{ asset_version }}">
 </head>
@@ -14,7 +14,7 @@
         <span><strong>テスト運用中</strong>の非公式サービスです（学生開発・大学公式ではありません）。</span>
     </div>
     <a class="back" href="{{ url_for('index') }}">← 空き教室検索へ</a>
-    <h1 class="search-title">教室から探す</h1>
+    <h1 class="search-title">個別の教室を検索</h1>
     <div class="sub">教室をタップすると、その教室の1週間の空きが見られます</div>
 
     <form class="view-switch" method="GET" action="">

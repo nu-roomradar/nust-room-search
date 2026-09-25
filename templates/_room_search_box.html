@@ -1,6 +1,6 @@
-{#- 教室名から1週間のページを探す入力欄。検索画面・1週間ページ・探す画面で共通 -#}
+{#- 個別の教室を検索する入力欄。「個別の教室を検索」ページと1週間ページで共通 -#}
 <form class="room-search" method="GET" action="{{ url_for('room_search') }}" role="search">
-    <label for="room-q">教室から探す</label>
+    <label for="room-q">教室名・教室番号</label>
     <div class="room-search-row">
         <input type="search" id="room-q" name="q" value="{{ room_query|default('') }}" list="room-list"
                placeholder="例: S303、1511" autocomplete="off" enterkeyhint="search" maxlength="40">

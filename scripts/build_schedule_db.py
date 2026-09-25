@@ -19,7 +19,7 @@ data/source/ に置かれた `<区分番号>_<区分名>_<学科番号>_<学科�
 出さないよう schedules には取り込むが、**教室マスタ（＝検索結果に出る教室の一覧）は
 理工学部・大学院からだけ作る**。RoomRadar は理工学部の学生向けで、短大専用教室を
 「空いています」と出しても行って使えるとは限らないため、安全側に倒している。
-`--divisions 1,3,4` で短大を外すと、短大取り込み前の内容を再現できる。
+`--divisions 1,3,4` で短大を外せる（占有判定から短大の授業が抜ける）。
 各ファイルはシート「前期」「後期」の 2 枚。中身は曜日×時限のグリッド（人が読む時間割表）。
   行1(0始まり)  B列に「2026年度」
   行2           B列に「理工学部 土木工学科」（大学院は「博士前期 土木工学専攻」）
@@ -51,14 +51,22 @@ data/source/ に置かれた `<区分番号>_<区分名>_<学科番号>_<学科�
                   例: 8号館実験室(819 826 829) → 819, 826, 829
            規則A  X(Y) で X が教室番号 → X だけ採用し (Y) は捨てる
                   例: 1201(PC演習室) → 1201 / S407(ｻﾃﾗｲﾄ時の主な相手:F1451) → S407
-           規則C  上に当たらなければ無加工（階段教室(大) 等はこの綴りで DB に載っている）
+           規則C  上に当たらなければ無加工（階段教室(大) 等はこの綴りで DB に載せる）
+           規則D  合同教室の略記「1456/7/8」→ 1456, 1457, 1458 に分ける（2026-09〜）。
+                  2つ目の片の桁数ぶん末尾を置き換える（1042/43 → 1042, 1043 ／ S1704/07/13/16 →
+                  S1704, S1707, S1713, S1716）。桁が増える片はその前に付ける（521/2/…/9/10 → …, 529, 5210）。
          中黒「・」は、両側がどちらも教室番号の形のときだけ分割する
          （短大の「1111・521」は分割、理工の「テクノ・工作技術センター」は分割しない）。
+         分ける前にセル全体を NFKC で正規化し、全角・半角の違いを無くす（2026-09〜）。
+         「階段教室（大）」と「階段教室(大)」、「CSTﾎｰﾙ」と「CSTホール」を同じ教室として数えるため。
+         ただし波線「～」は「~」にせず全角のまま残す（「まち製図室1～5」）。
+         教室番号 = ^[A-Za-z]?\d{3,4}[A-Za-z]?$（805B・811C のような末尾の英字も含む）。
+[誤記]   原本の明らかな誤記は ROOM_FIXES で直す（理由つき。レポートに件数を出す）。
 [教室 000/0000] "000"（教室未定）は捨てる。"0000" は schedules には残すが classrooms には入れない。
 [例外表] 規則では説明できず、DB 作成者が黙って捨てた 2 トークンだけを破棄する
          （EXCEPTION_DROP。件数と理由は必ずレポートに出す）。
 [校舎]   校舎列 F → 船橋校舎 ／ S かつ教室名が "S" 始まり → タワースコラ ／ S かつそれ以外 → 駿河台校舎。
-         例外: 「まち製図室１～５」は S 始まりでないのにタワースコラにあり、DB では
+         例外: 「まち製図室1～5」は S 始まりでないのにタワースコラにあり、DB では
          同じセルの先頭教室の校舎を引き継いでいる（BUILDING_INHERIT_ROOMS）。
 [classrooms] schedules に出た教室名から**年度ごとに**作る（"0000" は除く）。building は
          その教室がその年度の schedules で最も多く取った校舎（最頻値）。短期大学部（区分2）の
@@ -67,10 +75,12 @@ data/source/ に置かれた `<区分番号>_<区分名>_<学科番号>_<学科�
 ────────────────────────────────────────────────────────────────────────
 既知の未解決（翌年度に向けて）
 ────────────────────────────────────────────────────────────────────────
+* 2026-09 に全角・半角の統一（NFKC）と合同教室の分割（規則D）を入れたので、それ以前の
+  現行 DB（手作業で作られたもの）とは一致しない。「現行 DB を完全再現」はそれより前の検証の話。
 * 例外表の 2 件は一般規則に還元できない。規則A〜Cのどれにも当たらずカッコを含んだまま
   採用したトークンは「要目視」として警告に出すので、翌年度は必ず目を通すこと。
 * 教室 134/143/144 は原本の校舎列で F と S の両方に現れる（原本側の品質問題の可能性）。
-* 「まち製図室１～５」は現行 DB 内で 駿河台校舎4行 / タワースコラ7行 に割れている。
+* 「まち製図室1～5」は現行 DB 内で 駿河台校舎4行 / タワースコラ7行 に割れている。
   上の継承規則はそれを再現するもので、classrooms（タワースコラ）とは 4 行食い違う。
 
 ────────────────────────────────────────────────────────────────────────
@@ -116,9 +126,11 @@ DATA_ROW = 6            # データ開始行
 TITLE_ROW = 1           # 「2026年度」がある行
 DEPT_ROW, DEPT_COL = 2, 1   # 「理工学部 土木工学科」があるセル
 
-ROOM_CODE = re.compile(r"^[A-Za-z]?\d{3,4}$")     # 641 / 819 / 1425 / S407
+ROOM_CODE = re.compile(r"^[A-Za-z]?\d{3,4}[A-Za-z]?$")     # 641 / 819 / 1425 / S407 / 805B
+# 合同教室の略記（規則D）: 1456/7/8、1042/43、S1704/07/13/16、521/2/3/4/5/7/8/9/10
+JOINT_ROOMS = re.compile(r"^([A-Za-z]?\d{3,4})((?:/\d{1,4})+)$")
 # 「名前(中身)」の形。半角・全角どちらのカッコでも拾う（開きと閉じは同じ幅で揃っていること）。
-# 全角と半角は別物として扱う。教室マスタには「階段教室(大)」と「階段教室（大）」が別々に載っている
+# セルは先に NFKC で正規化するので、実際に来るのは半角カッコだけ（全角も念のため残す）
 PAREN_PAIRS = (("(", ")"), ("（", "）"))
 PAREN = re.compile(r"^([^()（）]*)(?:\(([^()（）]*)\)|（([^()（）]*)）)$")
 SPACES = re.compile(r"[ 　]+")
@@ -147,7 +159,13 @@ TANDAI_PREFIX = "短大 "     # 学科名に付ける印（「一般教育」が
 MIDDLE_DOTS = "・･"
 
 # S 始まりでないのにタワースコラにある教室。DB では同じセルの先頭教室の校舎を引き継いでいる
-BUILDING_INHERIT_ROOMS = {"まち製図室１～５"}
+BUILDING_INHERIT_ROOMS = {"まち製図室1～5"}   # normalize_text() 後の綴り
+
+# 原本の明らかな誤記。ここに足すのは、別の年度・別の原本と突き合わせて誤記と確かめられたときだけ
+ROOM_FIXES = {
+    "112/3": ("1122/3", "2025年度 航空宇宙工学科の原本。同じ授業（航空宇宙工学実験ⅡA/ⅡB 月3・4限）が"
+                        "2026年度は 1122/3 で、教室 112 はどの原本にも無い"),
+}
 BUILDING_ORDER = ("タワースコラ", "駿河台校舎", "船橋校舎")
 
 # 年度は行に持たせる。複数年度を同じ DB に同居させ、アプリ側で選べるようにするため。
@@ -189,6 +207,8 @@ class Stats:
         self.rule_a = collections.Counter()         # X(Y) → X
         self.rule_b = collections.Counter()         # X(Y) → Y を展開
         self.paren_kept = collections.Counter()     # 規則C だがカッコ付き = 要目視
+        self.rule_d = collections.Counter()         # 1456/7/8 → 1456, 1457, 1458
+        self.room_fixes = collections.Counter()     # 原本の誤記を直した数
         self.building_inherited = collections.Counter()
         self.duplicates = 0                         # 同じ行が重なって1行にまとめた数
         self.tandai_rows = 0       # 短期大学部由来の行（教室マスタには入れない）
@@ -475,16 +495,52 @@ def split_middle_dot(token):
     return [token]
 
 
+def normalize_text(text):
+    """全角・半角の違いを無くす（NFKC）。波線「～」だけは「~」にせず全角に戻す"""
+    return unicodedata.normalize("NFKC", text or "").replace("~", "～")
+
+
+def split_joint_rooms(token):
+    """規則D: 合同教室の略記を個別の教室に分ける。当てはまらなければ None
+
+    2つ目の片の桁数 w ぶん、先頭の教室番号の末尾を置き換える。
+      1456/7/8 → 1456, 1457, 1458 ／ 1042/43 → 1042, 1043 ／ S1704/07/13/16 → S1704, S1707, S1713, S1716
+    w より長い片は、置き換える前の部分に付ける（521/2/…/9/10 → 521, 522, …, 529, 5210）。
+    """
+    m = JOINT_ROOMS.match(token)
+    if not m:
+        return None
+    first = m.group(1)
+    pieces = m.group(2).split("/")[1:]
+    w = len(pieces[0])
+    digits = len(re.match(r"^[A-Za-z]?(\d+)", first).group(1))
+    if w >= digits:
+        return None   # 「101/102」のように片が先頭と同じ桁なら略記ではない。規則Dでは扱わない
+    base = first[:-w]
+    rooms = [first]
+    for p in pieces:
+        rooms.append(base + p if len(p) >= w else first[:-len(p)] + p)
+    return rooms
+
+
 def normalize_rooms(cell, stats, where):
     """教室名セル → 教室名のリスト。捨てたもの・変換したものは stats に記録する"""
     rooms = []
-    for token in tokenize_rooms(cell):
+    for token in tokenize_rooms(normalize_text(cell)):
         stats.tokens += 1
         if token == ROOM_UNDECIDED:
             stats.dropped_undecided += 1          # 教室未定
             continue
         if token in EXCEPTION_DROP:
             stats.dropped_exception[token] += 1   # 例外表（理由つきでレポートに出す）
+            continue
+        if token in ROOM_FIXES:
+            stats.room_fixes[f"{token} → {ROOM_FIXES[token][0]}"] += 1
+            token = ROOM_FIXES[token][0]
+        joint = split_joint_rooms(token)
+        if joint:
+            stats.rule_d[token] += 1              # 規則D: 合同教室の略記 → 個別の教室
+            rooms.extend(joint)
             continue
         m = PAREN.match(token)
         if not m:
@@ -691,6 +747,13 @@ def report_build(stats):
           f"{sum(stats.paren_kept.values()):,} 件 / {len(stats.paren_kept)} 種")
     for token, n in sorted(stats.paren_kept.items()):
         print(f"    {n:>4} 件  {token}")
+    print(f"規則D（合同教室を分ける）: {sum(stats.rule_d.values()):,} 件 / {len(stats.rule_d)} 種")
+    for token, n in sorted(stats.rule_d.items()):
+        print(f"    {n:>4} 件  {token} → {', '.join(split_joint_rooms(token))}")
+    if stats.room_fixes:
+        print("原本の誤記の修正（ROOM_FIXES）:")
+        for key, n in sorted(stats.room_fixes.items()):
+            print(f"    {n:>4} 件  {key}")
     if stats.building_inherited:
         print("校舎の継承補正（S 始まりでないタワースコラ教室）:")
         for key, n in sorted(stats.building_inherited.items()):
@@ -788,7 +851,7 @@ def main(argv=None):
     ap.add_argument("--no-write", action="store_true", help="DB を書かない（--report と組み合わせて確認だけ）")
     ap.add_argument("--divisions", default=None,
                     help="読む区分番号をカンマ区切りで絞る（1=理工学部 2=短期大学部 3=博士前期 4=博士後期）。"
-                         "既定は全部。`--divisions 1,3,4` で短大を外すと現行DBを完全再現する")
+                         "既定は全部。`--divisions 1,3,4` で短大を外す")
     args = ap.parse_args(argv)
 
     divisions = None

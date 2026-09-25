@@ -1,10 +1,10 @@
-// 教室から探す: 1週間ページの URL、最近見た教室（この端末だけに保存）、検索画面の年度・学期の引き継ぎ
+// 個別の教室を検索: 1週間ページの URL、最近見た教室（この端末だけに保存）、検索画面の年度・学期の引き継ぎ
 (function () {
     var KEY = 'rr_recent_rooms';
     var MAX = 6;
     var CLS = { 'タワースコラ': 'tower', '駿河台校舎': 'surugadai', '船橋校舎': 'funabashi' };
 
-    // 教室の1週間ページの URL。教室名に「/」を含むもの（S1704/07/13/16 など）があるので、区切りごとにエンコードする
+    // 教室の1週間ページの URL。教室名に「/」が入っても壊れないよう、区切りごとにエンコードする
     window.roomWeekUrl = function (name, year, term) {
         var q = new URLSearchParams();
         if (year) q.set('year', year);
@@ -33,7 +33,7 @@
         save(visited);
     }
 
-    // 空き教室検索の画面: 年度・学期を変えたら「教室から1週間を見る」のリンク先もそれに合わせる
+    // 空き教室検索の画面: 年度・学期を変えたら「個別の教室を検索」のリンク先もそれに合わせる
     var link = document.getElementById('room-search-link');
     var selYear = document.getElementById('sel-year');
     var selTerm = document.getElementById('sel-term');

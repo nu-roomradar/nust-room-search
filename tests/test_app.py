@@ -642,16 +642,30 @@ class RoomSearchTests(unittest.TestCase):
             self.assertIn("テスト運用中", html, url)
             self.assertIn("大学公式", html, url)
 
-    def test_room_name_with_slash_opens(self):
-        slash = [r["name"] for r in rr.list_rooms(2026) if "/" in r["name"]]
-        self.assertTrue(slash)
-        r = self.c.get("/room/" + slash[0] + "?year=2026&term=前期")
-        self.assertEqual(r.status_code, 200)
-        self.assertIn(slash[0], r.get_data(as_text=True))
+    def test_old_width_variant_urls_redirect(self):
+        """DB の教室名を NFKC に揃える前のリンク（全角カッコ・半角カナ）も開ける"""
+        for old, new in (("階段教室（大）", "階段教室(大)"), ("CSTﾎｰﾙ", "CSTホール")):
+            r = self.c.get("/room/" + old, query_string={"year": "2026", "term": "前期"})
+            self.assertEqual(r.status_code, 302, old)
+            self.assertIn("/room/" + new + "?", urllib.parse.unquote(r.headers["Location"]))
+
+    def test_joint_rooms_are_listed_individually(self):
+        """「1456/7/8」のような合同教室の略記は、1456・1457・1458 として別々の教室になる"""
+        names = {r["name"] for r in rr.list_rooms(2026)}
+        self.assertTrue({"1456", "1457", "1458", "S1704", "S1707", "S1713", "S1716"} <= names)
+        self.assertFalse(any("/" in n for n in names))
+        self.assertFalse({"階段教室（大）", "階段教室（小）", "CSTﾎｰﾙ"} & names)
+
+    def test_joint_room_class_marks_each_room_busy(self):
+        """2026年度前期 月3限の「1456/7/8」の授業で、1457 の1週間の月3限が埋まる"""
+        html = self.c.get("/room/1457?year=2026&term=前期").get_data(as_text=True)
+        m = re.search(r'<td class="(\w+)[^"]*"[^>]*data-slot="月3限"', html)
+        self.assertEqual(m.group(1), "busy")
 
     def test_search_page_links_to_room_search_without_changing_layout(self):
         html = self.c.get("/").get_data(as_text=True)
         self.assertIn('id="room-search-link"', html)
+        self.assertIn("個別の教室を検索", html)
         self.assertIn('href="/room?', html)
         self.assertNotIn('<datalist id="room-list">', html)   # 検索画面そのものには入力欄を置かない
 

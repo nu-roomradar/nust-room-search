@@ -61,11 +61,39 @@ class RoomTokenTests(unittest.TestCase):
         self.assertEqual(bsd.normalize_rooms("スタジオ（S701 S702 S705）", st, "t"),
                          ["S701", "S702", "S705"])
 
-    def test_keeps_full_and_half_width_variants_apart(self):
-        """教室マスタには「階段教室(大)」と「階段教室（大）」が別々に載っている。幅を揃えてはいけない"""
+    def test_unifies_full_and_half_width(self):
+        """全角・半角の違いは同じ教室として扱う（2026-09〜。以前は「階段教室（大）」が別の教室になっていた）"""
         st = bsd.Stats()
-        self.assertEqual(bsd.normalize_rooms("階段教室（大）", st, "t"), ["階段教室（大）"])
+        self.assertEqual(bsd.normalize_rooms("階段教室（大）", st, "t"), ["階段教室(大)"])
         self.assertEqual(bsd.normalize_rooms("階段教室(大)", st, "t"), ["階段教室(大)"])
+        self.assertEqual(bsd.normalize_rooms("CSTﾎｰﾙ", st, "t"), ["CSTホール"])
+        self.assertEqual(bsd.normalize_rooms("ｓ３０３", st, "t"), ["s303"])
+        # 波線は「~」にしない
+        self.assertEqual(bsd.normalize_rooms("まち製図室１～５", st, "t"), ["まち製図室1～5"])
+
+    def test_splits_joint_rooms(self):
+        """規則D: 合同教室の略記は個別の教室に分ける"""
+        cases = {
+            "1456/7/8": ["1456", "1457", "1458"],
+            "1457/58": ["1457", "1458"],
+            "1042/43": ["1042", "1043"],
+            "1231/32/33/34": ["1231", "1232", "1233", "1234"],
+            "S1704/07/13/16": ["S1704", "S1707", "S1713", "S1716"],
+            "521/2/3/4/5/7/8/9/10": ["521", "522", "523", "524", "525", "527", "528", "529", "5210"],
+            "S401/2": ["S401", "S402"],
+        }
+        for token, expect in cases.items():
+            st = bsd.Stats()
+            self.assertEqual(bsd.normalize_rooms(token, st, "t"), expect, token)
+            self.assertEqual(st.rule_d[token], 1)
+        # 略記でないものは分けない
+        self.assertIsNone(bsd.split_joint_rooms("1201"))
+        self.assertIsNone(bsd.split_joint_rooms("101/102"))
+
+    def test_fixes_known_typo_before_splitting(self):
+        st = bsd.Stats()
+        self.assertEqual(bsd.normalize_rooms("112/3", st, "t"), ["1122", "1123"])
+        self.assertEqual(sum(st.room_fixes.values()), 1)
 
     def test_middle_dot_splits_only_between_room_codes(self):
         # 短大の原本: 教室番号の区切り
@@ -74,6 +102,8 @@ class RoomTokenTests(unittest.TestCase):
         # 理工の原本: 教室名そのもの。割ると壊れる
         self.assertEqual(bsd.split_middle_dot("テクノ・工作技術センター"), ["テクノ・工作技術センター"])
         self.assertEqual(bsd.split_middle_dot("1041"), ["1041"])
+        # 半角の中黒・末尾に英字のある教室番号も、NFKC の後なら分ける
+        self.assertEqual(bsd.normalize_rooms("812･805B・811C", bsd.Stats(), "t"), ["812", "805B", "811C"])
 
     def test_junk_token_is_listed_as_dropped(self):
         self.assertIn("他", bsd.EXCEPTION_DROP)
