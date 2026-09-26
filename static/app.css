@@ -468,8 +468,18 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
 /* PC の Chrome/Safari は datalist の ▼ の幅を常に空けるので、例示の文字が切れる。▼ は隠す（補完は出る） */
 .room-search input::-webkit-calendar-picker-indicator { display: none !important; }
 .room-search input::-webkit-list-button { display: none; }
-/* 「個別の教室を検索」は「空き教室を検索」と同じ大きさ・見た目のボタン（.btn-search を使う）。a 要素なので表示だけ合わせる */
-a.btn-search.room-search-link { display: block; text-align: center; text-decoration: none; margin-top: 10px; }
+/* 「個別の教室を検索」: 主ボタンより控えめだが、ただの文字リンクより目立つ（淡い色の枠付き） */
+.room-search-link {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    margin-top: 10px; padding: 11px 14px; border-radius: 10px;
+    border: 1px solid rgba(108,143,255,0.45); background: rgba(108,143,255,0.10);
+    color: var(--accent); font-size: 0.95rem; font-weight: 700; text-decoration: none;
+    transition: background 0.2s;
+}
+.room-search-link:hover { background: rgba(108,143,255,0.18); }
+.room-search-link:active { transform: scale(0.98); }
+.room-search-link .arrow { transition: transform 0.2s; }
+.room-search-link:hover .arrow { transform: translateX(3px); }
 .room-recent { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .room-recent[hidden] { display: none; }
 .room-recent-label { font-size: 0.72rem; color: var(--muted); margin-right: 2px; }
