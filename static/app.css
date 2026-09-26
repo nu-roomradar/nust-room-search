@@ -468,10 +468,8 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
 /* PC の Chrome/Safari は datalist の ▼ の幅を常に空けるので、例示の文字が切れる。▼ は隠す（補完は出る） */
 .room-search input::-webkit-calendar-picker-indicator { display: none !important; }
 .room-search input::-webkit-list-button { display: none; }
-.room-search-link {
-    display: block; text-align: center; margin-top: 12px; padding: 6px 0;
-    color: var(--accent); font-size: 0.85rem; font-weight: 700; text-decoration: none;
-}
+/* 「個別の教室を検索」は「空き教室を検索」と同じ大きさ・見た目のボタン（.btn-search を使う）。a 要素なので表示だけ合わせる */
+a.btn-search.room-search-link { display: block; text-align: center; text-decoration: none; margin-top: 10px; }
 .room-recent { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .room-recent[hidden] { display: none; }
 .room-recent-label { font-size: 0.72rem; color: var(--muted); margin-right: 2px; }
