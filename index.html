@@ -995,35 +995,25 @@ footer { font-size: 0.8rem; line-height: 1.7; }
 /* TEST 札を文の先頭に入れて、札だけ別の行にならないように */
 .hero-note { display: block; max-width: 600px; text-align: center; }
 .hero-note-tag { display: inline-block; margin-right: 6px; vertical-align: 0.1em; }
-/* ヒーローの「今すぐ使う」: いちばん押してほしいボタンなので、青のグラデーションで大きく。
-   ゆっくり広がる輪（transform と opacity だけ）で目を引く。動きを減らす設定では輪を出さない */
+/* ヒーローの「今すぐ使う」: 落ち着いた黒のボタンに細い光沢と控えめな影。触れたときだけ矢印が進む */
 .hero-cta {
-  position: relative; isolation: isolate;
-  font-size: 1.12rem; padding: 18px 44px; gap: 12px;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 60%, #1e40af 100%);
-  box-shadow: 0 10px 28px rgba(37,99,235,0.38), inset 0 1px 0 rgba(255,255,255,0.25);
+  font-size: 1.05rem; font-weight: 700; letter-spacing: 0.04em;
+  padding: 17px 30px 17px 36px; gap: 14px;
+  background: linear-gradient(180deg, #2a2723 0%, #1a1814 100%);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset, 0 12px 30px -10px rgba(26,24,20,0.55);
 }
-.hero-cta:hover { box-shadow: 0 14px 36px rgba(37,99,235,0.48), inset 0 1px 0 rgba(255,255,255,0.25); }
-.hero-cta::after {
-  content: ''; position: absolute; inset: 0; border-radius: inherit; z-index: -1;
-  border: 2px solid rgba(37,99,235,0.55);
-  animation: ctaRing 2.6s ease-out infinite;
-}
-@keyframes ctaRing {
-  0%   { transform: scale(1);    opacity: 0.8; }
-  70%  { transform: scale(1.18); opacity: 0; }
-  100% { transform: scale(1.18); opacity: 0; }
-}
+.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset, 0 18px 36px -12px rgba(26,24,20,0.6); }
 .hero-cta .arrow {
-  display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 50%;
-  background: rgba(255,255,255,0.18); font-size: 1em;
+  display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); color: #fff; font-size: 0.9rem;
+  transition: transform 0.25s ease;
 }
-@media (max-width: 767px) {
-  .hero-cta { font-size: 1.05rem; padding: 16px 36px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .hero-cta::after { animation: none; opacity: 0; }
-}
+.hero-cta:hover .arrow { transform: translateX(4px); }
+@media (max-width: 767px) { .hero-cta { font-size: 1rem; padding: 15px 24px 15px 30px; } }
+/* 統計の数字: 横に広い Syne をやめ、本文と同じ Noto Sans JP の太字で詰めすぎず並べる */
+.stat-num { font-family: 'Noto Sans JP', sans-serif; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.stat-num span:not(.num) { font-size: 0.6em; margin-left: 2px; }
 /* TEST 表記は数字の下。少し間を空ける */
 .hero-note { margin-top: 22px; opacity: 1; animation: fadeUp 0.7s 0.75s ease both; }
 .stat-note { margin-top: 12px; }
