@@ -1017,11 +1017,15 @@ footer { font-size: 0.8rem; line-height: 1.7; }
 .stat-num { font-family: 'Noto Sans JP', sans-serif; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .stat-num span:not(.num) { font-size: 0.6em; margin-left: 2px; }
 /* 「今すぐ使う」の上下に余白 */
-/* タイトルとボタンの高さは、説明文が長かった以前のページと同じ位置にそろえる */
-.hero-typewriter { margin-bottom: 17px; }
-.hero-desc { margin-bottom: 73px; }
-.hero-stats { margin-top: 68px; }
-@media (max-width: 767px) { .hero-note { margin-top: 28px; } .hero { padding-top: 113px; } .hero-desc { margin-bottom: 81px; } .hero-stats { margin-top: 40px; } }
+/* ヒーローの余白: 説明文→ボタン→数字→TEST 表記を、同じ調子の間隔で並べる */
+.hero-typewriter { margin-bottom: 12px; }
+.hero-desc { margin: 20px auto 36px; }
+.hero-stats { margin-top: 48px; }
+@media (max-width: 767px) {
+  .hero-desc { margin: 16px auto 32px; }
+  .hero-stats { margin-top: 40px; }
+  .hero-note { margin-top: 28px !important; }
+}
 /* TEST 表記は数字の下。しっかり間を空ける */
 .hero-note { margin-top: 48px; text-align: center; opacity: 1; animation: fadeUp 0.7s 0.75s ease both; }
 .stat-note { margin-top: 12px; }
