@@ -995,6 +995,8 @@ footer { font-size: 0.8rem; line-height: 1.7; }
 /* TEST 札を文の先頭に入れて、札だけ別の行にならないように */
 .hero-note { display: block; max-width: 600px; text-align: center; }
 .hero-note-tag { display: inline-block; margin-right: 6px; vertical-align: 0.1em; }
+/* TEST 札は1行目に単独で、文は改行して中央ぞろえ */
+.hero-note .hero-note-tag { display: table; margin: 0 auto 8px; }
 /* ヒーローの「今すぐ使う」: 落ち着いた黒のボタンに細い光沢と控えめな影。触れたときだけ矢印が進む */
 .hero-cta {
   font-size: 1.05rem; font-weight: 700; letter-spacing: 0.04em;
@@ -1019,9 +1021,9 @@ footer { font-size: 0.8rem; line-height: 1.7; }
 .hero-typewriter { margin-bottom: 17px; }
 .hero-desc { margin-bottom: 73px; }
 .hero-stats { margin-top: 68px; }
-@media (max-width: 767px) { .hero { padding-top: 112px; } .hero-desc { margin-bottom: 81px; } .hero-stats { margin-top: 52px; } }
+@media (max-width: 767px) { .hero-note { margin-top: 28px; } .hero { padding-top: 113px; } .hero-desc { margin-bottom: 81px; } .hero-stats { margin-top: 40px; } }
 /* TEST 表記は数字の下。しっかり間を空ける */
-.hero-note { margin-top: 48px; opacity: 1; animation: fadeUp 0.7s 0.75s ease both; }
+.hero-note { margin-top: 48px; text-align: center; opacity: 1; animation: fadeUp 0.7s 0.75s ease both; }
 .stat-note { margin-top: 12px; }
 /* 「探しに行こ／う。」のように途中で折れないように */
 .cta-title .accent { display: inline-block; }
