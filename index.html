@@ -1014,8 +1014,12 @@ footer { font-size: 0.8rem; line-height: 1.7; }
 /* 統計の数字: 横に広い Syne をやめ、本文と同じ Noto Sans JP の太字で詰めすぎず並べる */
 .stat-num { font-family: 'Noto Sans JP', sans-serif; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .stat-num span:not(.num) { font-size: 0.6em; margin-left: 2px; }
-/* TEST 表記は数字の下。少し間を空ける */
-.hero-note { margin-top: 22px; opacity: 1; animation: fadeUp 0.7s 0.75s ease both; }
+/* 「今すぐ使う」の上下に余白 */
+.hero-desc { margin-bottom: 52px; }
+.hero-stats { margin-top: 68px; }
+@media (max-width: 767px) { .hero-desc { margin-bottom: 40px; } .hero-stats { margin-top: 52px; } }
+/* TEST 表記は数字の下。しっかり間を空ける */
+.hero-note { margin-top: 48px; opacity: 1; animation: fadeUp 0.7s 0.75s ease both; }
 .stat-note { margin-top: 12px; }
 /* 「探しに行こ／う。」のように途中で折れないように */
 .cta-title .accent { display: inline-block; }
