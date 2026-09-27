@@ -1015,9 +1015,11 @@ footer { font-size: 0.8rem; line-height: 1.7; }
 .stat-num { font-family: 'Noto Sans JP', sans-serif; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .stat-num span:not(.num) { font-size: 0.6em; margin-left: 2px; }
 /* 「今すぐ使う」の上下に余白 */
-.hero-desc { margin-bottom: 52px; }
+/* タイトルとボタンの高さは、説明文が長かった以前のページと同じ位置にそろえる */
+.hero-typewriter { margin-bottom: 17px; }
+.hero-desc { margin-bottom: 73px; }
 .hero-stats { margin-top: 68px; }
-@media (max-width: 767px) { .hero-desc { margin-bottom: 40px; } .hero-stats { margin-top: 52px; } }
+@media (max-width: 767px) { .hero { padding-top: 112px; } .hero-desc { margin-bottom: 81px; } .hero-stats { margin-top: 52px; } }
 /* TEST 表記は数字の下。しっかり間を空ける */
 .hero-note { margin-top: 48px; opacity: 1; animation: fadeUp 0.7s 0.75s ease both; }
 .stat-note { margin-top: 12px; }
