@@ -193,8 +193,12 @@ def period_end_dt(day_str, period_num):
     target_date = (now + datetime.timedelta(days=delta)).date()
     end_str = PERIODS[period_num][1]
     h, m = map(int, end_str.split(':'))
-    return datetime.datetime(target_date.year, target_date.month, target_date.day,
-                             h, m, tzinfo=JST)
+    end = datetime.datetime(target_date.year, target_date.month, target_date.day, h, m, tzinfo=JST)
+    # 今日のその時限がもう終わっているなら来週の分。そうしないと、終わった時限に入れた仮予約・報告が
+    # 期限切れとしてすぐ消えていた（月曜 12:30 以降に「月2限」を仮予約すると一覧に出ない、など）
+    if end <= now:
+        end += datetime.timedelta(days=7)
+    return end
 
 def init_reserve_db():
     conn = sqlite3.connect(RESERVE_DB)

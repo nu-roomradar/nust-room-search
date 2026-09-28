@@ -716,5 +716,23 @@ class RoomSearchTests(unittest.TestCase):
         self.assertNotIn('class="now-tag"', past_html)
 
 
+class PeriodEndTests(unittest.TestCase):
+    """仮予約・報告の期限（その時限の終わり）が、もう終わった時限でも過去にならない"""
+    def _at(self, when):
+        class FakeDT(datetime.datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return when
+        return mock.patch.object(rr.datetime, "datetime", FakeDT)
+
+    def test_period_already_over_today_rolls_to_next_week(self):
+        now = datetime.datetime(2026, 9, 28, 13, 7, tzinfo=rr.JST)   # 月曜 13:07（2限は 12:30 に終了）
+        with self._at(now):
+            end = rr.period_end_dt("月", 2)
+            self.assertGreater(end, now)
+            self.assertEqual((end.month, end.day, end.hour, end.minute), (10, 5, 12, 30))
+            self.assertEqual(rr.period_end_dt("月", 3).day, 28)       # 3限（15:00 まで）は今日のまま
+
+
 if __name__ == "__main__":
     unittest.main()
