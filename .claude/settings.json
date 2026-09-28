@@ -12,16 +12,25 @@
       "Bash(git push -f*)"
     ],
     "ask": [
-      "Bash(git push *)",
       "Bash(python scripts/post_to_instagram.py *)",
       "Bash(python3 scripts/post_to_instagram.py *)",
-      "Bash(curl *)",
-      "Bash(wget *)"
+      "mcp__github__actions_run_trigger"
     ],
     "allow": [
-      "Bash(python scripts/make_*)",
-      "Bash(python3 scripts/make_*)",
-      "Bash(pip install *)"
+      "Bash",
+      "Edit",
+      "Write",
+      "MultiEdit",
+      "Read",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "WebSearch",
+      "NotebookEdit",
+      "mcp__github__actions_list",
+      "mcp__github__get_job_logs",
+      "mcp__github__get_file_contents",
+      "mcp__github__list_commits"
     ]
   },
   "hooks": {
