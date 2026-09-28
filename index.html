@@ -1029,6 +1029,35 @@ footer { font-size: 0.8rem; line-height: 1.7; }
 /* TEST 表記は数字の下。しっかり間を空ける */
 .hero-note { margin-top: 68px; text-align: center; opacity: 1; animation: fadeUp 0.7s 0.75s ease both; }
 .stat-note { margin-top: 12px; }
+
+/* ════════════════════════════════════════════
+   3つの校舎（3D 模型）
+════════════════════════════════════════════ */
+.campus { padding-top: 72px; }
+.campus-stage {
+  position: relative; height: clamp(320px, 56vh, 560px);
+  background: #F0EEE6; border: 1px solid var(--border); border-radius: 20px; overflow: hidden;
+}
+.campus-stage rr-campus { position: absolute; inset: 0; height: 100%; }
+.campus-fallback { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 0.85rem; }
+.campus-stage.loaded .campus-fallback { display: none; }
+.campus-picks { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+.campus-pick {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px;
+  border-radius: 99px; border: 1.5px solid var(--border); background: var(--card); color: var(--ink);
+  font: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: border-color .2s, background .2s;
+}
+.campus-pick .n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 0.75rem; }
+.campus-pick em { font-style: normal; font-weight: 500; color: var(--muted); font-size: 0.8rem; }
+.campus-pick.tower[aria-pressed=true]  { border-color: var(--tower);  background: rgba(37,99,235,0.07); }
+.campus-pick.suruga[aria-pressed=true] { border-color: var(--suruga); background: rgba(22,163,74,0.07); }
+.campus-pick.funa[aria-pressed=true]   { border-color: var(--funa);   background: rgba(234,88,12,0.07); }
+.campus-note { margin: 14px auto 0; max-width: 720px; font-size: 0.74rem; color: var(--muted); line-height: 1.7; text-align: center; }
+@media (max-width: 767px) {
+  .campus { padding-top: 56px; }
+  .campus-stage { height: clamp(300px, 62vw, 420px); border-radius: 16px; }
+  .campus-pick { font-size: 0.8rem; padding: 0 12px; }
+}
 /* 「探しに行こ／う。」のように途中で折れないように */
 .cta-title .accent { display: inline-block; }
 </style>
@@ -1242,6 +1271,41 @@ footer { font-size: 0.8rem; line-height: 1.7; }
 </section>
 
 <div class="blend-band tall" style="background:linear-gradient(180deg,#2e3a55 0%,#f5f3ee 100%)"><span class="glow" style="background:var(--accent);left:25%"></span></div>
+<!-- ════════════════════════════════════════════
+     3つの校舎（3D 模型）
+════════════════════════════════════════════ -->
+<section class="campus" id="campus" aria-labelledby="campus-title">
+  <div class="section-inner">
+    <div class="section-eyebrow reveal">Campus</div>
+    <h2 class="section-title reveal" id="campus-title">
+      <span class="ja">3つの校舎の空き教室を、まとめて。</span>
+      <span class="en">Three buildings, one search.</span>
+      <span class="zh">三个教学楼的空教室，一次查完。</span>
+    </h2>
+    <div class="campus-stage reveal" id="campusStage">
+      <!-- 3D は画面に近づいてから読み込む（three.js が約 750KB あるため）。使えない環境ではこの静止表示のまま -->
+      <div class="campus-fallback" id="campusFallback">
+        <span class="campus-loading ja">校舎の模型を読み込み中…</span>
+        <span class="campus-loading en">Loading the campus model…</span>
+        <span class="campus-loading zh">正在加载校舎模型…</span>
+      </div>
+    </div>
+    <div class="campus-picks" role="group" aria-label="校舎">
+      <button type="button" class="campus-pick tower" data-id="tower" aria-pressed="false"><span class="n">1</span>
+        <span class="ja">タワー・スコラ</span><span class="en">Tower Schola</span><span class="zh">Tower Schola</span><em>38<span class="ja">室</span><span class="en"> rooms</span><span class="zh">间</span></em></button>
+      <button type="button" class="campus-pick suruga" data-id="ichi" aria-pressed="false"><span class="n">2</span>
+        <span class="ja">駿河台校舎</span><span class="en">Surugadai</span><span class="zh">骏河台校舍</span><em>27<span class="ja">室</span><span class="en"> rooms</span><span class="zh">间</span></em></button>
+      <button type="button" class="campus-pick funa" data-id="funa" aria-pressed="false"><span class="n">3</span>
+        <span class="ja">船橋校舎</span><span class="en">Funabashi</span><span class="zh">船桥校舍</span><em>119<span class="ja">室</span><span class="en"> rooms</span><span class="zh">间</span></em></button>
+    </div>
+    <p class="campus-note">
+      <span class="ja">※ 模型は公開情報の階数・高さをもとにした模式図で、実測ではありません（駿河台校舎は1号館を表示）。光っている階は空き教室のイメージで、実際の空き状況ではありません。教室数は2026年度の検索対象の数です。</span>
+      <span class="en">* A schematic model based on public floor counts and heights, not a survey (Surugadai shows Building 1). Lit floors are only an illustration, not live availability. Room counts are the rooms searchable for AY2026.</span>
+      <span class="zh">※ 模型根据公开的楼层数和高度制作，仅为示意，并非实测（骏河台校舍显示1号馆）。发光的楼层只是空教室的示意，不代表实际空闲情况。教室数为2026学年可搜索的教室数。</span>
+    </p>
+  </div>
+</section>
+
 <!-- ════════════════════════════════════════════
      特徴
 ════════════════════════════════════════════ -->
@@ -1845,6 +1909,46 @@ const GOOGLE_FORM = {
   // 入力中はキーボードやボタンに重ならないよう隠す
   document.addEventListener('focusin', e => { typing = !!e.target.closest('input, textarea, select'); update(); });
   document.addEventListener('focusout', () => { typing = false; update(); });
+})();
+
+// ════════════════════════════════════════════
+// 3つの校舎の 3D 模型: 画面に近づいてから読み込む。WebGL が使えなければ静止表示のまま
+// ════════════════════════════════════════════
+(function () {
+  const stage = document.getElementById('campusStage');
+  if (!stage || !('IntersectionObserver' in window)) return;
+  const picks = document.querySelectorAll('.campus-pick');
+  let el = null, overview = true;
+  const DEF = { tower: '2-5F', ichi: '3-5F', funa: 'bldg' };
+  function mark(id) { picks.forEach(b => b.setAttribute('aria-pressed', b.dataset.id === id ? 'true' : 'false')); }
+  function make(mode, id) {
+    const n = document.createElement('rr-campus');
+    n.setAttribute('mode', mode); n.setAttribute('theme', 'day');
+    n.setAttribute('aria-label', '日本大学理工学部の3つの校舎の模型（模式図）');
+    if (mode === 'overview') n.setAttribute('badges', '');
+    else { n.setAttribute('focus', id); n.setAttribute('zone', DEF[id]); }
+    n.addEventListener('ready', () => stage.classList.add('loaded'));
+    n.addEventListener('error', () => { stage.classList.remove('loaded'); n.remove(); });
+    n.addEventListener('pick', e => show(e.detail.id));
+    if (el) el.remove();
+    stage.appendChild(n); el = n;
+  }
+  // 校舎を選ぶと、その校舎だけの模型に切り替える。同じボタンをもう一度押すと全体に戻る
+  function show(id) {
+    if (!el) return;
+    const same = !overview && el.getAttribute('focus') === id;
+    if (same) { overview = true; make('overview'); mark(null); return; }
+    if (overview) { overview = false; make('single', id); }
+    else { el.setAttribute('zone', DEF[id]); el.setAttribute('focus', id); }
+    mark(id);
+  }
+  picks.forEach(b => b.addEventListener('click', () => show(b.dataset.id)));
+  const io = new IntersectionObserver(entries => {
+    if (!entries.some(e => e.isIntersecting)) return;
+    io.disconnect();
+    import('./assets/lp/rr-campus3d.js').then(() => make('overview')).catch(() => {});
+  }, { rootMargin: '300px 0px' });
+  io.observe(stage);
 })();
 </script>
 </body>
