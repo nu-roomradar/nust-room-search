@@ -935,7 +935,7 @@ footer { font-size: 0.8rem; line-height: 1.7; }
 .app-shot figcaption { margin-top: 14px; font-size: 0.78rem; color: var(--muted); text-align: center; line-height: 1.6; }
 
 /* このサービスについて */
-.about { background: var(--bg); }
+.about { background: #eef2ff; }  /* 意見箱の終わりと、最後の案内のつなぎ帯の色に合わせる */
 .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
 .about-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 24px; }
 .about-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
@@ -1633,44 +1633,6 @@ footer { font-size: 0.8rem; line-height: 1.7; }
 
 
 <!-- ════════════════════════════════════════════
-     CTA
-════════════════════════════════════════════ -->
-<div class="blend-band tall" style="background:linear-gradient(180deg,#eef2ff 0%,#2e3a55 100%)"><span class="glow" style="background:var(--accent);left:30%"></span></div>
-<section class="cta-section" id="cta">
-  <div class="cta-particles">
-    <span style="width:8px; height:8px; top:20%; left:15%; animation-delay:0s;"></span>
-    <span style="width:5px; height:5px; top:65%; left:80%; animation-delay:2s;"></span>
-    <span style="width:10px; height:10px; top:35%; left:70%; animation-delay:4s;"></span>
-    <span style="width:6px; height:6px; top:80%; left:25%; animation-delay:6s;"></span>
-    <span style="width:4px; height:4px; top:50%; left:45%; animation-delay:8s;"></span>
-    <span style="width:7px; height:7px; top:15%; left:90%; animation-delay:3s;"></span>
-  </div>
-  <div class="section-inner">
-    <h2 class="cta-title reveal">
-      <span class="ja">さあ、教室を<span class="accent">探しに行こう。</span></span>
-      <span class="en">Stop wandering.<br><span class="accent">Start searching.</span></span>
-      <span class="zh">别再乱走了。<br><span class="accent">立刻开始搜索。</span></span>
-    </h2>
-    <p class="cta-desc reveal">
-      <span class="ja">アプリのインストール不要。ブラウザだけで今すぐ使えます。</span>
-      <span class="en">No app install needed. Works in any browser, right now.</span>
-      <span class="zh">无需安装应用。现在就可以在浏览器中使用。</span>
-    </p>
-    <a href="https://nust-room-search.onrender.com" class="cta-btn reveal" target="_blank">
-      <span class="ja">RoomRadarを開く</span>
-      <span class="en">Open RoomRadar</span>
-      <span class="zh">打开RoomRadar</span>
-      →
-    </a>
-    <div class="cta-badge reveal">
-      <span class="ja">日本大学理工学部 · 学生プロジェクト · 2026</span>
-      <span class="en">Nihon University CST · Student Project · 2026</span>
-      <span class="zh">日本大学理工学部 · 学生项目 · 2026</span>
-    </div>
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════════
      このサービスについて
 ════════════════════════════════════════════ -->
 <section class="about" id="about" aria-labelledby="about-title">
@@ -1711,6 +1673,44 @@ footer { font-size: 0.8rem; line-height: 1.7; }
     </div>
   </div>
 </section>
+<!-- ════════════════════════════════════════════
+     CTA
+════════════════════════════════════════════ -->
+<div class="blend-band tall" style="background:linear-gradient(180deg,#eef2ff 0%,#2e3a55 100%)"><span class="glow" style="background:var(--accent);left:30%"></span></div>
+<section class="cta-section" id="cta">
+  <div class="cta-particles">
+    <span style="width:8px; height:8px; top:20%; left:15%; animation-delay:0s;"></span>
+    <span style="width:5px; height:5px; top:65%; left:80%; animation-delay:2s;"></span>
+    <span style="width:10px; height:10px; top:35%; left:70%; animation-delay:4s;"></span>
+    <span style="width:6px; height:6px; top:80%; left:25%; animation-delay:6s;"></span>
+    <span style="width:4px; height:4px; top:50%; left:45%; animation-delay:8s;"></span>
+    <span style="width:7px; height:7px; top:15%; left:90%; animation-delay:3s;"></span>
+  </div>
+  <div class="section-inner">
+    <h2 class="cta-title reveal">
+      <span class="ja">さあ、教室を<span class="accent">探しに行こう。</span></span>
+      <span class="en">Stop wandering.<br><span class="accent">Start searching.</span></span>
+      <span class="zh">别再乱走了。<br><span class="accent">立刻开始搜索。</span></span>
+    </h2>
+    <p class="cta-desc reveal">
+      <span class="ja">アプリのインストール不要。ブラウザだけで今すぐ使えます。</span>
+      <span class="en">No app install needed. Works in any browser, right now.</span>
+      <span class="zh">无需安装应用。现在就可以在浏览器中使用。</span>
+    </p>
+    <a href="https://nust-room-search.onrender.com" class="cta-btn reveal" target="_blank">
+      <span class="ja">RoomRadarを開く</span>
+      <span class="en">Open RoomRadar</span>
+      <span class="zh">打开RoomRadar</span>
+      →
+    </a>
+    <div class="cta-badge reveal">
+      <span class="ja">日本大学理工学部 · 学生プロジェクト · 2026</span>
+      <span class="en">Nihon University CST · Student Project · 2026</span>
+      <span class="zh">日本大学理工学部 · 学生项目 · 2026</span>
+    </div>
+  </div>
+</section>
+
 </main>
 
 <!-- スマホ用: スクロール中も押せる「開く」ボタン（ヒーローと最後の案内が見えている間は隠す） -->
