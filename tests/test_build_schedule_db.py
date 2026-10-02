@@ -108,6 +108,30 @@ class RoomTokenTests(unittest.TestCase):
     def test_junk_token_is_listed_as_dropped(self):
         self.assertIn("他", bsd.EXCEPTION_DROP)
 
+    def test_room_change_replaces_only_matching_row(self):
+        rows = [(2026, "物理学科", "後期", "月", 3, "S404", "タワースコラ", "数理統計の基礎Ⅱ"),
+                (2025, "物理学科", "後期", "月", 3, "S404", "タワースコラ", "数理統計の基礎Ⅱ"),
+                (2026, "物理学科", "前期", "月", 3, "S404", "タワースコラ", "数理統計の基礎Ⅰ")]
+        change = {"年度": 2026, "学期": "後期", "曜日": "月", "時限": 3, "学科": "物理学科",
+                  "科目名": "数理統計の基礎Ⅱ", "旧教室": "S404", "新教室": "S101", "新校舎": "タワースコラ"}
+        stats = bsd.Stats()
+        out = bsd.apply_room_changes(rows, [change], stats)
+        self.assertEqual(out[0][5], "S101")
+        self.assertEqual(out[1:], rows[1:])
+        self.assertEqual(stats.warnings, [])
+
+    def test_room_change_that_matches_nothing_is_warned(self):
+        change = {"年度": 2026, "学期": "後期", "曜日": "火", "時限": 1, "学科": "x",
+                  "科目名": "存在しない授業", "旧教室": "S404", "新教室": "S101", "新校舎": "タワースコラ"}
+        stats = bsd.Stats()
+        bsd.apply_room_changes([], [change], stats)
+        self.assertEqual(len(stats.warnings), 1)
+
+    def test_room_changes_file_matches_current_sources(self):
+        """data/room_changes.csv の各行に新教室と既知の校舎名が入っている（書き間違い防止）"""
+        for ch in bsd.read_room_changes(bsd.DEFAULT_CHANGES):
+            self.assertTrue(ch["新教室"] and ch["新校舎"] in bsd.BUILDING_ORDER, ch)
+
 
 class CliTests(unittest.TestCase):
     def test_rejects_bad_divisions(self):

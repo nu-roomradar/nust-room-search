@@ -62,6 +62,9 @@ data/source/ に置かれた `<区分番号>_<区分名>_<学科番号>_<学科�
          ただし波線「～」は「~」にせず全角のまま残す（「まち製図室1～5」）。
          教室番号 = ^[A-Za-z]?\d{3,4}[A-Za-z]?$（805B・811C のような末尾の英字も含む）。
 [誤記]   原本の明らかな誤記は ROOM_FIXES で直す（理由つき。レポートに件数を出す）。
+[教室変更] 学期が始まってからの教室変更は原本に載らないので、data/room_changes.csv に
+         1 授業 1 行で書き、組み立ての最後に差し替える（2026-10〜）。年度・学期・曜日・時限・学科・
+         科目名・旧教室がすべて合う行だけを新教室に変える。どの行にも当たらない変更は警告に出す。
 [教室 000/0000] "000"（教室未定）は捨てる。"0000" は schedules には残すが classrooms には入れない。
 [例外表] 規則では説明できず、DB 作成者が黙って捨てた 2 トークンだけを破棄する
          （EXCEPTION_DROP。件数と理由は必ずレポートに出す）。
@@ -97,6 +100,7 @@ data/source/ に置かれた `<区分番号>_<区分名>_<学科番号>_<学科�
 """
 import argparse
 import collections
+import csv
 import re
 import shutil
 import sqlite3
@@ -110,6 +114,7 @@ REPO = Path(__file__).resolve().parents[1]
 DEFAULT_SRC = REPO / "data" / "source"
 DEFAULT_REF = REPO / "schedule_final.db"
 DEFAULT_OUT = REPO / "schedule_final.new.db"
+DEFAULT_CHANGES = REPO / "data" / "room_changes.csv"
 
 # 原本ファイル名: <区分番号>_<区分名>_<学科番号>_<学科名>[_<コース>]_<年>年_時間割表N面_<timestamp>.xls
 SRC_GLOB = "[0-9]_*.xls"
@@ -211,6 +216,7 @@ class Stats:
         self.room_fixes = collections.Counter()     # 原本の誤記を直した数
         self.building_inherited = collections.Counter()
         self.duplicates = 0                         # 同じ行が重なって1行にまとめた数
+        self.room_changes = []     # (変更の説明, 当たった行数)
         self.tandai_rows = 0       # 短期大学部由来の行（教室マスタには入れない）
         self.warnings = []
 
@@ -625,6 +631,41 @@ def build_rows(metas, stats):
     return rows, master_rows
 
 
+def read_room_changes(path):
+    """data/room_changes.csv → 変更のリスト。ファイルが無ければ空"""
+    path = Path(path)
+    if not path.exists():
+        return []
+    with path.open(encoding="utf-8", newline="") as f:
+        out = []
+        for i, r in enumerate(csv.DictReader(f), start=2):
+            try:
+                out.append({**{k: (v or "").strip() for k, v in r.items()},
+                            "年度": int(r["年度"]), "時限": int(r["時限"])})
+            except (KeyError, ValueError) as exc:
+                raise SourceError(f"{path} の {i} 行目が読めません: {exc}") from exc
+    return out
+
+
+def apply_room_changes(rows, changes, stats):
+    """学期中の教室変更を差し替える。キーが全部合う行だけ変え、当たらない変更は警告"""
+    rows = list(rows)
+    for ch in changes:
+        key = (ch["年度"], ch["学科"], ch["学期"], ch["曜日"], ch["時限"], ch["旧教室"], ch["科目名"])
+        hit = 0
+        for i, (year, dept, term, day, period, room, building, subject) in enumerate(rows):
+            if (year, dept, term, day, period, room, subject) == key:
+                rows[i] = (year, dept, term, day, period, ch["新教室"], ch["新校舎"], subject)
+                hit += 1
+        desc = (f"{ch['年度']} {ch['学期']} {ch['曜日']}{ch['時限']} {ch['学科']}「{ch['科目名']}」"
+                f" {ch['旧教室']} → {ch['新教室']}（確認 {ch.get('確認日', '')}）")
+        if stats is not None:
+            stats.room_changes.append((desc, hit))
+            if not hit:
+                stats.warn(f"教室変更がどの行にも当たりませんでした: {desc}")
+    return rows
+
+
 def build_classrooms(rows, stats):
     """schedules の行から教室マスタを作る。年度ごとに、building は最頻値、並びは初出順
 
@@ -754,6 +795,10 @@ def report_build(stats):
         print("原本の誤記の修正（ROOM_FIXES）:")
         for key, n in sorted(stats.room_fixes.items()):
             print(f"    {n:>4} 件  {key}")
+    if stats.room_changes:
+        print("学期中の教室変更（data/room_changes.csv）:")
+        for desc, n in stats.room_changes:
+            print(f"    {n:>4} 行  {desc}")
     if stats.building_inherited:
         print("校舎の継承補正（S 始まりでないタワースコラ教室）:")
         for key, n in sorted(stats.building_inherited.items()):
@@ -845,6 +890,8 @@ def main(argv=None):
                     help="使う年度フォルダ（例 2027）。省略するといちばん新しい年度")
     ap.add_argument("--out", default=str(DEFAULT_OUT), help=f"出力先 DB（既定 {DEFAULT_OUT}）")
     ap.add_argument("--ref", default=str(DEFAULT_REF), help=f"比較する現行 DB（既定 {DEFAULT_REF}）")
+    ap.add_argument("--changes", default=str(DEFAULT_CHANGES),
+                    help=f"学期中の教室変更の一覧（既定 {DEFAULT_CHANGES}）")
     ap.add_argument("--replace", action="store_true",
                     help="現行 DB（--ref）を置き換える。置き換え前に .bak を作る")
     ap.add_argument("--report", action="store_true", help="現行 DB との差分を出す")
@@ -875,6 +922,9 @@ def main(argv=None):
         if len(years) > 1:
             print(f"  {len(years)} 年度分を 1 つの DB に入れます（アプリ側で選べる）")
         rows, master_rows = build_rows(metas, stats)
+        changes = read_room_changes(args.changes)
+        rows = apply_room_changes(rows, changes, stats)
+        master_rows = apply_room_changes(master_rows, changes, None)
         # 教室マスタは短大を除いた行から作る（短大専用教室を検索対象に増やさないため）
         classrooms = build_classrooms(master_rows, stats)
     except SourceError as exc:
