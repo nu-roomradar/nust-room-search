@@ -57,6 +57,12 @@ def collect(src_dirs, divisions, stats):
                     "校舎記号": rec["building_col"], "校舎": building,
                     "教室名": rec["room_raw"], "教室": room, "原本ファイル": rec["file"],
                 })
+    # 学期中の教室変更（data/room_changes.csv）も DB と同じく反映する。原本の表記（教室名）はそのまま
+    for ch in bsd.read_room_changes(bsd.DEFAULT_CHANGES):
+        for r in rows:
+            if (r["年度"], r["学科"], r["履修期名"], r["曜日"], r["時限"], r["教室"], r["科目名"]) == (
+                    ch["年度"], ch["学科"], ch["学期"], ch["曜日"], ch["時限"], ch["旧教室"], ch["科目名"]):
+                r["教室"], r["校舎"] = ch["新教室"], ch["新校舎"]
     return rows
 
 
