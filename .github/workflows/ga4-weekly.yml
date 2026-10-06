@@ -1,0 +1,39 @@
+name: GA4 週次の記録
+
+# 毎週月曜 6:07 JST に、直前の1週（月〜日）の利用状況を data/ga4_weekly.* に追記する。
+# main への push で Render が再デプロイされるので、授業時間（平日 9:00–20:30）を避けた早朝に回す。
+# 必要な Secrets: GA4_PROPERTY_ID / GA4_SA_KEY（docs/OPERATIONS.md 4.6）
+on:
+  schedule:
+    - cron: "7 21 * * 0"   # 日曜 21:07 UTC = 月曜 6:07 JST
+  workflow_dispatch:
+    inputs:
+      weeks:
+        description: "直前の何週ぶんを取り直すか（初回は 4 など）"
+        default: "1"
+
+permissions:
+  contents: write
+
+jobs:
+  ga4:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install google-analytics-data
+      - name: Fetch GA4
+        env:
+          GA4_PROPERTY_ID: ${{ secrets.GA4_PROPERTY_ID }}
+          GA4_SA_KEY: ${{ secrets.GA4_SA_KEY }}
+        run: python scripts/fetch_ga4_metrics.py --weeks "${{ inputs.weeks || '1' }}"
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ga4_weekly.json data/ga4_weekly.md data/ga4_history.json data/ga4_breakdown.json
+          if git diff --staged --quiet; then echo "変更なし"; exit 0; fi
+          git commit -m "chore: GA4 週次の記録を更新 ($(TZ=Asia/Tokyo date +%Y-%m-%d))"
+          git pull --rebase origin main && git push

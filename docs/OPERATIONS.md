@@ -32,7 +32,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 | GitHub Organization `nu-roomradar` | コード・Actions・Secrets・Pages | `Kota0004`、`csko24143-droid`（いずれも現運営者） | Organization の Owner が Settings → People から招待 |
 | Render | アプリのホスティング・プラン変更・ログ | [要記入] | Render ダッシュボード → Team → Invite |
 | Meta for Developers（Instagram API） | 投稿用アクセストークンの発行 | [要記入] | アプリの「役割」に管理者として追加 |
-| Google Analytics（GA4） | LP の計測（集計の自動取得は 2026-08 に終了） | [要記入] | GA4 の管理 → プロパティのアクセス管理 |
+| Google Analytics（GA4） | LP とアプリの計測（週次の自動記録は 4.6） | [要記入] | GA4 の管理 → プロパティのアクセス管理 |
 | Claude（Pro） | Claude Code on the web での開発・運用作業 | 現運営者の個人契約 | 個人ごとに契約。組織契約（Team）に上げるかは人数次第 |
 | GitHub Secrets（`IG_ACCESS_TOKEN` / `IG_ACCOUNT_ID`） | Instagram 投稿ワークフロー | GitHub の Owner | リポジトリ Settings → Secrets and variables → Actions |
 
@@ -92,6 +92,27 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 
 トークンはログに出ない（長さと末尾4文字だけ）。
 
+## 4.6 GA4 週次の記録（2026-10〜）
+
+`.github/workflows/ga4-weekly.yml` が毎週月曜 6:07 JST に `scripts/fetch_ga4_metrics.py` を回し、直前の1週（月〜日）の利用状況を `data/ga4_weekly.md`（表）と `data/ga4_weekly.json` に追記する。アプリと LP はドメインが別なので分けて記録する。ダッシュボード用の `data/ga4_history.json`・`ga4_breakdown.json`（直近28日）も更新する。
+2026-08 までの取得が毎回失敗していたのは、下の Secrets が未設定だったため。
+
+**最初の設定（運営者の作業・1回だけ。iPad は Safari の「デスクトップ用Webサイトを表示」で）**
+1. https://console.cloud.google.com/ でプロジェクトを作る（名前は roomradar など）。
+2. 「API とサービス」→「ライブラリ」で **Google Analytics Data API** を有効にする。
+3. 「IAM と管理」→「サービスアカウント」→ 作成（名前は ga4-reader など。ロールは付けなくてよい）。
+4. 作ったサービスアカウント →「鍵」→「鍵を追加」→「新しい鍵を作成」→ **JSON**。ファイルがダウンロードされる（再取得できないので保管）。
+5. GA4（https://analytics.google.com ）→ 管理 → **プロパティのアクセス管理** → ＋ → 手順3のメールアドレス（`…@….iam.gserviceaccount.com`）を **閲覧者** で追加。
+6. GA4 → 管理 → **プロパティの詳細** の「プロパティ ID」（数字）を控える。
+7. https://github.com/nu-roomradar/nust-room-search/settings/secrets/actions で2つ登録する。
+   - `GA4_PROPERTY_ID` … 手順6の数字
+   - `GA4_SA_KEY` … 手順4の JSON ファイルの中身を丸ごと
+8. Actions →「GA4 週次の記録」→ Run workflow（weeks に `4` を入れると直前4週を取り直す）。`data/ga4_weekly.md` に表が出れば完了。
+
+**検索条件の内訳**（校舎・曜日・時限）を取るには、GA4 → 管理 → カスタム定義 → カスタムディメンションに `search_building`・`search_day`・`search_period`（範囲＝イベント）を登録する。未登録でも週次の記録は取れる（警告が出るだけ）。
+
+**失敗したとき**: `Secrets … が設定されていません` → 手順7。`PERMISSION_DENIED` → 手順5（閲覧者の追加漏れ・別プロパティ）。`API has not been used` → 手順2。
+
 ## 5. 日常の作業のしかた
 
 1. claude.ai/code でこのリポジトリを開き、やりたいことを日本語で伝える。
@@ -122,7 +143,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 - **仮予約・報告が再デプロイで消える。** Render の無料プランはディスクが揮発する。残したいときは Render の有料プラン（Starter 以上）で Disk を付け（例: マウント先 `/var/data`、1GB で足りる）、Environment に `DATA_DIR=/var/data` を追加する。コード側は対応済み。Disk を付けるとそのサービスはゼロダウンタイムデプロイができなくなる点に注意。
 - ブランチ運用・PR レビューが無い（ひとり運用のため）。2人以上になったら PR 運用に切り替える。
 - テストは最小限（運用スクリプト・hook・API・検索ページ）。UI の見た目は `/verify-ui` で目視。
-- Instagram・GA4 の集計は 2026-08 に終了。ダッシュボードは最終取得時点のデータを表示したまま（凍結）。
+- Instagram の集計は 2026-08 に終了（凍結）。GA4 は 2026-10 に週次の記録として再開（4.6）。
 - LP のスマホ幅ナビは横スワイプで動くが、スワイプできることを示す手がかりが無い。
 - 「テスト運用中・非公式」の表記は学生課・教務課との協議次第で変わる可能性がある。変えるときは `.claude/hooks/guard-notices.py` の `GUARDED` も更新する。
 
