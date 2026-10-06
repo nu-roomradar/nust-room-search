@@ -1,1 +1,103 @@
-{"updated": null}
+{
+ "updated": "2026-10-06",
+ "events": {
+  "search": 93,
+  "report_room": 1
+ },
+ "search_building": [
+  {
+   "label": "main",
+   "count": 34
+  },
+  {
+   "label": "all",
+   "count": 32
+  },
+  {
+   "label": "tower",
+   "count": 18
+  },
+  {
+   "label": "funabashi",
+   "count": 9
+  }
+ ],
+ "search_period": [
+  {
+   "label": "2",
+   "count": 40
+  },
+  {
+   "label": "3",
+   "count": 27
+  },
+  {
+   "label": "4",
+   "count": 12
+  },
+  {
+   "label": "1",
+   "count": 8
+  },
+  {
+   "label": "5",
+   "count": 4
+  },
+  {
+   "label": "6",
+   "count": 2
+  }
+ ],
+ "search_day": [
+  {
+   "label": "火",
+   "count": 31
+  },
+  {
+   "label": "月",
+   "count": 20
+  },
+  {
+   "label": "金",
+   "count": 17
+  },
+  {
+   "label": "水",
+   "count": 13
+  },
+  {
+   "label": "木",
+   "count": 11
+  },
+  {
+   "label": "土",
+   "count": 1
+  }
+ ],
+ "channels": [
+  {
+   "label": "Referral",
+   "sessions": 104
+  },
+  {
+   "label": "Organic Social",
+   "sessions": 48
+  },
+  {
+   "label": "Direct",
+   "sessions": 30
+  },
+  {
+   "label": "Unassigned",
+   "sessions": 10
+  },
+  {
+   "label": "Cross-network",
+   "sessions": 7
+  },
+  {
+   "label": "Organic Search",
+   "sessions": 1
+  }
+ ]
+}

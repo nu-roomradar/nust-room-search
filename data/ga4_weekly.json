@@ -1,0 +1,82 @@
+[
+ {
+  "week_start": "2026-09-07",
+  "week_end": "2026-09-13",
+  "app": {
+   "users": 2,
+   "sessions": 5,
+   "page_views": 13
+  },
+  "lp": {
+   "users": 1,
+   "sessions": 3,
+   "page_views": 4
+  },
+  "events": {
+   "search": 7,
+   "report_room": 0,
+   "reserve_room": 0,
+   "feedback_submit": 0
+  }
+ },
+ {
+  "week_start": "2026-09-14",
+  "week_end": "2026-09-20",
+  "app": {
+   "users": 2,
+   "sessions": 3,
+   "page_views": 4
+  },
+  "lp": {
+   "users": 0,
+   "sessions": 0,
+   "page_views": 0
+  },
+  "events": {
+   "search": 1,
+   "report_room": 0,
+   "reserve_room": 0,
+   "feedback_submit": 0
+  }
+ },
+ {
+  "week_start": "2026-09-21",
+  "week_end": "2026-09-27",
+  "app": {
+   "users": 15,
+   "sessions": 22,
+   "page_views": 79
+  },
+  "lp": {
+   "users": 15,
+   "sessions": 21,
+   "page_views": 25
+  },
+  "events": {
+   "search": 29,
+   "report_room": 0,
+   "reserve_room": 0,
+   "feedback_submit": 0
+  }
+ },
+ {
+  "week_start": "2026-09-28",
+  "week_end": "2026-10-04",
+  "app": {
+   "users": 40,
+   "sessions": 62,
+   "page_views": 121
+  },
+  "lp": {
+   "users": 32,
+   "sessions": 47,
+   "page_views": 50
+  },
+  "events": {
+   "search": 47,
+   "report_room": 1,
+   "reserve_room": 0,
+   "feedback_submit": 0
+  }
+ }
+]
