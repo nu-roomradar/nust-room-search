@@ -358,7 +358,7 @@ export function createStage(canvas, opts = {}) {
     // 3校舎なら三角に、駿河台の2校舎だけなら左右に並べる
     const LAYOUT = ids.length === 3
       ? { tower: [0, -1.85, 0], ichi: [-2.55, 1.85, 0.32], funa: [2.45, 1.8, -0.32] }
-      : { tower: [1.85, -0.25, -0.12], ichi: [-2.25, 0.75, 0.32], funa: [1.85, -0.25, -0.12] };
+      : { tower: [2.45, -0.1, -0.12], ichi: [-2.85, 0.65, 0.32], funa: [2.45, -0.1, -0.12] };
     for (const id of ids) place(models[id], ...LAYOUT[id]);
     ground.position.y = -0.142;
   } else {
