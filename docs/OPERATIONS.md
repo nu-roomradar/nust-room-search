@@ -36,6 +36,13 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 | Claude（Pro） | Claude Code on the web での開発・運用作業 | 現運営者の個人契約 | 個人ごとに契約。組織契約（Team）に上げるかは人数次第 |
 | GitHub Secrets（`IG_ACCESS_TOKEN` / `IG_ACCOUNT_ID`） | Instagram 投稿ワークフロー | GitHub の Owner | リポジトリ Settings → Secrets and variables → Actions |
 
+**大学側の窓口**
+
+| 窓口 | 連絡先 | 用件 |
+|---|---|---|
+| 自主創造プロジェクト（本部） | honbu-gakusei@nihon-u.ac.jp | プロジェクトの事務、他学部への依頼（2026-10：各学部の教室担当部署へのアンケート依頼） |
+| 理工学部 学生課 | 運営者のメールのやり取りを参照 | 周知の許可、テスト運用（2026-10-13〜12-19、駿河台キャンパスのみ） |
+
 ## 3. 定期作業カレンダー
 
 | いつ | 何を | どうやって |
