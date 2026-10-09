@@ -17,7 +17,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 | 検索アプリ（`app.py`） | Render https://nust-room-search.onrender.com | `main` に push すると自動デプロイ（数分） |
 | LP（`index.html`）・運営用ダッシュボード（`dashboard.html`） | GitHub Pages https://nu-roomradar.github.io/nust-room-search/ | `main` に push すると自動反映 |
 | 時間割 DB（`schedule_final.db`） | リポジトリ内 | 2025・2026年度を同居（2026年度: 前期 6,437 行・後期 6,260 行・教室 180）。**`python scripts/build_schedule_db.py` で原本から再現できる**（6.） |
-| 仮予約・使用中報告（`reservations.db` / `reports.db`） | Render の実行環境 | 実行時に自動生成。**再起動・再デプロイで消える**。環境変数 `DATA_DIR` を永続ディスクに向ければ残る（6. 参照） |
+| 「実は使われていた」報告（`reports.db`。仮予約は 2026-10 に廃止） | Render の実行環境 | 実行時に自動生成。**再起動・再デプロイで消える**。環境変数 `DATA_DIR` を永続ディスクに向ければ残る（6. 参照） |
 | Instagram @roomradar_nust | Meta | `instagram-post.yml` を手動起動して投稿 |
 | ソースコード | GitHub Organization `nu-roomradar` / `nust-room-search` | 現状は `main` へ直接 push（ひとり運用のため） |
 
@@ -50,7 +50,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 | **毎週月曜 09:00** | 運用ヘルスチェックの結果を見る | 自動で動く。異常があれば「【運用ヘルスチェック】異常を検知しました」という Issue が開く。復旧すると自動で閉じる。**Issue が開いたら中を読んで対応する**だけでよい |
 | **毎月1日** | Instagram トークンの自動延長 | 自動。`ig-token-refresh.yml` が60日先まで延ばして Secret を書き換える。**人がやることは無い。失敗したときだけ対応**（下の「Instagram トークンの自動更新」参照） |
 | **年1回程度** | `IG_REFRESH_PAT` の更新 | PAT に有効期限を付けた場合のみ。切れると上の自動延長が失敗し、ヘルスチェックが Issue で知らせる |
-| **後期開始前（9/24 に Issue が自動で立つ）** | Render のプランを Starter に戻す | Render ダッシュボード → `nust-room-search` → Settings → Instance Type。**再起動で仮予約データが消える**ので利用の少ない時間帯に |
+| **後期開始前（9/24 に Issue が自動で立つ）** | Render のプランを Starter に戻す | Render ダッシュボード → `nust-room-search` → Settings → Instance Type。**再起動で報告データが消える**ので利用の少ない時間帯に |
 | **夏休み前（7月末）** | Render のプランを Free に落とす（費用節約） | 同上。戻し忘れ防止に `render-plan-reminder.yml` がある |
 | **4/1 と 9/21** | 検索の学期が自動で前期／後期に切り替わる | 何もしなくてよい。ただし DB にその学期の時間割が入っている必要がある |
 | **年1回（3〜4月）** | 翌年度の時間割を DB に入れる | 教務ページから時間割表をダウンロード → `data/source/` に置く → `python scripts/build_schedule_db.py --report` で差分を確認 → 問題なければ `--replace`。手順は 6. |
@@ -64,7 +64,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 | 「テスト運用中・非公式」表記が本番から消えた | ヘルスチェックの Issue | 学生課・教務課と協議中のため即対応。`CLAUDE.md` ルール1。Claude Code なら hook が編集を止めるので、消えるとすれば手作業か外部要因 |
 | Actions が失敗している | GitHub → Actions → 該当 run のログ | Instagram 系なら 9 割トークン失効。CI の失敗はテストが落ちている＝直すまで `main` に入れない |
 | Instagram に投稿できない | Actions のログの `[ERROR]` 行 | `code=190` / `OAuthException` → トークン再発行。それ以外は `.claude/skills/instagram-post/SKILL.md` |
-| 仮予約・報告が全部消えた | — | Render の再起動・デプロイで消える仕様。復旧不要。利用者への説明は「時限終了で自動リセット」の範囲内 |
+| 報告が全部消えた | — | Render の再起動・デプロイで消える仕様。復旧不要。利用者への説明は「時限終了で自動リセット」の範囲内 |
 | 検索結果がおかしい（授業中のはずの教室が空きで出る） | `schedule_final.db` の該当学期のデータ | DB が古い、または学期切替の境界（4/1・9/21）。時間割の更新が必要 |
 | 何が壊れているか分からない | Claude Code on the web でリポジトリを開き、症状を説明する | `CLAUDE.md` と skills を読んだ状態で調査してくれる |
 
@@ -126,7 +126,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 2. Instagram 投稿・ポスター・画面確認は `/instagram-post` `/make-poster` `/verify-ui` の手順書に沿って進む。**投稿と `git push` は必ず確認が入る**。
 3. **本番に出す前に必ず運営者が確認する。** Claude は変更を作業ブランチに置き、変わる画面のスクショ（スマホ幅・PC幅）を送ってくる。見て「OK」と返したときだけ `main` に出る（2026-09 から。CLAUDE.md ルール5）。
    `main` に push すると Render と GitHub Pages が自動更新される。数分後に本番を自分のスマホで確認する（Claude の環境からは本番が見えない）。
-4. **アプリ（`app.py`・`templates/`・`static/`・`schedule_final.db`）の push は授業時間外（平日 20:30 以降・日曜など）に行う。** push すると Render が再デプロイし、その時点の仮予約・報告が消えるため（永続ディスクは付けない方針。2026-09 決定）。LP・ダッシュボードだけの変更はいつでもよい。
+4. **アプリ（`app.py`・`templates/`・`static/`・`schedule_final.db`）の push は授業時間外（平日 20:30 以降・日曜など）に行う。** push すると Render が再デプロイし、その時点の報告が消えるため（永続ディスクは付けない方針。2026-09 決定）。LP・ダッシュボードだけの変更はいつでもよい。
 5. CI（`ci.yml`）が push ごとにテストを回す。赤くなったら直す。
 
 ## 6. 未整備・既知の課題（引き継ぎ時に必ず共有）
@@ -147,7 +147,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 
 - **短期大学部は船橋校舎を共用している。** 2026-09 に取り込むまで、短大の授業が入っている教室を「空き」と表示していた（既存181教室のうち20室・109スロット）。schedules には短大を入れるが、教室マスタ（検索結果に出る教室）は理工学部・大学院からだけ作る。短大専用教室は理工の学生が行っても使えるとは限らないため。
 - **教室名が校舎をまたいで衝突している。** 「134」「143」「144」は船橋と駿河台の両方に存在し、「まち製図室1～5」はタワースコラと駿河台にあるが、DB は教室名だけで束ねている（`classrooms.name` が一意）。駿河台側の授業があると船橋の同名教室が「使用中」と出る。**空きを埋まって見せる方向の誤りなので実害は小さい**が、原本を回収したら (校舎, 教室) で管理するよう直す。それまでは `tests/test_schedule_db.py` の `KNOWN_NAME_COLLISIONS` に既知として登録してある。
-- **仮予約・報告が再デプロイで消える。** Render の無料プランはディスクが揮発する。残したいときは Render の有料プラン（Starter 以上）で Disk を付け（例: マウント先 `/var/data`、1GB で足りる）、Environment に `DATA_DIR=/var/data` を追加する。コード側は対応済み。Disk を付けるとそのサービスはゼロダウンタイムデプロイができなくなる点に注意。
+- **報告が再デプロイで消える。** Render の無料プランはディスクが揮発する。残したいときは Render の有料プラン（Starter 以上）で Disk を付け（例: マウント先 `/var/data`、1GB で足りる）、Environment に `DATA_DIR=/var/data` を追加する。コード側は対応済み。Disk を付けるとそのサービスはゼロダウンタイムデプロイができなくなる点に注意。
 - ブランチ運用・PR レビューが無い（ひとり運用のため）。2人以上になったら PR 運用に切り替える。
 - テストは最小限（運用スクリプト・hook・API・検索ページ）。UI の見た目は `/verify-ui` で目視。
 - Instagram の集計は 2026-08 に終了（凍結）。GA4 は 2026-10 に週次の記録として再開（4.6）。

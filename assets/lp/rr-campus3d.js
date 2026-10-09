@@ -10,6 +10,7 @@
  * 属性: mode = overview | single / theme = day | night / focus = tower | ichi | funa
  *       zone = tower: 1F 2-5F 6-18F R · ichi: 3-5F 6F stair · funa: bldg track
  *       period = 1周の秒数（0 で停止, 既定 80） / badges = 全体表示に 1・2・3 のボタンを重ねる
+ *       campuses = 全体表示に出す校舎（空白区切り。既定は tower ichi funa。例: "tower ichi"）
  * イベント: ready / pick（detail.id — badges のクリック） / anchors（detail = [{id,x,y}] 毎フレーム）
  * JS から: el.stage.setFocus('ichi','6F') など createStage() の戻り値を直接操作可
  */
@@ -344,14 +345,21 @@ export function createStage(canvas, opts = {}) {
   const groundMat = new THREE.ShadowMaterial({ opacity: 0.16, color: 0x141413 });
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(90, 90), groundMat); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
   const rig = new THREE.Group(); scene.add(rig);
-  const models = { tower: buildTower(M), ichi: buildIchi(M), funa: buildFuna(M) };
+  const ids = (opts.ids && opts.ids.length ? opts.ids : ['tower', 'ichi', 'funa']);
+  const BUILD = { tower: buildTower, ichi: buildIchi, funa: buildFuna }, models = {};
+  for (const id of ids) models[id] = BUILD[id](M);
+  if (!models[focus]) focus = ids[0];
 
   if (mode === 'overview') {
     const tg = new THREE.CylinderGeometry(6.1, 6.1, 0.14, 128), table = new THREE.Mesh(tg, M.table);
     table.position.y = -0.07; table.castShadow = table.receiveShadow = true; rig.add(table);
     const te = new THREE.LineSegments(new THREE.EdgesGeometry(tg, 30), M.line); te.position.y = -0.07; rig.add(te);
     const place = (R, x, z, ry) => { R.root.position.set(x, 0, z); R.root.rotation.y = ry; rig.add(R.root); };
-    place(models.tower, 0, -1.85, 0); place(models.ichi, -2.55, 1.85, 0.32); place(models.funa, 2.45, 1.8, -0.32);
+    // 3校舎なら三角に、駿河台の2校舎だけなら左右に並べる
+    const LAYOUT = ids.length === 3
+      ? { tower: [0, -1.85, 0], ichi: [-2.55, 1.85, 0.32], funa: [2.45, 1.8, -0.32] }
+      : { tower: [1.85, -0.25, -0.12], ichi: [-2.25, 0.75, 0.32], funa: [1.85, -0.25, -0.12] };
+    for (const id of ids) place(models[id], ...LAYOUT[id]);
     ground.position.y = -0.142;
   } else {
     for (const k in models) { rig.add(models[k].root); models[k].root.visible = k === focus; }
@@ -431,7 +439,7 @@ export function createStage(canvas, opts = {}) {
   const io = new IntersectionObserver(es => { vis = es[0].isIntersecting; }, { threshold: 0 }); io.observe(canvas);
   canvas.style.transition = 'opacity 260ms ease';
 
-  const anc = ['tower', 'ichi', 'funa'], av = new V3();
+  const anc = ids, av = new V3();
   function frame(now) {
     raf = requestAnimationFrame(frame);
     if ((!vis || document.hidden) && ready) { last = now; return; }
@@ -487,16 +495,19 @@ class RRCampus extends HTMLElement {
     const canvas = root.querySelector('canvas');
     canvas.setAttribute('aria-label', this.getAttribute('aria-label') || '日本大学理工学部の校舎模型');
     const mode = this.getAttribute('mode') === 'single' ? 'single' : 'overview', badges = mode === 'overview' && this.hasAttribute('badges');
+    const ids = (this.getAttribute('campuses') || '').split(/\s+/).filter(id => IDS.includes(id));
+    const shown = ids.length ? ids : IDS;
     this.badgeEls = {};
-    if (badges) IDS.forEach((id, i) => {
-      const b = document.createElement('button'); b.type = 'button'; b.textContent = String(i + 1); b.setAttribute('aria-label', ['タワー・スコラ', '駿河台校舎 1号館', '船橋校舎'][i]);
+    const NAMES = { tower: 'タワー・スコラ', ichi: '駿河台校舎 1号館', funa: '船橋校舎' };
+    if (badges) shown.forEach((id, i) => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = String(i + 1); b.setAttribute('aria-label', NAMES[id]);
       b.addEventListener('click', () => this.dispatchEvent(new CustomEvent('pick', { detail: { id }, bubbles: true })));
       root.appendChild(b); this.badgeEls[id] = b;
     });
     const p = this.getAttribute('period');
     try {
       this.stage = createStage(canvas, {
-        mode, theme: this.getAttribute('theme') || 'day', period: p === null ? 80 : +p,
+        mode, ids: shown, theme: this.getAttribute('theme') || 'day', period: p === null ? 80 : +p,
         focus: this.getAttribute('focus') || 'tower', zone: this.getAttribute('zone') || null,
         onAnchors: (a) => {
           for (const q of a) { const b = this.badgeEls[q.id]; if (b) b.style.transform = 'translate(' + q.x.toFixed(1) + 'px,' + q.y.toFixed(1) + 'px)'; }

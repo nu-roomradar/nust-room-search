@@ -77,7 +77,7 @@ if (RR.searched && !RR.auto && !RR.error) window.addEventListener('load', functi
     showToast('✓ 検索しました — ' + RR.count + '室');
 });
 
-// ── 仮予約モーダル ──
+// ── 教室モーダル（その教室の1週間へのリンクと「実は使われていた」の報告） ──
 let currentRoom = '', currentBuilding = '';
 
 function openModal(room, building) {
@@ -87,10 +87,7 @@ function openModal(room, building) {
     document.getElementById('modal-week').href = window.roomWeekUrl(room, RR.year, RR.term);  // static/rooms.js
     document.getElementById('modal-info').textContent =
         building + ' · ' + RR.day + '曜 ' + RR.period + '限';
-    document.getElementById('reserve-name').value = '';
-    document.getElementById('reserve-note').value = '';
     document.getElementById('modal').classList.add('open');
-    updateReserveButton();
     updateReportButton();
 }
 
@@ -100,53 +97,6 @@ function closeModal() {
 
 function handleOverlayClick(e) {
     if (e.target === document.getElementById('modal')) closeModal();
-}
-
-async function submitReserve() {
-    const name    = document.getElementById('reserve-name').value.trim();
-    const purpose = document.getElementById('reserve-note').value.trim();
-    if (!name) { showToast('⚠ お名前を入力してください'); return; }
-
-    // すでに予約済みなら取り消し
-    const storedCode = localStorage.getItem(`reserve_${currentRoom}_${RR.day}_${RR.period}`);
-    if (storedCode) {
-        const res = await fetch('/api/reserve/cancel', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({room: currentRoom, day: RR.day, period: RR.period, cancel_code: storedCode})
-        });
-        const data = await res.json();
-        if (data.ok) {
-            localStorage.removeItem(`reserve_${currentRoom}_${RR.day}_${RR.period}`);
-            closeModal();
-            showToast('✓ 仮予約を取り消しました');
-            setTimeout(() => location.reload(), 1000);
-        }
-        return;
-    }
-
-    // 新規予約
-    const res = await fetch('/api/reserve', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            room: currentRoom, building: currentBuilding,
-            day: RR.day, period: RR.period,
-            name, purpose
-        })
-    });
-    const data = await res.json();
-    if (data.ok) {
-        localStorage.setItem(`reserve_${currentRoom}_${RR.day}_${RR.period}`, data.cancel_code);
-        if (typeof gtag === 'function') {
-            gtag('event', 'reserve_room', { building: currentBuilding, room: currentRoom });
-        }
-        closeModal();
-        showToast('✓ ' + currentRoom + ' を仮予約しました（RoomRadar上のみ）');
-        setTimeout(() => location.reload(), 1000);
-    } else if (data.error === 'rate_limited') {
-        showToast('⚠ しばらく時間をおいて再試行してください');
-    }
 }
 
 // ── 使用中報告 ──
@@ -191,19 +141,6 @@ async function submitReport() {
         closeModal();
         showToast('⚠ 報告しました。ありがとうございます！');
         setTimeout(() => location.reload(), 1000);
-    }
-}
-
-function updateReserveButton() {
-    const btn  = document.querySelector('.btn-reserve');
-    const code = localStorage.getItem(`reserve_${currentRoom}_${RR.day}_${RR.period}`);
-    if (!btn) return;
-    if (code) {
-        btn.textContent = '✓ 予約済み（タップで取り消し）';
-        btn.style.background = 'rgba(77,217,160,0.3)';
-    } else {
-        btn.textContent = '仮予約する';
-        btn.style.background = '';
     }
 }
 

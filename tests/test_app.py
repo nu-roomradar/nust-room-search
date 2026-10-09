@@ -1,6 +1,6 @@
 """
 app.py（検索アプリ）の最小テスト。
-時間割DB（schedule_final.db）は本物をコピーし、揮発DB（reservations.db / reports.db）は
+時間割DB（schedule_final.db）は本物をコピーし、揮発DB（reports.db）は
 一時ディレクトリに作る。app.py は cwd 直下の DB ファイルを使うため、import 前に chdir する。
 実行: python -m unittest discover -s tests -v
 """
@@ -108,63 +108,25 @@ class ApiTests(unittest.TestCase):
     def setUp(self):
         self.c = rr.app.test_client()
         rr._rate_store.clear()
-        for db, table in ((rr.RESERVE_DB, "reservations"), (rr.REPORTS_DB, "reports")):
-            conn = sqlite3.connect(db)
-            conn.execute(f"DELETE FROM {table}")
-            conn.commit(); conn.close()
+        conn = sqlite3.connect(rr.REPORTS_DB); conn.execute("DELETE FROM reports"); conn.commit(); conn.close()
 
-    def reserve(self, **over):
-        body = {"room": "1041", "building": "船橋校舎", "day": "月", "period": 2, "name": "テスト太郎", "purpose": "自習"}
-        body.update(over)
-        return self.c.post("/api/reserve", json=body)
+    def test_reservation_feature_is_gone(self):
+        """仮予約は 2026-10 に学生課との協議を受けて廃止した。API も画面も残っていないこと"""
+        for path in ("/api/reserve", "/api/reserve/cancel"):
+            self.assertEqual(self.c.post(path, json={"room": "1041", "day": "月", "period": 2, "name": "x"}).status_code, 404, path)
+        self.assertEqual(self.c.get("/api/reserve/list?day=月&period=2").status_code, 404)
+        html = self.c.post("/", data={"day": "月", "period": "2", "building": "all"}).get_data(as_text=True)
+        self.assertNotIn("仮予約", html)
+        self.assertNotIn("予約中", html)
+        self.assertNotIn("reserve-name", html)
+        self.assertFalse(hasattr(rr, "RESERVE_DB"))
 
-    def test_reserve_roundtrip(self):
-        r = self.reserve()
-        self.assertEqual(r.status_code, 200)
-        j = r.get_json()
-        self.assertTrue(j["ok"]); self.assertEqual(j["count"], 1)
-        code = j["cancel_code"]
-
-        lst = self.c.get("/api/reserve/list?day=月&period=2").get_json()
-        self.assertEqual([x["room"] for x in lst["reservations"]], ["1041"])
-        self.assertEqual(lst["reservations"][0]["name"], "テスト太郎")
-
-        wrong = self.c.post("/api/reserve/cancel", json={"room": "1041", "day": "月", "period": 2, "cancel_code": "XXXXXX"})
-        self.assertFalse(wrong.get_json()["ok"])
-        right = self.c.post("/api/reserve/cancel", json={"room": "1041", "day": "月", "period": 2, "cancel_code": code})
-        self.assertTrue(right.get_json()["ok"])
-        self.assertEqual(self.c.get("/api/reserve/list?day=月&period=2").get_json()["reservations"], [])
-
-    def test_reserve_rejects_invalid_input(self):
-        for bad in ({"day": "日"}, {"period": 7}, {"period": "2"}, {"name": ""}, {"room": " "}):
-            r = self.reserve(**bad)
-            self.assertEqual(r.status_code, 400, bad)
-            self.assertEqual(r.get_json()["error"], "invalid")
-        self.assertEqual(self.c.post("/api/reserve", data="not json").status_code, 400)
-        self.assertEqual(self.c.get("/api/reserve/list?day=日&period=2").status_code, 400)
-        self.assertEqual(self.c.get("/api/reserve/list?day=月&period=9").status_code, 400)
-
-    def test_reserve_truncates_long_fields(self):
-        self.reserve(name="あ" * 40, purpose="い" * 100)
-        item = self.c.get("/api/reserve/list?day=月&period=2").get_json()["reservations"][0]
-        self.assertEqual(len(item["name"]), 30)
-        self.assertEqual(len(item["purpose"]), 60)
-
-    def test_reserve_rate_limited_returns_429(self):
+    def test_report_rate_limited_returns_429(self):
         with mock.patch.object(rr, "RATE_LIMIT", 2):
-            self.assertEqual(self.reserve().status_code, 200)
-            self.assertEqual(self.reserve().status_code, 200)
-            r = self.reserve()
-        self.assertEqual(r.status_code, 429)
-        self.assertEqual(r.get_json()["error"], "rate_limited")
-
-    def test_expired_reservations_are_cleaned_on_list(self):
-        past = (datetime.datetime.now(rr.JST) - datetime.timedelta(days=1)).isoformat()
-        conn = sqlite3.connect(rr.RESERVE_DB)
-        conn.execute("INSERT INTO reservations (room, building, day, period, name, purpose, cancel_code, created_at, expires_at) "
-                     "VALUES ('1041','船橋校舎','月',2,'古い','',  'ABC123', ?, ?)", (past, past))
-        conn.commit(); conn.close()
-        self.assertEqual(self.c.get("/api/reserve/list?day=月&period=2").get_json()["reservations"], [])
+            codes = [self.c.post("/api/report", json={"room": room, "day": "月", "period": 2},
+                                 headers=as_ip("203.0.113.9")).status_code
+                     for room in ("1041", "1042", "1043")]
+        self.assertEqual(codes, [200, 200, 429])
 
     def test_report_counts_and_cancel(self):
         body = {"room": "1041", "day": "月", "period": 2}
@@ -259,8 +221,7 @@ class AbuseResistanceTests(unittest.TestCase):
     def setUp(self):
         self.c = rr.app.test_client()
         rr._rate_store.clear()
-        for db, table in ((rr.RESERVE_DB, "reservations"), (rr.REPORTS_DB, "reports")):
-            conn = sqlite3.connect(db); conn.execute(f"DELETE FROM {table}"); conn.commit(); conn.close()
+        conn = sqlite3.connect(rr.REPORTS_DB); conn.execute("DELETE FROM reports"); conn.commit(); conn.close()
 
     def ip_for(self, xff, remote="127.0.0.1"):
         with rr.app.test_request_context("/", headers={"X-Forwarded-For": xff} if xff else {},
@@ -281,11 +242,10 @@ class AbuseResistanceTests(unittest.TestCase):
 
     def test_spoofed_header_does_not_bypass_rate_limit(self):
         """先頭を毎回変えても、末尾（本当の接続元）が同じなら制限される"""
-        body = {"room": "1041", "building": "船橋校舎", "day": "月", "period": 2, "name": "x"}
         codes = []
         with mock.patch.object(rr, "RATE_LIMIT", 3):
             for i in range(5):
-                r = self.c.post("/api/reserve", json=body,
+                r = self.c.post("/api/report", json={"room": f"104{i}", "day": "月", "period": 2},
                                 headers={"X-Forwarded-For": f"6.6.6.{i}, 203.0.113.9"})
                 codes.append(r.status_code)
         self.assertEqual(codes, [200, 200, 200, 429, 429])
@@ -340,7 +300,7 @@ class AbuseResistanceTests(unittest.TestCase):
 
     def test_cancel_endpoints_are_rate_limited(self):
         """キャンセルコードの総当たりを防ぐ"""
-        for path in ("/api/report/cancel", "/api/reserve/cancel"):
+        for path in ("/api/report/cancel",):
             rr._rate_store.clear()
             codes = []
             with mock.patch.object(rr, "RATE_LIMIT", 2):

@@ -14,33 +14,29 @@ def lang_spans(cls):
 
 class LandingPageTests(unittest.TestCase):
     def test_room_count_matches_latest_year_in_db(self):
-        """ヒーローの教室数は、DB のいちばん新しい年度の教室マスタの件数（年度を足したら直す）"""
+        """ヒーローの教室数は、DB のいちばん新しい年度の駿河台キャンパス（タワースコラ・駿河台校舎）の教室数。
+        テスト運用は駿河台キャンパスのみが対象なので、船橋校舎は数えない（2026-10 学生課と協議）"""
         con = sqlite3.connect(f"file:{ROOT / 'schedule_final.db'}?mode=ro", uri=True)
         try:
             year, n = con.execute(
-                "SELECT 年度, COUNT(*) FROM classrooms WHERE 年度=(SELECT MAX(年度) FROM classrooms)").fetchone()
+                "SELECT 年度, COUNT(*) FROM classrooms WHERE 年度=(SELECT MAX(年度) FROM classrooms) "
+                "AND building IN ('タワースコラ', '駿河台校舎')").fetchone()
         finally:
             con.close()
         m = re.search(r'data-count="(\d+)" id="stat-rooms"><span class="num">(\d+)</span>', LP)
         self.assertIsNotNone(m)
-        self.assertEqual((int(m.group(1)), int(m.group(2))), (n, n), f"{year}年度の教室は {n} 室")
-        self.assertIn(f"教室（{year}年度）", LP)
+        self.assertEqual((int(m.group(1)), int(m.group(2))), (n, n), f"{year}年度の駿河台キャンパスの教室は {n} 室")
+        self.assertIn(f"駿河台の教室（{year}年度）", LP)
 
-    def test_tentative_hold_never_reads_as_a_real_reservation(self):
-        """CLAUDE.md ルール3: 仮予約に触れる文には、公式でない・使用権を保証しない旨を併記する"""
-        # 仮予約で「何ができるか」を説明する文（「予約」と「できます」を含むもの）が対象
-        described = [t for t in lang_spans("ja") if "予約" in t and "できます" in t]
-        self.assertGreaterEqual(len(described), 2)
-        for text in described:
-            self.assertIn("使用権", text, text)
-            self.assertIn("大学公式", text, text)
-        # 英語も同じ: 仮予約で何ができるかを説明する文には「公式の予約ではない」を入れる
-        described_en = [t for t in lang_spans("en") if "let others know you plan" in t or "add a tentative hold" in t]
-        self.assertGreaterEqual(len(described_en), 2)
-        for text in described_en:
-            self.assertIn("not an official", text, text)
-        for bad in ("Room Reservation", "reserve it", "it's taken", "已被占用"):
+    def test_no_tentative_hold_and_no_funabashi(self):
+        """仮予約は廃止。船橋校舎はテスト運用の対象外なので LP に載せない（2026-10 学生課と協議）。
+        検索アプリでは船橋校舎も選べるが、周知物（LP・ポスター）では扱わない"""
+        visible = " ".join(lang_spans("ja") + lang_spans("en") + lang_spans("zh"))
+        for bad in ("仮予約", "Tentative hold", "tentative hold", "临时占用", "船橋", "Funabashi", "船桥"):
+            self.assertNotIn(bad, visible, bad)
+        for bad in ("Room Reservation", "reserve it", "it's taken", "已被占用", "仮予約"):
             self.assertNotIn(bad, LP)
+        self.assertIn("campuses', 'tower ichi'", LP)   # 3D 模型も駿河台の2校舎だけ
 
     def test_no_overclaiming_real_time_or_official_data(self):
         for bad in ("リアルタイム", "real-time", "in real time", "实时", "大学公式の時間割", "official timetable"):

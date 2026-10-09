@@ -266,16 +266,7 @@ select:focus { outline: none; border-color: var(--accent); }
     background: rgba(255,255,255,0.08); color: var(--text);
 }
 
-/* 予約中バッジ */
-.room-card.reserved::after {
-    content: '予約中';
-    position: absolute; top: 5px; right: 5px;
-    font-size: 0.55rem; font-weight: 700;
-    background: rgba(255,255,255,0.1); color: var(--muted);
-    padding: 1px 5px; border-radius: 4px;
-}
-
-/* ── モーダル（仮予約） ── */
+/* ── モーダル（教室の1週間へのリンクと報告） ── */
 .modal-overlay {
     display: none; position: fixed; inset: 0;
     background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
@@ -297,67 +288,12 @@ select:focus { outline: none; border-color: var(--accent); }
 .modal-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
 .modal-room-info { color: var(--muted); font-size: 0.85rem; margin-bottom: 20px; }
 
-.modal-notice {
-    background: rgba(255,200,60,0.08); border: 1px solid rgba(255,200,60,0.2);
-    border-radius: 10px; padding: 12px 14px; font-size: 0.78rem;
-    color: #ffc83c; line-height: 1.6; margin-bottom: 20px;
-}
-.modal-notice strong { display: block; margin-bottom: 2px; }
-
-.modal-form label { color: var(--muted); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 6px; margin-top: 14px; }
-.modal-form input, .modal-form textarea {
-    width: 100%; padding: 12px 14px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 10px; color: var(--text); font-size: 0.9rem;
-    font-family: 'Noto Sans JP', sans-serif;
-}
-.modal-form input:focus, .modal-form textarea:focus { outline: none; border-color: var(--accent); }
-.modal-form textarea { resize: none; height: 72px; }
-
-.modal-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: 18px; }
+.modal-actions { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 18px; }
 .btn-cancel {
     padding: 13px; background: var(--surface2); border: 1px solid var(--border);
     border-radius: 10px; color: var(--muted); font-size: 0.9rem; font-weight: 700;
     font-family: 'Noto Sans JP', sans-serif; cursor: pointer;
 }
-.btn-reserve {
-    padding: 13px; background: var(--accent); border: none;
-    border-radius: 10px; color: #fff; font-size: 0.9rem; font-weight: 700;
-    font-family: 'Noto Sans JP', sans-serif; cursor: pointer;
-}
-
-/* ── 予約済みバッジ ── */
-.room-card.has-reserve { position: relative; }
-.reserve-badge {
-    position: absolute; top: 6px; right: 6px;
-    font-size: 0.55rem; font-weight: 700; padding: 2px 6px;
-    border-radius: 4px; background: rgba(255,200,60,0.15);
-    color: #ffc83c; border: 1px solid rgba(255,200,60,0.3);
-    line-height: 1.4;
-}
-
-/* ── 予約一覧パネル ── */
-.reserve-panel {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 14px; margin-top: 10px;
-    font-size: 0.82rem;
-}
-.reserve-panel-title {
-    font-size: 0.72rem; font-weight: 700; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
-}
-.reserve-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 8px 0; border-bottom: 1px solid var(--border);
-}
-.reserve-item:last-child { border-bottom: none; }
-.reserve-item-name { font-weight: 700; color: var(--text); }
-.reserve-item-purpose { color: var(--muted); font-size: 0.75rem; margin-top: 2px; }
-.reserve-item-room {
-    font-size: 0.72rem; padding: 2px 8px; border-radius: 4px;
-    background: var(--surface); color: var(--muted);
-}
-
 /* ── キャンセルコード表示 ── */
 .cancel-code-box {
     background: rgba(108,143,255,0.08); border: 1px solid rgba(108,143,255,0.3);

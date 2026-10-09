@@ -45,7 +45,7 @@ argument-hint: "[app|lp|dashboard|all] [変更点の要約]"
    - レイアウト崩れ: 要素の重なり・はみ出し・不自然な改行・ボタンやカードの整列・文字の切れ。
    - 横はみ出し: `scrollWidth > clientWidth` なら 390px で横スクロールが発生している。原因要素は `[...document.querySelectorAll('body *')].filter(e => e.getBoundingClientRect().right > document.documentElement.clientWidth + 1)` で特定する。**既知の問題**: HEAD 時点で app.py の教室カード（`.room-card` のグリッド）が 390px で右にはみ出す（実測 `[scrollWidth, clientWidth]` = [434, 390]、船橋校舎の3列目カードが右端で切れる）。無関係の変更でも初回から「横はみ出しあり」と出るので、自分の変更で悪化していないか（数値・原因要素が増えていないか）を見て、この既知分を直すかどうかはユーザーに確認してから決める。
    - **「テスト運用中・非公式」表記が両幅で見えているか**（ルール1）。文字列として残っているだけでなく、折りたたみ・重なり・色で読めなくなっていないかを見る。`.claude/hooks/guard-notices.py` が `テスト運用中` / `大学公式` の出現数を HEAD と比較して減る編集・commit をブロックするが、hook は表示崩れまでは見ない。
-   - 仮予約に触れる文言は「予約」と言い切らず、非公式で教室の使用権を保証しない旨が併記されているか（ルール3）。
+   - 仮予約（2026-10 廃止）の文言・ボタンが残っていないか、LP に船橋校舎が出ていないか（ルール3・テスト運用の範囲）。
    - 変更点が意図どおりに反映されているか。app は検索フォーム（GET）と結果一覧（POST）の両方。
 5. 環境由来の見え方（バグではない）: Google Fonts（fonts.googleapis.com）・GA4（googletagmanager.com）・Chart.js（cdn.jsdelivr.net）・Instagram サムネ（cdninstagram.com）はプロキシで取得に失敗する。→ 代替フォントでの字詰め・改行ずれ、dashboard のグラフ枠が空・投稿サムネが壊れて見えるのは仕様。本来の見え方は公開 URL でユーザーに確認してもらう。
 6. 結果を報告し、必要ならユーザーにもスクショを見せる（SendUserFile）。崩れがあれば直して**両幅を再撮影**する。直すか、そのまま進めるか（意図的なデザインか）はユーザーに確認してから決める。
@@ -55,4 +55,4 @@ argument-hint: "[app|lp|dashboard|all] [変更点の要約]"
 - 表記を消す・隠す・小さくして読めなくする変更は通さない。「合格」と報告する前に両幅で表記を目視したことを明記する。
 - スクショをリポジトリ（`assets/` 等）に入れない。ポスター用のアプリ画面スクショ（`assets/posters/handoff/app-phone-screenshot.png`、390x844・dsf=3）の差し替えは make-poster スキルの手順で行う。
 - `index.html` の Instagram QR（`assets/instagram-qr.png`）を差し替えたら「QR を含む成果物の変更」なので、実物をデコードして飛び先を確認する（`cv2.QRCodeDetector().detectAndDecodeMulti()`。make-poster スキル参照）。
-- 起動時に生成される `reservations.db` / `reports.db`、`__pycache__/` はコミットしない（.gitignore 済み）。`git status` で成果物以外が混ざっていないか確認する。
+- 起動時に生成される `reports.db`、`__pycache__/` はコミットしない（.gitignore 済み）。`git status` で成果物以外が混ざっていないか確認する。

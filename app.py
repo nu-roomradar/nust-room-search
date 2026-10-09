@@ -17,11 +17,11 @@ DB_NAME = "schedule_final.db"
 JST = datetime.timezone(datetime.timedelta(hours=9))
 PERIODS = {1: ("09:00", "10:40"), 2: ("10:50", "12:30"), 3: ("13:20", "15:00"),
            4: ("15:10", "16:50"), 5: ("17:00", "18:40"), 6: ("18:50", "20:30")}
-# 仮予約・報告の置き場所。Render の通常ディスクは再デプロイ・再起動で消えるので、
+# 「実は使われていた」報告の置き場所。Render の通常ディスクは再デプロイ・再起動で消えるので、
 # 永続ディスク（Render Disk）を付けたら環境変数 DATA_DIR にそのマウント先を入れる。未設定なら従来どおりカレント。
+# 仮予約（reservations.db）は 2026-10 に理工学部学生課との協議を受けて廃止した。
 DATA_DIR    = os.environ.get("DATA_DIR", ".")
 os.makedirs(DATA_DIR, exist_ok=True)
-RESERVE_DB  = os.path.join(DATA_DIR, "reservations.db")
 REPORTS_DB  = os.path.join(DATA_DIR, "reports.db")
 REPORT_THRESHOLD = 2  # 何人報告でグレーアウトするか
 
@@ -194,59 +194,21 @@ def period_end_dt(day_str, period_num):
     end_str = PERIODS[period_num][1]
     h, m = map(int, end_str.split(':'))
     end = datetime.datetime(target_date.year, target_date.month, target_date.day, h, m, tzinfo=JST)
-    # 今日のその時限がもう終わっているなら来週の分。そうしないと、終わった時限に入れた仮予約・報告が
-    # 期限切れとしてすぐ消えていた（月曜 12:30 以降に「月2限」を仮予約すると一覧に出ない、など）
+    # 今日のその時限がもう終わっているなら来週の分。そうしないと、終わった時限に入れた報告が
+    # 期限切れとしてすぐ消えていた（月曜 12:30 以降に「月2限」を報告するとすぐ消える、など）
     if end <= now:
         end += datetime.timedelta(days=7)
     return end
 
-def init_reserve_db():
-    conn = sqlite3.connect(RESERVE_DB)
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS reservations (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            room        TEXT NOT NULL,
-            building    TEXT NOT NULL,
-            day         TEXT NOT NULL,
-            period      INTEGER NOT NULL,
-            name        TEXT NOT NULL,
-            purpose     TEXT,
-            cancel_code TEXT NOT NULL,
-            created_at  TEXT NOT NULL,
-            expires_at  TEXT NOT NULL
-        )
-    """)
-    conn.execute("CREATE INDEX IF NOT EXISTS idx_res_room ON reservations (room, day, period)")
-    conn.commit(); conn.close()
-
-def cleanup_expired():
-    """時限終了済みの予約を自動削除"""
-    now = datetime.datetime.now(JST).isoformat()
-    conn = sqlite3.connect(RESERVE_DB)
-    conn.execute("DELETE FROM reservations WHERE expires_at < ?", (now,))
-    conn.commit(); conn.close()
-
 CANCEL_CODE_ALPHABET = string.ascii_uppercase + string.digits
 
 def make_cancel_code():
-    """仮予約・報告を取り消すための6文字のコード
+    """「実は使われていた」報告を取り消すための6文字のコード
 
-    random は疑似乱数で、出力を観察すると続きを予測できる。他人の仮予約を勝手に
+    random は疑似乱数で、出力を観察すると続きを予測できる。他人の報告を勝手に
     取り消せないよう、暗号論的に安全な secrets を使う（36^6 ≒ 21億通り）。
     """
     return ''.join(secrets.choice(CANCEL_CODE_ALPHABET) for _ in range(6))
-
-def get_reservations(day, period):
-    """指定曜日・時限の予約一覧を返す"""
-    conn = sqlite3.connect(RESERVE_DB)
-    rows = conn.execute(
-        "SELECT id, room, building, name, purpose, created_at FROM reservations WHERE day=? AND period=?",
-        (day, period)
-    ).fetchall()
-    conn.close()
-    return [{'id':r[0],'room':r[1],'building':r[2],'name':r[3],'purpose':r[4],'created_at':r[5]} for r in rows]
-
-init_reserve_db()
 
 def _asset_version():
     """static/ の中身のハッシュ。デプロイで CSS/JS が変わったらブラウザのキャッシュを捨てさせる"""
@@ -258,76 +220,6 @@ def _asset_version():
     return h.hexdigest()[:10]
 
 ASSET_VERSION = _asset_version()
-
-
-@app.route('/api/reserve', methods=['POST'])
-def api_reserve():
-    data = request.get_json(silent=True) or {}
-    room    = str(data.get('room', '')).strip()[:20]
-    building= str(data.get('building', '')).strip()[:20]
-    day     = data.get('day', '')
-    period  = data.get('period', 0)
-    name    = str(data.get('name', '')).strip()[:30]
-    purpose = str(data.get('purpose', '')).strip()[:60]
-
-    if not room or not name or day not in VALID_DAYS or period not in VALID_PERIODS:
-        return jsonify({'ok': False, 'error': 'invalid'}), 400
-
-    ip = client_ip()
-    if is_rate_limited(ip):
-        return jsonify({'ok': False, 'error': 'rate_limited'}), 429
-
-    cleanup_expired()
-    expires     = period_end_dt(day, period).isoformat()
-    cancel_code = make_cancel_code()
-    created_at  = datetime.datetime.now(JST).isoformat()
-
-    conn = sqlite3.connect(RESERVE_DB)
-    conn.execute(
-        "INSERT INTO reservations (room, building, day, period, name, purpose, cancel_code, created_at, expires_at) VALUES (?,?,?,?,?,?,?,?,?)",
-        (room, building, day, period, name, purpose, cancel_code, created_at, expires)
-    )
-    conn.commit()
-    count = conn.execute(
-        "SELECT COUNT(*) FROM reservations WHERE room=? AND day=? AND period=?",
-        (room, day, period)
-    ).fetchone()[0]
-    conn.close()
-    return jsonify({'ok': True, 'cancel_code': cancel_code, 'count': count})
-
-
-@app.route('/api/reserve/cancel', methods=['POST'])
-def api_reserve_cancel():
-    data = request.get_json(silent=True) or {}
-    room        = str(data.get('room', '')).strip()[:20]
-    day         = data.get('day', '')
-    period      = data.get('period', 0)
-    cancel_code = str(data.get('cancel_code', '')).strip()[:10]
-    if not room or not cancel_code:
-        return jsonify({'ok': False}), 400
-    # キャンセルコードの総当たりを防ぐため、取り消しにもレート制限をかける
-    if is_rate_limited(client_ip()):
-        return jsonify({'ok': False, 'error': 'rate_limited'}), 429
-
-    conn = sqlite3.connect(RESERVE_DB)
-    cur  = conn.cursor()
-    cur.execute(
-        "DELETE FROM reservations WHERE room=? AND day=? AND period=? AND cancel_code=?",
-        (room, day, period, cancel_code)
-    )
-    deleted = cur.rowcount
-    conn.commit(); conn.close()
-    return jsonify({'ok': deleted > 0})
-
-
-@app.route('/api/reserve/list', methods=['GET'])
-def api_reserve_list():
-    day    = request.args.get('day', '')
-    period = request.args.get('period', 0, type=int)
-    if day not in VALID_DAYS or period not in VALID_PERIODS:
-        return jsonify({'ok': False}), 400
-    cleanup_expired()
-    return jsonify({'ok': True, 'reservations': get_reservations(day, period)})
 
 
 @app.route('/api/report', methods=['POST'])
@@ -501,19 +393,9 @@ def index():
         empty_rooms = []
         biweekly_rooms = []
 
-    # 報告数・予約数を取得（検索済みの場合のみ）
+    # 「実は使われていた」の報告数を取得（検索済みの場合のみ）
     cleanup_reports()
-    cleanup_expired()
     report_counts   = get_report_counts(day, period) if searched else {}
-    reserve_counts  = {}
-    if searched:
-        conn = sqlite3.connect(RESERVE_DB)
-        for row in conn.execute(
-            "SELECT room, COUNT(*) FROM reservations WHERE day=? AND period=? GROUP BY room",
-            (day, period)
-        ):
-            reserve_counts[row[0]] = row[1]
-        conn.close()
 
     # static/app.js が読む設定。テンプレート内の JS に Jinja を埋め込まないための受け渡し口
     rr_config = {
@@ -538,7 +420,6 @@ def index():
         searched=searched,
         report_counts=report_counts,
         report_threshold=REPORT_THRESHOLD,
-        reserve_counts=reserve_counts,
         current_term=get_current_term_label(),
         selected_year=year, selected_term=term, selected_span=span,
         max_period=MAX_PERIOD,

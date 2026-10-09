@@ -64,7 +64,7 @@
 
 ## 運用メモ
 
-- `reservations.db` / `reports.db`（仮予約・使用中報告）は実行時に自動生成される揮発データで、リポジトリには含めません。
+- `reports.db`（「実は使われていた」報告）は実行時に自動生成される揮発データで、リポジトリには含めません。仮予約は 2026-10 に廃止しました。
 - Instagram 投稿キャプションには規定の共通ハッシュタグ `#日大生プロジェクト` がスクリプトで自動付与されます。
 - ポスターは `python scripts/make_poster.py --print-files` で再生成できます（A4縦・約392dpi、PDF/PPTX同時出力）。
 - Claude Code on the web では `.claude/hooks/session-start.sh` がセッション開始時に依存パッケージを自動インストールします。

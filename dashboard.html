@@ -156,7 +156,7 @@
       <div class="t">集客（流入元）</div><div class="d">Instagram・検索・直リンクなど、どこから来たか</div>
     </a>
     <a class="ga-link" href="https://analytics.google.com/analytics/web/#/p0/reports/explorer" target="_blank" rel="noopener">
-      <div class="t">エンゲージメント</div><div class="d">search / reserve_room などカスタムイベントの発生数</div>
+      <div class="t">エンゲージメント</div><div class="d">search / report_room などカスタムイベントの発生数</div>
     </a>
     <a class="ga-link" href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener">
       <div class="t">GA4を開く →</div><div class="d">すべてのレポート・ユーザー属性・デバイス</div>
@@ -313,7 +313,7 @@ function deltaHTML(cur, prev){
   if (gaBreak.channels) mParts.push('<div class="sub">流入元（セッション）</div>' +
     barlist(gaBreak.channels, 'sessions'));
   if (gaBreak.events) {
-    const EV_JA = {search:'検索', reserve_room:'仮予約', report_room:'使用中報告', feedback_submit:'意見箱'};
+    const EV_JA = {search:'検索', reserve_room:'仮予約（廃止）', report_room:'使用中報告', feedback_submit:'意見箱'};
     const evItems = Object.entries(gaBreak.events).map(([k,v]) => ({label:EV_JA[k]||k, count:v}));
     mParts.push('<div class="sub">イベント発生数</div>' + barlist(evItems, 'count'));
   }

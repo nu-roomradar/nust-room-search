@@ -7,10 +7,7 @@
     <span class="room-number">{{ room.name }}</span>
     {% if room.free_until > selected_period %}<span class="room-span">〜{{ room.free_until }}限</span>{% endif %}
     <span class="room-bldg">
-        {%- set rcnt = reserve_counts.get(room.name, 0) -%}
-        {%- if rcnt > 0 -%}📋{{ rcnt }}件予約中　{%- endif -%}
-        {%- if cnt > 0 -%}⚠{{ cnt }}件報告{%- endif -%}
-        {%- if rcnt == 0 and cnt == 0 -%}{{ bname }}{%- endif -%}
+        {%- if cnt > 0 -%}⚠{{ cnt }}件報告{%- else -%}{{ bname }}{%- endif -%}
     </span>
 </div>
 {% endmacro -%}
@@ -227,14 +224,6 @@
             </div>
 
             <div class="help-item">
-                <div class="help-icon green">📋</div>
-                <div>
-                    <div class="help-text-title">仮予約する（RoomRadar上のみ）</div>
-                    <div class="help-text-desc">教室カードをタップするとモーダルが開きます。お名前と利用目的を入力して「仮予約する」を押すと、他のユーザーに共有されます。<br>⚠ 大学公式の予約ではなく、使用権を保証するものではありません。</div>
-                </div>
-            </div>
-
-            <div class="help-item">
                 <div class="help-icon red">⚠</div>
                 <div>
                     <div class="help-text-title">「実は使われていた」を報告する</div>
@@ -273,7 +262,7 @@
 
 </div><!-- /wrap -->
 
-<!-- 仮予約モーダル -->
+<!-- 教室モーダル（その教室の1週間へのリンクと「実は使われていた」の報告） -->
 <div class="modal-overlay" id="modal" onclick="handleOverlayClick(event)">
     <div class="modal">
         <div class="modal-handle"></div>
@@ -281,24 +270,10 @@
         <div class="modal-room-info" id="modal-info">校舎 · 現在検索中の時間帯</div>
         <a class="modal-week-link" id="modal-week" href="#">この教室の1週間を見る →</a>
 
-        <div class="modal-notice">
-            <strong>⚠ これはRoomRadar上の仮予約です</strong>
-            大学公式の予約システムではありません。教室の使用権を保証するものではなく、
-            他の利用者への情報共有を目的としています。
-        </div>
-
-        <div class="modal-form">
-            <label>お名前 / グループ名</label>
-            <input type="text" id="reserve-name" placeholder="例: 二川・物理学科" maxlength="30">
-            <label>利用目的（任意）</label>
-            <textarea id="reserve-note" placeholder="例: グループ課題の打ち合わせ"></textarea>
-        </div>
-
         <button class="btn-report" onclick="submitReport()">⚠ 実は使われていた</button>
         <div class="report-count-note" id="report-note"></div>
         <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
-            <button class="btn-reserve" onclick="submitReserve()">仮予約する</button>
+            <button class="btn-cancel" onclick="closeModal()">閉じる</button>
         </div>
     </div>
 </div>
