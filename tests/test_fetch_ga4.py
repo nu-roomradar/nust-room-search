@@ -37,5 +37,25 @@ class WeekTests(unittest.TestCase):
         self.assertIn("| 2026-10-12〜10-18 | 12 | 15 | +50% | 0 |", md)
 
 
+class SearchValueTests(unittest.TestCase):
+    def test_unknown_values_are_dropped(self):
+        """GA4 には外部から偽の記録を送れる。アプリが送る値以外はダッシュボードに入れない"""
+        items = [{"label": "main", "count": 5}, {"label": "<img src=x onerror=alert(1)>", "count": 50},
+                 {"label": "(not set)", "count": 2}, {"label": "funabashi", "count": 1}]
+        kept, dropped = g.keep_known("search_building", items)
+        self.assertEqual([i["label"] for i in kept], ["main", "funabashi"])
+        self.assertEqual(dropped, 2)
+        self.assertEqual(g.keep_known("search_period", [{"label": "7", "count": 1}])[1], 1)
+        self.assertEqual(g.keep_known("search_day", [{"label": "日", "count": 1}])[1], 1)
+
+    def test_dashboard_escapes_data_before_innerhtml(self):
+        """dashboard.html は JSON の文字を esc() を通してから画面に入れる"""
+        html = (Path(__file__).resolve().parents[1] / "dashboard.html").read_text(encoding="utf-8")
+        self.assertIn("const esc = s =>", html)
+        self.assertIn("const name = esc(labelFn ? labelFn(i.label) : i.label);", html)
+        self.assertIn("${esc(p.caption)}", html)
+        self.assertNotIn("${p.permalink", html)
+
+
 if __name__ == "__main__":
     unittest.main()

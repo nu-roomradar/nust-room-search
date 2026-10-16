@@ -5,6 +5,7 @@ app.py（検索アプリ）の最小テスト。
 実行: python -m unittest discover -s tests -v
 """
 import collections
+import html as html_lib
 import datetime
 import os
 import re
@@ -164,7 +165,7 @@ class PageTests(unittest.TestCase):
         html = r.get_data(as_text=True)
         self.assertIn("room-card", html)
         self.assertIn("テスト運用中", html)
-        rooms = re.findall(r"openModal\('([^']+)'", html)
+        rooms = [html_lib.unescape(r) for r in re.findall(r'data-room="([^"]+)"', html)]
         self.assertGreater(len(rooms), 10)         # 時間割DBから空き教室が引けている
 
         only_f = self.c.post("/", data={"day": "月", "period": "2", "building": "funabashi"}).get_data(as_text=True)
@@ -173,7 +174,7 @@ class PageTests(unittest.TestCase):
 
     def test_reported_room_is_greyed_out_after_threshold(self):
         html = self.c.post("/", data={"day": "月", "period": "2", "building": "all"}).get_data(as_text=True)
-        room = re.findall(r"openModal\('([^']+)'", html)[0]
+        room = [html_lib.unescape(r) for r in re.findall(r'data-room="([^"]+)"', html)][0]
         for i in range(rr.REPORT_THRESHOLD):
             self.c.post("/api/report", json={"room": room, "day": "月", "period": 2},
                         headers=as_ip(f"10.0.1.{i + 1}"))
@@ -204,7 +205,7 @@ class TermFilterTests(unittest.TestCase):
 
     def rooms(self):
         html = self.c.post("/", data={"day": self.day, "period": str(self.period), "building": "all"}).get_data(as_text=True)
-        return set(re.findall(r"openModal\('([^']+)'", html)), html
+        return set([html_lib.unescape(r) for r in re.findall(r'data-room="([^"]+)"', html)]), html
 
     def test_room_is_free_in_first_term_but_occupied_in_second(self):
         with _fixed_now(5, 1):
@@ -245,7 +246,7 @@ class AbuseResistanceTests(unittest.TestCase):
         codes = []
         with mock.patch.object(rr, "RATE_LIMIT", 3):
             for i in range(5):
-                r = self.c.post("/api/report", json={"room": f"104{i}", "day": "月", "period": 2},
+                r = self.c.post("/api/report", json={"room": ("1041", "1042", "1043", "S303", "S101")[i], "day": "月", "period": 2},
                                 headers={"X-Forwarded-For": f"6.6.6.{i}, 203.0.113.9"})
                 codes.append(r.status_code)
         self.assertEqual(codes, [200, 200, 200, 429, 429])
@@ -321,7 +322,7 @@ class ConsecutiveFreeTests(unittest.TestCase):
         conn = sqlite3.connect(rr.REPORTS_DB); conn.execute("DELETE FROM reports"); conn.commit(); conn.close()
 
     def rooms(self, html):
-        return set(re.findall(r"openModal\('([^']+)'", html))
+        return set([html_lib.unescape(r) for r in re.findall(r'data-room="([^"]+)"', html)])
 
     def search(self, **over):
         year = rr.get_available_years()[0]
@@ -394,7 +395,7 @@ class YearAndTermSelectionTests(unittest.TestCase):
         return self.c.post("/", data=body).get_data(as_text=True)
 
     def rooms(self, html):
-        return set(re.findall(r"openModal\('([^']+)'", html))
+        return set([html_lib.unescape(r) for r in re.findall(r'data-room="([^"]+)"', html)])
 
     def test_form_offers_year_and_term(self):
         html = self.c.get("/").get_data(as_text=True)
@@ -550,7 +551,7 @@ class BiweeklyTests(unittest.TestCase):
                 for room in re.findall(r'/room/([^?"]+)\?', extra):
                     room = urllib.parse.unquote(room)
                     found += 1
-                    self.assertNotIn(f"openModal('{room}'", main)
+                    self.assertNotIn(f'data-room="{html_lib.escape(room)}"', main)
                     subs = {r[0] for r in conn.execute(
                         "SELECT 科目名 FROM schedules WHERE 年度=2026 AND 履修期名='前期' AND 曜日=? AND 時限=? AND 教室=?",
                         (day, period, room))}
@@ -692,6 +693,55 @@ class PeriodEndTests(unittest.TestCase):
             self.assertGreater(end, now)
             self.assertEqual((end.month, end.day, end.hour, end.minute), (10, 5, 12, 30))
             self.assertEqual(rr.period_end_dt("月", 3).day, 28)       # 3限（15:00 まで）は今日のまま
+
+
+class SecurityHardeningTests(unittest.TestCase):
+    """2026-10 のセキュリティ点検で直した点"""
+
+    def setUp(self):
+        self.c = rr.app.test_client()
+        rr._rate_store.clear()
+        conn = sqlite3.connect(rr.REPORTS_DB); conn.execute("DELETE FROM reports"); conn.commit(); conn.close()
+
+    def test_report_rejects_rooms_that_do_not_exist(self):
+        for room in ("<b>x</b>", "ZZZ999", "1041; DROP TABLE reports"):
+            r = self.c.post("/api/report", json={"room": room, "day": "月", "period": 2}, headers=as_ip("203.0.113.9"))
+            self.assertEqual(r.status_code, 400, room)
+        self.assertEqual(rr.get_report_counts("月", 2), {})
+
+    def test_one_person_can_report_only_a_few_rooms_per_period(self):
+        """回線を2つ使うだけで全教室を「使用中の可能性」にできないよう、1人あたりの教室数に上限がある"""
+        rooms = ["1041", "1042", "1043", "S303", "S101"]
+        codes = [self.c.post("/api/report", json={"room": r, "day": "月", "period": 2},
+                             headers=as_ip("203.0.113.9")).status_code for r in rooms]
+        n = rr.REPORT_MAX_ROOMS_PER_PERIOD
+        self.assertEqual(codes, [200] * n + [429] * (len(rooms) - n))
+        # 別の時限なら、また報告できる
+        r = self.c.post("/api/report", json={"room": "S303", "day": "月", "period": 3}, headers=as_ip("203.0.113.9"))
+        self.assertEqual(r.status_code, 200)
+
+    def test_bad_search_input_falls_back_instead_of_500(self):
+        for form in ({"day": "月", "period": "abc", "building": "all"}, {"day": "月", "building": "all"},
+                     {"day": "X", "period": "3", "building": "zzz"}, {"day": "月", "period": "99"}):
+            r = self.c.post("/", data=form)
+            self.assertEqual(r.status_code, 200, form)
+            html = r.get_data(as_text=True)
+            self.assertIn("テスト運用中", html)
+            self.assertNotIn("X曜", html)
+
+    def test_room_cards_do_not_embed_names_in_inline_js(self):
+        html = self.c.post("/", data={"day": "月", "period": "2", "building": "all"}).get_data(as_text=True)
+        self.assertNotIn("onclick=\"openModal(", html)
+        self.assertIn('data-room="', html)
+
+    def test_security_headers(self):
+        for path in ("/", "/room?q=S303", "/room/S303"):
+            h = self.c.get(path).headers
+            self.assertEqual(h.get("X-Content-Type-Options"), "nosniff", path)
+            self.assertEqual(h.get("X-Frame-Options"), "DENY", path)
+            self.assertIn("frame-ancestors 'none'", h.get("Content-Security-Policy", ""), path)
+            self.assertIn("strict-origin-when-cross-origin", h.get("Referrer-Policy", ""), path)
+            self.assertIn("max-age=", h.get("Strict-Transport-Security", ""), path)
 
 
 if __name__ == "__main__":

@@ -8,7 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<!-- Chart.js 4.4.1 は npm の配布物（sha512 を照合済み）を同梱して同じサイトから読む。外部 CDN で書き換えられないように -->
+<script src="assets/vendor/chartjs/chart.umd.js"></script>
 <style>
   :root{
     --bg:#f5f3ee; --ink:#1a1814; --muted:#8a8577;
@@ -164,7 +165,11 @@
   </div>
 
 <script>
-const fmt = n => (n === null || n === undefined) ? '—' : n.toLocaleString();
+// data/*.json の中身を innerHTML に入れるときは、必ず esc / fmt / safeUrl を通す。
+// GA4 の検索条件などは、測定IDさえ分かれば外部の誰でも書き込める（そのまま入れると蓄積型XSSになる）
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => (n === null || n === undefined) ? '—' : (typeof n === 'number' ? n.toLocaleString() : esc(n));
+const safeUrl = u => /^https:\/\//.test(String(u || '')) ? esc(u) : '';
 
 async function load(path){
   try { const r = await fetch(path); if(!r.ok) throw 0; return await r.json(); }
@@ -232,10 +237,10 @@ function deltaHTML(cur, prev){
     posts.sort((a,b)=> eng(b)-eng(a));
     area.className = 'posts';
     area.innerHTML = posts.map(p => `
-      <a class="post" href="${p.permalink||'#'}" target="_blank" rel="noopener">
-        ${p.thumbnail ? `<img src="${p.thumbnail}" alt="" loading="lazy">` : ''}
+      <a class="post" href="${safeUrl(p.permalink) || '#'}" target="_blank" rel="noopener">
+        ${safeUrl(p.thumbnail) ? `<img src="${safeUrl(p.thumbnail)}" alt="" loading="lazy">` : ''}
         <div class="meta">
-          <div class="cap">${(p.caption||'').replace(/</g,'&lt;')}</div>
+          <div class="cap">${esc(p.caption)}</div>
           <div class="stats">
             <span><b>${fmt(p.like_count)}</b> ♥</span>
             <span><b>${fmt(p.comments_count)}</b> 💬</span>
@@ -286,10 +291,10 @@ function deltaHTML(cur, prev){
   const BUILDING_JA = {all:'すべて', tower:'タワースコラ', main:'駿河台', funabashi:'船橋'};
   function barlist(items, valkey, labelFn){
     if(!items || !items.length) return '';
-    const max = Math.max(...items.map(i=>i[valkey]||0)) || 1;
+    const max = Math.max(...items.map(i=>Number(i[valkey])||0)) || 1;
     return items.slice(0,8).map(i => {
-      const name = labelFn ? labelFn(i.label) : i.label;
-      const v = i[valkey]||0;
+      const name = esc(labelFn ? labelFn(i.label) : i.label);
+      const v = Number(i[valkey]) || 0;
       return `<div class="bar-row"><span class="name" title="${name}">${name}</span>
         <span class="track"><span class="fill" style="width:${Math.round(v/max*100)}%"></span></span>
         <span class="v">${fmt(v)}</span></div>`;
@@ -328,7 +333,7 @@ function deltaHTML(cur, prev){
   const selT = document.getElementById('occ-term'), selB = document.getElementById('occ-bldg');
   if(!occ){ document.getElementById('occ-table').innerHTML = '<tr><td>データを読み込めませんでした</td></tr>'; return; }
   const terms = [...new Set(occ.views.map(v => v.year + '|' + v.term))];
-  selT.innerHTML = terms.map(k => { const [y,t] = k.split('|'); return `<option value="${k}">${y}年度 ${t}</option>`; }).join('');
+  selT.innerHTML = terms.map(k => { const [y,t] = k.split('|'); return `<option value="${esc(k)}">${esc(y)}年度 ${esc(t)}</option>`; }).join('');
   const bl = {all:'全校舎', 'タワースコラ':'タワースコラ', '駿河台校舎':'駿河台校舎', '船橋校舎':'船橋校舎'};
   selB.innerHTML = Object.entries(bl).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
   function draw(){
@@ -336,12 +341,13 @@ function deltaHTML(cur, prev){
     const v = occ.views.find(v => String(v.year) === y && v.term === t && v.building === selB.value);
     const tbl = document.getElementById('occ-table');
     if(!v){ tbl.innerHTML = '<tr><td>この校舎の教室はありません</td></tr>'; return; }
-    let h = '<tr><th></th>' + occ.periods.map(p => `<th>${p}限</th>`).join('') + '</tr>';
+    let h = '<tr><th></th>' + occ.periods.map(p => `<th>${esc(p)}限</th>`).join('') + '</tr>';
     occ.days.forEach((d, i) => {
-      h += `<tr><th>${d}</th>` + v.busy[i].map((n, j) => {
+      h += `<tr><th>${esc(d)}</th>` + v.busy[i].map((n, j) => {
+        n = Number(n) || 0;
         const r = n / v.rooms, pct = Math.round(r * 100);
         const ink = r > 0.55 ? '#fff' : 'var(--ink, #1a1814)';
-        return `<td style="background:rgba(37,99,235,${(0.04 + r * 0.96).toFixed(3)});color:${ink}" title="${d}曜 ${occ.periods[j]}限: ${v.rooms}室中 ${n}室で授業（空き ${v.rooms - n}室）">${pct}%</td>`;
+        return `<td style="background:rgba(37,99,235,${(0.04 + r * 0.96).toFixed(3)});color:${ink}" title="${esc(d)}曜 ${esc(occ.periods[j])}限: ${esc(v.rooms)}室中 ${n}室で授業（空き ${v.rooms - n}室）">${pct}%</td>`;
       }).join('') + '</tr>';
     });
     tbl.innerHTML = h;

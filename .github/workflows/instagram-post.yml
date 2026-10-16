@@ -50,19 +50,24 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
+      # 入力値は env で渡す。run の中に inputs を式で直接書くと、キャプションの " や $( ) が
+      # シェルのコマンドとして動いてしまう（2026-10 セキュリティ点検）
       - name: Post to Instagram
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_ACCOUNT_ID: ${{ secrets.IG_ACCOUNT_ID }}
+          POST_TYPE: ${{ inputs.post_type }}
+          IMAGE_URL: ${{ inputs.image_url }}
+          CAPTION: ${{ inputs.caption }}
         run: |
-          if [ "${{ inputs.post_type }}" = "story" ]; then
+          if [ "$POST_TYPE" = "story" ]; then
             python scripts/post_to_instagram.py \
-              --image-url "${{ inputs.image_url }}" \
+              --image-url "$IMAGE_URL" \
               --story
           else
             python scripts/post_to_instagram.py \
-              --image-url "${{ inputs.image_url }}" \
-              --caption "${{ inputs.caption }}"
+              --image-url "$IMAGE_URL" \
+              --caption "$CAPTION"
           fi
 
       # フィード投稿時のみ、その投稿を告知するストーリーズを生成して同時投稿する
@@ -78,10 +83,11 @@ jobs:
           # 見出しは story_headline で指定する。未入力ならキャプションの1行目
           STORY_CAPTION: ${{ inputs.caption }}
           STORY_HEADLINE: ${{ inputs.story_headline }}
+          FEED_IMAGE_URL: ${{ inputs.image_url }}
         run: |
           mkdir -p assets/instagram/auto
           python scripts/make_story_promo.py \
-            --feed-image-url "${{ inputs.image_url }}" \
+            --feed-image-url "$FEED_IMAGE_URL" \
             --caption "$STORY_CAPTION" \
             ${STORY_HEADLINE:+--headline "$STORY_HEADLINE"} \
             --out assets/instagram/auto/latest-story.png

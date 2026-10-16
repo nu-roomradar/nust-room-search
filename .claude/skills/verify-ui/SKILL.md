@@ -47,7 +47,7 @@ argument-hint: "[app|lp|dashboard|all] [変更点の要約]"
    - **「テスト運用中・非公式」表記が両幅で見えているか**（ルール1）。文字列として残っているだけでなく、折りたたみ・重なり・色で読めなくなっていないかを見る。`.claude/hooks/guard-notices.py` が `テスト運用中` / `大学公式` の出現数を HEAD と比較して減る編集・commit をブロックするが、hook は表示崩れまでは見ない。
    - 仮予約（2026-10 廃止）の文言・ボタンが残っていないか、LP に船橋校舎が出ていないか（ルール3・テスト運用の範囲）。
    - 変更点が意図どおりに反映されているか。app は検索フォーム（GET）と結果一覧（POST）の両方。
-5. 環境由来の見え方（バグではない）: Google Fonts（fonts.googleapis.com）・GA4（googletagmanager.com）・Chart.js（cdn.jsdelivr.net）・Instagram サムネ（cdninstagram.com）はプロキシで取得に失敗する。→ 代替フォントでの字詰め・改行ずれ、dashboard のグラフ枠が空・投稿サムネが壊れて見えるのは仕様。本来の見え方は公開 URL でユーザーに確認してもらう。
+5. 環境由来の見え方（バグではない）: Google Fonts（fonts.googleapis.com）・GA4（googletagmanager.com）・Instagram サムネ（cdninstagram.com）はプロキシで取得に失敗する。→ 代替フォントでの字詰め・改行ずれ、投稿サムネが壊れて見えるのは仕様（Chart.js は 2026-10 から `assets/vendor/chartjs/` に同梱しているのでグラフは出る）。本来の見え方は公開 URL でユーザーに確認してもらう。
 6. 結果を報告し、必要ならユーザーにもスクショを見せる（SendUserFile）。崩れがあれば直して**両幅を再撮影**する。直すか、そのまま進めるか（意図的なデザインか）はユーザーに確認してから決める。
 7. 後片付け: `pkill -f "[p]ython app.py"; pkill -f "[h]ttp.server 8088"`（**ブラケット記法必須**。素の `pkill -f "python app.py"` は Bash ツール自身のコマンドライン `bash -c 'pkill -f "python app.py"'` にもパターンが一致して呼び出し元シェルごと殺され、exit code 144 で後続コマンドが実行されない。同じ Bash 呼び出しに `python app.py` を含む起動コマンドを同居させないこと。単独実行で rc=0・停止を確認済み）。代替として起動時に PID を控える方式でもよい: 手順2を `PORT=5055 python app.py > <scratch>/app.log 2>&1 & echo $! > <scratch>/app.pid` にして `kill $(cat <scratch>/app.pid)` で止める。コミットするなら `git config user.email noreply@anthropic.com && git config user.name Claude` を設定してから。push はユーザー確認後（`main` への push で Render が自動デプロイ、GitHub Pages も更新される）。
 

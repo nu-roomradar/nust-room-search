@@ -1,8 +1,9 @@
 {% macro room_card(room, cls, bname) %}
 {% set cnt = report_counts.get(room.name, 0) %}
 {% set is_reported = cnt >= report_threshold %}
+{#- 教室名は onclick の JS 文字列に埋め込まず data 属性で渡す（属性の中の ' が JS を壊さないように） -#}
 <div class="room-card {{ cls }} {% if is_reported %}reported{% endif %} has-report"
-     onclick="{% if not is_reported %}openModal('{{ room.name }}', '{{ bname }}'){% endif %}">
+     data-room="{{ room.name }}" data-bldg="{{ bname }}"{% if not is_reported %} role="button" tabindex="0"{% endif %}>
     {% if is_reported %}<span class="reported-badge">使用中の可能性</span>{% endif %}
     <span class="room-number">{{ room.name }}</span>
     {% if room.free_until > selected_period %}<span class="room-span">〜{{ room.free_until }}限</span>{% endif %}

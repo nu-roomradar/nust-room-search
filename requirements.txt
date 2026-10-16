@@ -1,4 +1,4 @@
-flask
-pandas
-openpyxl
-gunicorn
+# 検索アプリ本体（Render）が使う依存だけ。版を固定する（2026-10 セキュリティ点検）。
+# 開発・運用スクリプト用は requirements-dev.txt
+flask==3.1.3
+gunicorn==26.2.0

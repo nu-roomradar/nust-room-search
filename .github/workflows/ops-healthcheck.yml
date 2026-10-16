@@ -47,8 +47,9 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           # 未設定ならトークン確認はスキップされる
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}   # 入力値は env で渡す（run に直接埋め込まない）
         run: |
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
+          if [ "$DRY_RUN" = "true" ]; then
             python scripts/ops_healthcheck.py --dry-run
           else
             python scripts/ops_healthcheck.py

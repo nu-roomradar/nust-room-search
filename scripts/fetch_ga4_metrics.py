@@ -35,6 +35,13 @@ BREAKDOWN_FILE = os.path.join(DATA_DIR, "ga4_breakdown.json")
 JST = datetime.timezone(datetime.timedelta(hours=9))
 HOSTS = {"app": "nust-room-search.onrender.com", "lp": "nu-roomradar.github.io"}
 EVENTS = ["search", "report_room", "reserve_room", "feedback_submit"]
+# 検索条件として記録してよい値。GA4 には測定IDさえ分かれば外部の誰でも記録を送れるので、
+# アプリが送る値（static/app.js）以外は取り込まない（ダッシュボードへの蓄積型XSSを防ぐ）
+ALLOWED_SEARCH_VALUES = {
+    "search_building": {"all", "tower", "main", "funabashi"},
+    "search_period": {"1", "2", "3", "4", "5", "6"},
+    "search_day": {"月", "火", "水", "木", "金", "土"},
+}
 
 
 # ── 純粋な関数（テスト対象。ネットワークを使わない） ──
@@ -44,6 +51,13 @@ def last_full_weeks(today, n=1):
     this_monday = today - datetime.timedelta(days=today.weekday())
     return [(this_monday - datetime.timedelta(weeks=k), this_monday - datetime.timedelta(weeks=k, days=-6))
             for k in range(n, 0, -1)]
+
+
+def keep_known(key, items):
+    """検索条件の内訳から、アプリが送らない値（偽の記録など）を落とす。落とした件数も返す"""
+    allowed = ALLOWED_SEARCH_VALUES[key]
+    kept = [i for i in items if i["label"] in allowed]
+    return kept, len(items) - len(kept)
 
 
 def merge_weeks(old, new):
@@ -134,8 +148,10 @@ def fetch_dashboard(client, prop, today):
                      ("search_day", "customEvent:search_day")]:
         try:
             rows = report(client, prop, [dim], ["eventCount"], start, end, limit=20)
-            bd[key] = sorted([{"label": d[0], "count": int(m[0])} for d, m in rows
-                              if d[0] not in ("(not set)", "")], key=lambda x: -x["count"])
+            items, dropped = keep_known(key, [{"label": d[0], "count": int(m[0])} for d, m in rows])
+            if dropped:
+                print(f"[WARN] {key}: 想定外の値 {dropped} 件を取り込みませんでした（偽の記録の可能性）", file=sys.stderr)
+            bd[key] = sorted(items, key=lambda x: -x["count"])
         except Exception as e:  # noqa: BLE001
             print(f"[WARN] {key} を取れません（GA4 でカスタムディメンション未登録の可能性）: {e}", file=sys.stderr)
     rows = report(client, prop, ["sessionDefaultChannelGroup"], ["sessions"], start, end, limit=10)

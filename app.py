@@ -6,6 +6,7 @@ import hashlib
 import secrets
 import string
 import collections
+import functools
 import time
 import logging
 import unicodedata
@@ -24,6 +25,9 @@ DATA_DIR    = os.environ.get("DATA_DIR", ".")
 os.makedirs(DATA_DIR, exist_ok=True)
 REPORTS_DB  = os.path.join(DATA_DIR, "reports.db")
 REPORT_THRESHOLD = 2  # 何人報告でグレーアウトするか
+# 1人（接続元）が同じ曜日・時限に報告できる教室の数。上限が無いと、回線を2つ使うだけで
+# 全教室を「使用中の可能性」にできてしまう（2026-10 セキュリティ点検）
+REPORT_MAX_ROOMS_PER_PERIOD = 3
 
 def init_reports_db():
     conn = sqlite3.connect(REPORTS_DB)
@@ -222,13 +226,33 @@ def _asset_version():
 ASSET_VERSION = _asset_version()
 
 
+# ブラウザへの安全設定（2026-10 セキュリティ点検）。画面はインラインの script / onclick を使っているので、
+# script-src までは絞らず、他サイトへの埋め込み（クリックジャッキング）・MIME の推測・不要な機能だけを止める
+SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Content-Security-Policy": "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Strict-Transport-Security": "max-age=31536000",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+}
+
+
+@app.after_request
+def add_security_headers(resp):
+    for k, v in SECURITY_HEADERS.items():
+        resp.headers.setdefault(k, v)
+    return resp
+
+
 @app.route('/api/report', methods=['POST'])
 def api_report():
     data = request.get_json(silent=True) or {}
     room   = str(data.get('room', '')).strip()[:20]
     day    = data.get('day', '')
     period = data.get('period', 0)
-    if not room or day not in VALID_DAYS or period not in VALID_PERIODS:
+    # 教室マスタに無い名前は受け付けない（存在しない教室名で DB を埋められないように）
+    if not room or day not in VALID_DAYS or period not in VALID_PERIODS or room not in known_room_names():
         return jsonify({'ok': False, 'error': 'invalid'}), 400
 
     ip = client_ip()
@@ -241,6 +265,11 @@ def api_report():
     reporter = reporter_id(ip)
 
     conn = sqlite3.connect(REPORTS_DB)
+    already = conn.execute("SELECT COUNT(*) FROM reports WHERE day=? AND period=? AND reporter=?",
+                           (day, period, reporter)).fetchone()[0]
+    if already >= REPORT_MAX_ROOMS_PER_PERIOD:
+        conn.close()
+        return jsonify({'ok': False, 'error': 'too_many_reports'}), 429
     try:
         conn.execute(
             "INSERT INTO reports (room, day, period, cancel_code, expires_at, reporter) VALUES (?,?,?,?,?,?)",
@@ -325,9 +354,16 @@ def index():
 
     if request.method == 'POST':
         searched = True
-        day = request.form.get('day')
-        period = int(request.form.get('period'))
-        building = request.form.get('building')
+        # 不正な値は既定値に戻す。以前は period が数字でないと 500 になっていた（2026-10 セキュリティ点検）
+        form_day = request.form.get('day')
+        day = form_day if form_day in VALID_DAYS else day
+        try:
+            form_period = int(request.form.get('period', ''))
+        except ValueError:
+            form_period = None
+        period = form_period if form_period in VALID_PERIODS else period
+        form_building = request.form.get('building')
+        building = form_building if form_building in VALID_BUILDINGS else 'all'
         year = resolve_year(request.form.get('year'), available_years)
         term = resolve_term(request.form.get('term'))
         span = resolve_span(request.form.get('span'))
@@ -461,6 +497,12 @@ def list_rooms(year):
         logging.error(f"RoomRadar list_rooms error: {e}")
         return []
     return sorted(({"name": str(n), "building": b} for n, b in rows), key=room_sort_key)
+
+
+@functools.lru_cache(maxsize=1)
+def known_room_names():
+    """報告を受け付ける教室名（全年度の教室マスタ）。時間割DBはデプロイ中に変わらないので1回だけ読む"""
+    return frozenset(r["name"] for r in list_rooms(None))
 
 
 def find_rooms(query, rooms):

@@ -91,6 +91,21 @@ function openModal(room, building) {
     updateReportButton();
 }
 
+// 教室カード（data-room）を押す・Enter で開く。「使用中の可能性」になったカードは開かない
+function cardFromEvent(e) {
+    const card = e.target.closest && e.target.closest('.room-card[data-room]');
+    return card && !card.classList.contains('reported') ? card : null;
+}
+document.addEventListener('click', function(e) {
+    const card = cardFromEvent(e);
+    if (card) openModal(card.dataset.room, card.dataset.bldg);
+});
+document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const card = cardFromEvent(e);
+    if (card) { e.preventDefault(); openModal(card.dataset.room, card.dataset.bldg); }
+});
+
 function closeModal() {
     document.getElementById('modal').classList.remove('open');
 }
@@ -129,6 +144,7 @@ async function submitReport() {
     const data = await res.json();
     if (!data.ok) {
         showToast(data.error === 'already_reported' ? 'この教室はすでに報告済みです'
+                : data.error === 'too_many_reports' ? '1つの時限に報告できるのは3教室までです'
                 : data.error === 'rate_limited' ? '操作が続いたため少し待ってからお試しください'
                 : '報告できませんでした');
         return;

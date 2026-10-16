@@ -48,8 +48,9 @@ jobs:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_REFRESH_PAT: ${{ secrets.IG_REFRESH_PAT }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+          DRY_RUN: ${{ inputs.dry_run }}   # 入力値は env で渡す（run に直接埋め込まない）
         run: |
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
+          if [ "$DRY_RUN" = "true" ]; then
             python scripts/refresh_ig_token.py --dry-run
           else
             python scripts/refresh_ig_token.py
