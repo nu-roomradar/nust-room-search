@@ -4,357 +4,427 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
-<title>RoomRadar — アナリティクス</title>
+<title>RoomRadar 運営ダッシュボード</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
 <!-- Chart.js 4.4.1 は npm の配布物（sha512 を照合済み）を同梱して同じサイトから読む。外部 CDN で書き換えられないように -->
 <script src="assets/vendor/chartjs/chart.umd.js"></script>
 <style>
+  /* 2026-10 作り直し: 日本語が読みやすいように、本文も数字も Noto Sans JP・大きめの文字・広めの行間に統一 */
   :root{
-    --bg:#f5f3ee; --ink:#1a1814; --muted:#8a8577;
-    --accent:#2563eb; --accent2:#f97316; --card:#fff; --border:rgba(26,24,20,0.1);
-    --ig1:#fa7e1e; --ig2:#d62976; --ig3:#962fbf;
+    --bg:#f6f5f1; --card:#fff; --ink:#1f2328; --sub:#4b5563; --muted:#6b7280;
+    --line:#e6e3da; --accent:#2563eb; --accent-soft:#e8efff; --up:#15803d; --down:#b91c1c;
+    --font:'Noto Sans JP','Hiragino Kaku Gothic ProN','Hiragino Sans',Meiryo,sans-serif;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink);
-    padding:40px 24px 80px;max-width:1100px;margin:0 auto;}
-  .head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px;}
-  h1{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;letter-spacing:-0.03em;}
-  .head .badge{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--accent);
-    background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.2);
-    padding:4px 12px;border-radius:99px;}
-  .updated{color:var(--muted);font-size:0.8rem;font-family:'DM Mono',monospace;margin-bottom:36px;}
-  .test-note{display:flex;align-items:center;gap:9px;margin-bottom:24px;
-    font-size:0.72rem;color:var(--muted);line-height:1.5;}
-  .test-note .tag{flex-shrink:0;font-family:'Syne',sans-serif;font-weight:700;font-size:0.56rem;
-    letter-spacing:0.1em;background:rgba(26,24,20,0.05);color:var(--muted);
-    border:1px solid var(--border);padding:3px 7px;border-radius:5px;}
-  h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.25rem;margin:44px 0 18px;
-    display:flex;align-items:center;gap:10px;}
-  h2 .ig-dot{width:18px;height:18px;border-radius:5px;
-    background:linear-gradient(135deg,#feda75,var(--ig1) 35%,var(--ig2) 65%,var(--ig3));}
-  h2 .ga-dot{width:18px;height:18px;border-radius:5px;background:linear-gradient(135deg,#f9ab00,#e8710a);}
+  html{scroll-behavior:smooth;}
+  body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:16px;line-height:1.75;
+    -webkit-font-smoothing:antialiased;font-feature-settings:"palt";}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 72px;}
+  .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum";}
 
-  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;}
-  .kpi{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:22px 24px;}
-  .kpi .label{font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);
-    text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
-  .kpi .val{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;line-height:1;}
-  .kpi .delta{font-size:0.8rem;margin-top:6px;font-weight:700;}
-  .kpi .delta.up{color:#16a34a;} .kpi .delta.down{color:#dc2626;} .kpi .delta.flat{color:var(--muted);}
+  /* 見出しまわり */
+  a.back{display:inline-block;color:var(--accent);text-decoration:none;font-size:.9rem;margin-bottom:14px;}
+  h1{font-size:1.75rem;font-weight:900;letter-spacing:.02em;line-height:1.4;}
+  h1 span{display:inline-block;}
+  @media(max-width:600px){h1{font-size:1.5rem;}}
+  .lead{color:var(--sub);font-size:.95rem;margin-top:4px;}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;color:var(--muted);font-size:.85rem;}
+  .notice{display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding:12px 16px;border-radius:12px;
+    background:#fff;border:1px solid var(--line);font-size:.85rem;color:var(--sub);line-height:1.7;}
+  .notice .tag{flex:none;font-size:.7rem;font-weight:700;letter-spacing:.08em;padding:2px 8px;border-radius:6px;
+    border:1px solid var(--line);color:var(--muted);background:var(--bg);margin-top:2px;}
+  nav.toc{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 6px;}
+  nav.toc a{font-size:.85rem;color:var(--sub);text-decoration:none;background:#fff;border:1px solid var(--line);
+    border-radius:99px;padding:5px 14px;}
+  nav.toc a:hover{border-color:var(--accent);color:var(--accent);}
 
-  .card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:24px;}
-  .chart-wrap{position:relative;height:300px;}
+  section{margin-top:40px;scroll-margin-top:16px;}
+  h2{font-size:1.25rem;font-weight:700;line-height:1.5;padding-left:12px;border-left:4px solid var(--accent);}
+  h2 small{font-size:.8rem;font-weight:500;color:var(--muted);margin-left:8px;}
+  .desc{color:var(--sub);font-size:.88rem;margin:6px 0 14px;}
 
-  .posts{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
-  .post{background:var(--card);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;
-    text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s;}
-  .post:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.08);}
-  .post img{width:100%;aspect-ratio:1;object-fit:cover;background:#eee;}
-  .post .meta{padding:12px 14px;}
-  .post .cap{font-size:0.78rem;color:var(--muted);line-height:1.5;height:3em;overflow:hidden;margin-bottom:10px;}
-  .post .stats{display:flex;gap:12px;flex-wrap:wrap;font-size:0.78rem;font-family:'DM Mono',monospace;}
-  .post .stats b{font-family:'Syne',sans-serif;font-weight:800;font-size:0.95rem;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+  .card h3{font-size:1rem;font-weight:700;margin-bottom:12px;}
 
-  .ga-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
-  .ga-link{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:20px 22px;
-    text-decoration:none;color:inherit;transition:border-color .2s,transform .2s;}
-  .ga-link:hover{border-color:var(--accent);transform:translateY(-2px);}
-  .ga-link .t{font-weight:700;margin-bottom:6px;}
-  .ga-link .d{font-size:0.82rem;color:var(--muted);line-height:1.6;}
-  .ga-note{font-size:0.85rem;color:var(--muted);line-height:1.8;margin-bottom:18px;
-    background:rgba(37,99,235,0.05);border-left:3px solid var(--accent);padding:14px 18px;border-radius:8px;}
-  .empty{color:var(--muted);font-size:0.9rem;padding:30px;text-align:center;
-    border:1.5px dashed var(--border);border-radius:16px;}
-  .ga-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
-  @media(max-width:680px){.ga-cols{grid-template-columns:1fr;}}
-  .barlist{display:flex;flex-direction:column;gap:12px;}
-  .barlist .sub{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);
-    text-transform:uppercase;letter-spacing:0.06em;margin:6px 0 2px;}
-  .bar-row{display:grid;grid-template-columns:90px 1fr 48px;align-items:center;gap:10px;font-size:0.85rem;}
-  .bar-row .name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .bar-row .track{height:10px;background:rgba(37,99,235,0.1);border-radius:6px;overflow:hidden;}
-  .bar-row .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:6px;}
-  .bar-row .v{text-align:right;font-family:'Syne',sans-serif;font-weight:800;font-size:0.9rem;}
-  a.back{display:inline-block;margin-bottom:24px;color:var(--accent);text-decoration:none;
-    font-size:0.85rem;font-family:'DM Mono',monospace;}
-  .occ-lead{font-size:0.82rem;color:#6b6760;line-height:1.7;margin:-6px 0 12px;}
-  .occ-filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
-  .occ-filters select{font:inherit;font-size:0.85rem;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);}
-  table.occ{width:100%;border-collapse:separate;border-spacing:2px;table-layout:fixed;font-size:0.78rem;}
-  table.occ th{font-weight:500;color:#6b6760;padding:4px 0;}
-  table.occ td{height:40px;text-align:center;border-radius:4px;font-variant-numeric:tabular-nums;}
-  .occ-legend{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:0.75rem;color:#6b6760;flex-wrap:wrap;}
-  .occ-ramp{width:120px;height:8px;border-radius:4px;background:linear-gradient(90deg,rgba(37,99,235,0.04),rgba(37,99,235,1));}
-  .occ-note{margin-left:auto;}
+  /* 数字のカード */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+  .kpi .label{font-size:.85rem;color:var(--sub);font-weight:500;}
+  .kpi .val{font-size:2rem;font-weight:700;line-height:1.3;margin-top:4px;}
+  .kpi .val .u{font-size:.95rem;font-weight:500;color:var(--sub);margin-left:3px;}
+  .kpi .delta{font-size:.85rem;font-weight:500;margin-top:2px;color:var(--muted);white-space:nowrap;}
+  .kpi .prev{font-size:.8rem;color:var(--muted);white-space:nowrap;}
+  .kpi .delta.up{color:var(--up);} .kpi .delta.down{color:var(--down);}
+  @media(max-width:600px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr));}}
+  .kpi.main{border-color:var(--accent);background:linear-gradient(180deg,#fff, var(--accent-soft));}
+
+  /* グラフ */
+  .chart{position:relative;height:280px;}
+  @media(max-width:600px){.chart{height:230px;}}
+
+  /* 表 */
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table.t{width:100%;border-collapse:collapse;font-size:.9rem;}
+  table.t th,table.t td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;}
+  table.t th{font-weight:500;color:var(--sub);font-size:.82rem;background:#fbfaf7;}
+  table.t th:first-child,table.t td:first-child{text-align:left;}
+  table.t tr.latest td{background:var(--accent-soft);font-weight:700;}
+  table.t td.post{text-align:left;white-space:normal;min-width:13em;line-height:1.6;}
+  table.t td.post a{color:var(--ink);text-decoration:none;} table.t td.post a:hover{color:var(--accent);text-decoration:underline;}
+  table.t td.post .when{font-size:.78rem;color:var(--muted);margin-top:2px;}
+  .hint{display:none;font-size:.8rem;color:var(--muted);margin-top:6px;text-align:right;}
+  @media(max-width:600px){.hint{display:block;}}
+
+  /* 横棒 */
+  .bars{display:flex;flex-direction:column;gap:14px;}
+  .bar{display:grid;grid-template-columns:1fr auto;column-gap:12px;row-gap:5px;align-items:baseline;font-size:.92rem;}
+  .bar .name{min-width:0;}
+  .bar .v{text-align:right;font-weight:700;}
+  .bar .track{grid-column:1 / -1;display:block;height:10px;background:#eef1f6;border-radius:5px;overflow:hidden;}
+  .bar .fill{display:block;height:100%;background:var(--accent);border-radius:5px;}
+  .bar:first-child .fill{background:#1d4ed8;}
+  .empty{color:var(--muted);font-size:.9rem;text-align:center;padding:24px 12px;border:1px dashed var(--line);border-radius:12px;}
+
+  /* 混み具合 */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  .filters select{font:inherit;font-size:.9rem;padding:7px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;}
+  table.occ{width:100%;border-collapse:separate;border-spacing:3px;table-layout:fixed;font-size:.85rem;}
+  table.occ th{font-weight:500;color:var(--sub);padding:2px 0;}
+  table.occ td{height:44px;text-align:center;border-radius:6px;font-variant-numeric:tabular-nums;}
+  .legend{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:.8rem;color:var(--sub);flex-wrap:wrap;}
+  .ramp{width:120px;height:10px;border-radius:5px;background:linear-gradient(90deg,rgba(37,99,235,.06),rgba(37,99,235,1));}
+  .legend .right{margin-left:auto;}
+
+  /* Instagram（集計終了・折りたたみ） */
+  details.ig{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 20px;}
+  details.ig summary{cursor:pointer;font-weight:700;}
+  details.ig[open] summary{margin-bottom:14px;}
+
+  .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+  .links a{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;
+    text-decoration:none;color:inherit;}
+  .links a:hover{border-color:var(--accent);}
+  .links .t{font-weight:700;} .links .d{font-size:.85rem;color:var(--sub);margin-top:2px;}
+  footer{margin-top:48px;color:var(--muted);font-size:.8rem;line-height:1.7;}
 </style>
 </head>
 <body>
-  <a class="back" href="./index.html">← RoomRadar トップ</a>
-  <div class="head">
-    <h1>アナリティクス</h1>
-    <span class="badge">RoomRadar Analytics</span>
-  </div>
-  <div class="test-note">
+<div class="wrap">
+  <a class="back" href="./index.html">← RoomRadar 紹介ページ</a>
+  <h1><span>RoomRadar</span> <span>運営ダッシュボード</span></h1>
+  <p class="lead">利用状況（Google アナリティクス）と、時間割から見た教室の混み具合をまとめた運営チーム用のページです。</p>
+  <div class="meta"><span id="updated">データを読み込んでいます…</span><span>週ごとの数字は毎週月曜の朝に自動で更新</span></div>
+  <div class="notice">
     <span class="tag">TEST</span>
-    <span>テスト運用中の非公式サービスです（学生開発・大学公式ではありません）。本ページは運営チーム用です。</span>
+    <span>RoomRadar はテスト運用中の非公式サービスです（学生開発・大学公式ではありません）。このページは運営チーム用です。</span>
   </div>
-  <div class="test-note">
-    <span class="tag">停止</span>
-    <span>Instagram・GA4 の集計は 2026年8月で終了しました。以下は最終取得時点のデータで、今後更新されません。</span>
-  </div>
-  <div class="updated" id="updated">データ読み込み中…</div>
+  <nav class="toc" aria-label="目次">
+    <a href="#week">今週のようす</a><a href="#weekly">週ごとの利用</a><a href="#search">よく探される条件</a>
+    <a href="#reports">報告の多い教室</a><a href="#source">どこから来たか</a><a href="#daily">日ごとの推移</a>
+    <a href="#occ">教室の混み具合</a><a href="#ig">Instagram</a>
+  </nav>
 
-  <!-- ════════ 時間割から見た教室の混み具合 ════════ -->
-  <h2>教室の混み具合（時間割から）</h2>
-  <p class="occ-lead">曜日×時限ごとに、検索対象の教室のうち授業が入っている割合。濃いほど空き教室が少ない。<br>元データは時間割 DB（<code>python scripts/export_occupancy.py</code> で更新）。隔週の授業も毎週ある扱い。</p>
-  <div class="occ-filters">
-    <select id="occ-term" aria-label="年度・学期"></select>
-    <select id="occ-bldg" aria-label="校舎"></select>
-  </div>
-  <div class="card"><table class="occ" id="occ-table"></table>
-    <div class="occ-legend"><span>0%</span><span class="occ-ramp"></span><span>100%</span><span class="occ-note" id="occ-note"></span></div>
-  </div>
+  <section id="week">
+    <h2>今週のようす<small id="week-range"></small></h2>
+    <p class="desc">直近の1週間（月〜日）の数字です。下の段は前の週との比較です。</p>
+    <div class="kpis" id="week-kpis"></div>
+  </section>
 
-  <!-- ════════ Instagram ════════ -->
-  <h2><span class="ig-dot"></span>Instagram</h2>
-  <div class="kpis" id="ig-kpis"></div>
+  <section id="weekly">
+    <h2>週ごとの利用</h2>
+    <p class="desc">検索アプリの訪問回数の推移です。紹介ページと検索アプリはドメインが別なので、合計はしていません。利用者数は端末・ブラウザの数で、人数ではありません。</p>
+    <div class="card"><div class="chart"><canvas id="weeklyChart" aria-label="週ごとの検索アプリの訪問回数"></canvas></div></div>
+    <div class="card table-scroll" style="margin-top:12px"><table class="t num" id="weekly-table"></table></div>
+    <p class="hint">表は横にスクロールできます →</p>
+  </section>
 
-  <h2 style="font-size:1rem;margin-top:32px;">フォロワー推移</h2>
-  <div class="card"><div class="chart-wrap"><canvas id="followersChart"></canvas></div></div>
-
-  <h2 style="font-size:1rem;">リーチ・プロフィール表示</h2>
-  <div class="card"><div class="chart-wrap"><canvas id="reachChart"></canvas></div></div>
-
-  <h2 style="font-size:1rem;">投稿パフォーマンス（エンゲージメント順）</h2>
-  <div id="posts-area"></div>
-
-  <!-- ════════ Google Analytics ════════ -->
-  <h2><span class="ga-dot"></span>サイト分析 (Google Analytics 4)</h2>
-  <div class="kpis" id="ga-kpis"></div>
-
-  <h2 style="font-size:1rem;margin-top:32px;">訪問者・ページビュー推移（過去28日）</h2>
-  <div class="card"><div class="chart-wrap"><canvas id="usersChart"></canvas></div></div>
-
-  <div class="ga-cols">
-    <div>
-      <h2 style="font-size:1rem;">人気の検索条件</h2>
-      <div class="card" id="ga-search"></div>
+  <section id="search">
+    <h2>よく探される条件<small>直近28日</small></h2>
+    <p class="desc">「空き教室を検索」を押したときの条件です（開いたときに自動で出る結果は含みません）。</p>
+    <div class="grid3">
+      <div class="card"><h3>校舎</h3><div class="bars num" id="s-building"></div></div>
+      <div class="card"><h3>時限</h3><div class="bars num" id="s-period"></div></div>
+      <div class="card"><h3>曜日</h3><div class="bars num" id="s-day"></div></div>
     </div>
-    <div>
-      <h2 style="font-size:1rem;">流入元 / イベント数</h2>
-      <div class="card" id="ga-misc"></div>
-    </div>
-  </div>
+  </section>
 
-  <h2 style="font-size:1rem;margin-top:32px;">GA4管理画面で詳しく見る</h2>
-  <div class="ga-grid">
-    <a class="ga-link" href="https://analytics.google.com/analytics/web/#/p0/realtime/overview" target="_blank" rel="noopener">
-      <div class="t">リアルタイム</div><div class="d">今この瞬間の同時アクセス数・閲覧中のページ</div>
-    </a>
-    <a class="ga-link" href="https://analytics.google.com/analytics/web/#/p0/reports/explorer?params=_u..nav%3Dmaui" target="_blank" rel="noopener">
-      <div class="t">集客（流入元）</div><div class="d">Instagram・検索・直リンクなど、どこから来たか</div>
-    </a>
-    <a class="ga-link" href="https://analytics.google.com/analytics/web/#/p0/reports/explorer" target="_blank" rel="noopener">
-      <div class="t">エンゲージメント</div><div class="d">search / report_room などカスタムイベントの発生数</div>
-    </a>
-    <a class="ga-link" href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener">
-      <div class="t">GA4を開く →</div><div class="d">すべてのレポート・ユーザー属性・デバイス</div>
-    </a>
-  </div>
+  <section id="reports">
+    <h2>「実は使われていた」報告の多い教室<small>直近28日</small></h2>
+    <p class="desc">報告は時限が終わるとアプリからは消えるので、残るのはこの件数だけです（時間割にない授業などで使われていた教室の目安）。</p>
+    <div class="card table-scroll" id="report-rooms"></div>
+  </section>
+
+  <section id="source">
+    <h2>どこから来たか・何をしたか<small>直近28日</small></h2>
+    <p class="desc">訪問のきっかけは紹介ページと検索アプリを合わせた訪問回数です（紹介ページから検索アプリへ移ったときは「他のサイトのリンク」に数えられます）。</p>
+    <div class="grid2">
+      <div class="card"><h3>訪問のきっかけ</h3><div class="bars num" id="channels"></div></div>
+      <div class="card"><h3>操作の回数</h3><div class="bars num" id="events"></div></div>
+    </div>
+  </section>
+
+  <section id="daily">
+    <h2>日ごとの推移<small>直近28日</small></h2>
+    <p class="desc">紹介ページと検索アプリを合わせた数です（両方を見た人は2回数えられます）。</p>
+    <div class="card"><div class="chart"><canvas id="dailyChart" aria-label="日ごとの訪問者と訪問回数"></canvas></div></div>
+  </section>
+
+  <section id="occ">
+    <h2>教室の混み具合<small>時間割から</small></h2>
+    <p class="desc">曜日×時限ごとに、検索できる教室のうち授業が入っている割合です。濃いほど空き教室が少なくなります。隔週の授業も毎週ある扱いです。</p>
+    <div class="filters">
+      <select id="occ-term" aria-label="年度・学期"></select>
+      <select id="occ-bldg" aria-label="校舎"></select>
+    </div>
+    <div class="card"><table class="occ" id="occ-table"></table>
+      <div class="legend"><span>0%</span><span class="ramp"></span><span>100%</span><span class="right" id="occ-note"></span></div>
+    </div>
+  </section>
+
+  <section id="ig">
+    <h2>Instagram<small>2026年8月で集計を終了</small></h2>
+    <p class="desc">集計を止めた時点（2026年8月13日）のまま更新していません。最新の数字は Instagram アプリのインサイトで見てください。</p>
+    <details class="ig">
+      <summary>8月までの記録を開く</summary>
+      <div class="kpis" id="ig-kpis"></div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="card"><h3>フォロワー数</h3><div class="chart"><canvas id="followersChart" aria-label="フォロワー数の推移"></canvas></div></div>
+        <div class="card"><h3>リーチ</h3><div class="chart"><canvas id="reachChart" aria-label="リーチの推移"></canvas></div></div>
+      </div>
+      <div class="card table-scroll" style="margin-top:12px"><h3>投稿ごとの反応（リーチの多い順）</h3><table class="t num" id="ig-posts"></table></div>
+      <p class="hint">表は横にスクロールできます →</p>
+    </details>
+  </section>
+
+  <section>
+    <h2>もっと詳しく見る</h2>
+    <div class="links" style="margin-top:14px">
+      <a href="https://github.com/nu-roomradar/nust-room-search/blob/main/data/ga4_weekly.md" target="_blank" rel="noopener">
+        <div class="t">週ごとの表（GitHub）</div><div class="d">毎週月曜に自動で追記される記録の元データ</div></a>
+      <a href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener">
+        <div class="t">Google アナリティクスを開く</div><div class="d">時間帯別・端末別など、ここにない数字を見るとき</div></a>
+      <a href="https://github.com/nu-roomradar/nust-room-search/blob/main/docs/OPERATIONS.md" target="_blank" rel="noopener">
+        <div class="t">運用手順書</div><div class="d">数字の意味（4.6・4.7）、トラブル時の対応</div></a>
+    </div>
+  </section>
+
+  <footer>© 2026 RoomRadar ／ 日本大学「自主創造プロジェクト」の一環として理工学部の学生が開発・運営しています。テスト運用中の非公式サービスです（大学公式ではありません）。</footer>
+</div>
 
 <script>
 // data/*.json の中身を innerHTML に入れるときは、必ず esc / fmt / safeUrl を通す。
 // GA4 の検索条件などは、測定IDさえ分かれば外部の誰でも書き込める（そのまま入れると蓄積型XSSになる）
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const fmt = n => (n === null || n === undefined) ? '—' : (typeof n === 'number' ? n.toLocaleString() : esc(n));
+const fmt = n => (n === null || n === undefined) ? '—' : (typeof n === 'number' ? n.toLocaleString('ja-JP') : esc(n));
 const safeUrl = u => /^https:\/\//.test(String(u || '')) ? esc(u) : '';
+const $ = id => document.getElementById(id);
 
 async function load(path){
-  try { const r = await fetch(path); if(!r.ok) throw 0; return await r.json(); }
+  try { const r = await fetch(path, {cache: 'no-cache'}); if(!r.ok) throw 0; return await r.json(); }
   catch(e){ return null; }
 }
+// "2026-10-05" → "10/5"、週は "10/5〜10/11"
+const md = s => { const [, m, d] = String(s).split('-'); return `${+m}/${+d}`; };
+const weekLabel = w => `${md(w.week_start)}〜${md(w.week_end)}`;
+const jpDate = s => { const [y, m, d] = String(s).split('-'); return `${+y}年${+m}月${+d}日`; };
 
-function deltaHTML(cur, prev){
-  if(cur == null || prev == null) return '';
-  const d = cur - prev;
-  if(d === 0) return '<div class="delta flat">±0</div>';
-  const cls = d > 0 ? 'up' : 'down';
-  const sign = d > 0 ? '+' : '';
-  return `<div class="delta ${cls}">${sign}${d.toLocaleString()}</div>`;
+function changeHTML(cur, prev, unit){
+  if (cur == null || prev == null) return '<div class="prev">前週の記録なし</div>';
+  const was = `<div class="prev">前週 ${fmt(prev)}${unit}</div>`;
+  if (prev === 0) return was;
+  const pct = Math.round((cur - prev) / prev * 100);
+  if (pct === 0) return '<div class="delta">前週と同じ</div>' + was;
+  const cls = pct > 0 ? 'up' : 'down', mark = pct > 0 ? '▲' : '▼';
+  return `<div class="delta ${cls}">${mark} ${Math.abs(pct)}% ${pct > 0 ? '増' : '減'}</div>` + was;
 }
 
+// 横棒のリスト。items = [{label, count}]、名前は labelFn で日本語にしてから esc を通す
+function barlist(items, labelFn){
+  if (!items || !items.length) return '<div class="empty">まだデータがありません</div>';
+  const max = Math.max(...items.map(i => Number(i.count) || 0)) || 1;
+  return items.map(i => {
+    const name = esc(labelFn ? labelFn(i.label) : i.label);
+    const v = Number(i.count) || 0;
+    return `<div class="bar"><span class="name">${name}</span><span class="v">${fmt(v)}</span>
+      <span class="track"><span class="fill" style="width:${Math.max(v ? 2 : 0, Math.round(v / max * 100))}%"></span></span></div>`;
+  }).join('');
+}
+
+// Chart.js の共通の見た目（細い線・薄い目盛り・日本語フォント）
+if (typeof Chart === 'function') {
+  Chart.defaults.font.family = getComputedStyle(document.documentElement).getPropertyValue('--font');
+  Chart.defaults.font.size = 13;
+  Chart.defaults.color = '#4b5563';
+  Chart.defaults.borderColor = '#eceae3';
+}
+const fontReady = Promise.race([
+  document.fonts ? document.fonts.load('500 13px "Noto Sans JP"', '0123456789月火水') : Promise.resolve(),
+  new Promise(r => setTimeout(r, 2000)),
+]).catch(() => {});
+async function chart(id, config){
+  if (typeof Chart !== 'function') return;
+  await fontReady;
+  try { new Chart($(id), config); } catch(e){ console.warn('chart failed', id, e); }
+}
+const BLUE = '#2563eb', BLUE_SOFT = 'rgba(37,99,235,0.35)', GRAY = '#94a3b8';
+
+// ════════ GA4（週ごと・直近28日） ════════
 (async function(){
-  const history = await load('./data/instagram_history.json') || [];
-  const postsData = await load('./data/instagram_posts.json') || {posts:[]};
+  const weeks = await load('./data/ga4_weekly.json') || [];
+  const bd = await load('./data/ga4_breakdown.json') || {};
+  const hist = await load('./data/ga4_history.json') || [];
+  $('updated').textContent = bd.updated ? `最終更新：${jpDate(bd.updated)}` : 'まだデータがありません';
 
-  document.getElementById('updated').textContent =
-    postsData.updated ? `最終更新: ${postsData.updated}` : 'まだデータがありません（ワークフロー実行後に表示されます）';
-
-  // ── KPI ──
-  const latest = history[history.length-1] || {};
-  const prev   = history[history.length-2] || {};
-  const kpis = [
-    {label:'フォロワー', val:latest.followers_count, prev:prev.followers_count},
-    {label:'フォロー中', val:latest.follows_count,   prev:prev.follows_count},
-    {label:'投稿数',     val:latest.media_count,     prev:prev.media_count},
-    {label:'リーチ(日)', val:latest.reach,           prev:prev.reach},
-  ];
-  document.getElementById('ig-kpis').innerHTML = kpis.map(k => `
-    <div class="kpi"><div class="label">${k.label}</div>
-      <div class="val">${fmt(k.val)}</div>${deltaHTML(k.val, k.prev)}</div>`).join('');
-
-  const labels = history.map(h => h.date);
-
-  // ── グラフ（Chart.jsが読めない場合もKPI/投稿は表示し続ける） ──
-  if (typeof Chart === 'function') {
-    try {
-      new Chart(document.getElementById('followersChart'), {
-        type:'line',
-        data:{labels, datasets:[{label:'フォロワー', data:history.map(h=>h.followers_count),
-          borderColor:'#d62976', backgroundColor:'rgba(214,41,118,0.1)', fill:true, tension:0.3, pointRadius:3}]},
-        options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}}
-      });
-      new Chart(document.getElementById('reachChart'), {
-        type:'bar',
-        data:{labels, datasets:[
-          {label:'リーチ', data:history.map(h=>h.reach ?? null), backgroundColor:'rgba(37,99,235,0.6)'},
-          {label:'プロフィール表示', data:history.map(h=>h.profile_views ?? null), backgroundColor:'rgba(249,115,22,0.6)'}
-        ]},
-        options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom'}}}
-      });
-    } catch (e) { console.warn('chart render failed', e); }
-  }
-
-  // ── 投稿パフォーマンス ──
-  const area = document.getElementById('posts-area');
-  const posts = (postsData.posts || []).slice();
-  if(!posts.length){
-    area.innerHTML = '<div class="empty">投稿データがまだありません。<br>「Instagramインサイトを記録」ワークフローを実行すると表示されます。</div>';
-  } else {
-    const eng = p => (p.total_interactions ?? ((p.like_count||0)+(p.comments_count||0)+(p.saved||0)));
-    posts.sort((a,b)=> eng(b)-eng(a));
-    area.className = 'posts';
-    area.innerHTML = posts.map(p => `
-      <a class="post" href="${safeUrl(p.permalink) || '#'}" target="_blank" rel="noopener">
-        ${safeUrl(p.thumbnail) ? `<img src="${safeUrl(p.thumbnail)}" alt="" loading="lazy">` : ''}
-        <div class="meta">
-          <div class="cap">${esc(p.caption)}</div>
-          <div class="stats">
-            <span><b>${fmt(p.like_count)}</b> ♥</span>
-            <span><b>${fmt(p.comments_count)}</b> 💬</span>
-            ${p.saved!=null?`<span><b>${fmt(p.saved)}</b> 保存</span>`:''}
-            ${p.reach!=null?`<span><b>${fmt(p.reach)}</b> reach</span>`:''}
-          </div>
-        </div>
-      </a>`).join('');
-  }
-
-  // ════════ GA4 ════════
-  const gaHist = await load('./data/ga4_history.json') || [];
-  const gaBreak = await load('./data/ga4_breakdown.json') || {};
-
-  if (gaHist.length) {
-    const total = (k) => gaHist.reduce((s,h)=> s + (h[k]||0), 0);
-    const last = gaHist[gaHist.length-1] || {};
-    const gaKpis = [
-      {label:'訪問者(28日)', val: total('active_users')},
-      {label:'新規(28日)',   val: total('new_users')},
-      {label:'PV(28日)',     val: total('page_views')},
-      {label:'本日の訪問',   val: last.active_users},
+  // 今週のようす
+  const cur = weeks[weeks.length - 1], prev = weeks[weeks.length - 2];
+  if (cur) {
+    $('week-range').textContent = `${jpDate(cur.week_start)}〜${md(cur.week_end)}`;
+    const p = prev || null, e = cur.events || {}, pe = (p && p.events) || {};
+    const cards = [
+      {label:'検索アプリの訪問', unit:'回', v:cur.app.sessions, pv:p && p.app.sessions, main:true},
+      {label:'検索アプリの利用者', unit:'台', v:cur.app.users, pv:p && p.app.users},
+      {label:'検索の回数', unit:'回', v:e.search, pv:p && pe.search},
+      {label:'「実は使われていた」報告', unit:'件', v:e.report_room, pv:p && pe.report_room},
+      {label:'紹介ページの訪問', unit:'回', v:cur.lp.sessions, pv:p && p.lp.sessions},
+      {label:'意見箱の送信', unit:'件', v:e.feedback_submit, pv:p && pe.feedback_submit},
     ];
-    document.getElementById('ga-kpis').innerHTML = gaKpis.map(k => `
-      <div class="kpi"><div class="label">${k.label}</div>
-        <div class="val">${fmt(k.val)}</div></div>`).join('');
-
-    if (typeof Chart === 'function') {
-      try {
-        new Chart(document.getElementById('usersChart'), {
-          type:'line',
-          data:{labels: gaHist.map(h=>h.date), datasets:[
-            {label:'訪問者', data:gaHist.map(h=>h.active_users), borderColor:'#2563eb',
-             backgroundColor:'rgba(37,99,235,0.1)', fill:true, tension:0.3, pointRadius:2},
-            {label:'ページビュー', data:gaHist.map(h=>h.page_views), borderColor:'#f97316',
-             backgroundColor:'rgba(249,115,22,0.08)', fill:true, tension:0.3, pointRadius:2}
-          ]},
-          options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom'}}}
-        });
-      } catch(e){ console.warn('ga chart failed', e); }
-    }
+    $('week-kpis').innerHTML = cards.map(c => `
+      <div class="kpi${c.main ? ' main' : ''}"><div class="label">${c.label}</div>
+        <div class="val num">${fmt(c.v)}<span class="u">${c.unit}</span></div>${changeHTML(c.v, c.pv, c.unit)}</div>`).join('');
   } else {
-    document.getElementById('ga-kpis').innerHTML =
-      '<div class="empty" style="grid-column:1/-1">GA4データはまだありません。<br>「GA4サイト分析を記録」ワークフローを実行すると表示されます。</div>';
+    $('week-kpis').innerHTML = '<div class="empty">週ごとの記録がまだありません</div>';
   }
 
-  // 棒リスト生成ヘルパー
-  const BUILDING_JA = {all:'すべて', tower:'タワースコラ', main:'駿河台', funabashi:'船橋'};
-  function barlist(items, valkey, labelFn){
-    if(!items || !items.length) return '';
-    const max = Math.max(...items.map(i=>Number(i[valkey])||0)) || 1;
-    return items.slice(0,8).map(i => {
-      const name = esc(labelFn ? labelFn(i.label) : i.label);
-      const v = Number(i[valkey]) || 0;
-      return `<div class="bar-row"><span class="name" title="${name}">${name}</span>
-        <span class="track"><span class="fill" style="width:${Math.round(v/max*100)}%"></span></span>
-        <span class="v">${fmt(v)}</span></div>`;
+  // 週ごとの利用（グラフ＋表）
+  if (weeks.length) {
+    chart('weeklyChart', {
+      type: 'bar',
+      data: { labels: weeks.map(w => [`${md(w.week_start)}〜`, md(w.week_end)]), datasets: [{ label: '検索アプリの訪問（回）',
+        data: weeks.map(w => w.app.sessions),
+        backgroundColor: weeks.map((w, i) => i === weeks.length - 1 ? BLUE : BLUE_SOFT),
+        borderRadius: 4, maxBarThickness: 48 }] },
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false },
+          tooltip: { callbacks: { title: c => weekLabel(weeks[c[0].dataIndex]),
+            label: c => ` 訪問 ${c.raw}回・利用者 ${weeks[c.dataIndex].app.users}台` } } },
+        scales: { x: { grid: { display: false }, ticks: { maxRotation: 0 } }, y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    });
+    const rows = weeks.slice().reverse().map((w, i) => {
+      const e = w.events || {};
+      return `<tr class="${i === 0 ? 'latest' : ''}"><td>${esc(weekLabel(w))}</td>
+        <td>${fmt(w.app.sessions)}</td><td>${fmt(w.app.users)}</td><td>${fmt(e.search)}</td><td>${fmt(e.report_room)}</td>
+        <td>${fmt(w.lp.sessions)}</td><td>${fmt(w.lp.users)}</td><td>${fmt(e.feedback_submit)}</td></tr>`;
     }).join('');
+    $('weekly-table').innerHTML = `<tr><th>週（月〜日）</th><th>アプリ 訪問</th><th>アプリ 利用者</th><th>検索</th>
+      <th>報告</th><th>紹介ページ 訪問</th><th>紹介ページ 利用者</th><th>意見箱</th></tr>` + rows;
   }
 
-  const searchEl = document.getElementById('ga-search');
-  const sParts = [];
-  if (gaBreak.search_building) sParts.push('<div class="sub">校舎</div>' +
-    barlist(gaBreak.search_building, 'count', l => BUILDING_JA[l] || l));
-  if (gaBreak.search_period) sParts.push('<div class="sub">時限</div>' +
-    barlist(gaBreak.search_period, 'count', l => l + '限'));
-  if (gaBreak.search_day) sParts.push('<div class="sub">曜日</div>' +
-    barlist(gaBreak.search_day, 'count', l => l + '曜'));
-  searchEl.className = 'card barlist';
-  searchEl.innerHTML = sParts.join('') ||
-    '<div class="empty">検索データがまだありません</div>';
+  // よく探される条件（時限・曜日は並び順のまま、校舎は多い順）
+  const B = {all:'指定なし（全校舎）', tower:'タワースコラ', main:'駿河台校舎', funabashi:'船橋校舎'};
+  const byOrder = (items, order) => order.map(k => (items || []).find(i => i.label === k)).filter(Boolean);
+  $('s-building').innerHTML = barlist(bd.search_building, l => B[l] || l);
+  $('s-period').innerHTML = barlist(byOrder(bd.search_period, ['1','2','3','4','5','6']), l => `${l}限`);
+  $('s-day').innerHTML = barlist(byOrder(bd.search_day, ['月','火','水','木','金','土']), l => `${l}曜日`);
 
-  const miscEl = document.getElementById('ga-misc');
-  const mParts = [];
-  if (gaBreak.channels) mParts.push('<div class="sub">流入元（セッション）</div>' +
-    barlist(gaBreak.channels, 'sessions'));
-  if (gaBreak.events) {
-    const EV_JA = {search:'検索', reserve_room:'仮予約（廃止）', report_room:'使用中報告', feedback_submit:'意見箱'};
-    const evItems = Object.entries(gaBreak.events).map(([k,v]) => ({label:EV_JA[k]||k, count:v}));
-    mParts.push('<div class="sub">イベント発生数</div>' + barlist(evItems, 'count'));
+  // 報告の多い教室
+  const rr = bd.report_rooms || [];
+  $('report-rooms').innerHTML = rr.length
+    ? `<table class="t num"><tr><th>教室</th><th>校舎</th><th>報告</th></tr>` +
+      rr.map(r => `<tr><td>${esc(r.label)}</td><td>${esc(r.building)}</td><td>${fmt(r.count)}件</td></tr>`).join('') + '</table>'
+    : '<div class="empty">直近28日の報告はありません</div>';
+
+  // 訪問のきっかけ・操作の回数
+  const CH = {'Referral':'他のサイトのリンク（紹介ページなど）', 'Organic Social':'SNS（Instagram など）',
+    'Direct':'直接（ブックマーク・URL）', 'Organic Search':'検索エンジン', 'Unassigned':'分類できないもの',
+    'Cross-network':'広告など', 'Paid Search':'検索広告', 'Email':'メール'};
+  $('channels').innerHTML = barlist((bd.channels || []).map(c => ({label: c.label, count: c.sessions})), l => CH[l] || l);
+  const EV = {search:'検索', report_room:'「実は使われていた」報告', feedback_submit:'意見箱の送信'};
+  const ev = bd.events || {};
+  $('events').innerHTML = barlist(Object.keys(EV).map(k => ({label: k, count: ev[k] || 0})), l => EV[l]);
+
+  // 日ごとの推移
+  if (hist.length) {
+    chart('dailyChart', {
+      type: 'line',
+      data: { labels: hist.map(h => md(h.date)), datasets: [
+        { label: '訪問者（台）', data: hist.map(h => h.active_users), borderColor: BLUE, backgroundColor: BLUE,
+          borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.25 },
+        { label: '訪問（回）', data: hist.map(h => h.sessions), borderColor: GRAY, backgroundColor: GRAY,
+          borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.25 } ] },
+      options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, boxHeight: 2 } } },
+        scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 8 } }, y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    });
   }
-  miscEl.className = 'card barlist';
-  miscEl.innerHTML = mParts.join('') ||
-    '<div class="empty">流入/イベントデータがまだありません</div>';
 })();
 
-// ── 教室の混み具合（data/occupancy.json） ──
+// ════════ 教室の混み具合（data/occupancy.json） ════════
 (async function(){
-  const occ = await load('data/occupancy.json');
-  const selT = document.getElementById('occ-term'), selB = document.getElementById('occ-bldg');
-  if(!occ){ document.getElementById('occ-table').innerHTML = '<tr><td>データを読み込めませんでした</td></tr>'; return; }
+  const occ = await load('./data/occupancy.json');
+  const selT = $('occ-term'), selB = $('occ-bldg');
+  if (!occ) { $('occ-table').innerHTML = '<tr><td>データを読み込めませんでした</td></tr>'; return; }
   const terms = [...new Set(occ.views.map(v => v.year + '|' + v.term))];
-  selT.innerHTML = terms.map(k => { const [y,t] = k.split('|'); return `<option value="${esc(k)}">${esc(y)}年度 ${esc(t)}</option>`; }).join('');
+  selT.innerHTML = terms.map(k => { const [y, t] = k.split('|'); return `<option value="${esc(k)}">${esc(y)}年度 ${esc(t)}</option>`; }).join('');
   const bl = {all:'全校舎', 'タワースコラ':'タワースコラ', '駿河台校舎':'駿河台校舎', '船橋校舎':'船橋校舎'};
-  selB.innerHTML = Object.entries(bl).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+  selB.innerHTML = Object.entries(bl).map(([k, v]) => `<option value="${esc(k)}">${esc(v)}</option>`).join('');
   function draw(){
-    const [y,t] = selT.value.split('|');
+    const [y, t] = selT.value.split('|');
     const v = occ.views.find(v => String(v.year) === y && v.term === t && v.building === selB.value);
-    const tbl = document.getElementById('occ-table');
-    if(!v){ tbl.innerHTML = '<tr><td>この校舎の教室はありません</td></tr>'; return; }
+    const tbl = $('occ-table');
+    if (!v) { tbl.innerHTML = '<tr><td>この校舎の教室はありません</td></tr>'; return; }
     let h = '<tr><th></th>' + occ.periods.map(p => `<th>${esc(p)}限</th>`).join('') + '</tr>';
     occ.days.forEach((d, i) => {
       h += `<tr><th>${esc(d)}</th>` + v.busy[i].map((n, j) => {
         n = Number(n) || 0;
         const r = n / v.rooms, pct = Math.round(r * 100);
-        const ink = r > 0.55 ? '#fff' : 'var(--ink, #1a1814)';
-        return `<td style="background:rgba(37,99,235,${(0.04 + r * 0.96).toFixed(3)});color:${ink}" title="${esc(d)}曜 ${esc(occ.periods[j])}限: ${esc(v.rooms)}室中 ${n}室で授業（空き ${v.rooms - n}室）">${pct}%</td>`;
+        const ink = r > 0.55 ? '#fff' : '#1f2328';
+        return `<td style="background:rgba(37,99,235,${(0.06 + r * 0.94).toFixed(3)});color:${ink}" title="${esc(d)}曜 ${esc(occ.periods[j])}限：${esc(v.rooms)}室中 ${n}室で授業（空き ${v.rooms - n}室）">${pct}%</td>`;
       }).join('') + '</tr>';
     });
     tbl.innerHTML = h;
-    document.getElementById('occ-note').textContent = `対象 ${v.rooms}室`;
+    $('occ-note').textContent = `対象 ${v.rooms}室`;
   }
   selT.onchange = selB.onchange = draw;
   draw();
+})();
+
+// ════════ Instagram（2026-08 で集計終了。凍結データ） ════════
+(async function(){
+  const history = await load('./data/instagram_history.json') || [];
+  const postsData = await load('./data/instagram_posts.json') || {posts: []};
+  const last = history[history.length - 1] || {};
+  const igCards = [
+    {label:'フォロワー', unit:'人', v:last.followers_count},
+    {label:'投稿数', unit:'件', v:last.media_count},
+    {label:'集計した最後の日', unit:'', v:last.date ? `${md(last.date).replace('/', '月')}日` : null},
+  ];
+  $('ig-kpis').innerHTML = igCards.map(c => `
+    <div class="kpi"><div class="label">${c.label}</div><div class="val num" style="font-size:1.4rem">${fmt(c.v)}<span class="u">${c.unit}</span></div></div>`).join('');
+  const labels = history.map(h => md(h.date));
+  chart('followersChart', { type: 'line',
+    data: { labels, datasets: [{ label: 'フォロワー（人）', data: history.map(h => h.followers_count),
+      borderColor: BLUE, backgroundColor: BLUE, borderWidth: 2, pointRadius: 2, tension: 0.25 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 6 } }, y: { ticks: { precision: 0 } } } } });
+  chart('reachChart', { type: 'bar',
+    data: { labels, datasets: [{ label: 'リーチ（人）', data: history.map(h => h.reach ?? null), backgroundColor: BLUE_SOFT, borderRadius: 3 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 6 } }, y: { beginAtZero: true, ticks: { precision: 0 } } } } });
+  const posts = (postsData.posts || []).slice().sort((a, b) => (Number(b.reach) || 0) - (Number(a.reach) || 0));
+  const title = p => esc(String(p.caption || '').split('\n')[0]);
+  $('ig-posts').innerHTML = posts.length
+    ? `<tr><th>投稿</th><th>リーチ</th><th>表示</th><th>いいね</th><th>保存</th></tr>` + posts.map(p => {
+        const url = safeUrl(p.permalink);
+        const head = url ? `<a href="${url}" target="_blank" rel="noopener">${title(p)}</a>` : title(p);
+        const when = p.timestamp ? esc(md(String(p.timestamp).slice(0, 10))) + ' 投稿' : '';
+        return `<tr><td class="post">${head}<div class="when">${when}</div></td>
+          <td>${fmt(p.reach)}</td><td>${fmt(p.views)}</td><td>${fmt(p.like_count)}</td><td>${fmt(p.saved)}</td></tr>`;
+      }).join('')
+    : '<tr><td>投稿の記録がありません</td></tr>';
 })();
 </script>
 </body>

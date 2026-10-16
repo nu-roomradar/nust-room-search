@@ -53,7 +53,7 @@ class SearchValueTests(unittest.TestCase):
         html = (Path(__file__).resolve().parents[1] / "dashboard.html").read_text(encoding="utf-8")
         self.assertIn("const esc = s =>", html)
         self.assertIn("const name = esc(labelFn ? labelFn(i.label) : i.label);", html)
-        self.assertIn("${esc(p.caption)}", html)
+        self.assertIn("const title = p => esc(", html)
         self.assertNotIn("${p.permalink", html)
 
 
