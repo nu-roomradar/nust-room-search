@@ -57,5 +57,30 @@ class SearchValueTests(unittest.TestCase):
         self.assertNotIn("${p.permalink", html)
 
 
+class ReportRoomTests(unittest.TestCase):
+    def test_counts_only_reports_of_real_rooms(self):
+        rows = [(["report_room", "S303", "タワースコラ"], ["3"]),
+                (["reserve_room", "S303", "タワースコラ"], ["9"]),        # 廃止した仮予約は数えない
+                (["report_room", "<b>x</b>", "タワースコラ"], ["50"]),    # 教室マスタに無い（偽の記録）
+                (["report_room", "(not set)", "(not set)"], ["4"]),
+                (["report_room", "1041", "駿河台校舎"], ["3"]),
+                (["report_room", "S303", "タワースコラ"], ["1"])]
+        got = g.top_report_rooms(rows, {"S303", "1041"})
+        self.assertEqual(got, [{"label": "S303", "building": "タワースコラ", "count": 4},
+                               {"label": "1041", "building": "駿河台校舎", "count": 3}])
+
+    def test_known_rooms_come_from_the_timetable_db(self):
+        rooms = g.known_rooms()
+        self.assertIn("S303", rooms)
+        self.assertGreater(len(rooms), 100)
+        self.assertEqual(g.known_rooms("/nonexistent.db"), set())
+
+    def test_markdown_lists_reported_rooms(self):
+        md = g.to_markdown([], [{"label": "S303", "building": "タワースコラ", "count": 4}])
+        self.assertIn("## 「実は使われていた」報告の多い教室（直近28日）", md)
+        self.assertIn("| S303 | タワースコラ | 4 |", md)
+        self.assertNotIn("報告の多い教室", g.to_markdown([]))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -23,6 +23,7 @@ import argparse
 import datetime
 import json
 import os
+import sqlite3
 import sys
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -31,6 +32,8 @@ WEEKLY_JSON = os.path.join(DATA_DIR, "ga4_weekly.json")
 WEEKLY_MD = os.path.join(DATA_DIR, "ga4_weekly.md")
 HISTORY_FILE = os.path.join(DATA_DIR, "ga4_history.json")
 BREAKDOWN_FILE = os.path.join(DATA_DIR, "ga4_breakdown.json")
+SCHEDULE_DB = os.path.join(ROOT, "schedule_final.db")
+REPORT_ROOMS_TOP = 10
 
 JST = datetime.timezone(datetime.timedelta(hours=9))
 HOSTS = {"app": "nust-room-search.onrender.com", "lp": "nu-roomradar.github.io"}
@@ -60,6 +63,34 @@ def keep_known(key, items):
     return kept, len(items) - len(kept)
 
 
+def top_report_rooms(rows, known, top=REPORT_ROOMS_TOP):
+    """「実は使われていた」報告（report_room）を教室ごとに数える。rows = [([イベント名, 教室, 校舎], [件数]), ...]
+
+    GA4 の room・building は 2026-06-18 にカスタムディメンション登録済み（「予約/報告-教室」）。
+    仮予約（reserve_room。2026-10 廃止）の行も来るので report_room だけを数え、教室マスタに無い名前（偽の記録）は落とす
+    """
+    counts, bldg = {}, {}
+    for (event, room, building), (n,) in rows:
+        if event != "report_room" or room not in known:
+            continue
+        counts[room] = counts.get(room, 0) + int(n)
+        bldg.setdefault(room, building)
+    ranked = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:top]
+    return [{"label": r, "building": bldg[r], "count": n} for r, n in ranked]
+
+
+def known_rooms(db=SCHEDULE_DB):
+    """全年度の教室マスタの教室名。時間割 DB が無ければ空（＝何も取り込まない）"""
+    try:
+        con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+        try:
+            return {r[0] for r in con.execute("SELECT DISTINCT name FROM classrooms")}
+        finally:
+            con.close()
+    except sqlite3.Error:
+        return set()
+
+
 def merge_weeks(old, new):
     """週の記録を week_start で上書きマージし、古い順に並べる"""
     by = {w["week_start"]: w for w in old}
@@ -74,7 +105,7 @@ def fmt_change(cur, prev):
     return f"{(cur - prev) / prev * 100:+.0f}%"
 
 
-def to_markdown(weeks):
+def to_markdown(weeks, report_rooms=None):
     lines = ["# GA4 週次の記録（自動更新・毎週月曜）", "",
              "アプリ＝検索アプリ（onrender.com）、LP＝紹介ページ（github.io）。ドメインが別なので合計しない。",
              "利用者数は端末・ブラウザの数で、人数ではない。前週比はアプリの訪問回数。", "",
@@ -87,6 +118,11 @@ def to_markdown(weeks):
                      f"{fmt_change(a['sessions'], prev)} | {e.get('search', 0)} | {e.get('report_room', 0)} | "
                      f"{l['users']} | {l['sessions']} | {e.get('feedback_submit', 0)} |")
         prev = a["sessions"]
+    if report_rooms:
+        lines += ["", "## 「実は使われていた」報告の多い教室（直近28日）", "",
+                  "報告は時限が終わるとアプリからは消えるので、残るのはこの件数だけ。", "",
+                  "| 教室 | 校舎 | 報告 |", "|---|---|---|"]
+        lines += [f"| {r['label']} | {r['building']} | {r['count']} |" for r in report_rooms]
     return "\n".join(lines) + "\n"
 
 
@@ -154,6 +190,12 @@ def fetch_dashboard(client, prop, today):
             bd[key] = sorted(items, key=lambda x: -x["count"])
         except Exception as e:  # noqa: BLE001
             print(f"[WARN] {key} を取れません（GA4 でカスタムディメンション未登録の可能性）: {e}", file=sys.stderr)
+    try:
+        rows = report(client, prop, ["eventName", "customEvent:room", "customEvent:building"], ["eventCount"],
+                      start, end, limit=500)
+        bd["report_rooms"] = top_report_rooms(rows, known_rooms())
+    except Exception as e:  # noqa: BLE001
+        print(f"[WARN] 報告の教室別の件数を取れません: {e}", file=sys.stderr)
     rows = report(client, prop, ["sessionDefaultChannelGroup"], ["sessions"], start, end, limit=10)
     bd["channels"] = sorted([{"label": d[0], "sessions": int(m[0])} for d, m in rows], key=lambda x: -x["sessions"])
     return history, bd
@@ -180,7 +222,7 @@ def main(argv=None):
             json.dump(obj, f, ensure_ascii=False, indent=1)
             f.write("\n")
     with open(WEEKLY_MD, "w", encoding="utf-8") as f:
-        f.write(to_markdown(weeks))
+        f.write(to_markdown(weeks, breakdown.get("report_rooms")))
     for w in new:
         print(f"[INFO] {w['week_start']}〜{w['week_end']}: アプリ 利用者{w['app']['users']}・訪問{w['app']['sessions']} / "
               f"LP 利用者{w['lp']['users']}・訪問{w['lp']['sessions']} / イベント {w['events']}")
