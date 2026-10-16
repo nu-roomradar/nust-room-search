@@ -1,19 +1,5 @@
 [
  {
-  "date": "2026-09-14",
-  "active_users": 1,
-  "new_users": 1,
-  "page_views": 1,
-  "sessions": 1
- },
- {
-  "date": "2026-09-15",
-  "active_users": 1,
-  "new_users": 0,
-  "page_views": 3,
-  "sessions": 2
- },
- {
   "date": "2026-09-21",
   "active_users": 1,
   "new_users": 0,
@@ -120,9 +106,37 @@
  },
  {
   "date": "2026-10-11",
-  "active_users": 1,
+  "active_users": 6,
+  "new_users": 3,
+  "page_views": 15,
+  "sessions": 9
+ },
+ {
+  "date": "2026-10-12",
+  "active_users": 18,
+  "new_users": 11,
+  "page_views": 36,
+  "sessions": 21
+ },
+ {
+  "date": "2026-10-13",
+  "active_users": 7,
+  "new_users": 6,
+  "page_views": 14,
+  "sessions": 9
+ },
+ {
+  "date": "2026-10-14",
+  "active_users": 0,
   "new_users": 0,
-  "page_views": 1,
+  "page_views": 0,
   "sessions": 1
+ },
+ {
+  "date": "2026-10-15",
+  "active_users": 9,
+  "new_users": 5,
+  "page_views": 13,
+  "sessions": 10
  }
 ]

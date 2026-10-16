@@ -1,47 +1,47 @@
 {
- "updated": "2026-10-12",
+ "updated": "2026-10-16",
  "events": {
-  "search": 119,
+  "search": 144,
   "report_room": 1
  },
  "search_building": [
   {
    "label": "all",
-   "count": 47
+   "count": 56
   },
   {
    "label": "main",
-   "count": 45
+   "count": 53
   },
   {
    "label": "tower",
-   "count": 19
+   "count": 21
   },
   {
    "label": "funabashi",
-   "count": 8
+   "count": 14
   }
  ],
  "search_period": [
   {
    "label": "2",
-   "count": 49
+   "count": 54
   },
   {
    "label": "3",
-   "count": 25
+   "count": 38
   },
   {
    "label": "4",
-   "count": 21
+   "count": 24
   },
   {
    "label": "1",
-   "count": 12
+   "count": 15
   },
   {
    "label": "5",
-   "count": 10
+   "count": 11
   },
   {
    "label": "6",
@@ -51,19 +51,19 @@
  "search_day": [
   {
    "label": "火",
-   "count": 33
-  },
-  {
-   "label": "金",
-   "count": 28
+   "count": 44
   },
   {
    "label": "水",
-   "count": 25
+   "count": 31
+  },
+  {
+   "label": "金",
+   "count": 31
   },
   {
    "label": "月",
-   "count": 17
+   "count": 22
   },
   {
    "label": "木",
@@ -74,25 +74,36 @@
    "count": 1
   }
  ],
+ "report_rooms": [
+  {
+   "label": "S1713",
+   "building": "タワースコラ",
+   "count": 1
+  }
+ ],
  "channels": [
   {
    "label": "Referral",
-   "sessions": 123
+   "sessions": 143
   },
   {
    "label": "Organic Social",
-   "sessions": 76
+   "sessions": 94
   },
   {
    "label": "Direct",
-   "sessions": 34
+   "sessions": 38
   },
   {
-   "label": "Organic Search",
-   "sessions": 1
+   "label": "Cross-network",
+   "sessions": 4
   },
   {
    "label": "Unassigned",
+   "sessions": 4
+  },
+  {
+   "label": "Organic Search",
    "sessions": 1
   }
  ]
