@@ -11,12 +11,17 @@ on:
         options:
           - feed
           - story
+          - reel
       image_url:
-        description: "投稿する画像の公開URL（https://...）"
+        description: "投稿する画像の公開URL（https://...）。リールではカバー画像"
         required: true
         type: string
+      video_url:
+        description: "リールの動画（mp4）の公開URL。post_type=reel のときだけ使う"
+        required: false
+        type: string
       caption:
-        description: "キャプション（フィードのみ・ストーリーズでは無視されます）"
+        description: "キャプション（フィード・リール。ストーリーズでは無視されます）"
         required: false
         type: string
       also_story:
@@ -58,12 +63,18 @@ jobs:
           IG_ACCOUNT_ID: ${{ secrets.IG_ACCOUNT_ID }}
           POST_TYPE: ${{ inputs.post_type }}
           IMAGE_URL: ${{ inputs.image_url }}
+          VIDEO_URL: ${{ inputs.video_url }}
           CAPTION: ${{ inputs.caption }}
         run: |
           if [ "$POST_TYPE" = "story" ]; then
             python scripts/post_to_instagram.py \
               --image-url "$IMAGE_URL" \
               --story
+          elif [ "$POST_TYPE" = "reel" ]; then
+            python scripts/post_to_instagram.py \
+              --video-url "$VIDEO_URL" \
+              --image-url "$IMAGE_URL" \
+              --caption "$CAPTION"
           else
             python scripts/post_to_instagram.py \
               --image-url "$IMAGE_URL" \

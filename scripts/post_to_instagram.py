@@ -1,5 +1,5 @@
 """
-Instagram Graph APIへフィード投稿するスクリプト。
+Instagram Graph APIへフィード・ストーリーズ・リールを投稿するスクリプト。
 
 必要な環境変数:
   IG_ACCESS_TOKEN : アクセストークン
@@ -10,6 +10,8 @@ Instagram Graph APIへフィード投稿するスクリプト。
   python post_to_instagram.py --image-url <公開URL> --caption "<キャプション>"
   # ストーリーズ投稿（キャプションは任意・ストーリーズには表示されない）
   python post_to_instagram.py --image-url <公開URL> --story
+  # リール投稿（--image-url はカバー画像。省略すると動画の先頭がカバーになる）
+  python post_to_instagram.py --video-url <mp4の公開URL> --image-url <カバー画像の公開URL> --caption "<キャプション>"
 """
 import argparse
 import os
@@ -54,21 +56,32 @@ def detect_host(account_id, access_token):
     raise RuntimeError("どのAPIホストでもアカウントにアクセスできませんでした。")
 
 
-def create_media_container(host, account_id, access_token, image_url, caption, story=False):
-    data = {
-        "image_url": image_url,
-        "access_token": access_token,
-    }
-    if story:
+def create_media_container(host, account_id, access_token, image_url, caption, story=False, video_url=None):
+    data = {"access_token": access_token}
+    if video_url:
+        # リール。フィードにも表示する。image_url はカバー画像として使う
+        data.update({"media_type": "REELS", "video_url": video_url, "caption": caption, "share_to_feed": "true"})
+        if image_url:
+            data["cover_url"] = image_url
+    elif story:
         # ストーリーズはキャプション欄を持たないため caption は付けない
-        data["media_type"] = "STORIES"
+        data.update({"image_url": image_url, "media_type": "STORIES"})
     else:
-        data["caption"] = caption
+        data.update({"image_url": image_url, "caption": caption})
     resp = requests.post(f"{host}/{API_VERSION}/{account_id}/media", data=data)
     if not resp.ok:
         show_error(resp, "コンテナ作成")
         resp.raise_for_status()
     return resp.json()["id"]
+
+
+def check_public_url(url):
+    """投稿前に、Instagram が取りに行く URL が公開されているかを見ておく（失敗時の切り分け用）"""
+    try:
+        resp = requests.head(url, allow_redirects=True, timeout=30)
+        print(f"[INFO] {url} -> {resp.status_code} {resp.headers.get('Content-Type')} {resp.headers.get('Content-Length')} bytes")
+    except requests.RequestException as e:
+        print(f"[WARN] {url} を確認できませんでした: {e}", file=sys.stderr)
 
 
 def wait_until_ready(host, container_id, access_token, timeout=120, interval=5):
@@ -104,13 +117,20 @@ def publish_media(host, account_id, access_token, container_id):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--image-url", required=True, help="投稿する画像の公開URL")
-    parser.add_argument("--caption", default="", help="投稿のキャプション（フィードのみ）")
+    parser.add_argument("--image-url", help="投稿する画像の公開URL（リールではカバー画像）")
+    parser.add_argument("--video-url", help="リールとして投稿する動画（mp4）の公開URL")
+    parser.add_argument("--caption", default="", help="投稿のキャプション（フィード・リール）")
     parser.add_argument("--story", action="store_true", help="ストーリーズとして投稿する")
     args = parser.parse_args()
 
+    if args.video_url and args.story:
+        print("--video-url と --story は同時に使えません。", file=sys.stderr)
+        sys.exit(1)
+    if not args.video_url and not args.image_url:
+        print("--image-url（リールなら --video-url）が必要です。", file=sys.stderr)
+        sys.exit(1)
     if not args.story and not args.caption:
-        print("フィード投稿には --caption が必要です。", file=sys.stderr)
+        print("フィード・リールの投稿には --caption が必要です。", file=sys.stderr)
         sys.exit(1)
 
     access_token = os.environ.get("IG_ACCESS_TOKEN")
@@ -124,14 +144,21 @@ def main():
 
     caption = args.caption if args.story else ensure_required_tags(args.caption)
 
-    kind = "ストーリーズ" if args.story else "フィード"
+    kind = "リール" if args.video_url else "ストーリーズ" if args.story else "フィード"
+    for url in (args.video_url, args.image_url):
+        if url:
+            check_public_url(url)
     print(f"メディアコンテナを作成しています...（{kind}）")
     container_id = create_media_container(
-        host, account_id, access_token, args.image_url, caption, story=args.story)
+        host, account_id, access_token, args.image_url, caption, story=args.story, video_url=args.video_url)
     print(f"コンテナID: {container_id}")
 
     print("コンテナの準備完了を待機しています...")
-    wait_until_ready(host, container_id, access_token)
+    # 動画は Instagram 側の変換に数分かかることがある
+    if args.video_url:
+        wait_until_ready(host, container_id, access_token, timeout=600, interval=10)
+    else:
+        wait_until_ready(host, container_id, access_token)
 
     print("投稿を公開しています...")
     media_id = publish_media(host, account_id, access_token, container_id)

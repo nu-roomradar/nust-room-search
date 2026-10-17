@@ -1,6 +1,6 @@
 ---
 name: instagram-post
-description: RoomRadar公式Instagram（@roomradar_nust）へのフィード／ストーリー投稿を GitHub Actions（instagram-post.yml）経由で行う手順。投稿の実行、告知ストーリーの生成と目視確認、キャプション作成（#日大生プロジェクト自動付与）、story_headline の見出し決め、弔事ストーリー、IG_ACCESS_TOKEN 失効の相談で使う。ワークフロー起動前に必ずユーザー確認を取る。
+description: RoomRadar公式Instagram（@roomradar_nust）へのフィード／ストーリー／リール投稿を GitHub Actions（instagram-post.yml）経由で行う手順。投稿の実行、告知ストーリーの生成と目視確認、キャプション作成（#日大生プロジェクト自動付与）、story_headline の見出し決め、弔事ストーリー、IG_ACCESS_TOKEN 失効の相談で使う。ワークフロー起動前に必ずユーザー確認を取る。
 disable-model-invocation: true
 argument-hint: "[feed|story|condolence|token] 投稿内容や相談の要点"
 ---
@@ -17,8 +17,9 @@ argument-hint: "[feed|story|condolence|token] 投稿内容や相談の要点"
 ## ワークフロー入力（instagram-post.yml）
 | 入力 | 内容 |
 |---|---|
-| `post_type` | `feed` / `story`（既定 feed） |
-| `image_url` | 投稿する画像の公開 URL（https://…）。必須 |
+| `post_type` | `feed` / `story` / `reel`（既定 feed） |
+| `image_url` | 投稿する画像の公開 URL（https://…）。必須。リールではカバー画像 |
+| `video_url` | リールの動画（mp4）の公開 URL。`post_type=reel` のときだけ使う |
 | `caption` | キャプション。フィードのみ。ストーリーでは無視される |
 | `also_story` | フィード投稿時に告知ストーリー画像を生成する（既定 true。`post_type=feed` のときだけ有効） |
 | `post_story` | 生成した告知ストーリーを同じ実行でそのまま投稿する（既定 false。true にすると**未確認の画像が公開される**。確認前は必ず false） |
@@ -26,7 +27,7 @@ argument-hint: "[feed|story|condolence|token] 投稿内容や相談の要点"
 
 真偽値は文字列 `"true"` / `"false"` で渡す。`caption` などの入力値は 2026-10 から環境変数でスクリプトに渡しているので、`"` や `$` を含んでも壊れない（それ以前は含めないようにしていた）。
 
-## キャプションの規則（フィードのみ）
+## キャプションの規則（フィード・リール）
 1. 1行目は見出し（ハウススタイル。`make_story_promo.py` もこの行を既定の見出しに使う）。
 2. `#日大生プロジェクト` は自主創造プロジェクトの規定で必須。`scripts/post_to_instagram.py` の `REQUIRED_TAGS` / `ensure_required_tags()` が無ければ自動付与する。**この機構を壊さない**（スクリプトを迂回して API を直接叩かない・タグを消さない）。ストーリーズはキャプション自体が無いので対象外。
 3. 仮予約は 2026-10 に廃止した。「予約」「確保」と書かない。船橋校舎はテスト運用の対象外なので、本文・ハッシュタグ（`#船橋キャンパス`）に入れない。
@@ -54,6 +55,13 @@ argument-hint: "[feed|story|condolence|token] 投稿内容や相談の要点"
 1. 画像（1080x1920）を `assets/instagram/` にコミット・push し、SHA 固定 raw URL を作る。
 2. 画像をユーザーに提示して承認を得てから `post_type=story` で起動する。
 3. **弔事（お見舞い・追悼）のストーリー**は、QR・LP リンク・CTA・ハッシュタグ・絵文字を一切入れない。ブランドカラー（青/ネイビー）も使わず明朝体（Noto Serif JP）で組む。実例は `scripts/make_condolence_story.py`（暖色グレージュ背景、ロゴ＋「RoomRadar 運営」の署名、上下の安全マージン 150px/240px、Playwright `/opt/pw-browsers/chromium-1194/chrome-linux/chrome` で `assets/instagram/kumamoto-condolence-story.png` を出力）。新しい弔事は同スクリプトを雛形に文面だけ差し替え、文面もユーザーに確認してから生成する。
+
+## 手順D: リール投稿（2026-10〜）
+1. 動画は 1080x1920・30fps・H.264（yuv420p、`-movflags +faststart`）・AAC ステレオ 128kbps の mp4 にする。カバーは 1080x1920 の JPEG。どちらも `assets/instagram/` にコミットし、**`main` に push する**。
+2. `video_url` は **GitHub Pages の URL**（`https://nu-roomradar.github.io/nust-room-search/assets/instagram/<file>.mp4`）を使う。raw.githubusercontent.com は mp4 を `application/octet-stream` で返すため、`video/mp4` で返す Pages を使う。push 後に Pages の公開（`pages build and deployment` の run）が終わってから起動する。新しいファイル名にすればキャッシュの心配はない。`image_url`（カバー）は手順A と同じ SHA 固定の raw URL でよい。
+3. 入力値一式（post_type=reel, video_url, image_url, caption 全文）をユーザーに提示し、承認を得てから起動する。`also_story` はリールでは使われない。
+4. 動画は Instagram 側の変換に数分かかる。スクリプトは最大10分待つ。ログ冒頭の `[INFO] <URL> -> 200 video/mp4 …` で、Instagram が取りに行く URL が公開されていたかを確かめられる。
+5. BGM は著作権の心配がない自作の音（numpy で合成）か無音にする。既存の曲を入れない。Instagram アプリで曲を付けたいときは、アプリから手で投稿する（API からは Instagram の楽曲を付けられない）。
 
 ## トークン失効（投稿・集計が急に失敗し出したとき）
 
