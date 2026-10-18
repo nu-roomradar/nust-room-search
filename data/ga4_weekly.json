@@ -98,5 +98,25 @@
    "reserve_room": 0,
    "feedback_submit": 0
   }
+ },
+ {
+  "week_start": "2026-10-12",
+  "week_end": "2026-10-18",
+  "app": {
+   "users": 16,
+   "sessions": 21,
+   "page_views": 43
+  },
+  "lp": {
+   "users": 18,
+   "sessions": 23,
+   "page_views": 25
+  },
+  "events": {
+   "search": 22,
+   "report_room": 0,
+   "reserve_room": 0,
+   "feedback_submit": 0
+  }
  }
 ]

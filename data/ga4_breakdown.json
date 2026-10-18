@@ -1,17 +1,17 @@
 {
- "updated": "2026-10-16",
+ "updated": "2026-10-19",
  "events": {
-  "search": 144,
+  "search": 146,
   "report_room": 1
  },
  "search_building": [
   {
    "label": "all",
-   "count": 56
+   "count": 57
   },
   {
    "label": "main",
-   "count": 53
+   "count": 54
   },
   {
    "label": "tower",
@@ -25,7 +25,7 @@
  "search_period": [
   {
    "label": "2",
-   "count": 54
+   "count": 55
   },
   {
    "label": "3",
@@ -41,7 +41,7 @@
   },
   {
    "label": "5",
-   "count": 11
+   "count": 12
   },
   {
    "label": "6",
@@ -54,11 +54,11 @@
    "count": 44
   },
   {
-   "label": "水",
-   "count": 31
+   "label": "金",
+   "count": 33
   },
   {
-   "label": "金",
+   "label": "水",
    "count": 31
   },
   {
@@ -84,23 +84,15 @@
  "channels": [
   {
    "label": "Referral",
-   "sessions": 143
+   "sessions": 145
   },
   {
    "label": "Organic Social",
-   "sessions": 94
+   "sessions": 98
   },
   {
    "label": "Direct",
-   "sessions": 38
-  },
-  {
-   "label": "Cross-network",
-   "sessions": 4
-  },
-  {
-   "label": "Unassigned",
-   "sessions": 4
+   "sessions": 39
   },
   {
    "label": "Organic Search",

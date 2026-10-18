@@ -136,7 +136,14 @@
   "date": "2026-10-15",
   "active_users": 9,
   "new_users": 5,
-  "page_views": 13,
+  "page_views": 14,
   "sessions": 10
+ },
+ {
+  "date": "2026-10-16",
+  "active_users": 2,
+  "new_users": 1,
+  "page_views": 4,
+  "sessions": 3
  }
 ]
