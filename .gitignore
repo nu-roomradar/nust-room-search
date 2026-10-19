@@ -31,3 +31,5 @@ video/*/vendor/
 video/*/node_modules/
 video/*/renders/
 video/*/snapshots/
+video/*/.hyperframes/
+video/*/sheet*.png

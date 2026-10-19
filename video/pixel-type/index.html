@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>RoomRadar — Pixel 風（文字が主役）</title>
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Round"; font-weight: 900; src: url("fonts/MPLUSRounded1c-Black.ttf"); }
+      @font-face { font-family: "Round"; font-weight: 800; src: url("fonts/MPLUSRounded1c-ExtraBold.ttf"); }
+      @font-face { font-family: "JP"; font-weight: 700; src: url("fonts/NotoSansCJKjp-Bold.otf"); }
+      @font-face { font-family: "JP"; font-weight: 500; src: url("fonts/NotoSansCJKjp-Medium.otf"); }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #fff; }
+      body { font-family: "Round", sans-serif; color: #1f1f1f; font-feature-settings: "palt"; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #fff; }
+      .scene { position: absolute; inset: 0; overflow: hidden; }
+      .bg { position: absolute; inset: 0; }
+      .center { position: absolute; left: 0; right: 0; display: flex; justify-content: center; }
+      .line { display: block; text-align: center; font-weight: 900; line-height: 1.15; }
+
+      /* 1: 空き／コマ */
+      #s1-grid { position: absolute; left: 150px; top: 520px; width: 780px; height: 780px; display: grid;
+        grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+      .ch { display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 340px; line-height: 1; }
+      .ch span { display: block; }
+
+      /* 2: どこ行く？ */
+      #s2-words { position: absolute; left: 90px; top: 520px; }
+      .drop { display: inline-block; font-weight: 900; font-size: 230px; line-height: 1.1; }
+      #s2-q { position: absolute; left: 560px; top: 820px; width: 420px; height: 620px; display: flex; align-items: center; justify-content: center;
+        font-weight: 900; font-size: 560px; line-height: 1; color: #0b57d0; }
+
+      /* 3: どこもいっぱい */
+      #s3-label { top: 560px; font-size: 92px; }
+      #s3-window { position: absolute; left: 90px; width: 900px; top: 760px; height: 260px; overflow: hidden; border-radius: 40px; background: rgba(255,255,255,.65); }
+      #s3-strip { position: absolute; left: 0; top: 0; width: 900px; }
+      .slot { display: flex; align-items: center; justify-content: center; height: 260px; font-weight: 900; font-size: 170px; }
+      #s3-stamp { position: absolute; left: 150px; top: 1110px; width: 780px; height: 230px; white-space: nowrap; display: flex; align-items: center; justify-content: center;
+        border: 12px solid #b3261e; border-radius: 36px; color: #b3261e; font-weight: 900; font-size: 132px; }
+
+      /* 4: 開くだけで、14室 */
+      #s4-head { top: 230px; font-size: 128px; }
+      #phone { position: absolute; left: 240px; top: 600px; width: 600px; height: 1300px; border-radius: 96px; background: #0a0a0c;
+        box-shadow: 0 0 0 3px #2a2a2e, 0 50px 110px rgba(14, 60, 30, .35); }
+      #screen { position: absolute; left: 15px; top: 15px; width: 570px; height: 1270px; border-radius: 82px; overflow: hidden; background: #0d0d12; }
+      #screen img { position: absolute; left: 0; top: 0; width: 570px; display: block; }
+      #island { position: absolute; left: 225px; top: 34px; width: 150px; height: 44px; border-radius: 22px; background: #000; }
+      #s4-num { position: absolute; left: 0; right: 0; top: 520px; height: 760px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      #num14 { opacity: 0; display: block; font-weight: 900; font-size: 600px; line-height: .9; color: #146c2e; letter-spacing: -.04em; }
+      #num14-sub { display: block; font-weight: 900; font-size: 128px; line-height: 1.2; }
+      #s4-note { position: absolute; left: 0; right: 0; top: 1530px; text-align: center; font-family: "JP"; font-weight: 500; font-size: 38px; color: #31513b; }
+
+      /* 5: 4限まで、ずっと */
+      #s5-head1 { top: 250px; font-size: 140px; }
+      #s5-head2 { top: 420px; font-size: 118px; color: #0b57d0; white-space: nowrap; }
+      #card { position: absolute; left: 200px; top: 760px; width: 680px; border-radius: 52px; box-shadow: 0 40px 90px rgba(11, 87, 208, .35); }
+
+      /* 6: 1週間 */
+      #s6-head { top: 240px; font-size: 100px; white-space: nowrap; }
+      #week { position: absolute; left: 140px; top: 560px; width: 800px; }
+      #days { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 18px; }
+      #days span { display: block; text-align: center; font-weight: 800; font-size: 58px; color: #444746; }
+      #days span.today { color: #0b57d0; }
+      #tiles { position: relative; display: grid; grid-template-columns: repeat(6, 120px); grid-auto-rows: 120px; gap: 16px; }
+      .tile { display: flex; align-items: center; justify-content: center; border-radius: 30px; font-weight: 900; font-size: 54px; }
+      .tile.free { background: #6dd58c; color: #fff; }
+      .tile.busy { background: #e3e3e3; color: #e3e3e3; }
+      #todayBox { position: absolute; left: 128px; top: -10px; width: 144px; height: 836px; border: 8px solid #0b57d0; border-radius: 38px; }
+      #s6-note { position: absolute; left: 0; right: 0; top: 1560px; text-align: center; font-family: "JP"; font-weight: 500; font-size: 38px; color: #444746; }
+
+      /* 7: ロゴ */
+      .blob { position: absolute; border-radius: 50%; }
+      #logoBox { position: absolute; left: 220px; top: 690px; width: 640px; height: 374px; }
+      #logoArt { position: absolute; inset: 0; --a: 0deg;
+        -webkit-mask-image: conic-gradient(from -90deg at 41.56% 42.97%, #000 0deg, #000 var(--a), transparent calc(var(--a) + 0.5deg));
+        mask-image: conic-gradient(from -90deg at 41.56% 42.97%, #000 0deg, #000 var(--a), transparent calc(var(--a) + 0.5deg)); }
+      #logo { position: absolute; inset: 0; width: 640px; height: 374px; display: block; }
+      #shine { position: absolute; inset: 0; -webkit-mask: url(assets/rr_logo_hd.png) center/contain no-repeat; mask: url(assets/rr_logo_hd.png) center/contain no-repeat;
+        background: linear-gradient(105deg, rgba(255,255,255,0) 42%, rgba(255,255,255,.75) 50%, rgba(255,255,255,0) 58%); background-size: 300% 100%; background-position: 100% 0; }
+      .ring { position: absolute; border-radius: 50%; border: 3px solid #60a5fa; }
+      .ping { position: absolute; border-radius: 50%; border: 4px solid #2dd4bf; }
+      #fine { position: absolute; left: 0; right: 0; top: 1712px; text-align: center; font-family: "JP"; font-weight: 500; font-size: 26px; letter-spacing: .06em; color: #86868b; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="15" data-width="1080" data-height="1920">
+
+      <section id="s1" class="scene clip" data-start="0" data-duration="2.45" data-track-index="0">
+        <div class="bg" style="background:#d3e3fd"></div>
+        <div id="s1-grid">
+          <div class="ch"><span id="c1" style="color:#0b57d0">空</span></div>
+          <div class="ch"><span id="c2">き</span></div>
+          <div class="ch"><span id="c3">コ</span></div>
+          <div class="ch"><span id="c4" style="color:#0b57d0">マ</span></div>
+        </div>
+      </section>
+
+      <section id="s2" class="scene clip" data-start="2" data-duration="1.95" data-track-index="1">
+        <div class="bg" style="background:#fde293"></div>
+        <div id="s2-words">
+          <div><span class="drop">ど</span><span class="drop">こ</span></div>
+          <div><span class="drop">行</span><span class="drop">く</span></div>
+        </div>
+        <div id="s2-q"><span id="q">？</span></div>
+      </section>
+
+      <section id="s3" class="scene clip" data-start="3.5" data-duration="2.45" data-track-index="2">
+        <div class="bg" style="background:#ffd8e4"></div>
+        <div id="s3-label" class="center"><span class="line">どこも…</span></div>
+        <div id="s3-window"><div id="s3-strip">
+          <div class="slot">図書館</div><div class="slot">学食</div><div class="slot">ラウンジ</div>
+        </div></div>
+        <div id="s3-stamp"><span>いっぱい。</span></div>
+      </section>
+
+      <section id="s4" class="scene clip" data-start="5.5" data-duration="2.95" data-track-index="3">
+        <div class="bg" style="background:#c4eed0"></div>
+        <div id="s4-head" class="center"><span class="line">開くだけで、</span></div>
+        <div id="phone">
+          <div id="screen"><img id="shot" src="assets/cap-tower-full.png" alt="" /></div>
+          <div id="island"></div>
+        </div>
+        <div id="s4-num"><span id="num14">14</span><span id="num14-sub">室、空いてる。</span></div>
+        <div id="s4-note">例：火曜2限・タワー・スコラ（2026年度後期の時間割）</div>
+      </section>
+
+      <section id="s5" class="scene clip" data-start="8" data-duration="2.45" data-track-index="4">
+        <div class="bg" style="background:#d3e3fd"></div>
+        <div id="s5-head1" class="center"><span class="line">4限まで、</span></div>
+        <div id="s5-head2" class="center"><span class="line">ずっと空いてる。</span></div>
+        <img id="card" src="assets/card-s305.png" alt="" />
+      </section>
+
+      <section id="s6" class="scene clip" data-start="10" data-duration="2.45" data-track-index="5">
+        <div class="bg" style="background:#f8f9fa"></div>
+        <div id="s6-head" class="center"><span class="line">1週間も、ひと目で。</span></div>
+        <div id="week">
+          <div id="days"><span>月</span><span class="today">火</span><span>水</span><span>木</span><span>金</span><span>土</span></div>
+          <div id="tiles"><div id="todayBox"></div></div>
+        </div>
+        <div id="s6-note">S305（タワー・スコラ）の後期の1週間。緑が授業のない時間</div>
+      </section>
+
+      <section id="s7" class="scene clip" data-start="12" data-duration="3" data-track-index="6">
+        <div class="bg" style="background:#fff"></div>
+        <div class="blob" id="e1" style="left:-180px;top:180px;width:560px;height:560px;background:#d3e3fd;filter:blur(30px)"></div>
+        <div class="blob" id="e2" style="left:700px;top:1100px;width:520px;height:520px;background:#c4eed0;filter:blur(30px)"></div>
+        <div class="blob" id="e3" style="left:760px;top:420px;width:260px;height:260px;background:#ffd8e4;filter:blur(24px)"></div>
+        <div id="logoBox">
+          <div class="ring" id="r1"></div><div class="ring" id="r2"></div><div class="ring" id="r3"></div>
+          <div class="ping" id="p1"></div><div class="ping" id="p2"></div>
+          <div id="logoArt"><img id="logo" src="assets/rr_logo_hd.png" alt="RoomRadar" /><div id="shine"></div></div>
+        </div>
+        <div id="fine">テスト運用中・学生開発の非公式サービスです</div>
+      </section>
+
+      <audio id="bgm" src="audio.wav" data-start="0" data-duration="15" data-track-index="9" data-volume="1"></audio>
+    </div>
+
+    <script>
+      // S305 の後期の空き（schedule_final.db から。行=1〜6限、列=月〜土、1=空き）
+      const WEEK = [[0,1,0,1,0,1],[0,1,1,0,0,1],[0,1,0,1,1,1],[0,1,0,1,0,1],[1,0,0,0,0,1],[1,0,0,1,0,1]];
+      const tiles = document.getElementById("tiles");
+      WEEK.forEach((row, r) => row.forEach((v, c) => {
+        const t = document.createElement("div");
+        t.className = "tile " + (v ? "free" : "busy"); t.textContent = v ? "空" : "";
+        t.dataset.r = r; t.dataset.c = c; tiles.appendChild(t);
+      }));
+      // ロゴのレーダーの輪: rr_logo_hd.png の同心円の中心（41.56%, 42.97%）から
+      const LC = { x: 640 * 0.4156, y: 374 * 0.4297 };
+      const circle = (id, r) => Object.assign(document.getElementById(id).style,
+        { left: LC.x - r + "px", top: LC.y - r + "px", width: 2 * r + "px", height: 2 * r + "px" });
+      circle("r1", 130); circle("r2", 205); circle("r3", 290); circle("p1", 96); circle("p2", 96);
+
+      // 端末の画面: CSS px × 570/390。結果一覧の件数チップ（rects.json の tower.count）の位置から「14」を出す
+      const K = 570 / 390, SCROLL = 640;
+      const chip = { x: 240 + 15 + (313.6 + 30.2) * K, y: 600 + 15 + (716.4 + 14.5 - SCROLL) * K };
+
+      const tl = gsap.timeline({ paused: true });
+      const wipe = (sel, t, at) => tl.fromTo(sel + " .bg", { clipPath: `circle(0% at ${at})` },
+        { clipPath: `circle(150% at ${at})`, duration: 0.45, ease: "power3.inOut" }, t);
+
+      // 1: 空き／コマ（1文字ずつ弾んで出る）
+      ["#c1", "#c2", "#c3", "#c4"].forEach((id, i) =>
+        tl.fromTo(id, { scale: 0, rotation: i % 2 ? 24 : -24 }, { scale: 1, rotation: 0, duration: 0.5, ease: "back.out(2.4)" }, 0.15 + i * 0.2));
+      tl.to("#s1-grid", { scale: 1.06, duration: 0.25, ease: "power2.out" }, 1.3).to("#s1-grid", { scale: 1, duration: 0.3, ease: "power2.in" }, 1.55);
+
+      // 2: どこ行く？
+      wipe("#s2", 2.0, "85% 80%");
+      tl.fromTo("#s2 .drop", { y: -420, rotation: -12 }, { y: 0, rotation: 0, duration: 0.45, ease: "back.out(1.8)", stagger: 0.1 }, 2.15);
+      tl.fromTo("#q", { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.55, ease: "back.out(2.6)" }, 2.6);
+      tl.to("#q", { rotation: -10, duration: 0.18, ease: "sine.inOut", yoyo: true, repeat: 3 }, 3.15);
+
+      // 3: どこもいっぱい（スロットのように場所が回る → スタンプ）
+      wipe("#s3", 3.5, "10% 15%");
+      tl.fromTo("#s3-label .line", { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 3.6);
+      tl.fromTo("#s3-strip", { y: 260 }, { y: 0, duration: 0.25, ease: "back.out(1.6)" }, 3.6)
+        .to("#s3-strip", { y: -260, duration: 0.25, ease: "back.out(1.6)" }, 4.05)
+        .to("#s3-strip", { y: -520, duration: 0.25, ease: "back.out(1.6)" }, 4.5);
+      tl.fromTo("#s3-stamp", { scale: 2.4, rotation: -20, opacity: 0 }, { scale: 1, rotation: -7, opacity: 1, duration: 0.28, ease: "power4.in" }, 4.75);
+      tl.fromTo("#s3-window", { x: 0 }, { x: 14, duration: 0.05, yoyo: true, repeat: 3, ease: "none" }, 5.03);
+
+      // 4: 開くだけで、14室、空いてる。
+      wipe("#s4", 5.5, "50% 50%");
+      tl.fromTo("#s4-head .line", { y: 90, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, 5.65);
+      tl.fromTo("#phone", { y: 1500, rotation: 6 }, { y: 0, rotation: 0, duration: 0.65, ease: "power3.out" }, 5.55);
+      tl.fromTo("#shot", { y: 0 }, { y: -SCROLL * K, duration: 0.6, ease: "power2.inOut" }, 6.3);
+      tl.to("#phone", { opacity: 0.18, scale: 0.92, duration: 0.4, ease: "power2.out" }, 6.95);
+      tl.fromTo("#num14", { x: chip.x - 540, y: chip.y - (520 + 300), scale: 0.06, opacity: 0 },
+        { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.55, ease: "back.out(1.7)" }, 6.95);
+      tl.fromTo("#num14-sub", { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 7.35);
+      tl.fromTo("#s4-note", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 7.5);
+
+      // 5: 4限まで、ずっと空いてる。
+      wipe("#s5", 8.0, "50% 100%");
+      tl.fromTo("#s5-head1 .line", { y: 90, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, 8.15);
+      tl.fromTo("#s5-head2 .line", { y: 90, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, 8.4);
+      tl.fromTo("#card", { scale: 0.3, rotation: -22, y: 300 }, { scale: 1, rotation: -4, y: 0, duration: 0.6, ease: "back.out(1.8)" }, 8.15);
+      tl.to("#card", { scale: 1.06, duration: 0.12, ease: "power2.out" }, 9.1).to("#card", { scale: 1, duration: 0.3, ease: "back.out(3)" }, 9.22);
+
+      // 6: 1週間も、ひと目で。（空きのマスが波のように出る）
+      wipe("#s6", 10.0, "90% 10%");
+      tl.fromTo("#s6-head .line", { y: 90, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, 10.1);
+      tl.fromTo("#days span", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, stagger: 0.04 }, 10.2);
+      document.querySelectorAll(".tile").forEach(t =>
+        tl.fromTo(t, { scale: 0 }, { scale: 1, duration: 0.35, ease: "back.out(2.2)" }, 10.3 + (+t.dataset.r + +t.dataset.c) * 0.045));
+      tl.fromTo("#todayBox", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 11.15);
+      tl.fromTo("#s6-note", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 11.2);
+
+      // 7: ロゴ（レーダーの輪 → 一周してロゴが現れる → 弾む → 波紋 → 光が走る → ふわふわ）
+      wipe("#s7", 12.0, "50% 50%");
+      [["#r1", 0.7, 0], ["#r2", 0.5, 0.05], ["#r3", 0.35, 0.1]].forEach(([id, o, d]) => {
+        tl.fromTo(id, { scale: 0.2, opacity: 0 }, { scale: 1, opacity: o, duration: 0.4, ease: "back.out(2)" }, 12.05 + d);
+        tl.to(id, { opacity: 0, duration: 0.6 }, 13.0);
+      });
+      tl.fromTo("#logoArt", { "--a": "0deg" }, { "--a": "361deg", duration: 0.8, ease: "power2.inOut" }, 12.1);
+      tl.fromTo("#logoBox", { scale: 0.8, rotation: -6 }, { scale: 1.08, rotation: 0, duration: 0.8, ease: "power3.out" }, 12.1)
+        .to("#logoBox", { scale: 1, duration: 0.3, ease: "back.out(3)" }, 12.9);
+      tl.fromTo("#p1", { scale: 0.5, opacity: 0.9 }, { scale: 3.6, opacity: 0, duration: 0.9, ease: "power2.out" }, 12.8);
+      tl.fromTo("#p2", { scale: 0.5, opacity: 0.8 }, { scale: 3.6, opacity: 0, duration: 0.9, ease: "power2.out" }, 13.6);
+      tl.fromTo("#shine", { backgroundPosition: "100% 0" }, { backgroundPosition: "0% 0", duration: 0.8, ease: "power2.inOut" }, 13.4);
+      tl.fromTo("#logoArt", { y: 0 }, { y: -8, duration: 0.7, ease: "sine.inOut", yoyo: true, repeat: 2 }, 13.2);
+      tl.fromTo("#fine", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 13.0);
+      tl.fromTo("#e1", { x: 0 }, { x: 60, duration: 3, ease: "none" }, 12).fromTo("#e2", { x: 0 }, { x: -50, duration: 3, ease: "none" }, 12);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
