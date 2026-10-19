@@ -18,7 +18,8 @@ argument-hint: "[new|edit|ai-footage|music] 作りたい動画の要点"
 - 既存の曲を入れない。音は自作（`video/cm-ai/music4.py` などを雛形に numpy で合成）か、BGM なし版を作って Instagram アプリで曲を付けて手動投稿する。
 - **書き出しはこの環境の中だけで行う。** HyperFrames の `publish`・`cloud`・`auth`・`lambda`・`cloudrun` は使わない（外部へのアップロード・課金）。実行時は `HYPERFRAMES_NO_TELEMETRY=1 HYPERFRAMES_SKIP_SKILLS=1` を付ける。
 - **サブエージェントやワークフローを大量に立ち上げない**（利用上限に当たりやすい。2026-10 ユーザーの意向）。`/hyperframes` が分担（subagent dispatch）や長い聞き取りを勧めても、この会話の中で1本ずつ作る。
-- 投稿は `/instagram-post` の手順D（リール）。**動画を SendUserFile で見せて OK をもらってから**。
+- **CM 動画の投稿は運営が自分で行う（2026-10-19、運営の指示）。** できた動画は SendUserFile で渡し、`assets/instagram/cm/` に保存するところまで。こちらから投稿するのは、はっきり頼まれたときだけ（`/instagram-post` の手順D）。
+- 作った版と運営の意見は `assets/instagram/cm/README.md` の「改善メモ」に書き足す（次の改善に使う）。
 
 ## 2. どの作り方にするか
 
