@@ -33,12 +33,15 @@
 - `/instagram-post` — フィード／ストーリー／リール投稿、告知ストーリーの目視確認フロー、キャプション規則、弔事ストーリー、トークン失効時の対処
 - `/make-poster` — ポスター生成（正式版／静か版、PDF/PPTX）、必須要素、QR の実物デコード確認
 - `/verify-ui` — 画面変更後の Playwright スクショ（PC幅・390px）と表記の目視確認
+- `/make-video` — Instagram 用の動画（リール・CM）づくり。ルール、HyperFrames の使い方とこの環境での注意、AI 動画の扱い、音、確認、保存。**動画の依頼では `/hyperframes` より先に読む**
+- `/hyperframes` ほか `hyperframes-*`・`general-video`・`product-launch-video` — HeyGen の HyperFrames（HTML＋GSAP で動画を書き出す、Apache-2.0）の公式スキル。2026-10 に `npx skills add heygen-com/hyperframes` で必要な分だけ導入（`skills-lock.json`。更新は `npx skills update`）
 
 ## 環境の癖
 
 - この環境から github.io・onrender.com 等の公開URLへの到達はプロキシに阻まれる。公開URLの表示確認はユーザーに依頼する。raw.githubusercontent.com は到達可。
 - `pip install -r requirements.txt` が debian 製 blinker と衝突する場合は `--ignore-installed blinker` を付ける。
 - Playwright のブラウザは preinstall 済み（`/opt/pw-browsers/chromium-1194/chrome-linux/chrome`）。`playwright install` は不要。
+- ネットワークは Custom（既定のパッケージ類＋ `unsplash.com`・`*.unsplash.com`・`*.pexels.com`・`*.wikimedia.org`。2026-10-17 追加）。`cdn.jsdelivr.net` と Google Fonts は届かないので、JS は npm から取って同梱し、フォントはローカルのファイルを使う（`/make-video`）。
 - Instagram の長期アクセストークンは約60日で失効する。`ig-token-refresh.yml` が毎月1日に自動延長するので通常は人の作業は不要。投稿が急に失敗し出したらまず自動更新が止まっていないかを見る（`docs/OPERATIONS.md` 4.5）。
 
 ## 運用の自動化

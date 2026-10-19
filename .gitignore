@@ -27,3 +27,7 @@ video/*/*_built.html
 video/*/*.wav
 video/*/pv-*.png
 video/*/out*.mp4
+video/*/vendor/
+video/*/node_modules/
+video/*/renders/
+video/*/snapshots/

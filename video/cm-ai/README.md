@@ -14,6 +14,8 @@ HTML で1コマずつ描いて Playwright で撮り、ffmpeg で MP4 にする�
 | `render4.py` / `render.py` | v3 / v2 の書き出し（`--preview 秒,秒,...` で確認用のコマだけ撮れる） |
 | `extract_clips.py` | `src/` から使う部分をコマ画像に切り出す（v3 は色調整・粒子・手持ちの揺れ付き） |
 | `music4.py` / `music3.py` | 自作 BGM（numpy で合成。既存の曲は使っていない） |
+| `piano_v1.py` | 写真版 v1 の静かなピアノ曲（`python3 piano_v1.py out.wav 24.5`）。静かな動画を作るときの雛形 |
+| `ai_prompts.md` | AI 動画（Gemini／Veo）を作るときのプロンプト。前回の6本分 |
 | `mix4.py` / `mix3.py` | BGM＋AI 動画の生の音＋効果音を混ぜる（`mix4.py out.wav nobgm` で BGM なし） |
 | `cap-tower-full.png` / `cap-room-full.png` / `card-s305.png` / `rects.json` | アプリの実画面（火曜 10:52・タワースコラで撮影）と、その中の位置 |
 | `capture.py` / `fakeapp.py` | 上の実画面を撮り直すとき用。時刻を固定してアプリを起動し、390px・3倍で撮る |
