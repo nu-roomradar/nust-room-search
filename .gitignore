@@ -16,3 +16,14 @@ __pycache__/
 CLAUDE.local.md
 # 必須表記ガードを一時的に緩めるマーカー（guard-notices.py 参照。作業後に削除する）
 .claude/guard-relax
+
+# 動画の作業ファイル（video/*/README.md の手順で作り直せる）
+video/*/fonts/
+video/*/clips/
+video/*/clips4/
+video/*/clips.json
+video/*/clips4.json
+video/*/*_built.html
+video/*/*.wav
+video/*/pv-*.png
+video/*/out*.mp4

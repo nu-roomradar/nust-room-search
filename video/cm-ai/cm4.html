@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>RoomRadar CM v3</title>
+<style>
+  @font-face{font-family:'JP';font-weight:500;src:url('fonts/NotoSansCJKjp-Medium.otf');}
+  @font-face{font-family:'JP';font-weight:700;src:url('fonts/NotoSansCJKjp-Bold.otf');}
+  @font-face{font-family:'JPB';font-weight:900;src:url('fonts/NotoSansCJKjp-Black.otf');}
+  @font-face{font-family:'Hand';src:url('fonts/YuseiMagic-Regular.ttf');}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:1080px;height:1920px;overflow:hidden;background:#000;}
+  body{font-family:'JP',sans-serif;font-feature-settings:"palt";}
+  #stage{position:absolute;inset:0;overflow:hidden;background:#000;}
+  .scene{position:absolute;inset:0;opacity:0;overflow:hidden;}
+  .clip img.frame{position:absolute;left:0;top:0;width:1080px;height:1920px;}
+
+  /* 画面録画 */
+  .rec{background:#0d0d12;}
+  .rec img.page{position:absolute;left:0;top:130px;width:1080px;}
+  .sbar{position:absolute;left:0;top:0;width:1080px;height:130px;background:#0d0d12;color:#fff;z-index:3;}
+  .sbar .tm{position:absolute;left:96px;top:46px;font-weight:700;font-size:46px;letter-spacing:.01em;}
+  .sbar svg{position:absolute;right:70px;top:52px;}
+  .touch{position:absolute;width:104px;height:104px;margin:-52px 0 0 -52px;border-radius:50%;background:rgba(255,255,255,.32);
+    border:3px solid rgba(255,255,255,.65);opacity:0;z-index:4;}
+
+  /* 手書きの書き込み */
+  #ink{position:absolute;left:0;top:0;z-index:5;pointer-events:none;}
+  #ink path{fill:none;stroke:#ffe14d;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 3px 6px rgba(0,0,0,.45));opacity:0;}
+  .note{position:absolute;font-family:'Hand';color:#ffe14d;font-size:70px;line-height:1.15;white-space:nowrap;z-index:6;opacity:0;
+    text-shadow:0 0 3px #000,0 0 10px rgba(0,0,0,.95),0 0 22px rgba(0,0,0,.85),0 0 40px rgba(0,0,0,.6);}
+
+  /* Reels 風の字幕（縁取り） */
+  .rc{position:absolute;left:0;right:0;top:1330px;text-align:center;opacity:0;z-index:6;}
+  .rc span{display:inline-block;position:relative;font-family:'JPB';font-weight:900;font-size:66px;line-height:1.2;letter-spacing:.01em;}
+  .rc span::before{content:attr(data-t);position:absolute;left:0;top:0;color:transparent;-webkit-text-stroke:16px #161616;z-index:-1;}
+  .rc span{color:#fff;}
+  .ts{position:absolute;left:64px;top:96px;font-family:'Hand';color:#fff;font-size:46px;text-shadow:0 2px 10px rgba(0,0,0,.6);opacity:0;z-index:6;}
+  .ts small{display:block;font-size:30px;opacity:.9;}
+
+  /* 締め: ロゴ */
+  #endScene{background:#fff;}
+  .blob{position:absolute;border-radius:50%;}
+  #logoBox{position:absolute;left:220px;top:690px;width:640px;height:374px;}
+  #logoArt{position:absolute;inset:0;}
+  #logo{position:absolute;inset:0;width:640px;height:374px;}
+  #shine{position:absolute;inset:0;-webkit-mask:url(rr_logo_hd.png) center/contain no-repeat;
+    background:linear-gradient(105deg,rgba(255,255,255,0) 42%,rgba(255,255,255,.75) 50%,rgba(255,255,255,0) 58%);background-size:300% 100%;background-position:100% 0;}
+  .ring{position:absolute;border-radius:50%;border:3px solid #60a5fa;opacity:0;}
+  .ping{position:absolute;border-radius:50%;border:4px solid #2dd4bf;opacity:0;}
+  #fine{position:absolute;left:0;right:0;top:1712px;text-align:center;color:#86868b;font-size:26px;font-weight:500;letter-spacing:.06em;opacity:0;}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="scene clip" id="A1"><img class="frame"></div>
+  <div class="scene clip" id="A2"><img class="frame"></div>
+  <div class="scene clip" id="A3"><img class="frame"></div>
+  <div class="scene rec" id="R1"><img class="page" id="p1img" src="cap-tower-full.png"></div>
+  <div class="scene rec" id="R2"><img class="page" src="cap-room-full.png"></div>
+  <div class="scene clip" id="A4"><img class="frame"></div>
+  <div class="scene clip" id="A5a"><img class="frame"></div>
+  <div class="scene clip" id="A5b"><img class="frame"></div>
+  <div class="scene clip" id="A6"><img class="frame"></div>
+
+  <!-- 画面録画のステータスバー（R1・R2 のときだけ出す） -->
+  <div class="sbar" id="sbar"><span class="tm">10:52</span>
+    <svg width="190" height="40" viewBox="0 0 190 40">
+      <rect x="0" y="26" width="9" height="12" rx="2" fill="#fff"/><rect x="14" y="20" width="9" height="18" rx="2" fill="#fff"/>
+      <rect x="28" y="13" width="9" height="25" rx="2" fill="#fff"/><rect x="42" y="6" width="9" height="32" rx="2" fill="#fff" opacity=".4"/>
+      <path d="M72 16 a26 26 0 0 1 36 0" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M79 24 a15 15 0 0 1 22 0" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <circle cx="90" cy="32" r="4" fill="#fff"/>
+      <rect x="124" y="7" width="54" height="28" rx="8" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="3"/>
+      <rect x="129" y="12" width="36" height="18" rx="4" fill="#fff"/><rect x="181" y="16" width="4" height="10" rx="2" fill="#fff" fill-opacity=".5"/>
+    </svg>
+  </div>
+  <div class="touch" id="tc1"></div><div class="touch" id="tc2"></div>
+  <svg id="ink" width="1080" height="1920" viewBox="0 0 1080 1920">
+    <path id="k1"/><path id="k1a"/><path id="k1h"/><path id="k2"/><path id="k2a"/><path id="k2h"/><path id="k3"/><path id="k3a"/><path id="k3h"/>
+  </svg>
+  <div class="note" id="n1">14室も！</div>
+  <div class="note" id="n2">4限まで<br>空いてる</div>
+  <div class="note" id="n3">今日はずっと<br>空いてる</div>
+
+  <!-- 字幕 -->
+  <div class="ts" id="ts1"><small>10/20（火）</small>10:52</div>
+  <div class="ts" id="ts2">10:58</div>
+  <div class="rc" id="c1"><span data-t="2限、休講になった">2限、休講になった</span></div>
+  <div class="rc" id="c2"><span data-t="空きコマどうする？">空きコマどうする？</span></div>
+  <div class="rc" id="c3"><span data-t="あ、これ使お">あ、これ使お</span></div>
+  <div class="rc" id="c4"><span data-t="ほんとに空いてた">ほんとに空いてた</span></div>
+  <div class="rc" id="c5"><span data-t="課題すすむ〜">課題すすむ〜</span></div>
+  <div class="rc" id="c6"><span data-t="結局しゃべってる笑">結局しゃべってる笑</span></div>
+  <div class="rc" id="c7"><span data-t="空きコマ、最高。">空きコマ、最高。</span></div>
+
+  <!-- 締め -->
+  <div class="scene" id="endScene">
+    <div class="blob" id="e1" style="left:-180px;top:180px;width:560px;height:560px;background:#dbeafe;filter:blur(30px)"></div>
+    <div class="blob" id="e2" style="left:700px;top:1100px;width:520px;height:520px;background:#ccfbf1;filter:blur(30px)"></div>
+    <div class="blob" id="e3" style="left:760px;top:420px;width:260px;height:260px;background:#ffedd5;filter:blur(24px)"></div>
+    <div id="logoBox"><div class="ring" id="r1"></div><div class="ring" id="r2"></div><div class="ring" id="r3"></div>
+      <div class="ping" id="q1"></div><div class="ping" id="q2"></div>
+      <div id="logoArt"><img id="logo" src="rr_logo_hd.png"><div id="shine"></div></div></div>
+    <div id="fine">テスト運用中・学生開発の非公式サービスです</div>
+  </div>
+</div>
+<script>
+const RECT = __RECTS__;
+const CLIPS = __CLIPS__;
+const $ = id => document.getElementById(id);
+// ── 画面録画の座標: CSS px × K、上にステータスバー 130px ──
+const K = 1080 / 390, SB = 130, SCROLL = 640, T = RECT.tower;
+const scr = (r, scroll) => ({x: r[0] * K, y: SB + (r[1] - scroll) * K, w: r[2] * K, h: r[3] * K});
+const place = (el, x, y) => Object.assign($(el).style, {left: x + 'px', top: y + 'px'});
+
+// ── 手書きの線（少しゆがんだ楕円・矢印）。seed で毎回ちがう揺れにする ──
+function rnd(seed){ let s = seed; return () => (s = (s * 9301 + 49297) % 233280) / 233280; }
+function wobbleEllipse(cx, cy, rx, ry, seed){
+  const r = rnd(seed), a0 = -2.2 + r() * .6, turns = 1.12, n = 90, pts = [];
+  const p1 = r() * 6, p2 = r() * 6;
+  for (let i = 0; i <= n; i++){
+    const t = i / n, th = a0 + t * turns * 2 * Math.PI, grow = 1 + .07 * t;
+    const k = 1 + .035 * Math.sin(3 * th + p1) + .02 * Math.sin(5 * th + p2);
+    pts.push([cx + Math.cos(th) * rx * k * grow, cy + Math.sin(th) * ry * k * grow + 10 * t]);
+  }
+  return 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L');
+}
+function arrow(x1, y1, x2, y2, bend, idLine, idHead){
+  const mx = (x1 + x2) / 2 + bend[0], my = (y1 + y2) / 2 + bend[1];
+  $(idLine).setAttribute('d', `M${x1} ${y1} Q${mx} ${my} ${x2} ${y2}`);
+  const ang = Math.atan2(y2 - my, x2 - mx), L = 40;
+  const h = a => `${(x2 - Math.cos(ang + a) * L).toFixed(1)} ${(y2 - Math.sin(ang + a) * L).toFixed(1)}`;
+  $(idHead).setAttribute('d', `M${h(.5)} L${x2} ${y2} L${h(-.5)}`);
+}
+// 14室（件数のチップ）
+const cnt = scr(T.count, SCROLL);
+$('k1').setAttribute('d', wobbleEllipse(cnt.x + cnt.w / 2, cnt.y + cnt.h / 2, cnt.w / 2 + 34, cnt.h / 2 + 30, 7));
+place('n1', 430, cnt.y - 120); $('n1').style.transform = 'rotate(-6deg)';
+arrow(730, cnt.y - 20, cnt.x - 18, cnt.y + cnt.h / 2 - 6, [-10, 40], 'k1a', 'k1h');
+// S305
+const crd = scr(T.s305, SCROLL);
+$('k2').setAttribute('d', wobbleEllipse(crd.x + crd.w / 2, crd.y + crd.h / 2, crd.w / 2 + 40, crd.h / 2 + 34, 19));
+place('n2', 640, crd.y + crd.h + 150); $('n2').style.transform = 'rotate(4deg)';
+arrow(700, crd.y + crd.h + 150, crd.x + crd.w * .7, crd.y + crd.h + 30, [-60, 10], 'k2a', 'k2h');
+// 教室の1週間: 今日の 2〜4限
+const nowc = scr([RECT.room.now[0], RECT.room.now[1], RECT.room.now[2], 57.3 * 2 + RECT.room.now[3]], 0);
+$('k3').setAttribute('d', wobbleEllipse(nowc.x + nowc.w / 2, nowc.y + nowc.h / 2, nowc.w / 2 + 42, nowc.h / 2 + 40, 31));
+place('n3', 520, nowc.y + nowc.h - 40); $('n3').style.transform = 'rotate(-4deg)';
+arrow(560, nowc.y + nowc.h, nowc.x + nowc.w + 40, nowc.y + nowc.h * .7, [20, 50], 'k3a', 'k3h');
+const LEN = {};
+for (const p of document.querySelectorAll('#ink path')){ const l = p.getTotalLength(); LEN[p.id] = l; p.style.strokeDasharray = l; p.style.strokeDashoffset = l; }
+// タップの位置
+const btn = scr(T.btn, 0);
+place('tc1', btn.x + btn.w * .55, btn.y + btn.h / 2); place('tc2', crd.x + crd.w / 2, crd.y + crd.h / 2);
+
+// ── ロゴのレーダー: rr_logo_hd.png の同心円の中心 ──
+const LC = {x: 640 * .4156, y: 374 * .4297};
+function circle(id, r){ Object.assign($(id).style, {left: LC.x - r + 'px', top: LC.y - r + 'px', width: 2 * r + 'px', height: 2 * r + 'px'}); }
+circle('r1', 130); circle('r2', 205); circle('r3', 290); circle('q1', 96); circle('q2', 96);
+
+// ── タイムライン ──
+const E = {lin: t => t, out: t => 1 - Math.pow(1 - t, 3), in: t => t * t * t,
+  io: t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, sine: t => -(Math.cos(Math.PI * t) - 1) / 2,
+  expo: t => t === 1 ? 1 : 1 - Math.pow(2, -10 * t),
+  back: t => { const c1 = 2.2, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }};
+const tracks = [];
+function A(sel, prop, keys){ document.querySelectorAll(sel).forEach(el => tracks.push({el, prop, keys})); }
+function val(keys, t){
+  if (t <= keys[0][0]) return keys[0][1];
+  for (let i = 1; i < keys.length; i++) if (t <= keys[i][0]){
+    const [t0, v0] = keys[i - 1], [t1, v1, e] = keys[i]; return v0 + (v1 - v0) * E[e || 'sine']((t - t0) / (t1 - t0)); }
+  return keys[keys.length - 1][1];
+}
+const on = (sel, a, b) => A(sel, 'o', [[a - .001, 0], [a, 1], [b - .001, 1], [b, 0]]);
+const SCENES = [['A1', 0, 2], ['A2', 2, 4], ['A3', 4, 5.5], ['R1', 5.5, 10], ['R2', 10, 11.5], ['A4', 11.5, 13.5],
+  ['A5a', 13.5, 15], ['A5b', 15, 17], ['A6', 17, 20], ['endScene', 20, 24.1]];
+for (const [id, a, b] of SCENES) on('#' + id, a, b);
+on('#sbar', 5.5, 11.5);
+// 字幕: カットに合わせてぱっと出る（少しだけ弾む）
+function rc(id, a, b){ on(id, a, b); A(id, 's', [[a, .9], [a + .14, 1, 'back']]); }
+rc('#c1', .2, 2); rc('#c2', 2.1, 4); rc('#c3', 4.1, 5.5); rc('#c4', 11.65, 13.5); rc('#c5', 13.6, 15); rc('#c6', 15.1, 17); rc('#c7', 17.25, 20);
+on('#ts1', 0, 2); on('#ts2', 11.5, 13.5);
+// 画面録画: 検索をタップ → 結果まで自動でスクロール → 書き込み → S305 をタップ
+function touch(id, t){ A(id, 'o', [[t - .01, 0], [t, .95], [t + .22, .95], [t + .45, 0]]); A(id, 's', [[t, .7], [t + .12, 1, 'out']]); }
+touch('#tc1', 6.25); touch('#tc2', 9.55);
+A('#p1img', 'y', [[6.5, 0], [7.2, -SCROLL * K, 'io']]);
+function draw(id, a, d, end){ A(id, 'dr', [[a, 0], [a + d, 1, 'out']]); A(id, 'o', [[a - .001, 0], [a, 1], [end - .001, 1], [end, 0]]); }
+function note(id, a, end){ A(id, 'rv', [[a, 100], [a + .35, 0, 'lin']]); A(id, 'o', [[a - .001, 0], [a, 1], [end - .001, 1], [end, 0]]); }
+draw('#k1', 7.4, .38, 10); draw('#k1a', 7.7, .22, 10); draw('#k1h', 7.9, .1, 10); note('#n1', 7.75, 10);
+draw('#k2', 8.45, .4, 10); draw('#k2a', 8.8, .22, 10); draw('#k2h', 9.0, .1, 10); note('#n2', 8.85, 10);
+draw('#k3', 10.25, .4, 11.5); draw('#k3a', 10.6, .22, 11.5); draw('#k3h', 10.8, .1, 11.5); note('#n3', 10.65, 11.5);
+// 締め
+A('#r1', 'o', [[20.0, 0], [20.15, .7], [21.0, .35], [21.6, 0]]); A('#r1', 's', [[20.0, .2], [20.35, 1, 'back']]);
+A('#r2', 'o', [[20.05, 0], [20.2, .5], [21.0, .25], [21.6, 0]]); A('#r2', 's', [[20.05, .2], [20.45, 1, 'back']]);
+A('#r3', 'o', [[20.1, 0], [20.25, .35], [21.0, .15], [21.6, 0]]); A('#r3', 's', [[20.1, .2], [20.55, 1, 'back']]);
+A('#logoArt', 'sweep', [[20.05, 0], [20.85, 360, 'io']]);
+A('#logoBox', 's', [[20.05, .8], [20.85, 1.08, 'out'], [21.15, 1, 'back']]);
+A('#logoBox', 'r', [[20.05, -6], [20.9, 0, 'back']]);
+A('#q1', 'o', [[20.75, 0], [20.8, .9], [21.7, 0]]); A('#q1', 's', [[20.75, .5], [21.7, 3.6, 'out']]);
+A('#q2', 'o', [[21.55, 0], [21.6, .8], [22.5, 0]]); A('#q2', 's', [[21.55, .5], [22.5, 3.6, 'out']]);
+A('#shine', 'bp', [[22.1, 100], [22.9, 0, 'io']]);
+A('#fine', 'o', [[21.3, 0], [21.9, 1]]);
+A('#e1', 'x', [[20, 0], [24, 60, 'lin']]); A('#e2', 'x', [[20, 0], [24, -50, 'lin']]); A('#e3', 'y', [[20, 0], [24, 40, 'lin']]);
+
+const frameImgs = {};
+for (const id of Object.keys(CLIPS)) frameImgs[id] = $(id).querySelector('img.frame');
+async function render(t){
+  const st = new Map();
+  for (const tr of tracks){ if (!st.has(tr.el)) st.set(tr.el, {}); st.get(tr.el)[tr.prop] = val(tr.keys, t); }
+  for (const [el, s] of st){
+    if ('o' in s) el.style.opacity = s.o;
+    let y = s.y ?? 0;
+    if (el.id === 'logoBox' && t > 21.3) y += Math.sin((t - 21.3) * 2.2) * 7;
+    if (['x','y','s','r'].some(k => k in s)){
+      const base = el.classList.contains('note') ? (el.dataset.rot ||= el.style.transform) : '';
+      el.style.transform = `translate(${s.x ?? 0}px,${y}px) scale(${s.s ?? 1}) rotate(${s.r ?? 0}deg) ${base}`;
+    }
+    if ('dr' in s) el.style.strokeDashoffset = LEN[el.id] * (1 - s.dr);
+    if ('rv' in s) el.style.clipPath = `inset(-20px ${s.rv}% -20px -20px)`;
+    if ('bp' in s) el.style.backgroundPosition = `${s.bp}% 0`;
+    if ('sweep' in s){ const a = s.sweep;
+      const m = a >= 359.9 ? 'none' : `conic-gradient(from -90deg at 41.56% 42.97%, #000 0deg, #000 ${a}deg, transparent ${a + .5}deg)`;
+      el.style.webkitMaskImage = m; el.style.maskImage = m; }
+  }
+  const waits = [];
+  for (const [id, a, b] of SCENES){
+    const im = frameImgs[id]; if (!im || t < a || t >= b) continue;
+    const c = CLIPS[id]; const n = Math.min(c.frames, Math.max(1, Math.floor((t - a) * 30) + 1));
+    const src = `clips4/${c.dir}/${String(n).padStart(4, '0')}.jpg`;
+    if (!im.src.endsWith(src)){ im.src = src; waits.push(im.decode().catch(() => {})); }
+  }
+  await Promise.all(waits);
+}
+window.render = render;
+render(0);
+</script>
+</body>
+</html>
