@@ -36,6 +36,16 @@ put(swish(.5), 10.1, .6)    # 端末が上がる
 put(bloom(), 10.7); put(pop(440), 11.1, .8)   # 表のカードが飛び出す
 put(tick(), 11.3)
 pk = np.abs(mix).max(); mix = np.tanh(mix / pk * 1.2) / np.tanh(1.2) * .9
-with wave.open("audio.wav", "wb") as w:
+with wave.open("audio_raw.wav", "wb") as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes((mix * 32767).astype(np.int16).tobytes())
 print("ok")
+
+# 音量を -14 LUFS（Instagram の目安）にそろえる（ffmpeg の loudnorm を2回）
+import json, re
+m = subprocess.run(["ffmpeg", "-hide_banner", "-i", "audio_raw.wav", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11:print_format=json", "-f", "null", "-"],
+                   capture_output=True, text=True).stderr
+j = json.loads(re.search(r"\{[^{}]*\}", m[m.rfind("Parsed_loudnorm"):], re.S).group(0))
+af = (f"loudnorm=I=-14:TP=-1.5:LRA=11:measured_I={j['input_i']}:measured_TP={j['input_tp']}:measured_LRA={j['input_lra']}"
+      f":measured_thresh={j['input_thresh']}:offset={j['target_offset']}:linear=true")
+subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", "audio_raw.wav", "-af", af, "-ar", str(SR), "audio.wav"], check=True)
+print("normalized")
