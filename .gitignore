@@ -33,3 +33,6 @@ video/*/renders/
 video/*/snapshots/
 video/*/.hyperframes/
 video/*/sheet*.png
+video/*/music_check.png
+video/*/spec_*.png
+video/*/wave_*.png
