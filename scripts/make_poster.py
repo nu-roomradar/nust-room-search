@@ -40,13 +40,15 @@ DEFAULT_OUT = ROOT / "assets/posters/roomradar-poster-pro.png"
 VARIANTS = {
     "official": {
         "eyebrow": "次のコマ、どこで過ごす？",
-        "h1": '「開けたら、<br>空いてる」を<br><span class="hl">当たり前に。</span>',
+        "h1": '「開けたら、空いてる」を<br><span class="hl">当たり前に。</span>',
+        "layout": "wide",
         "lead": (
-            "曜日・時限・校舎を選ぶだけ。時間割をもとに、授業の入っていない教室を表示します。"
-            "空きコマに使える教室を、迷わず見つけられます。"
+            "曜日・時限・校舎を選ぶだけ。<br>時間割をもとに、授業の入っていない教室を<br>表示します。"
+            "空きコマに使える教室を、<br>迷わず見つけられます。"
         ),
         "rules": True,
     },
+    "official-b": None,   # 下で official をもとに作る（見出しの区切りだけ違う）
     "shizuka": {
         "eyebrow": "教室では“静か”にしろ",
         "lead": (
@@ -58,6 +60,10 @@ VARIANTS = {
         "rules": False,
     },
 }
+
+
+VARIANTS["official-b"] = dict(VARIANTS["official"],
+                              h1='「開けたら、空いてる」<br>を<span class="hl">当たり前に。</span>')
 
 
 def datauri(path):
@@ -84,9 +90,9 @@ IC_APP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-widt
 RULES_HTML = """
 <div class="rules">
       <div class="rh">空き教室は、みんなで使う場所です。</div>
-      <div class="rb">使い方は人それぞれ。誰もが安心して使えるよう、お互いを尊重して、周りに配慮して使いましょう。</div>
-      <div class="chips"><span>個人学習</span><span>グループワーク</span><span>課題の相談</span><span>学生同士の打ち合わせ</span><span>授業の合間のひと休み</span></div>
-      <div class="rn">※ 空き教室は自習専用のスペースではありません。静かに学習したいときは、図書館または1号館のCSTギャラリーへ。</div>
+      <div class="rb">使う目的は人それぞれ。静かさを求めすぎず、大きな声で騒がず、<br>お互いの利用目的を尊重し、周囲に配慮して利用しましょう。</div>
+      <div class="chips"><span class="lbl">使い方の例</span><span>個人学習</span><span>グループワーク</span><span>課題についての相談</span><span>学生同士の打合せ</span><span>授業の合間の休憩</span></div>
+      <div class="rn">※ 空き教室は自習専用のスペースではありません。静かな環境で学習したい場合は、図書館または1号館のCSTギャラリーをご利用ください。</div>
       <div class="rn">※ 時間割にない授業もあります。使う前にドア越しに軽く確認し、人がいたらひと声かけましょう。</div>
     </div>
 """
@@ -99,13 +105,46 @@ def build_html(variant):
     shot = datauri(SHOT_PATH)
     qr_lp = qr_datauri(LP_URL)
     qr_ig = datauri(IG_QR_PATH)
+    phone_html = f'''<div class="phone-shadow"></div>
+        <div class="phone"><div class="notch"></div><div class="screen"><img src="{shot}" alt="RoomRadar app"></div><div class="glare"></div></div>'''
+    if v.get("layout") == "wide":
+        hero_html = f'''<div class="hero2">
+      <span class="eyebrow">{v["eyebrow"]}</span>
+      <h1>{v["h1"]}</h1>
+      <div class="hero-row">
+        <div class="left">
+          <p class="lead">{v["lead"]}</p>
+          <div class="flist">
+            <div class="fi"><div class="ico">{IC_SEARCH}</div><div><div class="t">リアルタイム検索</div><div class="d">曜日・時限・校舎を選ぶだけ</div></div></div>
+            <div class="fi o"><div class="ico">{IC_FREE}</div><div><div class="t">登録不要・無料</div><div class="d">ブラウザだけですぐ使える</div></div></div>
+            <div class="fi"><div class="ico">{IC_BUILD}</div><div><div class="t">2校舎に対応</div><div class="d">タワースコラ／駿河台校舎</div></div></div>
+          </div>
+        </div>
+        <div class="hero-r">{phone_html}</div>
+      </div>
+    </div>'''
+    else:
+        hero_html = f'''<div class="hero">
+      <div class="hero-l">
+        <span class="eyebrow">{v["eyebrow"]}</span>
+        <h1>{v["h1"]}</h1>
+        <p class="lead">{v["lead"]}</p>
+      </div>
+      <div class="hero-r">{phone_html}</div>
+    </div>
+
+    <div class="feats">
+      <div class="feat"><div class="ico">{IC_SEARCH}</div><div><div class="t">リアルタイム検索</div><div class="d">曜日・時限・校舎を選ぶだけ</div></div></div>
+      <div class="feat o"><div class="ico">{IC_FREE}</div><div><div class="t">登録不要・無料</div><div class="d">ブラウザだけですぐ使える</div></div></div>
+      <div class="feat"><div class="ico">{IC_BUILD}</div><div><div class="t">2校舎に対応</div><div class="d">タワースコラ / 駿河台校舎</div></div></div>
+    </div>'''
     tight = bool(v.get("rules"))
     h1_size = "3.65rem" if tight else "4.1rem"
-    phone_w, phone_h = (232, 452) if tight else (296, 576)
+    phone_w, phone_h = (214, 418) if tight else (296, 576)
     feat_pad = 18 if tight else 30
-    igqr = 168 if tight else 224
-    secqr = 128 if tight else 150
-    qrpad = 20 if tight else 26
+    igqr = 150 if tight else 224
+    secqr = 112 if tight else 150
+    qrpad = 16 if tight else 26
     return f"""<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -113,7 +152,7 @@ def build_html(variant):
   :root {{ --ink:#101828; --muted:#6b7280; --accent:#2563eb; --accent2:#f97316;
     --navy:#14203a; --navy2:#1e2f52; --border:rgba(16,24,40,0.1); }}
   html,body {{ width:1080px; height:1528px; }}
-  body {{ font-family:'Noto Sans JP',sans-serif; color:var(--ink);
+  body {{ font-family:'Noto Sans JP',sans-serif; color:var(--ink); word-break:auto-phrase;
     background:
       radial-gradient(1250px 780px at 86% 12%, rgba(249,115,22,0.24), transparent 62%),
       radial-gradient(1150px 800px at 8% 94%, rgba(37,99,235,0.24), transparent 62%),
@@ -183,7 +222,7 @@ def build_html(variant):
 
   /* ── QR（Instagramを主役に） ── */
   .qrwrap {{ padding:0 72px; }}
-  .qrhead {{ text-align:center; font-weight:800; font-size:1.32rem; margin-bottom:22px; }}
+  .qrhead {{ text-align:center; font-weight:800; font-size:1.28rem; margin-bottom:18px; }}
   .qrhead .em {{ color:var(--accent2); }}
   .qrs {{ display:flex; gap:26px; align-items:stretch; }}
   .qr-primary {{ flex:1.35; display:flex; align-items:center; gap:28px; position:relative;
@@ -205,15 +244,33 @@ def build_html(variant):
   .qr-sec .k svg {{ width:20px; height:20px; color:var(--accent); }}
   .qr-sec .s {{ font-size:0.9rem; color:var(--muted); margin-top:7px; }}
 
+  /* ── 正式版（2026-10-21）: 横幅いっぱいの見出し＋左に説明と特徴・右にスマホ ── */
+  .hero2 {{ padding:0 72px; position:relative; z-index:1; }}
+  .hero2 h1 {{ font-size:4.4rem; line-height:1.16; margin-top:14px; white-space:nowrap; font-feature-settings:'palt'; }}
+  .hero-row {{ display:flex; gap:30px; align-items:center; margin-top:10px; }}
+  .hero-row .left {{ flex:1.2; }}
+  .hero-row .lead {{ margin-top:0; max-width:none; font-size:1.2rem; line-height:1.66; }}
+  .flist {{ display:flex; flex-direction:column; gap:10px; margin-top:16px; }}
+  .fi {{ display:flex; align-items:center; gap:14px; background:#fff; border:1px solid var(--border); border-radius:16px;
+    padding:9px 18px; box-shadow:0 6px 18px rgba(16,24,40,0.05); }}
+  .fi .ico {{ width:42px; height:42px; flex-shrink:0; border-radius:13px; display:flex; align-items:center; justify-content:center;
+    background:rgba(37,99,235,0.08); color:var(--accent); }}
+  .fi.o .ico {{ background:rgba(249,115,22,0.1); color:var(--accent2); }}
+  .fi .ico svg {{ width:25px; height:25px; }}
+  .fi .t {{ font-weight:800; font-size:1.16rem; white-space:nowrap; }}
+  .fi .d {{ font-size:0.94rem; color:var(--muted); margin-top:2px; white-space:nowrap; }}
+  .hero-row .hero-r {{ flex:0.8; }}
+
   /* ── 空き教室の使い方（学生課長の4点） ── */
   .rules {{ margin:0 72px; background:rgba(255,255,255,0.92); border:1px solid var(--border); border-radius:20px;
-    padding:20px 28px 18px; box-shadow:0 6px 20px rgba(16,24,40,0.05); }}
-  .rules .rh {{ font-weight:900; font-size:1.42rem; color:var(--ink); }}
-  .rules .rb {{ font-size:1.06rem; color:#374151; margin-top:6px; line-height:1.6; font-weight:500; }}
-  .rules .chips {{ display:flex; flex-wrap:wrap; gap:9px; margin-top:12px; }}
-  .rules .chips span {{ font-weight:700; font-size:0.98rem; color:var(--accent); background:rgba(37,99,235,0.08);
-    border:1px solid rgba(37,99,235,0.2); border-radius:99px; padding:5px 14px; }}
-  .rules .rn {{ font-size:0.9rem; color:#4b5563; margin-top:8px; line-height:1.55; }}
+    padding:16px 26px 14px; box-shadow:0 6px 20px rgba(16,24,40,0.05); }}
+  .rules .rh {{ font-weight:900; font-size:1.36rem; color:var(--ink); }}
+  .rules .rb {{ font-size:1.02rem; color:#374151; margin-top:4px; line-height:1.55; font-weight:500; }}
+  .rules .chips {{ display:flex; flex-wrap:nowrap; gap:8px; margin-top:10px; white-space:nowrap; }}
+  .rules .chips .lbl {{ font-weight:700; font-size:0.92rem; color:#374151; background:none; border:none; padding:5px 0; }}
+  .rules .chips span {{ font-weight:700; font-size:0.94rem; color:var(--accent); background:rgba(37,99,235,0.08);
+    border:1px solid rgba(37,99,235,0.2); border-radius:99px; padding:4px 12px; }}
+  .rules .rn {{ font-size:0.86rem; color:#4b5563; margin-top:8px; line-height:1.5; }}
   .rules .rn + .rn {{ margin-top:2px; }}
 
   /* ── フッター帯 ── */
@@ -240,23 +297,7 @@ def build_html(variant):
   </div>
 
   <div class="main">
-    <div class="hero">
-      <div class="hero-l">
-        <span class="eyebrow">{v["eyebrow"]}</span>
-        <h1>{v["h1"]}</h1>
-        <p class="lead">{v["lead"]}</p>
-      </div>
-      <div class="hero-r">
-        <div class="phone-shadow"></div>
-        <div class="phone"><div class="notch"></div><div class="screen"><img src="{shot}" alt="RoomRadar app"></div><div class="glare"></div></div>
-      </div>
-    </div>
-
-    <div class="feats">
-      <div class="feat"><div class="ico">{IC_SEARCH}</div><div><div class="t">リアルタイム検索</div><div class="d">曜日・時限・校舎を選ぶだけ</div></div></div>
-      <div class="feat o"><div class="ico">{IC_FREE}</div><div><div class="t">登録不要・無料</div><div class="d">ブラウザだけですぐ使える</div></div></div>
-      <div class="feat"><div class="ico">{IC_BUILD}</div><div><div class="t">2校舎に対応</div><div class="d">タワースコラ / 駿河台校舎</div></div></div>
-    </div>
+    {hero_html}
 
     {rules}
     <div class="qrwrap">

@@ -14,6 +14,7 @@ Claude Code on the web のセッション内（Bash）で完結する。ポス�
 | 種別 | パス |
 |---|---|
 | 正式版 | `assets/posters/roomradar-poster-pro.png`、印刷用 `roomradar-poster.{pdf,pptx}`（A4）と `roomradar-poster-A3.pdf`（同じ画像を A3 に拡大、約277dpi） |
+| 正式版 B（見出しの区切りだけ違う。「「開けたら、空いてる」／を当たり前に。」） | `--variant official-b` → `roomradar-poster-pro-b.png`・`roomradar-poster-b.{pdf,pptx}`・`roomradar-poster-b-A3.pdf`。運営がどちらかを選んだら、使わない方を消す |
 | 静か版（**掲示しない**。2026-10-20 の学生課長の指示と合わないため。記録として残す） | `assets/posters/roomradar-poster-shizuka.{png,pdf,pptx}` |
 | ロゴ | `rr_logo.png`（リポジトリ直下） |
 | アプリ画面スクショ | `assets/posters/handoff/app-phone-screenshot.png` |
