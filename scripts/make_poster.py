@@ -13,8 +13,10 @@
 必要パッケージ: qrcode, pillow, playwright, python-pptx（--print-files時）
 素材: rr_logo.png / assets/posters/handoff/{app-phone-screenshot,qr-instagram-branded}.png
 
-注意: 静か版はネタ文言を含む仮バージョン。掲示先での運用判断のため、成果物は
-assets/posters/roomradar-poster-shizuka.{png,pdf,pptx} としてリポジトリに保存している。
+注意: 静か版はネタ文言を含む仮バージョン。2026-10-20 の学生課長の指示（空き教室は自習専用ではない・
+静かに学習したいときは図書館／CSTギャラリー・みんなで使う場所）と合わないため、掲示しない（運営決定）。
+正式版は 2026-10-21 に見出しを「「開けたら、空いてる」を当たり前に。」へ変え、学生課長の4点を
+「空き教室は、みんなで使う場所です。」の枠にまとめて入れた（docs/OPERATIONS.md 2.5）。
 """
 import argparse
 import base64
@@ -38,11 +40,12 @@ DEFAULT_OUT = ROOT / "assets/posters/roomradar-poster-pro.png"
 VARIANTS = {
     "official": {
         "eyebrow": "次のコマ、どこで過ごす？",
+        "h1": '「開けたら、<br>空いてる」を<br><span class="hl">当たり前に。</span>',
         "lead": (
-            "曜日・時限・校舎を選ぶだけ。時間割データをもとに、授業が入っていない教室を"
-            "リアルタイムで表示します。もう教室を探して歩き回らない。"
-            "静かな教室で、集中して勉強・作業ができます。"
+            "曜日・時限・校舎を選ぶだけ。時間割をもとに、授業の入っていない教室を表示します。"
+            "空きコマに使える教室を、迷わず見つけられます。"
         ),
+        "rules": True,
     },
     "shizuka": {
         "eyebrow": "教室では“静か”にしろ",
@@ -51,6 +54,8 @@ VARIANTS = {
             "リアルタイムで表示します。もう教室を探して歩き回らない。"
             '<span class="kw">“静か”</span>な教室で、集中して勉強・作業ができます。'
         ),
+        "h1": '空いてる教室、<br><span class="hl">3秒</span>で見つかる。',
+        "rules": False,
     },
 }
 
@@ -76,12 +81,31 @@ IC_IG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width
 IC_APP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><line x1="12" y1="18" x2="12" y2="18"/></svg>'
 
 
+RULES_HTML = """
+<div class="rules">
+      <div class="rh">空き教室は、みんなで使う場所です。</div>
+      <div class="rb">使い方は人それぞれ。誰もが安心して使えるよう、お互いを尊重して、周りに配慮して使いましょう。</div>
+      <div class="chips"><span>個人学習</span><span>グループワーク</span><span>課題の相談</span><span>学生同士の打ち合わせ</span><span>授業の合間のひと休み</span></div>
+      <div class="rn">※ 空き教室は自習専用のスペースではありません。静かに学習したいときは、図書館または1号館のCSTギャラリーへ。</div>
+      <div class="rn">※ 時間割にない授業もあります。使う前にドア越しに軽く確認し、人がいたらひと声かけましょう。</div>
+    </div>
+"""
+
+
 def build_html(variant):
     v = VARIANTS[variant]
+    rules = RULES_HTML if v.get("rules") else ""
     logo = datauri(LOGO_PATH)
     shot = datauri(SHOT_PATH)
     qr_lp = qr_datauri(LP_URL)
     qr_ig = datauri(IG_QR_PATH)
+    tight = bool(v.get("rules"))
+    h1_size = "3.65rem" if tight else "4.1rem"
+    phone_w, phone_h = (232, 452) if tight else (296, 576)
+    feat_pad = 18 if tight else 30
+    igqr = 168 if tight else 224
+    secqr = 128 if tight else 150
+    qrpad = 20 if tight else 26
     return f"""<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -104,7 +128,7 @@ def build_html(variant):
   .top .radar span {{ position:absolute; border:2px solid #7fa8ff; border-radius:50%; inset:0; }}
   .top .radar span:nth-child(2){{ inset:60px; }} .top .radar span:nth-child(3){{ inset:120px; }} .top .radar span:nth-child(4){{ inset:180px; }}
   .top img {{ height:92px; margin-right:22px; filter:drop-shadow(0 4px 10px rgba(0,0,0,0.3)); }}
-  .brandtxt .wm {{ font-family:'Syne',sans-serif; font-weight:800; font-size:2.7rem; color:#fff; letter-spacing:-0.02em; line-height:1; }}
+  .brandtxt .wm {{ font-family:'Noto Sans JP',sans-serif; font-weight:800; font-size:2.7rem; color:#fff; letter-spacing:-0.02em; line-height:1; }}
   .brandtxt .wm .b {{ color:#7fa8ff; }}
   .brandtxt .tg {{ color:#b9c4dc; font-size:1.02rem; font-weight:500; margin-top:8px; letter-spacing:0.05em; }}
 
@@ -116,9 +140,9 @@ def build_html(variant):
   .hero-l {{ flex:1.1; }}
   .eyebrow {{ display:inline-block; font-weight:700; font-size:1rem; color:var(--accent);
     background:rgba(37,99,235,0.09); border:1px solid rgba(37,99,235,0.22); padding:8px 18px; border-radius:99px; letter-spacing:0.04em; }}
-  h1 {{ font-weight:900; font-size:4.1rem; line-height:1.24; margin-top:26px; letter-spacing:-0.02em; }}
+  h1 {{ font-weight:900; font-size:{h1_size}; line-height:1.22; margin-top:22px; letter-spacing:-0.02em; }}
   h1 .hl {{ color:var(--accent); }}
-  .lead {{ font-size:1.34rem; color:#4b5563; line-height:1.75; margin-top:26px; font-weight:500; max-width:530px; }}
+  .lead {{ font-size:1.28rem; color:#4b5563; line-height:1.72; margin-top:22px; font-weight:500; max-width:530px; }}
   .lead .kw {{ white-space:nowrap; font-weight:800; color:var(--accent); }}
   .hero-r {{ flex:0.9; display:flex; justify-content:center; align-items:center; position:relative; perspective:1700px; }}
 
@@ -129,7 +153,7 @@ def build_html(variant):
     filter:blur(9px); }}
 
   /* ── スマホモック（自然な正面寄り3D・影は下方向のみ） ── */
-  .phone {{ position:relative; z-index:1; width:296px; height:576px; border-radius:44px; background:#05070d;
+  .phone {{ position:relative; z-index:1; width:{phone_w}px; height:{phone_h}px; border-radius:44px; background:#05070d;
     padding:13px;
     box-shadow:
       0 30px 48px rgba(16,24,40,0.28),
@@ -148,7 +172,7 @@ def build_html(variant):
   /* ── 特徴3点 ── */
   .feats {{ display:flex; gap:22px; padding:0 72px; position:relative; z-index:3; }}
   .feat {{ flex:1; display:flex; gap:17px; align-items:center;
-    background:#fff; border:1px solid var(--border); border-radius:20px; padding:30px 26px;
+    background:#fff; border:1px solid var(--border); border-radius:20px; padding:{feat_pad}px 26px;
     box-shadow:0 6px 20px rgba(16,24,40,0.05); }}
   .feat .ico {{ width:56px; height:56px; flex-shrink:0; border-radius:15px; display:flex; align-items:center; justify-content:center;
     background:rgba(37,99,235,0.08); color:var(--accent); }}
@@ -163,36 +187,47 @@ def build_html(variant):
   .qrhead .em {{ color:var(--accent2); }}
   .qrs {{ display:flex; gap:26px; align-items:stretch; }}
   .qr-primary {{ flex:1.35; display:flex; align-items:center; gap:28px; position:relative;
-    background:#fff; border:2px solid rgba(249,115,22,0.4); border-radius:22px; padding:26px 30px;
+    background:#fff; border:2px solid rgba(249,115,22,0.4); border-radius:22px; padding:{qrpad}px 30px;
     box-shadow:0 18px 44px rgba(249,115,22,0.16); }}
   .qr-primary .badge {{ position:absolute; top:-16px; left:30px; background:var(--accent2); color:#fff;
     font-weight:800; font-size:0.86rem; padding:6px 16px; border-radius:99px; box-shadow:0 6px 16px rgba(249,115,22,0.35); }}
-  .qr-primary .qbox {{ width:224px; flex-shrink:0; }}
+  .qr-primary .qbox {{ width:{igqr}px; flex-shrink:0; }}
   .qr-primary .qbox img {{ width:100%; height:auto; display:block; }}
   .qr-primary .k {{ display:flex; align-items:center; gap:9px; font-weight:900; font-size:1.3rem; white-space:nowrap; }}
   .qr-primary .k svg {{ width:24px; height:24px; color:var(--accent2); flex-shrink:0; }}
-  .qr-primary .handle {{ font-family:'Syne',sans-serif; font-weight:800; font-size:1.62rem; margin-top:8px; white-space:nowrap; }}
+  .qr-primary .handle {{ font-family:'Noto Sans JP',sans-serif; font-weight:700; font-size:1.62rem; margin-top:8px; white-space:nowrap; }}
   .qr-primary .s {{ font-size:1rem; color:var(--muted); margin-top:12px; line-height:1.5; }}
   .qr-sec {{ flex:0.85; display:flex; flex-direction:column; align-items:center; text-align:center;
     background:#fff; border:1px solid var(--border); border-radius:22px; padding:24px 24px; }}
-  .qr-sec .qbox {{ width:150px; height:150px; border-radius:14px; padding:8px; background:#fff; border:1px solid var(--border); }}
+  .qr-sec .qbox {{ width:{secqr}px; height:{secqr}px; border-radius:14px; padding:8px; background:#fff; border:1px solid var(--border); }}
   .qr-sec .qbox img {{ width:100%; height:100%; display:block; }}
   .qr-sec .k {{ display:flex; align-items:center; gap:8px; font-weight:800; font-size:1.12rem; margin-top:16px; }}
   .qr-sec .k svg {{ width:20px; height:20px; color:var(--accent); }}
   .qr-sec .s {{ font-size:0.9rem; color:var(--muted); margin-top:7px; }}
+
+  /* ── 空き教室の使い方（学生課長の4点） ── */
+  .rules {{ margin:0 72px; background:rgba(255,255,255,0.92); border:1px solid var(--border); border-radius:20px;
+    padding:20px 28px 18px; box-shadow:0 6px 20px rgba(16,24,40,0.05); }}
+  .rules .rh {{ font-weight:900; font-size:1.42rem; color:var(--ink); }}
+  .rules .rb {{ font-size:1.06rem; color:#374151; margin-top:6px; line-height:1.6; font-weight:500; }}
+  .rules .chips {{ display:flex; flex-wrap:wrap; gap:9px; margin-top:12px; }}
+  .rules .chips span {{ font-weight:700; font-size:0.98rem; color:var(--accent); background:rgba(37,99,235,0.08);
+    border:1px solid rgba(37,99,235,0.2); border-radius:99px; padding:5px 14px; }}
+  .rules .rn {{ font-size:0.9rem; color:#4b5563; margin-top:8px; line-height:1.55; }}
+  .rules .rn + .rn {{ margin-top:2px; }}
 
   /* ── フッター帯 ── */
   .foot {{ background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 100%);
     padding:24px 72px 28px; color:#fff; flex-shrink:0; }}
   .foot .note {{ display:inline-flex; align-items:center; gap:11px; font-size:0.98rem; color:#dbe3f0; margin-bottom:16px;
     background:rgba(249,115,22,0.14); border:1px solid rgba(249,115,22,0.42); border-radius:10px; padding:10px 15px; }}
-  .foot .note .tg {{ font-family:'Syne',sans-serif; font-weight:800; font-size:0.76rem; letter-spacing:0.12em;
+  .foot .note .tg {{ font-family:'Noto Sans JP',sans-serif; font-weight:900; font-size:0.76rem; letter-spacing:0.12em;
     background:var(--accent2); color:#fff; border-radius:6px; padding:4px 11px; }}
   .foot .note strong {{ color:#ffd9b8; font-weight:800; }}
   .foot .row {{ display:flex; align-items:center; gap:20px; flex-wrap:wrap; }}
   .foot .org {{ font-weight:800; font-size:1.4rem; }}
   .foot .hash {{ font-weight:800; color:#7fa8ff; font-size:1.05rem; }}
-  .foot .url {{ font-family:'Syne',sans-serif; font-size:0.98rem; color:#9fb0d0; margin-left:auto; }}
+  .foot .url {{ font-family:'Noto Sans JP',sans-serif; font-size:0.98rem; color:#9fb0d0; margin-left:auto; }}
 </style></head>
 <body>
   <div class="top">
@@ -208,7 +243,7 @@ def build_html(variant):
     <div class="hero">
       <div class="hero-l">
         <span class="eyebrow">{v["eyebrow"]}</span>
-        <h1>空いてる教室、<br><span class="hl">3秒</span>で見つかる。</h1>
+        <h1>{v["h1"]}</h1>
         <p class="lead">{v["lead"]}</p>
       </div>
       <div class="hero-r">
@@ -223,6 +258,7 @@ def build_html(variant):
       <div class="feat"><div class="ico">{IC_BUILD}</div><div><div class="t">2校舎に対応</div><div class="d">タワースコラ / 駿河台校舎</div></div></div>
     </div>
 
+    {rules}
     <div class="qrwrap">
       <div class="qrhead">スマホのカメラで <span class="em">まずはInstagramをフォロー</span> ！</div>
       <div class="qrs">
@@ -232,7 +268,7 @@ def build_html(variant):
           <div>
             <div class="k">{IC_IG}Instagramをフォロー</div>
             <div class="handle">@roomradar_nust</div>
-            <div class="s">最新情報・新機能・お役立ちTipsを配信中</div>
+            <div class="s">最新情報・新機能を配信中</div>
           </div>
         </div>
         <div class="qr-sec">
@@ -255,6 +291,21 @@ def build_html(variant):
 </body></html>"""
 
 
+LOCAL_FONT_DIR = ROOT / "video/cm-ai/fonts"   # video/cm-ai/fetch_fonts.sh で入る（無ければ Google Fonts を読む）
+LOCAL_NOTO = {"400": "Regular", "500": "Medium", "700": "Bold", "800": "Black", "900": "Black"}
+
+
+def _route_local_fonts(page):
+    if not (LOCAL_FONT_DIR / "NotoSansCJKjp-Black.otf").exists():
+        return
+    css = "".join(f"@font-face{{font-family:'Noto Sans JP';font-weight:{w};src:url('https://fonts.gstatic.com/local/NotoSansCJKjp-{n}.otf') format('opentype');}}"
+                  for w, n in LOCAL_NOTO.items())
+    page.route("**/fonts.googleapis.com/**", lambda r: r.fulfill(status=200, content_type="text/css", body=css))
+    page.route("**/fonts.gstatic.com/local/**", lambda r: r.fulfill(
+        status=200, content_type="font/otf", body=(LOCAL_FONT_DIR / r.request.url.rsplit("/", 1)[-1]).read_bytes(),
+        headers={"Access-Control-Allow-Origin": "*"}))
+
+
 def render(html, out_png):
     tmp_html = pathlib.Path("/tmp/roomradar_poster_render.html")
     tmp_html.write_text(html, encoding="utf-8")
@@ -262,6 +313,7 @@ def render(html, out_png):
         browser = p.chromium.launch(executable_path=CHROME)
         # device_scale_factor=3 → 3240x4584 ≒ A4 392dpi（印刷グレード）
         page = browser.new_page(viewport={"width": 1080, "height": 1528}, device_scale_factor=3)
+        _route_local_fonts(page)
         page.goto(tmp_html.as_uri(), wait_until="networkidle", timeout=30000)
         page.wait_for_timeout(1200)
         out_png.parent.mkdir(parents=True, exist_ok=True)
