@@ -108,20 +108,18 @@ def build_html(variant):
     phone_html = f'''<div class="phone-shadow"></div>
         <div class="phone"><div class="notch"></div><div class="screen"><img src="{shot}" alt="RoomRadar app"></div><div class="glare"></div></div>'''
     if v.get("layout") == "wide":
-        hero_html = f'''<div class="hero2">
-      <span class="eyebrow">{v["eyebrow"]}</span>
-      <h1>{v["h1"]}</h1>
-      <div class="hero-row">
-        <div class="left">
-          <p class="lead">{v["lead"]}</p>
-          <div class="flist">
-            <div class="fi"><div class="ico">{IC_SEARCH}</div><div><div class="t">リアルタイム検索</div><div class="d">曜日・時限・校舎を選ぶだけ</div></div></div>
-            <div class="fi o"><div class="ico">{IC_FREE}</div><div><div class="t">登録不要・無料</div><div class="d">ブラウザだけですぐ使える</div></div></div>
-            <div class="fi"><div class="ico">{IC_BUILD}</div><div><div class="t">2校舎に対応</div><div class="d">タワースコラ／駿河台校舎</div></div></div>
-          </div>
+        hero_html = f'''<div class="hero hero3">
+      <div class="hero-l">
+        <span class="eyebrow">{v["eyebrow"]}</span>
+        <h1 class="fit">{v["h1"]}</h1>
+        <p class="lead">{v["lead"]}</p>
+        <div class="flist">
+          <div class="fi"><div class="ico">{IC_SEARCH}</div><div><div class="t">リアルタイム検索</div><div class="d">曜日・時限・校舎を選ぶだけ</div></div></div>
+          <div class="fi o"><div class="ico">{IC_FREE}</div><div><div class="t">登録不要・無料</div><div class="d">ブラウザだけですぐ使える</div></div></div>
+          <div class="fi"><div class="ico">{IC_BUILD}</div><div><div class="t">2校舎に対応</div><div class="d">タワースコラ／駿河台校舎</div></div></div>
         </div>
-        <div class="hero-r">{phone_html}</div>
       </div>
+      <div class="hero-r">{phone_html}</div>
     </div>'''
     else:
         hero_html = f'''<div class="hero">
@@ -140,10 +138,10 @@ def build_html(variant):
     </div>'''
     tight = bool(v.get("rules"))
     h1_size = "3.65rem" if tight else "4.1rem"
-    phone_w, phone_h = (214, 418) if tight else (296, 576)
+    phone_w, phone_h = (296, 576)        # スマホは元の大きさのまま
     feat_pad = 18 if tight else 30
-    igqr = 150 if tight else 224
-    secqr = 112 if tight else 150
+    igqr = 160 if tight else 224
+    secqr = 120 if tight else 150
     qrpad = 16 if tight else 26
     return f"""<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -261,6 +259,11 @@ def build_html(variant):
   .fi .d {{ font-size:0.94rem; color:var(--muted); margin-top:2px; white-space:nowrap; }}
   .hero-row .hero-r {{ flex:0.8; }}
 
+  .hero3 .hero-l {{ min-width:0; }}
+  .hero3 h1.fit {{ white-space:nowrap; font-feature-settings:'palt'; line-height:1.2; margin-top:20px; }}
+  .hero3 .lead {{ font-size:1.2rem; line-height:1.66; margin-top:18px; max-width:none; }}
+  .hero3 .flist {{ margin-top:18px; }}
+
   /* ── 空き教室の使い方（学生課長の4点） ── */
   .rules {{ margin:0 72px; background:rgba(255,255,255,0.92); border:1px solid var(--border); border-radius:20px;
     padding:16px 26px 14px; box-shadow:0 6px 20px rgba(16,24,40,0.05); }}
@@ -329,6 +332,14 @@ def build_html(variant):
       <span class="url">nu-roomradar.github.io/nust-room-search</span>
     </div>
   </div>
+<script>
+  // 見出しを左の列の幅に収める（大きすぎたら 1px ずつ小さくする）
+  document.querySelectorAll('h1.fit').forEach(h => {{
+    const box = h.parentElement; let size = 66;
+    h.style.fontSize = size + 'px';
+    while (h.scrollWidth > box.clientWidth && size > 30) {{ size -= 1; h.style.fontSize = size + 'px'; }}
+  }});
+</script>
 </body></html>"""
 
 
