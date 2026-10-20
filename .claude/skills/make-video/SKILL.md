@@ -70,6 +70,8 @@ npx -y hyperframes browser ensure        # 描画用の Chrome（~/.cache/hyperf
 - 自作 BGM: 明るい曲は `music4.py`（120BPM、ウクレレ風・手拍子・鉄琴）、静かな曲は `video/cm-ai/piano_v1.py`（写真版 v1 のピアノ）。場面の切り替えと BGM の小節（2秒）をそろえる。
 - 音量は `ffmpeg -af ebur128` で -13〜-15 LUFS くらい。声のある場面は BGM を 4dB 下げる。
 - タップ・スクロール・ペンの効果音は `mix4.py` の `tap`・`swish`・`pen`。
+- 楽器を合成するときは**音程を FFT で測って確かめる**（2026-10-20、Karplus-Strong のギターが +6〜+20 セントずれて「ナチュラルじゃない」と言われた）。なめらかなギターは `video/pixel-type/music8.py` の加算合成（`string()`）を使う。細工（こすれ音・ミュート・大きなタイミングの揺らぎ）は入れすぎない。
+- 私（Claude）は音を聞けないので、波形・スペクトル・音量（LUFS）・音程の数値で確かめ、最後は運営に聞いてもらう。
 
 ## 7. 出す前の確認
 
