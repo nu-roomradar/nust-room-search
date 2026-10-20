@@ -14,7 +14,6 @@ Claude Code on the web のセッション内（Bash）で完結する。ポス�
 | 種別 | パス |
 |---|---|
 | 正式版 | `assets/posters/roomradar-poster-pro.png`、印刷用 `roomradar-poster.{pdf,pptx}`（A4）と `roomradar-poster-A3.pdf`（同じ画像を A3 に拡大、約277dpi） |
-| 正式版 B（見出しの区切りだけ違う。「「開けたら、空いてる」／を当たり前に。」） | `--variant official-b` → `roomradar-poster-pro-b.png`・`roomradar-poster-b.{pdf,pptx}`・`roomradar-poster-b-A3.pdf`。運営がどちらかを選んだら、使わない方を消す |
 | 静か版（**掲示しない**。2026-10-20 の学生課長の指示と合わないため。記録として残す） | `assets/posters/roomradar-poster-shizuka.{png,pdf,pptx}` |
 | ロゴ | `rr_logo.png`（リポジトリ直下） |
 | アプリ画面スクショ | `assets/posters/handoff/app-phone-screenshot.png` |
@@ -53,7 +52,7 @@ Claude Code on the web のセッション内（Bash）で完結する。ポス�
 - ポスターから TEST 表記（テスト運用中・非公式）と `#日大生プロジェクト` を消さない・減らさない。`.claude/hooks/guard-notices.py` が `scripts/make_poster.py` の `#日大生プロジェクト` 出現数を HEAD と比較してブロックする。文言変更が必要なときはユーザーに確認し、hook の説明に従う。
 - 仮予約は 2026-10 に廃止した。ポスターに「予約」「確保」と書かない。船橋校舎はテスト運用の対象外なので載せない（対象は駿河台キャンパスの65教室）。
 - 静か版はネタ文言の仮版。正式版の代わりに掲示するかの判断はユーザーが行う。
-- 正式版は 2026-10-21 から再び `scripts/make_poster.py` で作っている（Claude Design 版とほぼ同じ見た目で、見出し「「開けたら、空いてる」を当たり前に。」と学生課長の4点の枠「空き教室は、みんなで使う場所です。」を入れた）。この環境では Google Fonts に届かないので、`video/cm-ai/fonts/`（`fetch_fonts.sh`）に Noto Sans CJK JP があれば自動で差し込む。どこ行く？版（`assets/posters/claude-design/`）は Claude Design で作っているので、直すときは運営者に Claude Design 用の指示文を渡す。
+- 正式版は 2026-10-21 から再び `scripts/make_poster.py` で作っている（Claude Design 版とほぼ同じ見た目で、見出し「「開けたら、空いてる」／を当たり前に。」（2行目の頭に「を」。2026-10-21 運営が採用）と学生課長の4点の枠「空き教室は、みんなで使う場所です。」を入れた。見出しは左の列の幅に収まる大きさに自動で合わせる）。この環境では Google Fonts に届かないので、`video/cm-ai/fonts/`（`fetch_fonts.sh`）に Noto Sans CJK JP があれば自動で差し込む。どこ行く？版（`assets/posters/claude-design/`）は Claude Design で作っているので、直すときは運営者に Claude Design 用の指示文を渡す。
 - 周知物の言葉は `docs/OPERATIONS.md` 2.5 の方針（みんなで使う場所／自習専用ではない／静かに学習したいときは図書館・1号館CSTギャラリー／「静か」「集中」「自習室」を売りにしない／他の場所を下げない）に合わせる。
 - `LP_URL` や Instagram QR 画像を変えたら、それは「QR を含む成果物の変更」なので手順 4 を必ず実施する。
 - この環境から github.io / onrender.com 等の公開 URL には到達できない。QR の飛び先が実際に表示されるかの確認はユーザーに依頼する。

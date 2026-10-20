@@ -15,7 +15,7 @@
 
 注意: 静か版はネタ文言を含む仮バージョン。2026-10-20 の学生課長の指示（空き教室は自習専用ではない・
 静かに学習したいときは図書館／CSTギャラリー・みんなで使う場所）と合わないため、掲示しない（運営決定）。
-正式版は 2026-10-21 に見出しを「「開けたら、空いてる」を当たり前に。」へ変え、学生課長の4点を
+正式版は 2026-10-21 に見出しを「「開けたら、空いてる」／を当たり前に。」へ変え、学生課長の4点を
 「空き教室は、みんなで使う場所です。」の枠にまとめて入れた（docs/OPERATIONS.md 2.5）。
 """
 import argparse
@@ -40,7 +40,7 @@ DEFAULT_OUT = ROOT / "assets/posters/roomradar-poster-pro.png"
 VARIANTS = {
     "official": {
         "eyebrow": "次のコマ、どこで過ごす？",
-        "h1": '「開けたら、空いてる」を<br><span class="hl">当たり前に。</span>',
+        "h1": '「開けたら、空いてる」<br>を<span class="hl">当たり前に。</span>',   # 2026-10-21 運営が B 案を採用
         "layout": "wide",
         "lead": (
             "曜日・時限・校舎を選ぶだけ。<br>時間割をもとに、授業の入っていない教室を<br>表示します。"
@@ -48,7 +48,6 @@ VARIANTS = {
         ),
         "rules": True,
     },
-    "official-b": None,   # 下で official をもとに作る（見出しの区切りだけ違う）
     "shizuka": {
         "eyebrow": "教室では“静か”にしろ",
         "lead": (
@@ -60,10 +59,6 @@ VARIANTS = {
         "rules": False,
     },
 }
-
-
-VARIANTS["official-b"] = dict(VARIANTS["official"],
-                              h1='「開けたら、空いてる」<br>を<span class="hl">当たり前に。</span>')
 
 
 def datauri(path):
