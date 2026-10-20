@@ -21,7 +21,9 @@ def thud():
     t = tt(.3); return np.sin(2 * np.pi * np.cumsum(90 + 60 * np.exp(-t * 25)) / SR) * np.exp(-t * 14) * .5
 def bloom():
     t = tt(.6); f = 300 + 1500 * (t / .6) ** .5; return np.sin(2 * np.pi * np.cumsum(f) / SR) * np.sin(np.pi * t / .6) * .18
+SFX_GAIN = 0.65   # ゆったりしたギターの曲（music7）に合わせて効果音を控えめに
 def put(sig, t0, g=1.0, pan=0.0):
+    g *= SFX_GAIN
     i = int(t0 * SR); j = min(N, i + len(sig)); mix[i:j, 0] += sig[:j - i] * g * (1 - pan); mix[i:j, 1] += sig[:j - i] * g * (1 + pan)
 for k, t in enumerate((.15, .35, .55, .75)): put(pop(520 + 80 * k), t, 1, (-.3, .3)[k % 2])
 for t in (2.0, 3.5, 5.5, 8.0, 10.0, 12.0): put(swish(), t - .12, .9)
