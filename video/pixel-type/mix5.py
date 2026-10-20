@@ -32,7 +32,9 @@ put(swish(.5), 5.6, .6)      # 端末が上がる
 put(tick(), 6.3)            # スクロール開始のタップ
 put(bloom(), 6.9); put(pop(400), 7.35, .9)
 put(pop(480), 8.15); put(thud(), 9.1, .7)
-for k in range(18): put(tick(), 10.3 + k * .045, .45, (k % 3 - 1) * .3)
+put(swish(.5), 10.1, .6)    # 端末が上がる
+put(bloom(), 10.7); put(pop(440), 11.1, .8)   # 表のカードが飛び出す
+put(tick(), 11.3)
 pk = np.abs(mix).max(); mix = np.tanh(mix / pk * 1.2) / np.tanh(1.2) * .9
 with wave.open("audio.wav", "wb") as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes((mix * 32767).astype(np.int16).tobytes())

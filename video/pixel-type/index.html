@@ -58,16 +58,20 @@
 
       /* 6: 1週間 */
       #s6-head { top: 240px; font-size: 100px; white-space: nowrap; }
-      #week { position: absolute; left: 140px; top: 560px; width: 800px; }
-      #days { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-bottom: 18px; }
-      #days span { display: block; text-align: center; font-weight: 800; font-size: 58px; color: #444746; }
-      #days span.today { color: #0b57d0; }
-      #tiles { position: relative; display: grid; grid-template-columns: repeat(6, 120px); grid-auto-rows: 120px; gap: 16px; }
-      .tile { display: flex; align-items: center; justify-content: center; border-radius: 30px; font-weight: 900; font-size: 54px; }
-      .tile.free { background: #6dd58c; color: #fff; }
-      .tile.busy { background: #e3e3e3; color: #e3e3e3; }
-      #todayBox { position: absolute; left: 128px; top: -10px; width: 144px; height: 836px; border: 8px solid #0b57d0; border-radius: 38px; }
-      #s6-note { position: absolute; left: 0; right: 0; top: 1560px; text-align: center; font-family: "JP"; font-weight: 500; font-size: 38px; color: #444746; }
+      #phone2 { position: absolute; left: 240px; top: 560px; width: 600px; height: 1300px; border-radius: 96px; background: #0a0a0c;
+        box-shadow: 0 0 0 3px #2a2a2e, 0 50px 110px rgba(30, 40, 60, .30); }
+      #screen2 { position: absolute; left: 15px; top: 15px; width: 570px; height: 1270px; border-radius: 82px; overflow: hidden; background: #0d0d12; }
+      #screen2 img { position: absolute; left: 0; top: 0; width: 570px; display: block; }
+      #island2 { position: absolute; left: 225px; top: 34px; width: 150px; height: 44px; border-radius: 22px; background: #000; }
+      #gridCard { position: absolute; left: 90px; top: 590px; width: 900px; height: 965px; border-radius: 44px; overflow: hidden; opacity: 0;
+        box-shadow: 0 0 0 3px #2a2a2e, 0 40px 100px rgba(11, 87, 208, .30); background: #0d0d12; }
+      #gridCard img { position: absolute; left: 0; top: 0; width: 900px; height: 965px; display: block; }
+      #gridShine { position: absolute; inset: 0; background: linear-gradient(105deg, rgba(255,255,255,0) 40%, rgba(255,255,255,.18) 50%, rgba(255,255,255,0) 60%);
+        background-size: 300% 100%; background-position: 100% 0; }
+      #todayBox { position: absolute; left: 228px; top: 2px; width: 138px; height: 958px; border: 8px solid #4c8df6; border-radius: 26px; opacity: 0;
+        box-shadow: 0 0 26px rgba(76, 141, 246, .7); }
+      #s6-note span { display: inline-block; white-space: nowrap; background: rgba(255,255,255,.92); border-radius: 999px; padding: 8px 26px; }
+      #s6-note { position: absolute; left: 0; right: 0; top: 1588px; text-align: center; font-family: "JP"; font-weight: 500; font-size: 38px; color: #444746; }
 
       /* 7: ロゴ */
       .blob { position: absolute; border-radius: 50%; }
@@ -135,11 +139,12 @@
       <section id="s6" class="scene clip" data-start="10" data-duration="2.45" data-track-index="5">
         <div class="bg" style="background:#f8f9fa"></div>
         <div id="s6-head" class="center"><span class="line">1週間も、ひと目で。</span></div>
-        <div id="week">
-          <div id="days"><span>月</span><span class="today">火</span><span>水</span><span>木</span><span>金</span><span>土</span></div>
-          <div id="tiles"><div id="todayBox"></div></div>
+        <div id="phone2">
+          <div id="screen2"><img src="assets/cap-room-full.png" alt="" /></div>
+          <div id="island2"></div>
         </div>
-        <div id="s6-note">S305（タワー・スコラ）の後期の1週間。緑が授業のない時間</div>
+        <div id="gridCard"><img src="assets/room-grid.png" alt="" /><div id="gridShine"></div><div id="todayBox"></div></div>
+        <div id="s6-note"><span>アプリの実際の画面（S305・2026年度後期）</span></div>
       </section>
 
       <section id="s7" class="scene clip" data-start="12" data-duration="3" data-track-index="6">
@@ -159,14 +164,6 @@
     </div>
 
     <script>
-      // S305 の後期の空き（schedule_final.db から。行=1〜6限、列=月〜土、1=空き）
-      const WEEK = [[0,1,0,1,0,1],[0,1,1,0,0,1],[0,1,0,1,1,1],[0,1,0,1,0,1],[1,0,0,0,0,1],[1,0,0,1,0,1]];
-      const tiles = document.getElementById("tiles");
-      WEEK.forEach((row, r) => row.forEach((v, c) => {
-        const t = document.createElement("div");
-        t.className = "tile " + (v ? "free" : "busy"); t.textContent = v ? "空" : "";
-        t.dataset.r = r; t.dataset.c = c; tiles.appendChild(t);
-      }));
       // ロゴのレーダーの輪: rr_logo_hd.png の同心円の中心（41.56%, 42.97%）から
       const LC = { x: 640 * 0.4156, y: 374 * 0.4297 };
       const circle = (id, r) => Object.assign(document.getElementById(id).style,
@@ -222,10 +219,15 @@
       // 6: 1週間も、ひと目で。（空きのマスが波のように出る）
       wipe("#s6", 10.0, "90% 10%");
       tl.fromTo("#s6-head .line", { y: 90, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, 10.1);
-      tl.fromTo("#days span", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, stagger: 0.04 }, 10.2);
-      document.querySelectorAll(".tile").forEach(t =>
-        tl.fromTo(t, { scale: 0 }, { scale: 1, duration: 0.35, ease: "back.out(2.2)" }, 10.3 + (+t.dataset.r + +t.dataset.c) * 0.045));
-      tl.fromTo("#todayBox", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 11.15);
+      // 端末が上がる → 表のカードが端末から飛び出して大きくなる → 今日（火曜）の列を囲む
+      const KR = 570 / 390, GW = 358 * KR;   // 端末の中の表: CSS (16,238) 幅358
+      const gStart = { x: 240 + 15 + 16 * KR, y: 560 + 15 + 238 * KR };
+      tl.fromTo("#phone2", { y: 1500, rotation: -6 }, { y: 0, rotation: 0, duration: 0.55, ease: "power3.out" }, 10.05);
+      tl.to("#phone2", { opacity: 0.18, scale: 0.94, duration: 0.4, ease: "power2.out" }, 10.75);
+      tl.fromTo("#gridCard", { x: gStart.x - 90, y: gStart.y - 590, scale: GW / 900, opacity: 0, transformOrigin: "0 0" },
+        { x: 0, y: 0, scale: 1, opacity: 1, duration: 0.55, ease: "back.out(1.4)" }, 10.75);
+      tl.fromTo("#todayBox", { opacity: 0, scale: 1.06 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 11.3);
+      tl.fromTo("#gridShine", { backgroundPosition: "100% 0" }, { backgroundPosition: "0% 0", duration: 0.7, ease: "power2.inOut" }, 11.45);
       tl.fromTo("#s6-note", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 11.2);
 
       // 7: ロゴ（レーダーの輪 → 一周してロゴが現れる → 弾む → 波紋 → 光が走る → ふわふわ）
