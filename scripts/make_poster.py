@@ -17,6 +17,7 @@
 静かに学習したいときは図書館／CSTギャラリー・みんなで使う場所）と合わないため、掲示しない（運営決定）。
 正式版は 2026-10-21 に見出しを「「開けたら、空いてる」／を当たり前に。」へ変え、学生課長の4点を
 「空き教室は、みんなで使う場所です。」の枠にまとめて入れた（docs/OPERATIONS.md 2.5）。
+同日、運営の指示で見出し（横幅いっぱい）とスマホを主役に大きくし、4点の枠は左の列に小さく置いた。
 """
 import argparse
 import base64
@@ -88,7 +89,7 @@ RULES_HTML = """
       <div class="rb">使う目的は人それぞれ。静かさを求めすぎず、大きな声で騒がず、<br>お互いの利用目的を尊重し、周囲に配慮して利用しましょう。</div>
       <div class="chips"><span class="lbl">使い方の例</span><span>個人学習</span><span>グループワーク</span><span>課題についての相談</span><span>学生同士の打合せ</span><span>授業の合間の休憩</span></div>
       <div class="rn">※ 空き教室は自習専用のスペースではありません。静かな環境で学習したい場合は、図書館または1号館のCSTギャラリーをご利用ください。</div>
-      <div class="rn">※ 時間割にない授業もあります。使う前にドア越しに軽く確認し、人がいたらひと声かけましょう。</div>
+      <div class="rn">※ 時間割にない授業もあります。使う前にドア越しに軽く確認し、<span style="white-space:nowrap">人がいたらひと声かけましょう。</span></div>
     </div>
 """
 
@@ -103,19 +104,24 @@ def build_html(variant):
     phone_html = f'''<div class="phone-shadow"></div>
         <div class="phone"><div class="notch"></div><div class="screen"><img src="{shot}" alt="RoomRadar app"></div><div class="glare"></div></div>'''
     if v.get("layout") == "wide":
-        hero_html = f'''<div class="hero hero3">
-      <div class="hero-l">
-        <span class="eyebrow">{v["eyebrow"]}</span>
-        <h1 class="fit">{v["h1"]}</h1>
-        <p class="lead">{v["lead"]}</p>
-        <div class="flist">
-          <div class="fi"><div class="ico">{IC_SEARCH}</div><div><div class="t">リアルタイム検索</div><div class="d">曜日・時限・校舎を選ぶだけ</div></div></div>
-          <div class="fi o"><div class="ico">{IC_FREE}</div><div><div class="t">登録不要・無料</div><div class="d">ブラウザだけですぐ使える</div></div></div>
-          <div class="fi"><div class="ico">{IC_BUILD}</div><div><div class="t">2校舎に対応</div><div class="d">タワースコラ／駿河台校舎</div></div></div>
+        # 見出しは横幅いっぱい、その下に「左：説明・特徴・学生課長の4点の枠／右：大きいスマホ」
+        hero_html = f'''<div class="hero2">
+      <span class="eyebrow">{v["eyebrow"]}</span>
+      <h1 class="fit" data-max="96">{v["h1"]}</h1>
+      <div class="hero-row">
+        <div class="left">
+          <p class="lead">{v["lead"]}</p>
+          <div class="flist">
+            <div class="fi"><div class="ico">{IC_SEARCH}</div><div><div class="t">リアルタイム検索</div><div class="d">曜日・時限・校舎を選ぶだけ</div></div></div>
+            <div class="fi o"><div class="ico">{IC_FREE}</div><div><div class="t">登録不要・無料</div><div class="d">ブラウザだけですぐ使える</div></div></div>
+            <div class="fi"><div class="ico">{IC_BUILD}</div><div><div class="t">2校舎に対応</div><div class="d">タワースコラ／駿河台校舎</div></div></div>
+          </div>
+          {rules}
         </div>
+        <div class="hero-r">{phone_html}</div>
       </div>
-      <div class="hero-r">{phone_html}</div>
     </div>'''
+        rules = ""   # 左の列に入れたので、下には置かない
     else:
         hero_html = f'''<div class="hero">
       <div class="hero-l">
@@ -133,7 +139,8 @@ def build_html(variant):
     </div>'''
     tight = bool(v.get("rules"))
     h1_size = "3.65rem" if tight else "4.1rem"
-    phone_w, phone_h = (296, 576)        # スマホは元の大きさのまま
+    wide = v.get("layout") == "wide"
+    phone_w, phone_h = (350, 681) if wide else (296, 576)   # 正式版はスマホを主役に大きく（2026-10-21）
     feat_pad = 18 if tight else 30
     igqr = 160 if tight else 224
     secqr = 120 if tight else 150
@@ -237,27 +244,22 @@ def build_html(variant):
   .qr-sec .k svg {{ width:20px; height:20px; color:var(--accent); }}
   .qr-sec .s {{ font-size:0.9rem; color:var(--muted); margin-top:7px; }}
 
-  /* ── 正式版（2026-10-21）: 横幅いっぱいの見出し＋左に説明と特徴・右にスマホ ── */
+  /* ── 正式版（2026-10-21）: 横幅いっぱいの見出し＋左に説明・特徴・4点の枠／右に大きいスマホ ── */
   .hero2 {{ padding:0 72px; position:relative; z-index:1; }}
-  .hero2 h1 {{ font-size:4.4rem; line-height:1.16; margin-top:14px; white-space:nowrap; font-feature-settings:'palt'; }}
-  .hero-row {{ display:flex; gap:30px; align-items:center; margin-top:10px; }}
-  .hero-row .left {{ flex:1.2; }}
-  .hero-row .lead {{ margin-top:0; max-width:none; font-size:1.2rem; line-height:1.66; }}
-  .flist {{ display:flex; flex-direction:column; gap:10px; margin-top:16px; }}
+  .hero2 h1.fit {{ line-height:1.14; margin-top:16px; white-space:nowrap; font-feature-settings:'palt'; }}
+  .hero-row {{ display:flex; gap:28px; align-items:flex-start; margin-top:18px; }}
+  .hero-row .left {{ flex:1; min-width:0; }}
+  .hero-row .lead {{ margin-top:0; max-width:none; font-size:1.16rem; line-height:1.62; }}
+  .hero-row .hero-r {{ flex:0 0 380px; margin-top:-100px; }}   /* 見出し2行目の右の空きまで持ち上げる */
+  .flist {{ display:flex; flex-direction:column; gap:8px; margin-top:14px; }}
   .fi {{ display:flex; align-items:center; gap:14px; background:#fff; border:1px solid var(--border); border-radius:16px;
-    padding:9px 18px; box-shadow:0 6px 18px rgba(16,24,40,0.05); }}
-  .fi .ico {{ width:42px; height:42px; flex-shrink:0; border-radius:13px; display:flex; align-items:center; justify-content:center;
+    padding:8px 16px; box-shadow:0 6px 18px rgba(16,24,40,0.05); }}
+  .fi .ico {{ width:40px; height:40px; flex-shrink:0; border-radius:12px; display:flex; align-items:center; justify-content:center;
     background:rgba(37,99,235,0.08); color:var(--accent); }}
   .fi.o .ico {{ background:rgba(249,115,22,0.1); color:var(--accent2); }}
-  .fi .ico svg {{ width:25px; height:25px; }}
-  .fi .t {{ font-weight:800; font-size:1.16rem; white-space:nowrap; }}
-  .fi .d {{ font-size:0.94rem; color:var(--muted); margin-top:2px; white-space:nowrap; }}
-  .hero-row .hero-r {{ flex:0.8; }}
-
-  .hero3 .hero-l {{ min-width:0; }}
-  .hero3 h1.fit {{ white-space:nowrap; font-feature-settings:'palt'; line-height:1.2; margin-top:20px; }}
-  .hero3 .lead {{ font-size:1.2rem; line-height:1.66; margin-top:18px; max-width:none; }}
-  .hero3 .flist {{ margin-top:18px; }}
+  .fi .ico svg {{ width:24px; height:24px; }}
+  .fi .t {{ font-weight:800; font-size:1.1rem; white-space:nowrap; }}
+  .fi .d {{ font-size:0.9rem; color:var(--muted); margin-top:1px; white-space:nowrap; }}
 
   /* ── 空き教室の使い方（学生課長の4点） ── */
   .rules {{ margin:0 72px; background:rgba(255,255,255,0.92); border:1px solid var(--border); border-radius:20px;
@@ -270,6 +272,14 @@ def build_html(variant):
     border:1px solid rgba(37,99,235,0.2); border-radius:99px; padding:4px 12px; }}
   .rules .rn {{ font-size:0.86rem; color:#4b5563; margin-top:8px; line-height:1.5; }}
   .rules .rn + .rn {{ margin-top:2px; }}
+  /* 正式版では左の列に小さく置く（主役は見出しとスマホ） */
+  .hero-row .rules {{ margin:14px 0 0; padding:11px 16px 10px; border-radius:16px; }}
+  .hero-row .rules .rh {{ font-size:1.04rem; }}
+  .hero-row .rules .rb {{ font-size:0.82rem; line-height:1.5; margin-top:3px; }}
+  .hero-row .rules .chips {{ flex-wrap:wrap; gap:5px; margin-top:7px; }}
+  .hero-row .rules .chips .lbl {{ font-size:0.76rem; padding:2px 2px 2px 0; }}
+  .hero-row .rules .chips span {{ font-size:0.76rem; padding:2px 9px; }}
+  .hero-row .rules .rn {{ font-size:0.74rem; margin-top:6px; line-height:1.45; }}
 
   /* ── フッター帯 ── */
   .foot {{ background:linear-gradient(120deg,var(--navy) 0%,var(--navy2) 100%);
@@ -328,11 +338,11 @@ def build_html(variant):
     </div>
   </div>
 <script>
-  // 見出しを左の列の幅に収める（大きすぎたら 1px ずつ小さくする）
+  // 見出しを横幅に収める（大きすぎたら 1px ずつ小さくする）
   document.querySelectorAll('h1.fit').forEach(h => {{
-    const box = h.parentElement; let size = 66;
+    let size = +(h.dataset.max || 66);
     h.style.fontSize = size + 'px';
-    while (h.scrollWidth > box.clientWidth && size > 30) {{ size -= 1; h.style.fontSize = size + 'px'; }}
+    while (h.scrollWidth > h.clientWidth && size > 30) {{ size -= 1; h.style.fontSize = size + 'px'; }}
   }});
 </script>
 </body></html>"""
