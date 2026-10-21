@@ -6,6 +6,19 @@ reports.db
 schedule_final.new.db
 schedule_final.db.bak
 
+# 秘密の値（公開リポジトリなので、誤って add しないように。2026-10-22 点検）
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*service-account*.json
+*-sa-key*.json
+credentials*.json
+*.db-journal
+*.db-wal
+*.db-shm
+
 # Python
 __pycache__/
 *.pyc

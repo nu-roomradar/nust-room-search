@@ -313,6 +313,51 @@ class AbuseResistanceTests(unittest.TestCase):
             self.assertEqual(codes[-1], 429, path)
 
 
+class MalformedInputTests(unittest.TestCase):
+    """おかしな形・大きさの本文を送られても 500 にせず、メモリも使い切らせない（2026-10-22 点検）"""
+
+    def setUp(self):
+        self.c = rr.app.test_client()
+        rr._rate_store.clear()
+        conn = sqlite3.connect(rr.REPORTS_DB); conn.execute("DELETE FROM reports"); conn.commit(); conn.close()
+
+    def test_oversized_body_is_rejected_with_413(self):
+        big = '{"room": "1041", "day": "月", "period": 2, "pad": "' + "x" * 100_000 + '"}'
+        for path in ("/api/report", "/api/report/cancel"):
+            r = self.c.post(path, data=big, content_type="application/json")
+            self.assertEqual(r.status_code, 413, path)
+            self.assertEqual(r.get_json(), {"ok": False, "error": "too_large"})
+
+    def test_wrong_json_shapes_are_400_not_500(self):
+        bodies = [[], ["1041"], "1041", 5, None,
+                  {"room": "1041", "day": ["月"], "period": 2},
+                  {"room": "1041", "day": "月", "period": [2]},
+                  {"room": "1041", "day": "月", "period": {"a": 1}},
+                  {"room": "1041", "day": "月", "period": True},
+                  {"room": "1041", "day": "月", "period": "2"}]
+        for path in ("/api/report", "/api/report/cancel"):
+            for body in bodies:
+                payload = {**body, "cancel_code": "ABCDEF"} if isinstance(body, dict) and path.endswith("cancel") else body
+                r = self.c.post(path, json=payload, headers=as_ip("203.0.113.50"))
+                self.assertEqual(r.status_code, 400, (path, body))
+
+    def test_normal_report_still_works(self):
+        r = self.c.post("/api/report", json={"room": "1041", "day": "月", "period": 2}, headers=as_ip("203.0.113.51"))
+        self.assertEqual(r.status_code, 200)
+        code = r.get_json()["cancel_code"]
+        r = self.c.post("/api/report/cancel", json={"room": "1041", "day": "月", "period": 2, "cancel_code": code},
+                        headers=as_ip("203.0.113.51"))
+        self.assertEqual(r.get_json(), {"ok": True})
+
+    def test_rate_store_drops_stale_addresses(self):
+        with mock.patch.object(rr, "RATE_STORE_MAX_KEYS", 5):
+            old = rr.time.time() - rr.RATE_WINDOW - 1
+            for i in range(10):
+                rr._rate_store[f"198.51.100.{i}"] = [old]
+            rr.is_rate_limited("203.0.113.52")
+            self.assertEqual(list(rr._rate_store), ["203.0.113.52"])
+
+
 class ConsecutiveFreeTests(unittest.TestCase):
     """「何限まで続けて空いているか」と「続けて使う」絞り込み"""
 

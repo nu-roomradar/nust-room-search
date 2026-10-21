@@ -13,3 +13,4 @@ qrcode            # ポスターの QR 生成
 pillow            # ポスターの画像処理
 python-pptx       # ポスターの PPTX 出力
 playwright        # ポスター・ストーリー画像の描画、画面検証のスクショ
+pyyaml            # tests/test_workflows.py（ワークフローの点検）

@@ -1,6 +1,8 @@
 """scripts/post_to_instagram.py のリール対応（2026-10）"""
+import io
 import sys
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest import mock
 
@@ -66,6 +68,42 @@ class MainTests(unittest.TestCase):
     def test_reel_and_story_together_is_rejected(self):
         with self.assertRaises(SystemExit):
             self.run_main(["--video-url", "https://x/v.mp4", "--story"])
+
+
+class ErrorOutputTests(unittest.TestCase):
+    def test_network_error_never_prints_the_token(self):
+        # requests の例外の文面には URL（?access_token=...）がそのまま入る
+        secret = "IGAA-secret-token-for-test-9876"
+
+        def boom(*a, **kw):
+            raise ig.requests.ConnectionError(f"Max retries exceeded with url: /v21.0/1?fields=id&access_token={secret}")
+
+        err = io.StringIO()
+        with mock.patch.object(sys, "argv", ["post_to_instagram.py", "--image-url", "https://x/a.png", "--caption", "本文"]), \
+             mock.patch.dict("os.environ", {"IG_ACCESS_TOKEN": secret, "IG_ACCOUNT_ID": "1"}), \
+             mock.patch.object(ig.requests, "get", side_effect=boom), \
+             redirect_stderr(err), self.assertRaises(SystemExit) as cm:
+            ig.main()
+        self.assertEqual(cm.exception.code, 1)
+        self.assertIn("ConnectionError", err.getvalue())
+        self.assertNotIn(secret, err.getvalue())
+
+    def test_every_api_call_has_a_timeout(self):
+        seen = []
+
+        def fake(url, **kw):
+            seen.append(kw.get("timeout"))
+            return FakeResp({"id": "c1", "status_code": "FINISHED"})
+
+        with mock.patch.object(ig.requests, "get", side_effect=fake), \
+             mock.patch.object(ig.requests, "post", side_effect=fake), \
+             redirect_stdout(io.StringIO()):
+            host = ig.detect_host("1", "t")
+            cid = ig.create_media_container(host, "1", "t", "https://x/a.png", "本文 #日大生プロジェクト")
+            ig.wait_until_ready(host, cid, "t")
+            ig.publish_media(host, "1", "t", cid)
+        self.assertTrue(seen)
+        self.assertTrue(all(t for t in seen), seen)
 
 
 if __name__ == "__main__":

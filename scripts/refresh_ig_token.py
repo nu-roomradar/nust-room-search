@@ -50,6 +50,14 @@ def mask(token):
     return f"<{len(token)}文字 …{token[-4:]}>" if token and len(token) > 8 else "<不正な値>"
 
 
+def hide_in_actions_log(token):
+    """GitHub Actions に、この値をログで伏せ字にするよう登録する。
+    延長で返ってくるトークンは Secret とは別の文字列なので、登録しないと伏せ字にならない。
+    flush しないと、後の通信エラーの表示（stderr）が先にログへ届いてしまう"""
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        print(f"::add-mask::{token}", flush=True)
+
+
 def api_error(resp, context):
     try:
         err = resp.json().get("error", {}) or {}
@@ -145,6 +153,7 @@ def main(argv=None):
     print(f"[INFO] 現行トークン: {mask(token)}")
     try:
         new_token, expires_in = refresh(token)
+        hide_in_actions_log(new_token)
         days = round(expires_in / 86400) if isinstance(expires_in, int) else None
         print(f"[INFO] 延長しました: {mask(new_token)}"
               + (f" / 有効期間 約{days}日" if days is not None else ""))
@@ -165,7 +174,8 @@ def main(argv=None):
         print(f"[ERROR] {exc}", file=sys.stderr)
         return 1
     except requests.RequestException as exc:
-        print(f"[ERROR] 通信に失敗しました: {type(exc).__name__}: {exc}", file=sys.stderr)
+        # 例外の文面には URL ごとトークンが入る（/me?access_token=...）ので、種類だけ出す
+        print(f"[ERROR] 通信に失敗しました: {type(exc).__name__}", file=sys.stderr)
         return 1
     return 0
 

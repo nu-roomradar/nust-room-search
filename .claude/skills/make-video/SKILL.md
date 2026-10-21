@@ -33,17 +33,18 @@ argument-hint: "[new|edit|ai-footage|music] 作りたい動画の要点"
 
 ```bash
 export HYPERFRAMES_NO_TELEMETRY=1 HYPERFRAMES_SKIP_SKILLS=1 CI=1
-npx -y hyperframes init video/<名前> --non-interactive --resolution portrait   # 1080x1920
-npx -y hyperframes browser ensure        # 描画用の Chrome（~/.cache/hyperframes。新しいコンテナでは取り直す）
+npx -y hyperframes@0.8.174 init video/<名前> --non-interactive --resolution portrait   # 1080x1920
+npx -y hyperframes@0.8.174 browser ensure        # 描画用の Chrome（~/.cache/hyperframes。新しいコンテナでは取り直す）
 ```
 
+- **npx は必ず版を付けて実行する**（`hyperframes@0.8.174`。版なしだと、その時の最新版とその依存をその場で取ってきて動かすので、乗っ取られた版が出ていたら入ってしまう。2026-10-22 点検）。版を上げるときは、その版を確かめてから手順書と `video/*/package.json` を一緒に直す。Secrets やトークンの入った環境変数があるところで動かさない。
 - **GSAP を同じフォルダに置く。** 雛形は `cdn.jsdelivr.net` から読むが、この環境からは届かない（書き出しが `sub_timeline_script_failure` で止まる）。npm から取って差し替える:
   ```bash
   cd video/<名前> && mkdir -p vendor && (cd vendor && npm pack gsap@3.14.2 --silent && tar -xzf gsap-3.14.2.tgz package/dist/gsap.min.js && mv package/dist/gsap.min.js . && rm -rf package gsap-*.tgz)
   sed -i 's#https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js#vendor/gsap.min.js#' index.html
   ```
 - **フォントはローカルのファイルを `@font-face` で読む**（Google Fonts もこの環境からは読めない）。`video/cm-ai/fetch_fonts.sh` をコピーして使う: 本文 Noto Sans CJK JP、丸ゴシック M PLUS Rounded 1c、手書き風 Yusei Magic（いずれも OFL。fonts/ は .gitignore 済み）。
-- 流れ: `npx hyperframes lint` → `npx hyperframes check` → `npx hyperframes render --quality draft --output out.mp4` → コマを抜いて目視 → 直す → `--quality delivery` で本番。
+- 流れ: `npx -y hyperframes@0.8.174 lint` → `… check` → `… render --quality draft --output out.mp4` → コマを抜いて目視 → 直す → `--quality delivery` で本番。
 - `preview`（Studio）の URL はユーザーの iPad から開けない。確認はコマの書き出し（下の5）と、完成動画の SendUserFile で行う。
 
 ## 4. 素材

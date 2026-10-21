@@ -13,6 +13,9 @@ import unicodedata
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 
 app = Flask(__name__)
+# 送られてくる本文の上限。報告の JSON は数百バイトしかない。上限が無いと、巨大な本文を
+# 何本か送るだけでメモリを使い切らせて落とせる（2026-10-22 セキュリティ点検）
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024
 
 DB_NAME = "schedule_final.db"
 JST = datetime.timezone(datetime.timedelta(hours=9))
@@ -115,8 +118,13 @@ def client_ip():
         return hops[-TRUSTED_PROXY_HOPS]
     return request.remote_addr or ""
 
+RATE_STORE_MAX_KEYS = 10000   # これを超えたら、もう来ていない接続元の記録を捨てる
+
 def is_rate_limited(ip):
     now = time.time()
+    if len(_rate_store) > RATE_STORE_MAX_KEYS:
+        for k in [k for k, ts in _rate_store.items() if not ts or now - ts[-1] >= RATE_WINDOW]:
+            del _rate_store[k]
     _rate_store[ip] = [t for t in _rate_store[ip] if now - t < RATE_WINDOW]
     if len(_rate_store[ip]) >= RATE_LIMIT: return True
     _rate_store[ip].append(now)
@@ -245,15 +253,33 @@ def add_security_headers(resp):
     return resp
 
 
-@app.route('/api/report', methods=['POST'])
-def api_report():
-    data = request.get_json(silent=True) or {}
+def report_target(data):
+    """報告・取り消しの本文から (教室, 曜日, 時限) を取り出す。形がおかしければ None。
+    リストや入れ子の値を送られても 500 にならないよう、型から確かめる"""
+    if not isinstance(data, dict):
+        return None
     room   = str(data.get('room', '')).strip()[:20]
     day    = data.get('day', '')
     period = data.get('period', 0)
+    if not room or not isinstance(day, str) or day not in VALID_DAYS:
+        return None
+    if type(period) is not int or period not in VALID_PERIODS:
+        return None
+    return room, day, period
+
+
+@app.errorhandler(413)
+def too_large(_e):
+    return jsonify({'ok': False, 'error': 'too_large'}), 413
+
+
+@app.route('/api/report', methods=['POST'])
+def api_report():
+    target = report_target(request.get_json(silent=True))
     # 教室マスタに無い名前は受け付けない（存在しない教室名で DB を埋められないように）
-    if not room or day not in VALID_DAYS or period not in VALID_PERIODS or room not in known_room_names():
+    if target is None or target[0] not in known_room_names():
         return jsonify({'ok': False, 'error': 'invalid'}), 400
+    room, day, period = target
 
     ip = client_ip()
     if is_rate_limited(ip):
@@ -288,13 +314,12 @@ def api_report():
 
 @app.route('/api/report/cancel', methods=['POST'])
 def api_report_cancel():
-    data = request.get_json(silent=True) or {}
-    room        = str(data.get('room', '')).strip()[:20]
-    day         = data.get('day', '')
-    period      = data.get('period', 0)
-    cancel_code = str(data.get('cancel_code', '')).strip()[:10]
-    if not room or not cancel_code:
+    data = request.get_json(silent=True)
+    target = report_target(data)
+    cancel_code = str(data.get('cancel_code', '')).strip()[:10] if target else ''
+    if target is None or not cancel_code:
         return jsonify({'ok': False}), 400
+    room, day, period = target
     # キャンセルコードの総当たりを防ぐため、取り消しにもレート制限をかける
     if is_rate_limited(client_ip()):
         return jsonify({'ok': False, 'error': 'rate_limited'}), 429

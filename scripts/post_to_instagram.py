@@ -21,6 +21,7 @@ import requests
 
 API_VERSION = "v21.0"
 HOSTS = ["https://graph.instagram.com", "https://graph.facebook.com"]
+TIMEOUT = 30   # 1回の通信の待ち時間（秒）。動画の変換待ちは wait_until_ready のループで別に待つ
 # 自主創造プロジェクトのレギュレーションで学外SNS発信時の使用が義務付けられた共通ハッシュタグ
 REQUIRED_TAGS = ["#日大生プロジェクト"]
 
@@ -48,7 +49,7 @@ def detect_host(account_id, access_token):
         resp = requests.get(f"{host}/{API_VERSION}/{account_id}", params={
             "fields": "id",
             "access_token": access_token,
-        })
+        }, timeout=TIMEOUT)
         if resp.ok:
             print(f"[INFO] 使用エンドポイント: {host}")
             return host
@@ -68,7 +69,7 @@ def create_media_container(host, account_id, access_token, image_url, caption, s
         data.update({"image_url": image_url, "media_type": "STORIES"})
     else:
         data.update({"image_url": image_url, "caption": caption})
-    resp = requests.post(f"{host}/{API_VERSION}/{account_id}/media", data=data)
+    resp = requests.post(f"{host}/{API_VERSION}/{account_id}/media", data=data, timeout=TIMEOUT)
     if not resp.ok:
         show_error(resp, "コンテナ作成")
         resp.raise_for_status()
@@ -90,7 +91,7 @@ def wait_until_ready(host, container_id, access_token, timeout=120, interval=5):
         resp = requests.get(f"{host}/{API_VERSION}/{container_id}", params={
             "fields": "status_code",
             "access_token": access_token,
-        })
+        }, timeout=TIMEOUT)
         if not resp.ok:
             show_error(resp, "ステータス確認")
             resp.raise_for_status()
@@ -108,7 +109,7 @@ def publish_media(host, account_id, access_token, container_id):
     resp = requests.post(f"{host}/{API_VERSION}/{account_id}/media_publish", data={
         "creation_id": container_id,
         "access_token": access_token,
-    })
+    }, timeout=TIMEOUT)
     if not resp.ok:
         show_error(resp, "公開")
         resp.raise_for_status()
@@ -140,6 +141,17 @@ def main():
         print("環境変数 IG_ACCESS_TOKEN / IG_ACCOUNT_ID が設定されていません。", file=sys.stderr)
         sys.exit(1)
 
+    try:
+        post(args, account_id, access_token)
+    except requests.RequestException as exc:
+        # 例外の文面には URL ごとトークンが入る（GET の ?access_token=...）ので、種類と状態コードだけ出す
+        status = getattr(getattr(exc, "response", None), "status_code", None)
+        print(f"[ERROR] 通信に失敗しました: {type(exc).__name__}" + (f"（HTTP {status}）" if status else ""),
+              file=sys.stderr)
+        sys.exit(1)
+
+
+def post(args, account_id, access_token):
     host = detect_host(account_id, access_token)
 
     caption = args.caption if args.story else ensure_required_tags(args.caption)

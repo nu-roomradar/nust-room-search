@@ -141,6 +141,26 @@ class FailureTests(unittest.TestCase):
         self.assertEqual(rc, 1)
         self.assertIn("通信に失敗", out)
 
+    def test_network_error_after_refresh_never_prints_the_new_token(self):
+        # requests の例外の文面には URL（?access_token=新トークン）がそのまま入る
+        def get(url, **kw):
+            if url.endswith("/me"):
+                raise rt.requests.ConnectionError(
+                    f"HTTPSConnectionPool: Max retries exceeded with url: /v21.0/me?fields=id&access_token={NEW}")
+            return happy_get(url, **kw)
+        rc, out = run(get=get)
+        self.assertEqual(rc, 1)
+        self.assertIn("通信に失敗", out)
+        self.assertIn("ConnectionError", out)
+        self.assertNotIn(NEW, out)
+
+    def test_new_token_is_registered_as_a_mask_in_actions(self):
+        # Actions では、延長した新トークンを最初に伏せ字として登録する（ほかの出力より前）
+        rc, out = run(argv=["--dry-run"], env={**ENV, "GITHUB_ACTIONS": "true"}, get=happy_get)
+        self.assertEqual(rc, 0, out)
+        first = out.splitlines()[1]          # 1行目は「現行トークン」
+        self.assertEqual(first, f"::add-mask::{NEW}")
+
     def test_secret_write_failure_is_reported(self):
         put = mock.Mock(return_value=FakeResponse(403, {"message": "Resource not accessible"}))
         rc, out = run(get=happy_get, put=put)
