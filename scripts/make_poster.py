@@ -7,7 +7,7 @@
 
 使い方:
   python scripts/make_poster.py                       # 正式版 → assets/posters/roomradar-poster-pro.png
-  python scripts/make_poster.py --print-files         # PNGに加えPDF/PPTXも出力
+  python scripts/make_poster.py --print-files         # PNGに加え A4 の PDF/PPTX と A3 の PDF（約300dpi）も出力
   python scripts/make_poster.py --variant shizuka --out assets/posters/roomradar-poster-shizuka.png
 
 必要パッケージ: qrcode, pillow, playwright, python-pptx（--print-files時）
@@ -363,13 +363,13 @@ def _route_local_fonts(page):
         headers={"Access-Control-Allow-Origin": "*"}))
 
 
-def render(html, out_png):
+def render(html, out_png, scale=3):
     tmp_html = pathlib.Path("/tmp/roomradar_poster_render.html")
     tmp_html.write_text(html, encoding="utf-8")
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path=CHROME)
-        # device_scale_factor=3 → 3240x4584 ≒ A4 392dpi（印刷グレード）
-        page = browser.new_page(viewport={"width": 1080, "height": 1528}, device_scale_factor=3)
+        # scale=3 → 3240x4584 ≒ A4 392dpi（印刷グレード）。A3 用は A3_SCALE で描き直す
+        page = browser.new_page(viewport={"width": 1080, "height": 1528}, device_scale_factor=scale)
         _route_local_fonts(page)
         page.goto(tmp_html.as_uri(), wait_until="networkidle", timeout=30000)
         page.wait_for_timeout(1200)
@@ -378,25 +378,41 @@ def render(html, out_png):
         browser.close()
 
 
-def export_print_files(png_path):
-    """PNGと同じ場所に、A4縦のPDFとPPTXを書き出す。"""
+A3_SCALE = 3.25   # 1080px × 3.25 = 3510px → A3（幅297mm）で約300dpi
+PDF_JPEG = {"quality": 95, "subsampling": 0}   # PDF の中の画像。文字のふちが荒れないよう高画質で
+
+
+def print_base(png_path):
+    """印刷用ファイルの名前の元。正式版は roomradar-poster-pro.png → roomradar-poster.*"""
+    return png_path.with_name(png_path.stem.removesuffix("-pro"))
+
+
+def export_print_files(png_path, html):
+    """A4縦の PDF・PPTX（PNG をそのまま使う）と、A3 の PDF（約300dpi で描き直す）を書き出す。
+    コンビニのマルチコピー機（ネットプリント等）でもそのまま印刷できる。"""
     from PIL import Image
     from pptx import Presentation
     from pptx.util import Mm
 
+    base = print_base(png_path)
     img = Image.open(png_path).convert("RGB")
-    dpi = img.size[0] / (210 / 25.4)  # 幅を210mmとしたときのdpi
-    pdf_path = png_path.with_suffix(".pdf")
-    img.save(pdf_path, "PDF", resolution=dpi)
+    pdf_path = base.with_suffix(".pdf")
+    img.save(pdf_path, "PDF", resolution=img.size[0] / (210 / 25.4), **PDF_JPEG)
 
     prs = Presentation()
     prs.slide_width = Mm(210)
     prs.slide_height = Mm(297)
     slide = prs.slides.add_slide(prs.slide_layouts[6])
     slide.shapes.add_picture(str(png_path), Mm(0), Mm(0), width=Mm(210), height=Mm(297))
-    pptx_path = png_path.with_suffix(".pptx")
+    pptx_path = base.with_suffix(".pptx")
     prs.save(pptx_path)
-    return pdf_path, pptx_path
+
+    a3_png = pathlib.Path("/tmp/roomradar_poster_A3.png")
+    render(html, a3_png, scale=A3_SCALE)
+    a3 = Image.open(a3_png).convert("RGB")
+    a3_pdf = base.with_name(base.name + "-A3.pdf")
+    a3.save(a3_pdf, "PDF", resolution=a3.size[0] / (297 / 25.4), **PDF_JPEG)
+    return pdf_path, pptx_path, a3_pdf
 
 
 def main():
@@ -404,17 +420,18 @@ def main():
     ap.add_argument("--variant", choices=list(VARIANTS), default="official")
     ap.add_argument("--out", type=pathlib.Path, default=None,
                     help="出力PNGパス（省略時: 正式版はassets/posters/、静か版は/tmp/）")
-    ap.add_argument("--print-files", action="store_true", help="PDF/PPTXも同じ場所に出力")
+    ap.add_argument("--print-files", action="store_true", help="A4 の PDF/PPTX と A3 の PDF も同じ場所に出力")
     args = ap.parse_args()
 
     out = args.out
     if out is None:
         out = DEFAULT_OUT if args.variant == "official" else pathlib.Path("/tmp/roomradar-poster-shizuka.png")
 
-    render(build_html(args.variant), out)
+    html = build_html(args.variant)
+    render(html, out)
     print("saved", out)
     if args.print_files:
-        for p in export_print_files(out):
+        for p in export_print_files(out, html):
             print("saved", p)
 
 

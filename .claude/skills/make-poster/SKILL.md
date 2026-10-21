@@ -13,7 +13,8 @@ Claude Code on the web のセッション内（Bash）で完結する。ポス�
 
 | 種別 | パス |
 |---|---|
-| 正式版 | `assets/posters/roomradar-poster-pro.png`、印刷用 `roomradar-poster.{pdf,pptx}`（A4）と `roomradar-poster-A3.pdf`（同じ画像を A3 に拡大、約277dpi） |
+| 正式版 | `assets/posters/roomradar-poster-pro.png`、印刷用 `roomradar-poster.{pdf,pptx}`（A4・約392dpi）と `roomradar-poster-A3.pdf`（A3・約300dpi） |
+| どこ行く？版（Claude Design で運営が作る） | `assets/posters/claude-design/RoomRadar_poster_{A4,A3}.pdf` と同じ画像の PNG（どちらも300dpi。2026-10-21 に学生課長の4点を入れた版に差し替え。古い塗り足し版は消した） |
 | 静か版（**掲示しない**。2026-10-20 の学生課長の指示と合わないため。記録として残す） | `assets/posters/roomradar-poster-shizuka.{png,pdf,pptx}` |
 | ロゴ | `rr_logo.png`（リポジトリ直下） |
 | アプリ画面スクショ | `assets/posters/handoff/app-phone-screenshot.png` |
@@ -31,8 +32,8 @@ Claude Code on the web のセッション内（Bash）で完結する。ポス�
    - 正式版: `python scripts/make_poster.py`（`--out` 省略時 → `assets/posters/roomradar-poster-pro.png`）
    - 静か版: `python scripts/make_poster.py --variant shizuka --out assets/posters/roomradar-poster-shizuka.png`
      （`--out` を省略すると `/tmp/roomradar-poster-shizuka.png` に出るので、成果物にするなら必ず指定）
-   - `--print-files` を付けると PNG と同じ場所・同名で **A4縦・約392dpi** の PDF/PPTX も出力（1080x1528 を dsf=3 で描画 → 3240x4584）。
-   - 注意: 正式版の印刷用ファイルはリポジトリ上 `roomradar-poster.{pdf,pptx}` だが、`--print-files` は `roomradar-poster-pro.{pdf,pptx}` を書き出す。旧ファイルが残って二重にならないよう、どちらの名前に揃えるかをユーザーに確認してから置き換える。
+   - `--print-files` を付けると、PNG と同じ場所に **A4縦・約392dpi** の PDF/PPTX（1080x1528 を dsf=3 で描画 → 3240x4584）と、**A3・約300dpi** の PDF（dsf=3.25 で描き直し → 3510x4966）も出力する。名前は正式版なら `roomradar-poster.{pdf,pptx}`・`roomradar-poster-A3.pdf`（PNG 名の `-pro` を外す）。PDF の中の画像は JPEG 画質95。
+   - コンビニのマルチコピー機（セブン-イレブンのネットプリント、ローソン・ファミリーマートのネットワークプリント）で A4・A3 とも印刷できる。300dpi あれば十分で、ファイルも 1 つ 3MB 以下。コピー機はフチまで印刷できないので、上下の濃紺の帯のまわりに白い余白が出る（文字は端から離してあるので切れない）。
 3. **生成した PNG を Read で目視する**。必須要素がすべて入っているか確認する: **ロゴ・LP QR・Instagram QR（ブランドQR）・「日本大学自主創造プロジェクト」・`#日大生プロジェクト`・TEST表記（「テスト運用中の非公式サービス」）**。一つでも欠けていたら成果物にしない。
    - HTML は Google Fonts を読み込む。プロキシで取得できず代替フォントで崩れることがあるので、文字の詰まり・改行位置も見る。
    - ユーザー（iPad）にも PNG を見せて確認を取る。手段: SendUserFile（`display=render`）で `assets/posters/roomradar-poster-pro.png`（静か版なら `roomradar-poster-shizuka.png`）を送る。送れない環境なら作業ブランチに push し、GitHub 上の画像プレビューで確認してもらう。
@@ -52,7 +53,7 @@ Claude Code on the web のセッション内（Bash）で完結する。ポス�
 - ポスターから TEST 表記（テスト運用中・非公式）と `#日大生プロジェクト` を消さない・減らさない。`.claude/hooks/guard-notices.py` が `scripts/make_poster.py` の `#日大生プロジェクト` 出現数を HEAD と比較してブロックする。文言変更が必要なときはユーザーに確認し、hook の説明に従う。
 - 仮予約は 2026-10 に廃止した。ポスターに「予約」「確保」と書かない。船橋校舎はテスト運用の対象外なので載せない（対象は駿河台キャンパスの65教室）。
 - 静か版はネタ文言の仮版。正式版の代わりに掲示するかの判断はユーザーが行う。
-- 正式版は 2026-10-21 から再び `scripts/make_poster.py` で作っている（Claude Design 版とほぼ同じ見た目で、見出し「「開けたら、空いてる」／を当たり前に。」（2行目の頭に「を」。2026-10-21 運営が採用）と学生課長の4点の枠「空き教室は、みんなで使う場所です。」を入れた。見出しは横幅いっぱいに置き、収まる大きさに自動で合わせる。2026-10-21 の運営の指示で、見出しとスマホを主役に大きくし、4点の枠は左の列に小さく入れた。A3 の PDF は `--print-files` では出ないので、同じ PNG を幅 297mm で PDF にする）。この環境では Google Fonts に届かないので、`video/cm-ai/fonts/`（`fetch_fonts.sh`）に Noto Sans CJK JP があれば自動で差し込む。どこ行く？版（`assets/posters/claude-design/`）は Claude Design で作っているので、直すときは運営者に Claude Design 用の指示文を渡す。
+- 正式版は 2026-10-21 から再び `scripts/make_poster.py` で作っている（Claude Design 版とほぼ同じ見た目で、見出し「「開けたら、空いてる」／を当たり前に。」（2行目の頭に「を」。2026-10-21 運営が採用）と学生課長の4点の枠「空き教室は、みんなで使う場所です。」を入れた。見出しは横幅いっぱいに置き、収まる大きさに自動で合わせる。2026-10-21 の運営の指示で、見出しとスマホを主役に大きくし、4点の枠は左の列に小さく入れた）。この環境では Google Fonts に届かないので、`video/cm-ai/fonts/`（`fetch_fonts.sh`）に Noto Sans CJK JP があれば自動で差し込む。どこ行く？版（`assets/posters/claude-design/`）は Claude Design で作っているので、直すときは運営者に Claude Design 用の指示文を渡す。
 - 周知物の言葉は `docs/OPERATIONS.md` 2.5 の方針（みんなで使う場所／自習専用ではない／静かに学習したいときは図書館・1号館CSTギャラリー／「静か」「集中」「自習室」を売りにしない／他の場所を下げない）に合わせる。
 - `LP_URL` や Instagram QR 画像を変えたら、それは「QR を含む成果物の変更」なので手順 4 を必ず実施する。
 - この環境から github.io / onrender.com 等の公開 URL には到達できない。QR の飛び先が実際に表示されるかの確認はユーザーに依頼する。
