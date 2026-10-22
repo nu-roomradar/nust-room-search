@@ -15,6 +15,8 @@
 
 注意: 静か版はネタ文言を含む仮バージョン。2026-10-20 の学生課長の指示（空き教室は自習専用ではない・
 静かに学習したいときは図書館／CSTギャラリー・みんなで使う場所）と合わないため、掲示しない（運営決定）。
+下の帯の表示は 2026-10-22 に学生課の提案の文言（「本サービスは、学生が「自主創造プロジェクト」の一環として
+開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。」）に変えた。
 正式版は 2026-10-21 に見出しを「「開けたら、空いてる」／を当たり前に。」へ変え、学生課長の4点を
 「空き教室は、みんなで使う場所です。」の枠にまとめて入れた（docs/OPERATIONS.md 2.5）。
 同日、運営の指示で見出し（横幅いっぱい）とスマホを主役に大きくし、4点の枠は左の列に小さく置いた。
@@ -288,7 +290,7 @@ def build_html(variant):
     background:rgba(249,115,22,0.14); border:1px solid rgba(249,115,22,0.42); border-radius:10px; padding:10px 15px; }}
   .foot .note .tg {{ font-family:'Noto Sans JP',sans-serif; font-weight:900; font-size:0.76rem; letter-spacing:0.12em;
     background:var(--accent2); color:#fff; border-radius:6px; padding:4px 11px; }}
-  .foot .note strong {{ color:#ffd9b8; font-weight:800; }}
+  .foot .note strong {{ color:#fdba74; font-weight:800; }}   /* TEST の札（--accent2 のオレンジ）と同じ色相の明るい色 */
   .foot .row {{ display:flex; align-items:center; gap:20px; flex-wrap:wrap; }}
   .foot .org {{ font-weight:800; font-size:1.4rem; }}
   .foot .hash {{ font-weight:800; color:#7fa8ff; font-size:1.05rem; }}
@@ -330,7 +332,7 @@ def build_html(variant):
   </div>
 
   <div class="foot">
-    <div class="note"><span class="tg">TEST</span><span>本サービスは<strong>テスト運用中の非公式サービス</strong>です（学生が開発・運営／大学公式のものではありません）</span></div>
+    <div class="note"><span class="tg">TEST</span><span>本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している<strong>試験運用中のサービス</strong>です。<br>大学が公式に提供するサービスではありません。</span></div>
     <div class="row">
       <span class="org">日本大学自主創造プロジェクト</span>
       <span class="hash">#日大生プロジェクト</span>
