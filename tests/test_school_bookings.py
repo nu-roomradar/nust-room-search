@@ -58,7 +58,7 @@ class ParseTests(unittest.TestCase):
         data, counts = sb.parse_text(text, PERIODS)
         self.assertEqual(data[D][2], {"s303", "s305"})
         self.assertEqual(data[D][3], {"s305"})
-        self.assertEqual(counts["bad"], 1)                   # 9限は無い
+        self.assertEqual((counts["bad"], counts["ignored"]), (0, 1))   # 9限は授業が無いので無視
 
     def test_json_and_english_headers(self):
         text = '[{"Date": "2026-10-26", "start": "9:00", "end": "10:40", "room": "S303", "name": "x"}]'
@@ -73,9 +73,35 @@ class ParseTests(unittest.TestCase):
         self.assertEqual(sb.periods_overlapping("08:00", "09:01", PERIODS), {1})
 
     def test_joint_room_abbreviation_is_split(self):
+        # 時間割 DB（scripts/build_schedule_db.py の規則D）と同じ分け方
         self.assertEqual(sb.room_keys("1456/7/8"), ["1456", "1457", "1458"])
         self.assertEqual(sb.room_keys("Ｓ３０３／４"), ["s303", "s304"])
+        self.assertEqual(sb.room_keys("521/2/3/4/5/7/8/9/10")[-1], "5210")
+        self.assertEqual(sb.room_keys("1456/7/58"), ["1456", "1457", "14558"])
+        self.assertEqual(sb.room_keys("S1704/07/13"), ["s1704", "s1707", "s1713"])
+        self.assertEqual(sb.room_keys("101/102"), ["101", "102"])
+        self.assertEqual(sb.room_keys("S303/S304"), ["s303", "s304"])
+        self.assertEqual(sb.room_keys("805B/806B"), ["805b", "806b"])
+        self.assertEqual(sb.room_keys("1111・521"), ["1111", "521"])
+        self.assertEqual(sb.room_keys("テクノ・工作技術センター"), ["テクノ・工作技術センター"])
         self.assertEqual(sb.room_keys("階段教室(大)"), ["階段教室(大)"])
+
+    def test_room_column_is_preferred_over_facility(self):
+        data, _ = sb.parse_text("施設,日付,時限,教室\nタワー・スコラ,2026-10-26,2,S303\n", PERIODS)
+        self.assertEqual(data[D][2], {"s303"})
+
+    def test_all_day_words_and_midnight(self):
+        text = ("日付,開始,終了,教室\n2026-10-26,終日,,S303\n2026-10-26,全日,,S304\n"
+                "2026-10-26,－,,S305\n2026-10-26,18:00,0:00,S306\n")
+        data, counts = sb.parse_text(text, PERIODS)
+        for room in ("s303", "s304", "s305"):
+            self.assertTrue(all(room in data[D][p] for p in PERIODS), room)
+        self.assertEqual({p for p in PERIODS if "s306" in data[D].get(p, ())}, {5, 6})   # 0時まで
+        self.assertEqual(counts["bad"], 0)
+
+    def test_date_range_is_not_silently_cut_to_first_day(self):
+        _, counts = sb.parse_text("日付,時限,教室\n2026/10/26～2026/10/30,2,S303\n2026-10-26,2,S304\n", PERIODS)
+        self.assertEqual(counts["bad"], 1)
 
     def test_row_without_time_blocks_the_whole_day(self):
         data, _ = sb.parse_text("日付,教室,予約者\n2026-10-26,S303,x\n", PERIODS)
@@ -95,7 +121,9 @@ class ParseTests(unittest.TestCase):
         for text in ("<!DOCTYPE html><html><body>ログイン</body></html>", "",
                      '{"items": [{"日付": "2026-10-26"}]}', "使用年月日,施設名\n2026-10-26,S303\n",
                      "教室予定一覧\n日付,教室\n2026-10-26,S303\n", "日付\t教室\n2026-10-26\tS303\n",
-                     '[{"foo": 1}]', "日付,開始,終了,教室\nあ,い,う,え\n"):
+                     '[{"foo": 1}]', "日付,開始,終了,教室\nあ,い,う,え\n",
+                     '["<html>login</html>"]', "[null]", "[{}]", '[{"error": ""}]',
+                     '[["日付", "時限", "教室"], ["2026-10-26", "2", "S303"]]'):
             with self.assertRaises(ValueError, msg=text[:30]):
                 sb.parse_text(text, PERIODS)
 
@@ -106,6 +134,7 @@ class ParseTests(unittest.TestCase):
 
 class SourceTests(unittest.TestCase):
     def setUp(self):
+        sb._after_fork_in_child()
         sb._reset_for_tests()
         self.sync = mock.patch.object(sb, "SYNC", True)
         self.sync.start()
@@ -225,26 +254,86 @@ class SourceTests(unittest.TestCase):
                 srv.shutdown()
                 srv.server_close()
 
-    def test_slow_source_is_cut_off(self):
-        class Slow:
-            def read(self, n):
-                time.sleep(0.02)
-                return b"x"
-        with mock.patch.object(sb, "READ_DEADLINE", 0.1):
+    def test_slow_source_is_cut_off_at_the_deadline(self):
+        # 本物のソケットで、本文を少しずつ返す相手。read() だと 64KiB たまるまで戻らず締め切りが効かなかった
+        class Drip(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                self.send_response(200)
+                self.send_header("Content-Length", "100")
+                self.end_headers()
+                for _ in range(100):
+                    try:
+                        self.wfile.write(b"x"); self.wfile.flush()
+                    except OSError:
+                        return
+                    time.sleep(0.1)
+
+            def log_message(self, *a):
+                pass
+
+        srv = http.server.HTTPServer(("127.0.0.1", 0), Drip)
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        try:
+            opener = sb.urllib.request.build_opener(sb.urllib.request.ProxyHandler({}), sb._NoRedirect)
+            resp = opener.open(f"http://127.0.0.1:{srv.server_port}/", timeout=5)
+            t0 = time.monotonic()
             with self.assertRaises(TimeoutError):
-                sb._read_all(Slow(), time.monotonic() + 0.1)
+                sb._read_all(resp, time.monotonic() + 0.5)
+            self.assertLess(time.monotonic() - t0, 2.0)
+            resp.close()
+        finally:
+            srv.shutdown()
+            srv.server_close()
+
+    def test_refresh_reports_when_it_did_not_read(self):
+        with mock.patch.dict(os.environ, {sb.FILE_ENV: self.path}, clear=True):
+            self.assertIs(sb.refresh(PERIODS, force=True), True)
+            self.assertIsNone(sb.refresh(PERIODS))           # まだ読み直しの時期ではない
+
+    def test_retry_interval_starts_short_and_doubles(self):
+        with mock.patch.object(sb, "REFRESH_SECONDS", 300):
+            self.assertEqual([sb.next_delay(False, n) for n in range(1, 8)], [60, 120, 240, 480, 960, 1800, 1800])
+            self.assertEqual(sb.next_delay(True, 0), 300)
+        with mock.patch.object(sb, "REFRESH_SECONDS", 3600):
+            self.assertEqual(sb.next_delay(False, 10), 3600)  # 通常の間隔より長くは延ばさない…が短くもならない
+
+    def test_child_after_fork_gets_fresh_locks(self):
+        sb._fetch_lock.acquire()                          # 親が読み取り中に fork した、という状況
+        try:
+            sb._after_fork_in_child()
+            self.assertTrue(sb._fetch_lock.acquire(blocking=False))
+            sb._fetch_lock.release()
+            self.assertIsNone(sb._worker["pid"])
+        finally:
+            pass
 
 
 class BackgroundTests(unittest.TestCase):
     """読み取りは検索の応答の外で行う"""
 
     def setUp(self):
+        sb._after_fork_in_child()      # 前のテストの読み取りスレッドを止め、ロックを新しくする
         sb._reset_for_tests()
-        sb._worker.update(pid=None, ready=threading.Event())
 
     def tearDown(self):
+        sb._after_fork_in_child()
         sb._reset_for_tests()
-        sb._worker.update(pid=None, ready=threading.Event())
+
+    def test_search_waits_only_right_after_startup(self):
+        def stuck():
+            time.sleep(3)
+            raise TimeoutError
+        with mock.patch.dict(os.environ, {sb.FILE_ENV: "/unused.csv"}), \
+             mock.patch.object(sb, "_read_source", side_effect=stuck), \
+             mock.patch.object(sb, "FIRST_LOAD_WAIT", 0.3):
+            t0 = time.monotonic()
+            sb.booked_rooms(D, PERIODS)                       # 起動直後だけ、少し待つ
+            self.assertLess(time.monotonic() - t0, 1.0)
+            time.sleep(0.35)
+            t1 = time.monotonic()
+            for _ in range(5):
+                self.assertEqual(sb.booked_rooms(D, PERIODS), {})
+            self.assertLess(time.monotonic() - t1, 0.1)      # 読み取りが詰まっていても、その後は待たない
 
     def test_slow_source_does_not_block_search(self):
         def slow():
@@ -280,6 +369,7 @@ class SearchIntegrationTests(unittest.TestCase):
         shutil.rmtree(cls.tmp, ignore_errors=True)
 
     def setUp(self):
+        sb._after_fork_in_child()
         sb._reset_for_tests()
         self.sync = mock.patch.object(sb, "SYNC", True)
         self.sync.start()
