@@ -435,7 +435,7 @@ def index():
         # 予定は日付で来るので、いまの年度・学期を見ているときだけ、この曜日・時限が次に来る日の分を使う
         booked_here = set()
         if school_bookings.enabled() and is_current_view(year, term):
-            booked = school_bookings.booked_rooms(period_end_dt(day, period).date(), PERIODS)
+            booked = school_bookings.booked_rooms(period_end_dt(day, period).date(), PERIODS, known_room_keys())
             for p_, keys in booked.items():
                 names = {str(r[0]) for r in all_rooms if normalize_room(str(r[0])) in keys}
                 occupied_at[p_].update(names)
@@ -542,6 +542,21 @@ def list_rooms(year):
 def known_room_names():
     """報告を受け付ける教室名（全年度の教室マスタ）。時間割DBはデプロイ中に変わらないので1回だけ読む"""
     return frozenset(r["name"] for r in list_rooms(None))
+
+
+@functools.lru_cache(maxsize=1)
+def known_room_keys():
+    """教務課の使用予定と照合する教室名の鍵（全年度の教室マスタと時間割の教室。表記ゆれは normalize_room で吸収）"""
+    keys = {normalize_room(n) for n in known_room_names()}
+    try:
+        conn = sqlite3.connect(f"file:{DB_NAME}?mode=ro", uri=True)
+        try:
+            keys.update(normalize_room(str(r[0])) for r in conn.execute("SELECT DISTINCT 教室 FROM schedules"))
+        finally:
+            conn.close()
+    except sqlite3.Error as e:
+        logging.error(f"RoomRadar known_room_keys error: {e}")
+    return frozenset(keys)
 
 
 def find_rooms(query, rooms):
