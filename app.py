@@ -12,6 +12,8 @@ import logging
 import unicodedata
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 
+import school_bookings   # 教務課の教室使用予定（仮。環境変数が無ければ何もしない）
+
 app = Flask(__name__)
 # 送られてくる本文の上限。報告の JSON は数百バイトしかない。上限が無いと、巨大な本文を
 # 何本か送るだけでメモリを使い切らせて落とせる（2026-10-22 セキュリティ点検）
@@ -429,6 +431,17 @@ def index():
         all_rooms = cur.fetchall()
         conn.close()
 
+        # 教務課の教室使用予定（授業以外の予約）が入っている教室も、空きには出さない（仮。school_bookings.py）。
+        # 予定は日付で来るので、いまの年度・学期を見ているときだけ、この曜日・時限が次に来る日の分を使う
+        booked_here = set()
+        if school_bookings.enabled() and is_current_view(year, term):
+            booked = school_bookings.booked_rooms(period_end_dt(day, period).date(), PERIODS)
+            for p_, keys in booked.items():
+                names = {str(r[0]) for r in all_rooms if normalize_room(str(r[0])) in keys}
+                occupied_at[p_].update(names)
+                if p_ == period:
+                    booked_here = names
+
         empty_rooms = sorted(
             [{"name": r[0], "building": r[1],
               "free_until": free_until(str(r[0]), period, occupied_at)}
@@ -443,7 +456,8 @@ def index():
         # 隔週の授業が2つ以上ある（A週・B週で交互に使う等）教室は毎週埋まりうるので出さない。
         biweekly_rooms = sorted(
             [{"name": r[0], "building": r[1]} for r in all_rooms
-             if len(subjects_here.get(str(r[0]), ())) == 1
+             if str(r[0]) not in booked_here
+             and len(subjects_here.get(str(r[0]), ())) == 1
              and is_biweekly(next(iter(subjects_here[str(r[0])])))],
             key=lambda x: (x['building'] != 'タワースコラ', x['building'] != '駿河台校舎', x['name'])
         ) if span == 1 else []
