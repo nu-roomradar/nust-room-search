@@ -31,7 +31,7 @@
   @media(max-width:600px){h1{font-size:1.5rem;}}
   .lead{color:var(--sub);font-size:.95rem;margin-top:4px;}
   .meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;color:var(--muted);font-size:.85rem;}
-  .notice{display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding:12px 16px;border-radius:12px;
+  .notice{word-break:auto-phrase;display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding:12px 16px;border-radius:12px;
     background:#fff;border:1px solid var(--line);font-size:.85rem;color:var(--sub);line-height:1.7;}
   .notice .tag{flex:none;font-size:.7rem;font-weight:700;letter-spacing:.08em;padding:2px 8px;border-radius:6px;
     border:1px solid var(--line);color:var(--muted);background:var(--bg);margin-top:2px;}
@@ -120,7 +120,7 @@
   <div class="meta"><span id="updated">データを読み込んでいます…</span><span>週ごとの数字は毎週月曜の朝に自動で更新</span></div>
   <div class="notice">
     <span class="tag">TEST</span>
-    <span>RoomRadar はテスト運用中の非公式サービスです（学生開発・大学公式ではありません）。このページは運営チーム用です。</span>
+    <span>本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。このページは運営チーム用です。</span>
   </div>
   <nav class="toc" aria-label="目次">
     <a href="#week">今週のようす</a><a href="#weekly">週ごとの利用</a><a href="#search">よく探される条件</a>
@@ -212,7 +212,7 @@
     </div>
   </section>
 
-  <footer>© 2026 RoomRadar ／ 日本大学「自主創造プロジェクト」の一環として理工学部の学生が開発・運営しています。テスト運用中の非公式サービスです（大学公式ではありません）。</footer>
+  <footer>© 2026 RoomRadar ／ 本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</footer>
 </div>
 
 <script>

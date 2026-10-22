@@ -156,15 +156,15 @@ class PageTests(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         html = r.get_data(as_text=True)
         self.assertIn('id="search-form"', html)
-        self.assertIn("テスト運用中", html)          # CLAUDE.md ルール1
-        self.assertIn("大学公式", html)
+        self.assertIn("試験運用中", html)          # CLAUDE.md ルール1
+        self.assertIn("大学が公式に提供するサービスではありません", html)
 
     def test_search_post_lists_rooms_and_keeps_notice(self):
         r = self.c.post("/", data={"day": "月", "period": "2", "building": "all"})
         self.assertEqual(r.status_code, 200)
         html = r.get_data(as_text=True)
         self.assertIn("room-card", html)
-        self.assertIn("テスト運用中", html)
+        self.assertIn("試験運用中", html)
         rooms = [html_lib.unescape(r) for r in re.findall(r'data-room="([^"]+)"', html)]
         self.assertGreater(len(rooms), 10)         # 時間割DBから空き教室が引けている
 
@@ -567,8 +567,8 @@ class RoomWeekTests(unittest.TestCase):
             "SELECT 曜日, 時限 FROM schedules WHERE 年度=2026 AND 履修期名='前期' AND 教室=?", (room,))}
         conn.close()
         html = self.c.get(f"/room/{room}?year=2026&term=前期").get_data(as_text=True)
-        self.assertIn("テスト運用中", html)
-        self.assertIn("大学公式", html)
+        self.assertIn("試験運用中", html)
+        self.assertIn("大学が公式に提供するサービスではありません", html)
         cells = sum(1 for d in rr.WEEK_DAYS for p in rr.PERIODS if (d, p) not in busy)
         self.assertEqual(len(re.findall(r'<td class="free[ "]', html)), cells)   # 今日の列は class="free today"
 
@@ -645,8 +645,8 @@ class RoomSearchTests(unittest.TestCase):
     def test_pages_keep_the_notice(self):
         for url in ("/room?q=30", "/room/S303", "/room/存在しない"):
             html = self.c.get(url).get_data(as_text=True)
-            self.assertIn("テスト運用中", html, url)
-            self.assertIn("大学公式", html, url)
+            self.assertIn("試験運用中", html, url)
+            self.assertIn("大学が公式に提供するサービスではありません", html, url)
 
     def test_old_width_variant_urls_redirect(self):
         """DB の教室名を NFKC に揃える前のリンク（全角カッコ・半角カナ）も開ける"""
@@ -771,7 +771,7 @@ class SecurityHardeningTests(unittest.TestCase):
             r = self.c.post("/", data=form)
             self.assertEqual(r.status_code, 200, form)
             html = r.get_data(as_text=True)
-            self.assertIn("テスト運用中", html)
+            self.assertIn("試験運用中", html)
             self.assertNotIn("X曜", html)
 
     def test_room_cards_do_not_embed_names_in_inline_js(self):

@@ -48,7 +48,8 @@ class LandingPageTests(unittest.TestCase):
         for tag in ('property="og:image"', 'property="og:description"', 'name="description"', 'rel="apple-touch-icon"'):
             self.assertIn(tag, LP)
         og = re.search(r'property="og:description" content="([^"]+)"', LP).group(1)
-        self.assertIn("非公式", og)
+        self.assertIn("試験運用中", og)
+        self.assertIn("大学が公式に提供するサービスではありません", og)
 
     def test_feedback_form_labels_are_linked(self):
         for fid in ("fbCategory", "fbOpinion", "fbContact"):

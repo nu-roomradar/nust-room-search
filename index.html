@@ -12,22 +12,22 @@
   gtag('config', 'G-L1T1CDZ05N');
 </script>
 <title>RoomRadar — 日大理工 空き教室検索</title>
-<meta name="description" content="日大理工の空き教室を、開いた瞬間に一覧表示。時間割をもとに、いま使える教室・2コマ続けて使える教室・教室ごとの1週間がわかります。学生開発・テスト運用中の非公式サービスです（大学公式ではありません）。">
+<meta name="description" content="日大理工の空き教室を、開いた瞬間に一覧表示。時間割をもとに、いま使える教室・2コマ続けて使える教室・教室ごとの1週間がわかります。本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。">
 <link rel="canonical" href="https://nu-roomradar.github.io/nust-room-search/">
 <meta name="theme-color" content="#f5f3ee">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/lp/favicon-32.png">
 <link rel="apple-touch-icon" href="assets/lp/icon-180.png">
-<!-- LINE・Instagram などで共有したときのプレビュー。非公式であることを必ず入れる -->
+<!-- LINE・Instagram などで共有したときのプレビュー。試験運用中で大学公式ではないことを必ず入れる -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="RoomRadar">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:url" content="https://nu-roomradar.github.io/nust-room-search/">
-<meta property="og:title" content="RoomRadar — 日大理工の空き教室が、開いた瞬間わかる（学生開発・非公式）">
-<meta property="og:description" content="時間割をもとに、いま使える教室を一覧表示。学生開発・テスト運用中の非公式サービスです（大学公式ではありません）。">
+<meta property="og:title" content="RoomRadar — 日大理工の空き教室が、開いた瞬間わかる（学生開発・試験運用中）">
+<meta property="og:description" content="時間割をもとに、いま使える教室を一覧表示。本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。">
 <meta property="og:image" content="https://nu-roomradar.github.io/nust-room-search/assets/lp/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="RoomRadar 日大理工の空き教室が、開いた瞬間わかる。テスト運用中の非公式サービスです">
+<meta property="og:image:alt" content="RoomRadar 日大理工の空き教室が、開いた瞬間わかる。試験運用中のサービスです（大学が公式に提供するサービスではありません）">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -267,7 +267,7 @@ body.lang-zh .hero-title .small{ font-size: 0.38em; letter-spacing: 0.02em; }
 .hero-cta .arrow { font-size: 1.2em; transition: transform 0.2s; }
 .hero-cta:hover .arrow { transform: translateX(4px); }
 
-/* テスト運用・非公式の明示（控えめ表記） */
+/* 試験運用中で大学公式ではないことの明示（控えめ表記） */
 .hero-note {
   display: flex; width: fit-content; align-items: center; gap: 8px; flex-wrap: wrap;
   justify-content: center; margin: 18px auto 0; max-width: 520px;
@@ -907,10 +907,10 @@ footer {
 /* ════════════════════════════════════════════
    2026-09 の改善（読みやすさ・軽さ・スマホ）
 ════════════════════════════════════════════ */
-/* 必須の「テスト運用中・非公式」表記を読める大きさに */
-.hero-note { font-size: 0.82rem; }
+/* 必須の「試験運用中・大学公式ではない」表記を読める大きさに */
+.hero-note { font-size: 0.82rem; word-break: auto-phrase; }   /* 長い表示文を言葉の途中で折り返さない */
 .hero-note-tag { font-size: 0.68rem; }
-footer { font-size: 0.8rem; line-height: 1.7; }
+footer { font-size: 0.8rem; line-height: 1.7; word-break: auto-phrase; }
 .cta-desc { color: rgba(255,255,255,0.75); }
 .cta-badge { color: rgba(255,255,255,0.7); }
 .stat-note { margin-top: 14px; font-size: 0.72rem; color: var(--muted); }
@@ -1196,9 +1196,9 @@ footer { font-size: 0.8rem; line-height: 1.7; }
 
     <div class="hero-note">
       <span class="hero-note-tag">TEST</span>
-      <span class="ja">現在テスト運用中の非公式サービスです（学生開発・大学公式ではありません）。</span>
-      <span class="en">Currently in test operation — an unofficial, student-built service (not an official university service).</span>
-      <span class="zh">目前为测试运营中的非官方服务（学生开发，非大学官方）。</span>
+      <span class="ja">本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</span>
+      <span class="en">This service is developed and run by students as part of Nihon University's student project program and is currently in trial operation. It is not an official service provided by the university.</span>
+      <span class="zh">本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。</span>
     </div>
 
   </div>
@@ -1646,9 +1646,9 @@ footer { font-size: 0.8rem; line-height: 1.7; }
       <div class="about-card reveal">
         <h3><span class="ja">運営</span><span class="en">Who runs it</span><span class="zh">运营</span></h3>
         <p>
-          <span class="ja">日本大学「自主創造プロジェクト」の一環として、理工学部の学生を中心に開発・運営しています。大学公式のサービスではなく、現在テスト運用中です。学内での正式な提供については調整中です。</span>
-          <span class="en">Developed and run mainly by students of the College of Science and Technology as part of a Nihon University student project program. It is not an official university service and is currently in test operation.</span>
-          <span class="zh">作为日本大学学生项目的一部分，主要由理工学部的学生开发和运营。本服务并非大学官方服务，目前为测试运营中。</span>
+          <span class="ja">本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。理工学部の学生が中心になって開発・運営しています。</span>
+          <span class="en">This service is developed and run by students as part of Nihon University's student project program and is currently in trial operation. It is not an official service provided by the university. It is developed and run mainly by students of the College of Science and Technology.</span>
+          <span class="zh">本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。主要由理工学部的学生开发和运营。</span>
         </p>
       </div>
       <div class="about-card reveal">
@@ -1720,9 +1720,9 @@ footer { font-size: 0.8rem; line-height: 1.7; }
 
 <!-- フッター -->
 <footer>
-  <span class="ja">© 2026 RoomRadar — 日本大学理工学部 学生プロジェクト. このサービスは大学公式のものではなく、現在テスト運用中です。</span>
-  <span class="en">© 2026 RoomRadar — Nihon University CST Student Project. This is an unofficial service, currently in test operation.</span>
-  <span class="zh">© 2026 RoomRadar — 日本大学理工学部学生项目。本服务非大学官方服务，目前为测试运营中。</span>
+  <span class="ja">© 2026 RoomRadar — 本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</span>
+  <span class="en">© 2026 RoomRadar — This service is developed and run by students as part of Nihon University's student project program and is currently in trial operation. It is not an official service provided by the university.</span>
+  <span class="zh">© 2026 RoomRadar — 本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。</span>
 </footer>
 
 <script>

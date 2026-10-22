@@ -332,11 +332,12 @@ select:focus { outline: none; border-color: var(--accent); }
     font-size: 0.7rem; color: var(--muted); text-align: center; line-height: 1.6;
 }
 
-/* ── テスト運用・非公式の控えめ表記 ── */
+/* ── 試験運用中・大学公式ではないことの控えめ表記（文言は 2026-10-22 に学生課が提案） ── */
 .test-banner {
     display: flex; align-items: center; gap: 8px;
     margin-bottom: 20px;
     font-size: 0.72rem; color: var(--muted); line-height: 1.5;
+    word-break: auto-phrase;   /* 長い文なので、言葉の途中で折り返さない */
 }
 .test-tag {
     flex-shrink: 0; font-family: 'Syne', sans-serif; font-weight: 700;

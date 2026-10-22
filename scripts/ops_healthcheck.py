@@ -7,7 +7,7 @@
 Issue として届くようにする。LLM は使わない（決定論的・無料・API キー不要）。
 
 チェック項目:
-  1. 検索アプリ（Render）が応答し、「テスト運用中」表記が本番ページに残っているか
+  1. 検索アプリ（Render）が応答し、「試験運用中」表記が本番ページに残っているか
   2. LP（GitHub Pages）が応答し、同表記が残っているか
   3. 直近 N 日の GitHub Actions 実行に失敗がないか
   4. GitHub に自動無効化されたワークフローがないか（public リポジトリは60日間活動が無いと止まる）
@@ -40,7 +40,7 @@ import requests
 
 APP_URL = "https://nust-room-search.onrender.com"
 LP_URL = "https://nu-roomradar.github.io/nust-room-search/"
-REQUIRED_NOTICE = "テスト運用中"  # CLAUDE.md ルール1。本番ページに残っているかを見る
+REQUIRED_NOTICE = "試験運用中"  # CLAUDE.md ルール1。本番ページに残っているかを見る（2026-10-22 に学生課の文言へ）
 RUN_LOOKBACK_DAYS = 14
 ISSUE_TITLE = "【運用ヘルスチェック】異常を検知しました"
 FINGERPRINT_TAG = "healthcheck-fingerprint"

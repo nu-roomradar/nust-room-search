@@ -15,9 +15,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HOOK = ROOT / ".claude" / "hooks" / "guard-notices.py"
 
-APP = "<p><strong>テスト運用中</strong>の非公式サービスです（大学公式ではありません）</p>\n<footer>現在テスト運用中です。大学公式のものではありません。</footer>\n"
-INDEX = "<span>現在テスト運用中の非公式サービスです（学生開発・大学公式ではありません）。</span>\n<span>© RoomRadar — 大学公式のものではなく、現在テスト運用中です。</span>\n"
-DASH = "<span>テスト運用中の非公式サービスです（学生開発・大学公式ではありません）。</span>\n"
+APP = "<p>本サービスは<strong>試験運用中</strong>のサービスです。大学が公式に提供するサービスではありません。</p>\n<footer>現在試験運用中です。大学が公式に提供するサービスではありません。</footer>\n"
+INDEX = "<span>現在試験運用中のサービスです（大学が公式に提供するサービスではありません）。</span>\n<span>© RoomRadar — 大学が公式に提供するサービスではありません。現在試験運用中です。</span>\n"
+DASH = "<span>試験運用中のサービスです（大学が公式に提供するサービスではありません）。</span>\n"
 POST = 'REQUIRED_TAGS = ["#日大生プロジェクト"]\n\ndef ensure_required_tags(caption):\n    return caption\n'
 POSTER = '<span class="hash">#日大生プロジェクト</span>\n'
 
@@ -69,15 +69,15 @@ class GuardNoticesTests(unittest.TestCase):
         self.assertEqual(self.hook("tree")[0], 0)
 
     def test_tree_blocks_when_notice_reduced(self):
-        self.write("dashboard.html", DASH.replace("テスト運用中", "正式運用中"))
+        self.write("dashboard.html", DASH.replace("試験運用中", "正式運用中"))
         rc, err = self.hook("tree", {"stop_hook_active": False})
         self.assertEqual(rc, 2)
         self.assertIn("dashboard.html", err)
-        self.assertIn("'テスト運用中'", err)
+        self.assertIn("'試験運用中'", err)
 
     def test_tree_guards_room_pages_too(self):
         for rel in ("templates/room.html", "templates/room_search.html"):
-            self.write(rel, APP.replace("大学公式", "公式"))
+            self.write(rel, APP.replace("大学が公式に提供するサービスではありません", "公式サービスです"))
             rc, err = self.hook("tree", {"stop_hook_active": False})
             self.assertEqual(rc, 2, rel)
             self.assertIn(rel, err)
@@ -105,14 +105,14 @@ class GuardNoticesTests(unittest.TestCase):
     # --- edit ----------------------------------------------------------------
 
     def test_edit_reducing_count_is_blocked(self):
-        rc, err = self.hook("edit", self.edit("templates/index.html", "<strong>テスト運用中</strong>の非公式サービスです",
-                                              "<strong>正式公開</strong>の公式サービスです"))
+        rc, err = self.hook("edit", self.edit("templates/index.html", "<strong>試験運用中</strong>のサービスです",
+                                              "<strong>正式公開</strong>のサービスです"))
         self.assertEqual(rc, 2)
         self.assertIn("1 箇所（必要 2）", err)
 
     def test_edit_keeping_count_passes(self):
-        rc, _ = self.hook("edit", self.edit("templates/index.html", "<strong>テスト運用中</strong>の非公式サービスです",
-                                            "<strong>テスト運用中</strong>の非公式サービスです（β）"))
+        rc, _ = self.hook("edit", self.edit("templates/index.html", "<strong>試験運用中</strong>のサービスです",
+                                            "<strong>試験運用中</strong>のサービスです（β）"))
         self.assertEqual(rc, 0)
 
     def test_edit_unrelated_file_passes(self):
@@ -132,14 +132,14 @@ class GuardNoticesTests(unittest.TestCase):
 
     def test_move_add_then_remove_passes(self):
         # 先に追加（作業ツリーは HEAD より多い）→ その後1箇所削除しても HEAD と同数なので通る
-        self.write("index.html", INDEX + "<!-- 現在テスト運用中・大学公式ではありません -->\n")
+        self.write("index.html", INDEX + "<!-- 現在試験運用中・大学が公式に提供するサービスではありません -->\n")
         rc, _ = self.hook("edit", self.edit("index.html",
-                                            "現在テスト運用中の非公式サービスです（学生開発・大学公式ではありません）。",
+                                            "現在試験運用中のサービスです（大学が公式に提供するサービスではありません）。",
                                             "（移動済み）"))
         self.assertEqual(rc, 0)
 
     def test_edit_with_absolute_path(self):
-        rc, _ = self.hook("edit", self.edit(str(self.tmp / "dashboard.html"), "テスト運用中", "正式運用中"))
+        rc, _ = self.hook("edit", self.edit(str(self.tmp / "dashboard.html"), "試験運用中", "正式運用中"))
         self.assertEqual(rc, 2)
 
     def test_edit_whose_old_string_is_absent_is_left_to_tool(self):
@@ -150,15 +150,15 @@ class GuardNoticesTests(unittest.TestCase):
 
     def test_relax_marker_allows_reduction_but_not_removal(self):
         (self.tmp / ".claude" / "guard-relax").touch()
-        rc, _ = self.hook("edit", self.edit("templates/index.html", "<strong>テスト運用中</strong>の非公式サービスです",
-                                            "<strong>正式公開</strong>の公式サービスです"))
+        rc, _ = self.hook("edit", self.edit("templates/index.html", "<strong>試験運用中</strong>のサービスです",
+                                            "<strong>正式公開</strong>のサービスです"))
         self.assertEqual(rc, 0)
         rc, _ = self.hook("edit", {"tool_name": "Write", "tool_input": {"file_path": "dashboard.html", "content": "<html/>"}})
         self.assertEqual(rc, 2)
 
     def test_relax_env_allows_reduction(self):
-        rc, _ = self.hook("edit", self.edit("templates/index.html", "<strong>テスト運用中</strong>の非公式サービスです",
-                                            "<strong>正式公開</strong>の公式サービスです"),
+        rc, _ = self.hook("edit", self.edit("templates/index.html", "<strong>試験運用中</strong>のサービスです",
+                                            "<strong>正式公開</strong>のサービスです"),
                           env={"ROOMRADAR_GUARD_RELAX": "1"})
         self.assertEqual(rc, 0)
 

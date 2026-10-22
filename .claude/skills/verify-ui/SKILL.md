@@ -1,6 +1,6 @@
 ---
 name: verify-ui
-description: app.py / index.html / dashboard.html の画面変更後に、ローカルでアプリを起動し Playwright で PC 幅とスマホ幅（390px）の両方のスクショを撮り、Read で目視してレイアウト崩れ・横はみ出し・「テスト運用中・非公式」表記の有無を確認する手順。画面系の変更をしたとき、見た目の確認を頼まれたとき、コミット前の最終確認に使う。公開 URL はこの環境から見えないので確認はユーザーに依頼する。
+description: app.py / index.html / dashboard.html の画面変更後に、ローカルでアプリを起動し Playwright で PC 幅とスマホ幅（390px）の両方のスクショを撮り、Read で目視してレイアウト崩れ・横はみ出し・「試験運用中・大学公式ではない」表記の有無を確認する手順。画面系の変更をしたとき、見た目の確認を頼まれたとき、コミット前の最終確認に使う。公開 URL はこの環境から見えないので確認はユーザーに依頼する。
 argument-hint: "[app|lp|dashboard|all] [変更点の要約]"
 ---
 
@@ -13,9 +13,9 @@ argument-hint: "[app|lp|dashboard|all] [変更点の要約]"
 - この環境から github.io / onrender.com 等の公開 URL にはプロキシに阻まれて到達できない。**公開 URL での表示確認（Render / GitHub Pages に反映されたか）は必ずユーザーに依頼する。**「公開 URL で確認した」とは書かない。
 
 ## 対象とローカルでの開き方
-| 対象 | 配信先 | ローカル | 「テスト運用中・非公式」表記の場所 |
+| 対象 | 配信先 | ローカル | 「試験運用中・大学公式ではない」表記の場所 |
 |---|---|---|---|
-| `app.py`（検索アプリ） | Render https://nust-room-search.onrender.com | `PORT=5055 python app.py` → `http://127.0.0.1:5055/`。GET が検索フォーム、`#search-form button` を押した POST が結果一覧（両方撮る） | ヘッダー下の TEST 帯「テスト運用中の非公式サービスです（学生開発・大学公式ではありません）」＋フッター |
+| `app.py`（検索アプリ） | Render https://nust-room-search.onrender.com | `PORT=5055 python app.py` → `http://127.0.0.1:5055/`。GET が検索フォーム、`#search-form button` を押した POST が結果一覧（両方撮る） | ヘッダー下の TEST 帯「本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。」＋フッター |
 | `index.html`（LP） | GitHub Pages https://nu-roomradar.github.io/nust-room-search/ | `python -m http.server 8088 --bind 127.0.0.1 --directory <リポジトリ直下>` → `http://127.0.0.1:8088/index.html` | ヒーロー直下の TEST 帯＋フッター |
 | `dashboard.html`（運営用） | 同上 `/dashboard.html` | 同上 `http://127.0.0.1:8088/dashboard.html`。`./data/*.json` を fetch するので **file:// では開かない**（データ無し表示になる） | 見出し直下の TEST 帯 |
 
@@ -36,7 +36,7 @@ argument-hint: "[app|lp|dashboard|all] [変更点の要約]"
            pg.wait_for_timeout(1000)
            pg.screenshot(path=f"{OUT}/{PAGE}-{name}.png", full_page=True)
            print(name, pg.evaluate("[document.documentElement.scrollWidth, document.documentElement.clientWidth]"),
-                 "テスト運用中" in pg.content(), "大学公式" in pg.content())
+                 "試験運用中" in pg.content(), "大学が公式に提供するサービスではありません" in pg.content())
            # app の結果一覧: pg.click("#search-form button"); pg.wait_for_load_state("load"); 再度 screenshot
        b.close()
    ```
@@ -44,7 +44,7 @@ argument-hint: "[app|lp|dashboard|all] [変更点の要約]"
 4. **Read で開いて目視する**。チェック項目:
    - レイアウト崩れ: 要素の重なり・はみ出し・不自然な改行・ボタンやカードの整列・文字の切れ。
    - 横はみ出し: `scrollWidth > clientWidth` なら 390px で横スクロールが発生している。原因要素は `[...document.querySelectorAll('body *')].filter(e => e.getBoundingClientRect().right > document.documentElement.clientWidth + 1)` で特定する。**既知の問題**: HEAD 時点で app.py の教室カード（`.room-card` のグリッド）が 390px で右にはみ出す（実測 `[scrollWidth, clientWidth]` = [434, 390]、船橋校舎の3列目カードが右端で切れる）。無関係の変更でも初回から「横はみ出しあり」と出るので、自分の変更で悪化していないか（数値・原因要素が増えていないか）を見て、この既知分を直すかどうかはユーザーに確認してから決める。
-   - **「テスト運用中・非公式」表記が両幅で見えているか**（ルール1）。文字列として残っているだけでなく、折りたたみ・重なり・色で読めなくなっていないかを見る。`.claude/hooks/guard-notices.py` が `テスト運用中` / `大学公式` の出現数を HEAD と比較して減る編集・commit をブロックするが、hook は表示崩れまでは見ない。
+   - **「試験運用中・大学公式ではない」表記が両幅で見えているか**（ルール1）。文字列として残っているだけでなく、折りたたみ・重なり・色で読めなくなっていないかを見る。`.claude/hooks/guard-notices.py` が `テスト運用中` / `大学公式` の出現数を HEAD と比較して減る編集・commit をブロックするが、hook は表示崩れまでは見ない。
    - 仮予約（2026-10 廃止）の文言・ボタンが残っていないか、LP に船橋校舎が出ていないか（ルール3・テスト運用の範囲）。
    - 変更点が意図どおりに反映されているか。app は検索フォーム（GET）と結果一覧（POST）の両方。
 5. 環境由来の見え方（バグではない）: Google Fonts（fonts.googleapis.com）・GA4（googletagmanager.com）・Instagram サムネ（cdninstagram.com）はプロキシで取得に失敗する。→ 代替フォントでの字詰め・改行ずれ、投稿サムネが壊れて見えるのは仕様（Chart.js は 2026-10 から `assets/vendor/chartjs/` に同梱しているのでグラフは出る）。本来の見え方は公開 URL でユーザーに確認してもらう。

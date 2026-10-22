@@ -10,13 +10,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# ルール1: 「テスト運用中・非公式」表記（学生課/教務課と協議中のため誤認防止が必須）
+# ルール1: 「試験運用中・大学公式ではない」表記（誤認防止。文言は 2026-10-22 に理工学部学生課が提案）
 NOTICE_FILES = {
-    "templates/index.html": ["テスト運用中", "大学公式"],
-    "templates/room.html": ["テスト運用中", "大学公式"],
-    "templates/room_search.html": ["テスト運用中", "大学公式"],
-    "index.html": ["テスト運用中", "大学公式"],
-    "dashboard.html": ["テスト運用中", "大学公式"],
+    "templates/index.html": ["試験運用中", "大学が公式に提供するサービスではありません"],
+    "templates/room.html": ["試験運用中", "大学が公式に提供するサービスではありません"],
+    "templates/room_search.html": ["試験運用中", "大学が公式に提供するサービスではありません"],
+    "index.html": ["試験運用中", "大学が公式に提供するサービスではありません"],
+    "dashboard.html": ["試験運用中", "大学が公式に提供するサービスではありません"],
 }
 # ルール2: Instagram 投稿キャプションの必須タグとポスターの表記
 REQUIRED_TAG = "#日大生プロジェクト"
