@@ -37,9 +37,11 @@ class NoticeTests(unittest.TestCase):
         self.assertIn("def ensure_required_tags", src)
 
     def test_poster_keeps_required_tag_and_test_notice(self):
+        # 表示の文言は 2026-10-22 に理工学部学生課の提案どおりに変えた
         src = (ROOT / "scripts" / "make_poster.py").read_text(encoding="utf-8")
         self.assertIn(REQUIRED_TAG, src)
-        self.assertIn("テスト運用中", src)
+        self.assertIn("試験運用中のサービス", src)
+        self.assertIn("大学が公式に提供するサービスではありません", src)
 
 
 if __name__ == "__main__":
