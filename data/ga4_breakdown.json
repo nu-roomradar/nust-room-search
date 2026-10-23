@@ -1,46 +1,46 @@
 {
- "updated": "2026-10-19",
+ "updated": "2026-10-23",
  "events": {
-  "search": 146,
-  "report_room": 1
+  "search": 153,
+  "report_room": 4
  },
  "search_building": [
   {
    "label": "all",
-   "count": 57
+   "count": 63
   },
   {
    "label": "main",
-   "count": 54
-  },
-  {
-   "label": "tower",
-   "count": 21
+   "count": 50
   },
   {
    "label": "funabashi",
-   "count": 14
+   "count": 22
+  },
+  {
+   "label": "tower",
+   "count": 18
   }
  ],
  "search_period": [
   {
    "label": "2",
-   "count": 55
+   "count": 48
   },
   {
    "label": "3",
-   "count": 38
+   "count": 46
   },
   {
    "label": "4",
-   "count": 24
-  },
-  {
-   "label": "1",
-   "count": 15
+   "count": 30
   },
   {
    "label": "5",
+   "count": 15
+  },
+  {
+   "label": "1",
    "count": 12
   },
   {
@@ -51,30 +51,36 @@
  "search_day": [
   {
    "label": "火",
-   "count": 44
-  },
-  {
-   "label": "金",
-   "count": 33
+   "count": 50
   },
   {
    "label": "水",
-   "count": 31
+   "count": 32
+  },
+  {
+   "label": "金",
+   "count": 26
   },
   {
    "label": "月",
-   "count": 22
+   "count": 23
   },
   {
    "label": "木",
-   "count": 15
-  },
-  {
-   "label": "土",
-   "count": 1
+   "count": 22
   }
  ],
  "report_rooms": [
+  {
+   "label": "1042",
+   "building": "船橋校舎",
+   "count": 2
+  },
+  {
+   "label": "131",
+   "building": "駿河台校舎",
+   "count": 1
+  },
   {
    "label": "S1713",
    "building": "タワースコラ",
@@ -84,15 +90,15 @@
  "channels": [
   {
    "label": "Referral",
-   "sessions": 145
+   "sessions": 147
   },
   {
    "label": "Organic Social",
-   "sessions": 98
+   "sessions": 103
   },
   {
    "label": "Direct",
-   "sessions": 39
+   "sessions": 47
   },
   {
    "label": "Organic Search",
