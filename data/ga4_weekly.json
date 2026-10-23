@@ -103,18 +103,18 @@
   "week_start": "2026-10-12",
   "week_end": "2026-10-18",
   "app": {
-   "users": 16,
-   "sessions": 21,
-   "page_views": 43
+   "users": 19,
+   "sessions": 26,
+   "page_views": 52
   },
   "lp": {
    "users": 18,
-   "sessions": 23,
-   "page_views": 25
+   "sessions": 25,
+   "page_views": 27
   },
   "events": {
-   "search": 22,
-   "report_room": 0,
+   "search": 25,
+   "report_room": 2,
    "reserve_room": 0,
    "feedback_submit": 0
   }
