@@ -154,8 +154,10 @@
 
   <section id="reports">
     <h2>「実は使われていた」報告の多い教室<small>直近28日</small></h2>
-    <p class="desc">報告は時限が終わるとアプリからは消えるので、残るのはこの件数だけです（時間割にない授業などで使われていた教室の目安）。</p>
+    <p class="desc">報告は時限が終わるとアプリからは消えるので、残るのはこの件数だけです（時間割にない授業などで使われていた教室の目安）。取り消された報告は引いています。</p>
     <div class="card table-scroll" id="report-rooms"></div>
+    <div class="card" style="margin-top:12px"><h3>曜日・時限</h3><table class="occ" id="report-slots"></table>
+      <p class="desc" id="report-slots-note">時間割にない使われ方が多い時間帯の目安です。曜日・時限は 2026年10月26日からの報告だけを数えています。</p></div>
   </section>
 
   <section id="source">
@@ -285,6 +287,9 @@ const BLUE = '#2563eb', BLUE_SOFT = 'rgba(37,99,235,0.35)', GRAY = '#94a3b8';
   const hist = await load('./data/ga4_history.json') || [];
   $('updated').textContent = bd.updated ? `最終更新：${jpDate(bd.updated)}` : 'まだデータがありません';
 
+  // 「実は使われていた」報告は、取り消された分を引いて数える（取り消しは 2026-10-26 から記録）
+  const netR = e => Math.max(0, ((e && e.report_room) || 0) - ((e && e.report_cancel) || 0));
+
   // 今週のようす
   const cur = weeks[weeks.length - 1], prev = weeks[weeks.length - 2];
   if (cur) {
@@ -294,7 +299,7 @@ const BLUE = '#2563eb', BLUE_SOFT = 'rgba(37,99,235,0.35)', GRAY = '#94a3b8';
       {label:'検索アプリの訪問', unit:'回', v:cur.app.sessions, pv:p && p.app.sessions, main:true},
       {label:'検索アプリの利用者', unit:'台', v:cur.app.users, pv:p && p.app.users},
       {label:'検索の回数', unit:'回', v:e.search, pv:p && pe.search},
-      {label:'「実は使われていた」報告', unit:'件', v:e.report_room, pv:p && pe.report_room},
+      {label:'「実は使われていた」報告', unit:'件', v:netR(e), pv:p && netR(pe)},
       {label:'紹介ページの訪問', unit:'回', v:cur.lp.sessions, pv:p && p.lp.sessions},
       {label:'意見箱の送信', unit:'件', v:e.feedback_submit, pv:p && pe.feedback_submit},
     ];
@@ -322,7 +327,7 @@ const BLUE = '#2563eb', BLUE_SOFT = 'rgba(37,99,235,0.35)', GRAY = '#94a3b8';
     const rows = weeks.slice().reverse().map((w, i) => {
       const e = w.events || {};
       return `<tr class="${i === 0 ? 'latest' : ''}"><td>${esc(weekLabel(w))}</td>
-        <td>${fmt(w.app.sessions)}</td><td>${fmt(w.app.users)}</td><td>${fmt(e.search)}</td><td>${fmt(e.report_room)}</td>
+        <td>${fmt(w.app.sessions)}</td><td>${fmt(w.app.users)}</td><td>${fmt(e.search)}</td><td>${fmt(netR(e))}</td>
         <td>${fmt(w.lp.sessions)}</td><td>${fmt(w.lp.users)}</td><td>${fmt(e.feedback_submit)}</td></tr>`;
     }).join('');
     $('weekly-table').innerHTML = `<tr><th>週（月〜日）</th><th>アプリ 訪問</th><th>アプリ 利用者</th><th>検索</th>
@@ -343,6 +348,25 @@ const BLUE = '#2563eb', BLUE_SOFT = 'rgba(37,99,235,0.35)', GRAY = '#94a3b8';
       rr.map(r => `<tr><td>${esc(r.label)}</td><td>${esc(r.building)}</td><td>${fmt(r.count)}件</td></tr>`).join('') + '</table>'
     : '<div class="empty">直近28日の報告はありません</div>';
 
+  // 報告の曜日・時限（行＝曜日、列＝時限。教室の混み具合と同じ向き）
+  const slots = bd.report_slots || {};
+  const DAYS = ['月','火','水','木','金','土'], PERIODS = ['1','2','3','4','5','6'];
+  const cell = (d, i) => Math.max(0, Number((slots[d] || [])[i]) || 0);
+  const slotMax = Math.max(0, ...DAYS.map(d => Math.max(...PERIODS.map((_, i) => cell(d, i)))));
+  if (slotMax) {
+    let h = '<tr><th></th>' + PERIODS.map(p => `<th>${p}限</th>`).join('') + '</tr>';
+    DAYS.forEach(d => {
+      h += `<tr><th>${d}</th>` + PERIODS.map((p, i) => {
+        const n = cell(d, i), r = n / slotMax;
+        return `<td style="background:rgba(234,88,12,${(0.05 + r * 0.85).toFixed(3)});color:${r > 0.55 ? '#fff' : '#1f2328'}"
+          title="${d}曜 ${p}限：報告 ${n}件">${n || ''}</td>`;
+      }).join('') + '</tr>';
+    });
+    $('report-slots').innerHTML = h;
+  } else {
+    $('report-slots').outerHTML = '<div class="empty">直近28日の報告はまだありません（曜日・時限は 2026年10月26日から記録）</div>';
+  }
+
   // 訪問のきっかけ・操作の回数
   const CH = {'Referral':'他のサイトのリンク（紹介ページなど）', 'Organic Social':'SNS（Instagram など）',
     'Direct':'直接（ブックマーク・URL）', 'Organic Search':'検索エンジン', 'Unassigned':'分類できないもの',
@@ -350,7 +374,7 @@ const BLUE = '#2563eb', BLUE_SOFT = 'rgba(37,99,235,0.35)', GRAY = '#94a3b8';
   $('channels').innerHTML = barlist((bd.channels || []).map(c => ({label: c.label, count: c.sessions})), l => CH[l] || l);
   const EV = {search:'検索', report_room:'「実は使われていた」報告', feedback_submit:'意見箱の送信'};
   const ev = bd.events || {};
-  $('events').innerHTML = barlist(Object.keys(EV).map(k => ({label: k, count: ev[k] || 0})), l => EV[l]);
+  $('events').innerHTML = barlist(Object.keys(EV).map(k => ({label: k, count: k === 'report_room' ? netR(ev) : (ev[k] || 0)})), l => EV[l]);
 
   // 使った目的のワンタップ調査（学生課長が挙げた使い方の例をもとにした分け方）
   const PU = {study:'個人学習', group:'グループワーク', meeting:'学生同士の打合せ',
