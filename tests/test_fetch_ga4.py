@@ -41,7 +41,7 @@ class PurposeTests(unittest.TestCase):
     """使った目的のワンタップ調査（2026-10-25〜）"""
 
     def test_purpose_events_are_counted(self):
-        for code in ("study", "group", "consult", "meeting", "break", "other"):
+        for code in ("study", "group", "meeting", "break", "other"):
             self.assertIn(f"purpose_{code}", g.EVENTS)
         self.assertIn("purpose_skip", g.EVENTS)
 
@@ -52,7 +52,7 @@ class PurposeTests(unittest.TestCase):
                  "events": {"purpose_study": 5, "purpose_break": 2, "purpose_skip": 4}}
         self.assertNotIn("何に使う", g.to_markdown([before]))
         md = g.to_markdown([before, after])
-        self.assertIn("| 2026-10-26〜11-01 | 5 | 0 | 0 | 0 | 2 | 0 | 7 | 4 |", md)
+        self.assertIn("| 2026-10-26〜11-01 | 5 | 0 | 0 | 2 | 0 | 7 | 4 |", md)
         self.assertNotIn("| 2026-10-19〜10-25 | 0 |", md.split("何に使う")[1])
 
 

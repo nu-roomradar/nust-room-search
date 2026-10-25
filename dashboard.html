@@ -352,9 +352,9 @@ const BLUE = '#2563eb', BLUE_SOFT = 'rgba(37,99,235,0.35)', GRAY = '#94a3b8';
   const ev = bd.events || {};
   $('events').innerHTML = barlist(Object.keys(EV).map(k => ({label: k, count: ev[k] || 0})), l => EV[l]);
 
-  // 使った目的のワンタップ調査（学生課長が挙げた使い方の例と同じ分け方）
-  const PU = {study:'個人学習', group:'グループワーク', consult:'課題についての相談',
-    meeting:'学生同士の打合せ', break:'授業の合間の休憩', other:'その他'};
+  // 使った目的のワンタップ調査（学生課長が挙げた使い方の例をもとにした分け方）
+  const PU = {study:'個人学習', group:'グループワーク', meeting:'学生同士の打合せ',
+    break:'授業の合間の休憩', other:'その他'};
   const pu = bd.purposes || [];
   const puTotal = pu.reduce((a, b) => a + (b.count || 0), 0);
   $('purposes').innerHTML = puTotal ? barlist(pu, l => PU[l] || l) : '<div class="empty">まだ回答はありません</div>';

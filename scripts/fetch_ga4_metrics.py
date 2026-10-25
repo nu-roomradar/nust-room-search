@@ -38,7 +38,7 @@ REPORT_ROOMS_TOP = 10
 JST = datetime.timezone(datetime.timedelta(hours=9))
 HOSTS = {"app": "nust-room-search.onrender.com", "lp": "nu-roomradar.github.io"}
 # 使った目的のワンタップ調査（2026-10-25〜）。目的ごとにイベント名を分けて送るので、GA4 側の設定なしで数えられる
-PURPOSES = [("study", "個人学習"), ("group", "グループワーク"), ("consult", "課題についての相談"),
+PURPOSES = [("study", "個人学習"), ("group", "グループワーク"),
             ("meeting", "学生同士の打合せ"), ("break", "授業の合間の休憩"), ("other", "その他")]
 PURPOSE_EVENTS = [f"purpose_{code}" for code, _ in PURPOSES]
 EVENTS = ["search", "report_room", "reserve_room", "feedback_submit"] + PURPOSE_EVENTS + ["purpose_skip"]

@@ -132,10 +132,6 @@
                 <span><strong>{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }}</strong>の時間割を表示しています（現在は{{ current_year }}年度 {{ current_term }}）。いま空いている教室を探す場合は、年度と学期を戻してください。</span>
             </div>
             {% endif %}
-            <div class="disclaimer">
-                <span class="disclaimer-icon">⚠</span>
-                <span>時間割に登録されていないゲリラ授業・急遽変更が行われている場合があります。実際に教室を使用する前に、ドア越しに確認することをおすすめします。</span>
-            </div>
             <div class="result-meta" id="result-meta">
                 <span class="result-label">{% if auto_note %}<span class="result-note">{{ auto_note }}</span>次は {% elif auto %}いまから使える · {% endif %}{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }} {{ selected_day }}曜 {{ selected_period }}限{% if selected_span > 1 %}から{{ selected_span }}コマ続けて{% endif %} の空き教室</span>
                 <span class="count-chip" id="count-chip"><em>{{ empty_rooms|length }}</em> 室</span>
@@ -144,20 +140,16 @@
             {% if ask_purpose %}
             <!-- 使った目的のワンタップ調査（任意・匿名。1台1日1回まで。答えは全体の集計にだけ使う） -->
             <div class="purpose-bar" id="purpose-bar" hidden>
-                <div class="purpose-head">
-                    <span class="purpose-q">この空きコマ、何に使う？</span>
-                    <span class="purpose-sub">任意・匿名</span>
-                    <button type="button" class="purpose-close" id="purpose-close" aria-label="答えずに閉じる">×</button>
-                </div>
+                <span class="purpose-q">何に使う？<small>任意・匿名</small></span>
                 <div class="purpose-chips" id="purpose-chips">
                     <button type="button" data-purpose="study">個人学習</button>
                     <button type="button" data-purpose="group">グループワーク</button>
-                    <button type="button" data-purpose="consult">課題についての相談</button>
-                    <button type="button" data-purpose="meeting">学生同士の打合せ</button>
-                    <button type="button" data-purpose="break">授業の合間の休憩</button>
+                    <button type="button" data-purpose="meeting">打合せ</button>
+                    <button type="button" data-purpose="break">休憩</button>
                     <button type="button" data-purpose="other">その他</button>
                 </div>
-                <div class="purpose-thanks" id="purpose-thanks" hidden>ありがとう！ 回答は匿名で、全体の集計にだけ使います</div>
+                <div class="purpose-thanks" id="purpose-thanks" hidden>ありがとう！ 匿名で全体の集計にだけ使います</div>
+                <button type="button" class="purpose-close" id="purpose-close" aria-label="答えずに閉じる">×</button>
             </div>
             {% endif %}
 
@@ -226,6 +218,12 @@
                 条件に合う空き教室はありませんでした。
             </div>
             {% endif %}
+
+            <!-- 結果の下に置く（2026-10-25 運営。結果と目的の調査を上に詰めるため） -->
+            <div class="disclaimer below-results">
+                <span class="disclaimer-icon">⚠</span>
+                <span>時間割に登録されていないゲリラ授業・急遽変更が行われている場合があります。実際に教室を使用する前に、ドア越しに確認することをおすすめします。</span>
+            </div>
             {% endif %}
 
         </div><!-- /results-area -->
