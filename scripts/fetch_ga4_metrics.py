@@ -41,13 +41,18 @@ HOSTS = {"app": "nust-room-search.onrender.com", "lp": "nu-roomradar.github.io"}
 PURPOSES = [("study", "個人学習"), ("group", "グループワーク"),
             ("meeting", "学生同士の打合せ"), ("break", "授業の合間の休憩"), ("other", "その他")]
 PURPOSE_EVENTS = [f"purpose_{code}" for code, _ in PURPOSES]
-EVENTS = ["search", "report_room", "reserve_room", "feedback_submit"] + PURPOSE_EVENTS + ["purpose_skip"]
+EVENTS = (["search", "report_room", "report_cancel", "reserve_room", "feedback_submit"]
+          + PURPOSE_EVENTS + ["purpose_skip"])
+# 「実は使われていた」報告は、報告（report_room）から取り消し（report_cancel）を引いて数える。
+# 取り消しと、報告の曜日・時限（search_day・search_period）は 2026-10-26 から送っている
+REPORT_SIGN = {"report_room": 1, "report_cancel": -1}
 # 検索条件として記録してよい値。GA4 には測定IDさえ分かれば外部の誰でも記録を送れるので、
 # アプリが送る値（static/app.js）以外は取り込まない（ダッシュボードへの蓄積型XSSを防ぐ）
+ORDERED = {"search_period": ["1", "2", "3", "4", "5", "6"], "search_day": ["月", "火", "水", "木", "金", "土"]}
 ALLOWED_SEARCH_VALUES = {
     "search_building": {"all", "tower", "main", "funabashi"},
-    "search_period": {"1", "2", "3", "4", "5", "6"},
-    "search_day": {"月", "火", "水", "木", "金", "土"},
+    "search_period": set(ORDERED["search_period"]),
+    "search_day": set(ORDERED["search_day"]),
 }
 
 
@@ -67,20 +72,50 @@ def keep_known(key, items):
     return kept, len(items) - len(kept)
 
 
+def net_reports(events):
+    """週・期間のイベント数から、取り消しを引いた「実は使われていた」報告の数"""
+    return max(0, events.get("report_room", 0) - events.get("report_cancel", 0))
+
+
 def top_report_rooms(rows, known, top=REPORT_ROOMS_TOP):
-    """「実は使われていた」報告（report_room）を教室ごとに数える。rows = [([イベント名, 教室, 校舎], [件数]), ...]
+    """「実は使われていた」報告を教室ごとに数える（取り消しは引く）。rows = [([イベント名, 教室, 校舎], [件数]), ...]
 
     GA4 の room・building は 2026-06-18 にカスタムディメンション登録済み（「予約/報告-教室」）。
-    仮予約（reserve_room。2026-10 廃止）の行も来るので report_room だけを数え、教室マスタに無い名前（偽の記録）は落とす
+    仮予約（reserve_room。2026-10 廃止）などほかのイベントの行も来るので報告と取り消しだけを数え、
+    教室マスタに無い名前（偽の記録）は落とす。期間より前の報告の取り消しで負にならないよう、0件以下は出さない
     """
     counts, bldg = {}, {}
     for (event, room, building), (n,) in rows:
-        if event != "report_room" or room not in known:
+        if event not in REPORT_SIGN or room not in known:
             continue
-        counts[room] = counts.get(room, 0) + int(n)
+        counts[room] = counts.get(room, 0) + REPORT_SIGN[event] * int(n)
         bldg.setdefault(room, building)
-    ranked = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:top]
+    ranked = sorted(((r, n) for r, n in counts.items() if n > 0), key=lambda kv: (-kv[1], kv[0]))[:top]
     return [{"label": r, "building": bldg[r], "count": n} for r, n in ranked]
+
+
+def report_slots(rows):
+    """「実は使われていた」報告を曜日×時限ごとに数える（取り消しは引く）。rows = [([イベント名, 曜日, 時限], [件数]), ...]
+
+    返り値は {曜日: [1限の件数, …, 6限の件数]}。曜日・時限の無い行（2026-10-25 までの報告は (not set)）や、
+    アプリが送らない値（偽の記録）は数えない"""
+    days, periods = ORDERED["search_day"], ORDERED["search_period"]
+    grid = {d: [0] * len(periods) for d in days}
+    for (event, day, period), (n,) in rows:
+        if event not in REPORT_SIGN or day not in grid or period not in periods:
+            continue
+        grid[day][periods.index(period)] += REPORT_SIGN[event] * int(n)
+    return {d: [max(0, n) for n in v] for d, v in grid.items()}
+
+
+def search_breakdown(key, rows):
+    """検索条件の内訳。rows = [([イベント名, 値], [件数]), ...]。同じ名前の値を送るほかのイベント
+    （使った目的の調査・報告）が混ざらないよう、検索（search）の行だけを数える"""
+    counts = {}
+    for (event, value), (n,) in rows:
+        if event == "search":
+            counts[value] = counts.get(value, 0) + int(n)
+    return keep_known(key, [{"label": v, "count": n} for v, n in counts.items()])
 
 
 def known_rooms(db=SCHEDULE_DB):
@@ -109,17 +144,18 @@ def fmt_change(cur, prev):
     return f"{(cur - prev) / prev * 100:+.0f}%"
 
 
-def to_markdown(weeks, report_rooms=None):
+def to_markdown(weeks, report_rooms=None, slots=None):
     lines = ["# GA4 週次の記録（自動更新・毎週月曜）", "",
              "アプリ＝検索アプリ（onrender.com）、LP＝紹介ページ（github.io）。ドメインが別なので合計しない。",
-             "利用者数は端末・ブラウザの数で、人数ではない。前週比はアプリの訪問回数。", "",
+             "利用者数は端末・ブラウザの数で、人数ではない。前週比はアプリの訪問回数。",
+             "「使われていた」報告は、取り消された分を引いた数（取り消しは 2026-10-26 から数えている）。", "",
              "| 週（月〜日） | アプリ 利用者 | アプリ 訪問 | 前週比 | 検索 | 「使われていた」報告 | LP 利用者 | LP 訪問 | 意見箱 |",
              "|---|---|---|---|---|---|---|---|---|"]
     prev = None
     for w in weeks:
         a, l, e = w["app"], w["lp"], w["events"]
         lines.append(f"| {w['week_start']}〜{w['week_end'][5:]} | {a['users']} | {a['sessions']} | "
-                     f"{fmt_change(a['sessions'], prev)} | {e.get('search', 0)} | {e.get('report_room', 0)} | "
+                     f"{fmt_change(a['sessions'], prev)} | {e.get('search', 0)} | {net_reports(e)} | "
                      f"{l['users']} | {l['sessions']} | {e.get('feedback_submit', 0)} |")
         prev = a["sessions"]
     asked = [w for w in weeks if any(w["events"].get(k, 0) for k in PURPOSE_EVENTS + ["purpose_skip"])]
@@ -138,6 +174,13 @@ def to_markdown(weeks, report_rooms=None):
                   "報告は時限が終わるとアプリからは消えるので、残るのはこの件数だけ。", "",
                   "| 教室 | 校舎 | 報告 |", "|---|---|---|"]
         lines += [f"| {r['label']} | {r['building']} | {r['count']} |" for r in report_rooms]
+    if slots and any(any(v) for v in slots.values()):
+        days, periods = ORDERED["search_day"], ORDERED["search_period"]
+        lines += ["", "## 「実は使われていた」報告の曜日・時限（直近28日）", "",
+                  "時間割にない使われ方が多い時間帯の目安。曜日・時限は 2026-10-26 からの報告だけ。", "",
+                  "| 時限 | " + " | ".join(days) + " |", "|---|" + "---|" * len(days)]
+        lines += [f"| {p}限 | " + " | ".join(str(slots[d][i]) if slots[d][i] else "·" for d in days) + " |"
+                  for i, p in enumerate(periods)]
     return "\n".join(lines) + "\n"
 
 
@@ -200,8 +243,8 @@ def fetch_dashboard(client, prop, today):
                      ("search_period", "customEvent:search_period"),
                      ("search_day", "customEvent:search_day")]:
         try:
-            rows = report(client, prop, [dim], ["eventCount"], start, end, limit=20)
-            items, dropped = keep_known(key, [{"label": d[0], "count": int(m[0])} for d, m in rows])
+            rows = report(client, prop, ["eventName", dim], ["eventCount"], start, end, limit=500)
+            items, dropped = search_breakdown(key, rows)
             if dropped:
                 print(f"[WARN] {key}: 想定外の値 {dropped} 件を取り込みませんでした（偽の記録の可能性）", file=sys.stderr)
             bd[key] = sorted(items, key=lambda x: -x["count"])
@@ -213,6 +256,12 @@ def fetch_dashboard(client, prop, today):
         bd["report_rooms"] = top_report_rooms(rows, known_rooms())
     except Exception as e:  # noqa: BLE001
         print(f"[WARN] 報告の教室別の件数を取れません: {e}", file=sys.stderr)
+    try:
+        rows = report(client, prop, ["eventName", "customEvent:search_day", "customEvent:search_period"],
+                      ["eventCount"], start, end, limit=2000)
+        bd["report_slots"] = report_slots(rows)
+    except Exception as e:  # noqa: BLE001
+        print(f"[WARN] 報告の曜日・時限別の件数を取れません: {e}", file=sys.stderr)
     rows = report(client, prop, ["sessionDefaultChannelGroup"], ["sessions"], start, end, limit=10)
     bd["channels"] = sorted([{"label": d[0], "sessions": int(m[0])} for d, m in rows], key=lambda x: -x["sessions"])
     return history, bd
@@ -239,7 +288,7 @@ def main(argv=None):
             json.dump(obj, f, ensure_ascii=False, indent=1)
             f.write("\n")
     with open(WEEKLY_MD, "w", encoding="utf-8") as f:
-        f.write(to_markdown(weeks, breakdown.get("report_rooms")))
+        f.write(to_markdown(weeks, breakdown.get("report_rooms"), breakdown.get("report_slots")))
     for w in new:
         print(f"[INFO] {w['week_start']}〜{w['week_end']}: アプリ 利用者{w['app']['users']}・訪問{w['app']['sessions']} / "
               f"LP 利用者{w['lp']['users']}・訪問{w['lp']['sessions']} / イベント {w['events']}")

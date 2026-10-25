@@ -149,6 +149,12 @@ function handleOverlayClick(e) {
 }
 
 // ── 使用中報告 ──
+// 報告の中身はサーバーでは時限が終わると消えるので、報告と取り消しの件数を GA4 に残す（全体の集計用）。
+// 曜日・時限は検索と同じ名前（search_day・search_period）で送り、GA4 側の追加設定なしで数えられるようにする
+function reportEventParams() {
+    return { building: currentBuilding, room: currentRoom, search_day: RR.day, search_period: String(RR.period) };
+}
+
 async function submitReport() {
     const cancelCode = localStorage.getItem(`report_${currentRoom}_${RR.day}_${RR.period}`);
     
@@ -162,6 +168,9 @@ async function submitReport() {
         const data = await res.json();
         if (data.ok) {
             localStorage.removeItem(`report_${currentRoom}_${RR.day}_${RR.period}`);
+            if (typeof gtag === 'function') {
+                gtag('event', 'report_cancel', reportEventParams());
+            }
             closeModal();
             showToast('✓ 報告を取り消しました');
             setTimeout(() => location.reload(), 1000);
@@ -186,7 +195,7 @@ async function submitReport() {
     if (data.ok) {
         localStorage.setItem(`report_${currentRoom}_${RR.day}_${RR.period}`, data.cancel_code);
         if (typeof gtag === 'function') {
-            gtag('event', 'report_room', { building: currentBuilding, room: currentRoom });
+            gtag('event', 'report_room', reportEventParams());
         }
         closeModal();
         showToast('⚠ 報告しました。ありがとうございます！');

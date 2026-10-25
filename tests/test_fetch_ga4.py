@@ -101,5 +101,65 @@ class ReportRoomTests(unittest.TestCase):
         self.assertNotIn("報告の多い教室", g.to_markdown([]))
 
 
+class ReportCancelAndSlotTests(unittest.TestCase):
+    """2026-10-26〜: 報告の取り消しを引き、報告の曜日・時限を数える"""
+
+    def test_cancel_event_is_fetched(self):
+        self.assertIn("report_cancel", g.EVENTS)
+
+    def test_rooms_subtract_cancellations(self):
+        rows = [(["report_room", "S303", "タワースコラ"], ["3"]),
+                (["report_cancel", "S303", "タワースコラ"], ["1"]),
+                (["report_room", "1041", "駿河台校舎"], ["1"]),
+                (["report_cancel", "1041", "駿河台校舎"], ["1"]),   # 全部取り消された教室は出さない
+                (["report_cancel", "131", "駿河台校舎"], ["1"])]    # 期間より前の報告の取り消し（負にしない）
+        self.assertEqual(g.top_report_rooms(rows, {"S303", "1041", "131"}),
+                         [{"label": "S303", "building": "タワースコラ", "count": 2}])
+
+    def test_slots_by_day_and_period(self):
+        rows = [(["report_room", "火", "2"], ["3"]),
+                (["report_cancel", "火", "2"], ["1"]),
+                (["report_room", "金", "6"], ["1"]),
+                (["search", "火", "2"], ["40"]),                 # 検索は数えない
+                (["purpose_study", "火", "2"], ["5"]),           # 使った目的の調査も数えない
+                (["report_room", "(not set)", "(not set)"], ["7"]),  # 2026-10-25 までの報告
+                (["report_room", "日", "<b>", ], ["9"]),         # アプリが送らない値（偽の記録）
+                (["report_cancel", "月", "1"], ["2"])]           # 負にしない
+        got = g.report_slots(rows)
+        self.assertEqual(list(got), ["月", "火", "水", "木", "金", "土"])
+        self.assertEqual(got["火"], [0, 2, 0, 0, 0, 0])
+        self.assertEqual(got["金"], [0, 0, 0, 0, 0, 1])
+        self.assertEqual(got["月"], [0] * 6)
+
+    def test_markdown_weekly_column_is_net_of_cancellations(self):
+        z = {"users": 0, "sessions": 0, "page_views": 0}
+        weeks = [{"week_start": "2026-10-26", "week_end": "2026-11-01", "app": {**z, "users": 3, "sessions": 4},
+                  "lp": z, "events": {"search": 9, "report_room": 5, "report_cancel": 2}}]
+        self.assertIn("| 2026-10-26〜11-01 | 3 | 4 | — | 9 | 3 |", g.to_markdown(weeks))
+
+    def test_markdown_slot_grid_only_when_there_are_reports(self):
+        slots = {d: [0] * 6 for d in "月火水木金土"}
+        self.assertNotIn("曜日・時限", g.to_markdown([], slots=slots))
+        slots["火"][1] = 2
+        md = g.to_markdown([], slots=slots)
+        self.assertIn("## 「実は使われていた」報告の曜日・時限（直近28日）", md)
+        self.assertIn("| 時限 | 月 | 火 | 水 | 木 | 金 | 土 |", md)
+        self.assertIn("| 2限 | · | 2 | · | · | · | · |", md)
+
+    def test_search_breakdown_counts_only_search_events(self):
+        """検索条件の内訳に、同じ名前の値を送る使った目的の調査・報告を混ぜない"""
+        rows = [(["search", "2"], ["10"]), (["purpose_group", "2"], ["4"]), (["report_room", "3"], ["1"]),
+                (["search", "3"], ["5"]), (["search", "9"], ["1"])]
+        kept, dropped = g.search_breakdown("search_period", rows)
+        self.assertEqual(sorted((i["label"], i["count"]) for i in kept), [("2", 10), ("3", 5)])
+        self.assertEqual(dropped, 1)
+
+    def test_app_sends_day_period_and_cancellations(self):
+        js = (Path(__file__).resolve().parents[1] / "static" / "app.js").read_text(encoding="utf-8")
+        self.assertIn("gtag('event', 'report_room', reportEventParams());", js)
+        self.assertIn("gtag('event', 'report_cancel', reportEventParams());", js)
+        self.assertIn("search_day: RR.day, search_period: String(RR.period)", js)
+
+
 if __name__ == "__main__":
     unittest.main()
