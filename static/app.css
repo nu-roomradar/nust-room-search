@@ -431,22 +431,23 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
 
 /* ── 使った目的のワンタップ調査（任意・匿名。2026-10-25） ── */
 .purpose-bar {
-    margin: 4px 0 18px; padding: 12px 14px 14px;
-    background: var(--surface); border: 1px solid rgba(108,143,255,0.22); border-radius: var(--radius);
+    position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+    margin: 2px 0 14px; padding: 10px 36px 10px 12px;
+    background: var(--surface); border: 1px solid rgba(108,143,255,0.22); border-radius: 12px;
 }
 .purpose-bar[hidden], .purpose-chips[hidden], .purpose-thanks[hidden] { display: none; }
-.purpose-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.purpose-q { font-weight: 700; font-size: 0.9rem; }
-.purpose-sub { font-size: 0.7rem; color: var(--muted); border: 1px solid var(--border); border-radius: 99px; padding: 1px 8px; }
+.purpose-q { font-weight: 700; font-size: 0.82rem; white-space: nowrap; margin-right: 4px; }
+.purpose-q small { margin-left: 6px; font-weight: 500; font-size: 0.66rem; color: var(--muted); }
 .purpose-close {
-    margin-left: auto; background: none; border: none; color: var(--muted);
-    font-size: 1.15rem; line-height: 1; padding: 4px 6px; cursor: pointer;
+    position: absolute; top: 4px; right: 4px; background: none; border: none; color: var(--muted);
+    font-size: 1.05rem; line-height: 1; padding: 6px 8px; cursor: pointer;
 }
-.purpose-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.purpose-chips { display: contents; }   /* 問いと選択肢を同じ行に流して、帯を低く保つ */
 .purpose-chips button {
-    font: inherit; font-size: 0.8rem; color: var(--text); cursor: pointer;
-    background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; padding: 8px 13px;
+    font: inherit; font-size: 0.74rem; color: var(--text); cursor: pointer;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; padding: 6px 11px;
     transition: border-color .15s, background .15s;
 }
 .purpose-chips button:hover, .purpose-chips button:focus-visible { border-color: var(--accent); background: rgba(108,143,255,0.12); }
-.purpose-thanks { font-size: 0.82rem; color: var(--surugadai-color); }
+.purpose-thanks { font-size: 0.78rem; color: var(--surugadai-color); }
+.disclaimer.below-results { margin-top: 18px; }

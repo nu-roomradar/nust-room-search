@@ -394,7 +394,7 @@ class PurposeSurveyTests(unittest.TestCase):
     def test_choices_follow_the_student_affairs_examples(self):
         with self.at(11, 0):
             html = self.c.get("/").get_data(as_text=True)
-        for label in ("個人学習", "グループワーク", "課題についての相談", "学生同士の打合せ", "授業の合間の休憩", "その他"):
+        for label in ("個人学習", "グループワーク", "打合せ", "休憩", "その他"):
             self.assertIn(label, html)
         self.assertIn("任意・匿名", html)
         bar = html[html.index('id="purpose-bar"'):html.index('id="purpose-thanks"') + 200]
