@@ -141,6 +141,26 @@
                 <span class="count-chip" id="count-chip"><em>{{ empty_rooms|length }}</em> 室</span>
             </div>
 
+            {% if ask_purpose %}
+            <!-- 使った目的のワンタップ調査（任意・匿名。1台1日1回まで。答えは全体の集計にだけ使う） -->
+            <div class="purpose-bar" id="purpose-bar" hidden>
+                <div class="purpose-head">
+                    <span class="purpose-q">この空きコマ、何に使う？</span>
+                    <span class="purpose-sub">任意・匿名</span>
+                    <button type="button" class="purpose-close" id="purpose-close" aria-label="答えずに閉じる">×</button>
+                </div>
+                <div class="purpose-chips" id="purpose-chips">
+                    <button type="button" data-purpose="study">個人学習</button>
+                    <button type="button" data-purpose="group">グループワーク</button>
+                    <button type="button" data-purpose="consult">課題についての相談</button>
+                    <button type="button" data-purpose="meeting">学生同士の打合せ</button>
+                    <button type="button" data-purpose="break">授業の合間の休憩</button>
+                    <button type="button" data-purpose="other">その他</button>
+                </div>
+                <div class="purpose-thanks" id="purpose-thanks" hidden>ありがとう！ 回答は匿名で、全体の集計にだけ使います</div>
+            </div>
+            {% endif %}
+
             {% if empty_rooms %}
                 {% set tower_rooms     = empty_rooms | selectattr('building', 'equalto', 'タワースコラ') | list %}
                 {% set surugadai_rooms = empty_rooms | selectattr('building', 'equalto', '駿河台校舎') | list %}

@@ -37,7 +37,11 @@ REPORT_ROOMS_TOP = 10
 
 JST = datetime.timezone(datetime.timedelta(hours=9))
 HOSTS = {"app": "nust-room-search.onrender.com", "lp": "nu-roomradar.github.io"}
-EVENTS = ["search", "report_room", "reserve_room", "feedback_submit"]
+# 使った目的のワンタップ調査（2026-10-25〜）。目的ごとにイベント名を分けて送るので、GA4 側の設定なしで数えられる
+PURPOSES = [("study", "個人学習"), ("group", "グループワーク"), ("consult", "課題についての相談"),
+            ("meeting", "学生同士の打合せ"), ("break", "授業の合間の休憩"), ("other", "その他")]
+PURPOSE_EVENTS = [f"purpose_{code}" for code, _ in PURPOSES]
+EVENTS = ["search", "report_room", "reserve_room", "feedback_submit"] + PURPOSE_EVENTS + ["purpose_skip"]
 # 検索条件として記録してよい値。GA4 には測定IDさえ分かれば外部の誰でも記録を送れるので、
 # アプリが送る値（static/app.js）以外は取り込まない（ダッシュボードへの蓄積型XSSを防ぐ）
 ALLOWED_SEARCH_VALUES = {
@@ -118,6 +122,17 @@ def to_markdown(weeks, report_rooms=None):
                      f"{fmt_change(a['sessions'], prev)} | {e.get('search', 0)} | {e.get('report_room', 0)} | "
                      f"{l['users']} | {l['sessions']} | {e.get('feedback_submit', 0)} |")
         prev = a["sessions"]
+    asked = [w for w in weeks if any(w["events"].get(k, 0) for k in PURPOSE_EVENTS + ["purpose_skip"])]
+    if asked:
+        lines += ["", "## 空きコマに何に使う？（使った目的のワンタップ調査・回答数）", "",
+                  "任意・匿名。今日のいまの時限か次の時限を検索したときだけ、1台1日1回まで聞く。「閉じた」は答えずに閉じた数。", "",
+                  "| 週（月〜日） | " + " | ".join(label for _, label in PURPOSES) + " | 回答計 | 閉じた |",
+                  "|---|" + "---|" * (len(PURPOSES) + 2)]
+        for w in asked:
+            e = w["events"]
+            counts = [e.get(k, 0) for k in PURPOSE_EVENTS]
+            lines.append(f"| {w['week_start']}〜{w['week_end'][5:]} | " + " | ".join(str(c) for c in counts)
+                         + f" | {sum(counts)} | {e.get('purpose_skip', 0)} |")
     if report_rooms:
         lines += ["", "## 「実は使われていた」報告の多い教室（直近28日）", "",
                   "報告は時限が終わるとアプリからは消えるので、残るのはこの件数だけ。", "",
@@ -178,6 +193,8 @@ def fetch_dashboard(client, prop, today):
     bd = {"updated": str(today)}
     ev = {d[0]: int(m[0]) for d, m in report(client, prop, ["eventName"], ["eventCount"], start, end)}
     bd["events"] = {k: ev[k] for k in EVENTS if k in ev}
+    bd["purposes"] = [{"label": code, "count": ev.get(f"purpose_{code}", 0)} for code, _ in PURPOSES]
+    bd["purpose_skip"] = ev.get("purpose_skip", 0)
     # 検索条件はカスタムディメンション。GA4 側で登録されていないと取れないので、失敗しても続ける
     for key, dim in [("search_building", "customEvent:search_building"),
                      ("search_period", "customEvent:search_period"),

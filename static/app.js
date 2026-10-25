@@ -77,6 +77,40 @@ if (RR.searched && !RR.auto && !RR.error) window.addEventListener('load', functi
     showToast('✓ 検索しました — ' + RR.count + '室');
 });
 
+// ── 使った目的のワンタップ調査（任意・匿名。1台1日1回まで） ──
+// 答えは GA4 に目的ごとのイベント（purpose_study など）として送るだけ。教室名や端末は送らず、サーバーにも残さない。
+// 結果は全体の集計（週次の記録・運営用ダッシュボード・学生課への結果報告）にだけ使う（2026-10-25 運営）
+(function() {
+    const bar = document.getElementById('purpose-bar');
+    if (!bar) return;
+    const d = new Date();
+    const key = 'purpose_asked_' + d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+    try { if (localStorage.getItem(key)) return; } catch (e) { /* 保存できない環境でも聞くだけは聞く */ }
+    bar.hidden = false;
+    function finish(eventName) {
+        try { localStorage.setItem(key, '1'); } catch (e) {}
+        if (typeof gtag === 'function') {
+            gtag('event', eventName, {
+                search_day: RR.day, search_period: String(RR.period), search_building: RR.building
+            });
+        }
+    }
+    bar.addEventListener('click', function(e) {
+        const chip = e.target.closest('[data-purpose]');
+        if (chip) {
+            finish('purpose_' + chip.dataset.purpose);
+            document.getElementById('purpose-chips').hidden = true;
+            document.getElementById('purpose-thanks').hidden = false;
+            setTimeout(function() { bar.hidden = true; }, 2400);
+            return;
+        }
+        if (e.target.closest('#purpose-close')) {
+            finish('purpose_skip');
+            bar.hidden = true;
+        }
+    });
+})();
+
 // ── 教室モーダル（その教室の1週間へのリンクと「実は使われていた」の報告） ──
 let currentRoom = '', currentBuilding = '';
 
