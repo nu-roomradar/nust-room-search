@@ -358,6 +358,56 @@ class MalformedInputTests(unittest.TestCase):
             self.assertEqual(list(rr._rate_store), ["203.0.113.52"])
 
 
+class PurposeSurveyTests(unittest.TestCase):
+    """使った目的のワンタップ調査は、今日のいまの時限か次の時限を見ているときだけ聞く（2026-10-25）"""
+
+    def setUp(self):
+        self.c = rr.app.test_client()
+
+    def at(self, hour, minute=0):
+        fixed = datetime.datetime(2026, 10, 26, hour, minute, tzinfo=rr.JST)   # 月曜（後期）
+
+        class FakeDT(datetime.datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return fixed
+        return mock.patch.object(rr.datetime, "datetime", FakeDT)
+
+    def search(self, day, period, term="後期"):
+        return self.c.post("/", data={"day": day, "period": str(period), "building": "all", "year": "2026",
+                                      "term": term, "span": "1"}).get_data(as_text=True)
+
+    def test_asked_for_the_current_and_next_period_today(self):
+        with self.at(11, 0):                                   # 2限の最中
+            self.assertIn('id="purpose-bar"', self.c.get("/").get_data(as_text=True))
+            self.assertIn('id="purpose-bar"', self.search("月", 2))
+            self.assertIn('id="purpose-bar"', self.search("月", 3))
+
+    def test_not_asked_when_just_browsing(self):
+        with self.at(11, 0):
+            self.assertNotIn('id="purpose-bar"', self.search("月", 5))        # 先の時限
+            self.assertNotIn('id="purpose-bar"', self.search("火", 2))        # ほかの曜日
+            self.assertNotIn('id="purpose-bar"', self.search("月", 2, "前期"))  # ほかの学期
+        with self.at(21, 0):                                   # 授業が終わった後（次の日の1限を出す）
+            self.assertNotIn('id="purpose-bar"', self.c.get("/").get_data(as_text=True))
+
+    def test_choices_follow_the_student_affairs_examples(self):
+        with self.at(11, 0):
+            html = self.c.get("/").get_data(as_text=True)
+        for label in ("個人学習", "グループワーク", "課題についての相談", "学生同士の打合せ", "授業の合間の休憩", "その他"):
+            self.assertIn(label, html)
+        self.assertIn("任意・匿名", html)
+        bar = html[html.index('id="purpose-bar"'):html.index('id="purpose-thanks"') + 200]
+        self.assertNotIn("予約", bar)                               # CLAUDE.md ルール3
+
+    def test_script_sends_only_purpose_events_once_a_day(self):
+        js = (ROOT / "static" / "app.js").read_text(encoding="utf-8")
+        self.assertIn("'purpose_' + chip.dataset.purpose", js)
+        self.assertIn("'purpose_asked_'", js)
+        block = js.split("使った目的のワンタップ調査")[1].split("教室モーダル")[0]
+        self.assertNotIn("room", block.lower().replace("rr.", ""))   # 教室名は送らない
+
+
 class ConsecutiveFreeTests(unittest.TestCase):
     """「何限まで続けて空いているか」と「続けて使う」絞り込み"""
 

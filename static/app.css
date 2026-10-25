@@ -428,3 +428,25 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
 .room-chip.tower     { color: var(--tower-color);     border-color: var(--tower-border); }
 .room-chip.surugadai { color: var(--surugadai-color); border-color: var(--surugadai-border); }
 .room-chip.funabashi { color: var(--funabashi-color); border-color: var(--funabashi-border); }
+
+/* ── 使った目的のワンタップ調査（任意・匿名。2026-10-25） ── */
+.purpose-bar {
+    margin: 4px 0 18px; padding: 12px 14px 14px;
+    background: var(--surface); border: 1px solid rgba(108,143,255,0.22); border-radius: var(--radius);
+}
+.purpose-bar[hidden], .purpose-chips[hidden], .purpose-thanks[hidden] { display: none; }
+.purpose-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.purpose-q { font-weight: 700; font-size: 0.9rem; }
+.purpose-sub { font-size: 0.7rem; color: var(--muted); border: 1px solid var(--border); border-radius: 99px; padding: 1px 8px; }
+.purpose-close {
+    margin-left: auto; background: none; border: none; color: var(--muted);
+    font-size: 1.15rem; line-height: 1; padding: 4px 6px; cursor: pointer;
+}
+.purpose-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.purpose-chips button {
+    font: inherit; font-size: 0.8rem; color: var(--text); cursor: pointer;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; padding: 8px 13px;
+    transition: border-color .15s, background .15s;
+}
+.purpose-chips button:hover, .purpose-chips button:focus-visible { border-color: var(--accent); background: rgba(108,143,255,0.12); }
+.purpose-thanks { font-size: 0.82rem; color: var(--surugadai-color); }

@@ -454,6 +454,13 @@ def index():
         empty_rooms = []
         biweekly_rooms = []
 
+    # 使った目的のワンタップ調査（任意・匿名）。今日のいまの時限か次の時限を見ているときだけ聞く。
+    # 来週の予定を眺めているときなど、実際に使うわけではない検索では聞かない（2026-10-25 運営）
+    now_period = upcoming_period(now)
+    ask_purpose = bool(searched and not error_message and empty_rooms and is_current_view(year, term)
+                       and now_period is not None and day == DAY_NAMES[now.weekday()]
+                       and period in (now_period, now_period + 1))
+
     # 「実は使われていた」の報告数を取得（検索済みの場合のみ）
     cleanup_reports()
     report_counts   = get_report_counts(day, period) if searched else {}
@@ -463,8 +470,9 @@ def index():
         'day': day, 'period': period,
         'searched': searched, 'auto': auto, 'error': bool(error_message),
         'count': len(empty_rooms or []),
-        'year': year, 'term': term,
+        'year': year, 'term': term, 'building': building,
         'periods': {p: [s, e] for p, (s, e) in PERIODS.items()},
+        'ask_purpose': ask_purpose,
     }
 
     return render_template(
@@ -473,7 +481,7 @@ def index():
         biweekly_rooms=biweekly_rooms,
         auto=auto, auto_note=auto_note,
         asset_version=ASSET_VERSION,
-        empty_rooms=empty_rooms,
+        empty_rooms=empty_rooms, ask_purpose=ask_purpose,
         selected_day=day, selected_period=period,
         selected_building=building,
         error_message=error_message,

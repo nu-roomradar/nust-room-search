@@ -37,6 +37,25 @@ class WeekTests(unittest.TestCase):
         self.assertIn("| 2026-10-12〜10-18 | 12 | 15 | +50% | 0 |", md)
 
 
+class PurposeTests(unittest.TestCase):
+    """使った目的のワンタップ調査（2026-10-25〜）"""
+
+    def test_purpose_events_are_counted(self):
+        for code in ("study", "group", "consult", "meeting", "break", "other"):
+            self.assertIn(f"purpose_{code}", g.EVENTS)
+        self.assertIn("purpose_skip", g.EVENTS)
+
+    def test_markdown_has_purpose_table_only_after_answers_arrive(self):
+        z = {"users": 0, "sessions": 0, "page_views": 0}
+        before = {"week_start": "2026-10-19", "week_end": "2026-10-25", "app": z, "lp": z, "events": {"search": 3}}
+        after = {"week_start": "2026-10-26", "week_end": "2026-11-01", "app": z, "lp": z,
+                 "events": {"purpose_study": 5, "purpose_break": 2, "purpose_skip": 4}}
+        self.assertNotIn("何に使う", g.to_markdown([before]))
+        md = g.to_markdown([before, after])
+        self.assertIn("| 2026-10-26〜11-01 | 5 | 0 | 0 | 0 | 2 | 0 | 7 | 4 |", md)
+        self.assertNotIn("| 2026-10-19〜10-25 | 0 |", md.split("何に使う")[1])
+
+
 class SearchValueTests(unittest.TestCase):
     def test_unknown_values_are_dropped(self):
         """GA4 には外部から偽の記録を送れる。アプリが送る値以外はダッシュボードに入れない"""
