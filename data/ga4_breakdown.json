@@ -1,17 +1,40 @@
 {
- "updated": "2026-10-23",
+ "updated": "2026-10-26",
  "events": {
-  "search": 153,
+  "search": 141,
   "report_room": 4
  },
+ "purposes": [
+  {
+   "label": "study",
+   "count": 0
+  },
+  {
+   "label": "group",
+   "count": 0
+  },
+  {
+   "label": "meeting",
+   "count": 0
+  },
+  {
+   "label": "break",
+   "count": 0
+  },
+  {
+   "label": "other",
+   "count": 0
+  }
+ ],
+ "purpose_skip": 0,
  "search_building": [
   {
    "label": "all",
-   "count": 63
+   "count": 60
   },
   {
    "label": "main",
-   "count": 50
+   "count": 46
   },
   {
    "label": "funabashi",
@@ -19,21 +42,21 @@
   },
   {
    "label": "tower",
-   "count": 18
+   "count": 13
   }
  ],
  "search_period": [
   {
    "label": "2",
-   "count": 48
+   "count": 45
   },
   {
    "label": "3",
-   "count": 46
+   "count": 40
   },
   {
    "label": "4",
-   "count": 30
+   "count": 27
   },
   {
    "label": "5",
@@ -62,12 +85,12 @@
    "count": 26
   },
   {
-   "label": "月",
-   "count": 23
+   "label": "木",
+   "count": 19
   },
   {
-   "label": "木",
-   "count": 22
+   "label": "月",
+   "count": 14
   }
  ],
  "report_rooms": [
@@ -90,19 +113,19 @@
  "channels": [
   {
    "label": "Referral",
-   "sessions": 147
+   "sessions": 138
   },
   {
    "label": "Organic Social",
-   "sessions": 103
+   "sessions": 99
   },
   {
    "label": "Direct",
-   "sessions": 47
+   "sessions": 43
   },
   {
    "label": "Organic Search",
-   "sessions": 1
+   "sessions": 2
   }
  ]
 }

@@ -1,19 +1,5 @@
 [
  {
-  "date": "2026-09-26",
-  "active_users": 1,
-  "new_users": 0,
-  "page_views": 2,
-  "sessions": 2
- },
- {
-  "date": "2026-09-27",
-  "active_users": 14,
-  "new_users": 8,
-  "page_views": 35,
-  "sessions": 18
- },
- {
   "date": "2026-09-28",
   "active_users": 20,
   "new_users": 13,
@@ -159,5 +145,19 @@
   "new_users": 3,
   "page_views": 19,
   "sessions": 10
+ },
+ {
+  "date": "2026-10-24",
+  "active_users": 2,
+  "new_users": 2,
+  "page_views": 4,
+  "sessions": 2
+ },
+ {
+  "date": "2026-10-25",
+  "active_users": 0,
+  "new_users": 0,
+  "page_views": 0,
+  "sessions": 2
  }
 ]

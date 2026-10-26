@@ -118,5 +118,31 @@
    "reserve_room": 0,
    "feedback_submit": 0
   }
+ },
+ {
+  "week_start": "2026-10-19",
+  "week_end": "2026-10-25",
+  "app": {
+   "users": 12,
+   "sessions": 21,
+   "page_views": 51
+  },
+  "lp": {
+   "users": 12,
+   "sessions": 14,
+   "page_views": 16
+  },
+  "events": {
+   "search": 21,
+   "report_room": 1,
+   "reserve_room": 0,
+   "feedback_submit": 0,
+   "purpose_study": 0,
+   "purpose_group": 0,
+   "purpose_meeting": 0,
+   "purpose_break": 0,
+   "purpose_other": 0,
+   "purpose_skip": 0
+  }
  }
 ]
