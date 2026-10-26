@@ -14,10 +14,10 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 
 | 部品 | 場所 | 更新のされ方 |
 |---|---|---|
-| 検索アプリ（`app.py`） | Render https://nust-room-search.onrender.com | `main` に push すると自動デプロイ（数分） |
+| 検索アプリ（`app.py`） | Render https://nust-room-search.onrender.com | `main` のアプリの変更を、**授業のない時間に自動で反映**（授業中に入った変更はその夜 20:40 に。4.10） |
 | LP（`index.html`）・運営用ダッシュボード（`dashboard.html`） | GitHub Pages https://nu-roomradar.github.io/nust-room-search/ | `main` に push すると自動反映 |
 | 時間割 DB（`schedule_final.db`） | リポジトリ内 | 2025・2026年度を同居（2026年度: 前期 6,437 行・後期 6,260 行・教室 180）。**`python scripts/build_schedule_db.py` で原本から再現できる**（6.） |
-| 「実は使われていた」報告（`reports.db`。仮予約は 2026-10 に廃止） | Render の実行環境 | 実行時に自動生成。**再起動・再デプロイで消える**。環境変数 `DATA_DIR` を永続ディスクに向ければ残る（6. 参照） |
+| 「実は使われていた」報告（`reports.db`。仮予約は 2026-10 に廃止） | Render の実行環境 | 実行時に自動生成。**再起動・再デプロイで消える**（再デプロイは授業のない時間だけにしてある。4.10）。環境変数 `DATA_DIR` を永続ディスクに向ければ残る（6. 参照） |
 | Instagram @roomradar_nust | Meta | `instagram-post.yml` を手動起動して投稿 |
 | ソースコード | GitHub Organization `nu-roomradar` / `nust-room-search` | 現状は `main` へ直接 push（ひとり運用のため） |
 
@@ -248,13 +248,31 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 4. Render の Environment に読み取り先と鍵を入れる（**リポジトリには書かない**）。本番で数件、予定のある教室が空きに出ないことを確かめてから、学生課に知らせる。
 - 教室の1週間の画面（`room.html`）に今週の予定を出すのは未対応（必要なら最終調整のときに足す）。
 
+## 4.10 アプリの反映を授業のない時間にずらす（2026-10-26〜）
+
+**なぜ**: Render に反映（再デプロイ）すると「実は使われていた」報告が消える。`main` にはいつ出してもよくして、アプリへの反映だけを自動で授業のない時間に行う（運営決定。ディスクを付ける案・反映の前後で報告を退避する案と比べて、費用もアプリの変更も要らないこの案にした）。
+
+**しくみ**（`.github/workflows/render-deploy.yml`・`scripts/render_deploy.py`）
+- Render の自動デプロイは切ってある。`main` に push されるたびと毎晩 20:40 に判定し、出すときは Render の **Deploy Hook** を呼ぶ。
+- 授業のある時間（**月〜土 9:00〜20:30**。祝日も授業日として扱う）には出さず、その夜 20:40 の実行で出す。GitHub の定期実行は1〜3時間遅れることがあるが、授業のあとなので問題ない。
+- アプリに関わるファイル（`app.py`・`school_bookings.py`・`requirements.txt`・`schedule_final.db`・`templates/`・`static/`）が前回の反映から変わっていなければ出さない。LP・ダッシュボード・docs・GA4 の記録の更新では Render を作り直さない（以前は月曜朝の GA4 の記録の更新でも作り直していた）。
+- 反映したコミットは GitHub の Deployments（環境 `render`）に記録し、次の判定の基準にする。いつ何を出したかもそこで見られる。
+- **急ぎの直し**: GitHub → Actions →「検索アプリを Render に反映」→ Run workflow → `force` にチェック。いまある報告は消える。Render の画面の Manual Deploy でもよい。
+
+**設定（運営者が1回だけ）** 順番を守る（逆にすると、その間アプリが反映されない）
+1. Render → `nust-room-search` → Settings → **Deploy Hook** の URL をコピーする。この URL を知っていると誰でも再デプロイ（＝報告を消す）できるので、チャット・メール・コミットには貼らない。
+2. GitHub → リポジトリの Settings → Secrets and variables → Actions → New repository secret。名前 `RENDER_DEPLOY_HOOK`、値に 1. の URL。
+3. Render → Settings → Build & Deploy → **Auto-Deploy を Off** にする。これを忘れると、push のたびに Render が勝手にも反映する（授業中に報告が消える）。
+
+**壊れたとき**: Secrets が無い、または Deploy Hook が無効だと、このワークフローが失敗する（Actions に赤が付き、月曜のヘルスチェックが Issue を立てる）。URL が漏れたかもしれないときは、Render の画面で Deploy Hook を作り直し（Regenerate）、Secrets も入れ替える。
+
 ## 5. 日常の作業のしかた
 
 1. claude.ai/code でこのリポジトリを開き、やりたいことを日本語で伝える。
 2. Instagram 投稿・ポスター・画面確認は `/instagram-post` `/make-poster` `/verify-ui` の手順書に沿って進む。**投稿と `git push` は必ず確認が入る**。
 3. **本番に出す前に必ず運営者が確認する。** Claude は変更を作業ブランチに置き、変わる画面のスクショ（スマホ幅・PC幅）を送ってくる。見て「OK」と返したときだけ `main` に出る（2026-09 から。CLAUDE.md ルール5）。
-   `main` に push すると Render と GitHub Pages が自動更新される。数分後に本番を自分のスマホで確認する（Claude の環境からは本番が見えない）。
-4. **アプリ（`app.py`・`templates/`・`static/`・`schedule_final.db`）の push は授業時間外（平日 20:30 以降・日曜など）に行う。** push すると Render が再デプロイし、その時点の報告が消えるため（永続ディスクは付けない方針。2026-09 決定）。LP・ダッシュボードだけの変更はいつでもよい。
+   `main` に push すると GitHub Pages（LP・ダッシュボード）はすぐ、検索アプリは授業のない時間に自動で更新される（4.10）。反映されたら本番を自分のスマホで確認する（Claude の環境からは本番が見えない）。
+4. **`main` にはいつ出してもよい。** アプリ（`app.py`・`templates/`・`static/`・`schedule_final.db` など）の変更は、Render への反映が自動で授業のない時間（月〜土 20:30 以降・朝 9:00 まで・日曜）にずれる。再デプロイすると報告が消えるため（永続ディスクは付けない方針。2026-09 決定。時刻ずらしは 2026-10-26 から）。授業中にすぐ出したいときだけ 4.10 の force を使う（報告は消える）。
 5. CI（`ci.yml`）が push ごとにテストを回す。赤くなったら直す。
 
 ## 6. 未整備・既知の課題（引き継ぎ時に必ず共有）
@@ -268,7 +286,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
   3. `python scripts/build_schedule_db.py --report` … 現行 DB との差分が出る。行数・学科別一致率・占有スロット・教室マスタの差分を見る。新年度なら当然大きく差が出るので、**件数の桁と学科の顔ぶれ**が妥当かを見る
   4. `python -m unittest discover -s tests` でテストが通ることを確認
   5. 問題なければ `python scripts/build_schedule_db.py --replace`（`.bak` が自動で作られる）と `python scripts/export_classes.py`（授業の生データ一覧 `data/classes_<年度>.csv` を更新）、`python scripts/export_occupancy.py`（ダッシュボードの混み具合 `data/occupancy.json` を更新）
-  6. コミットして push → Render が自動デプロイ。本番で数件検索して妥当性を確認
+  6. コミットして push → 授業のない時間に Render に反映される（4.10）。反映後に本番で数件検索して妥当性を確認
 
   既定では本番 DB を上書きしない（`schedule_final.new.db` に出る）。`--replace` を明示したときだけ差し替わる。
   本番 DB は全区分のビルド結果と完全に一致する（テストが検査）。原本を変えずに `--report` を走らせて差分が 0 なら、スクリプトは壊れていない。
@@ -276,7 +294,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 
 - **短期大学部は船橋校舎を共用している。** 2026-09 に取り込むまで、短大の授業が入っている教室を「空き」と表示していた（既存181教室のうち20室・109スロット）。schedules には短大を入れるが、教室マスタ（検索結果に出る教室）は理工学部・大学院からだけ作る。短大専用教室は理工の学生が行っても使えるとは限らないため。
 - **教室名が校舎をまたいで衝突している。** 「134」「143」「144」は船橋と駿河台の両方に存在し、「まち製図室1～5」はタワースコラと駿河台にあるが、DB は教室名だけで束ねている（`classrooms.name` が一意）。駿河台側の授業があると船橋の同名教室が「使用中」と出る。**空きを埋まって見せる方向の誤りなので実害は小さい**が、原本を回収したら (校舎, 教室) で管理するよう直す。それまでは `tests/test_schedule_db.py` の `KNOWN_NAME_COLLISIONS` に既知として登録してある。
-- **報告が再デプロイで消える。** Render の無料プランはディスクが揮発する。残したいときは Render の有料プラン（Starter 以上）で Disk を付け（例: マウント先 `/var/data`、1GB で足りる）、Environment に `DATA_DIR=/var/data` を追加する。コード側は対応済み。Disk を付けるとそのサービスはゼロダウンタイムデプロイができなくなる点に注意。
+- **報告が再デプロイで消える。** Render の無料プランはディスクが揮発する。残したいときは Render の有料プラン（Starter 以上）で Disk を付け（例: マウント先 `/var/data`、1GB で足りる）、Environment に `DATA_DIR=/var/data` を追加する。コード側は対応済み。Disk を付けるとそのサービスはゼロダウンタイムデプロイができなくなる点に注意。2026-10-26 に、ディスクは付けず、反映を授業のない時間にずらす方を選んだ（4.10）。いま消えるのは、夜〜朝の反映のときに残っていた報告（先の時限に入れたものなど）と、Render 側の都合で再起動したときだけ。
 - **「実は使われていた」報告は、いまの時限に限らずどの曜日・時限にも出せる**（2026-10-22 点検）。接続元を数十用意すれば、1週間先まで多くの教室を「使用中の可能性」にできる。対策案（報告をいまの時限だけに絞る・1コマで灰色にできる教室数に上限を付ける）は画面の動きが変わるので、**2026-10-22 の運営判断で当面いまのまま**にした。起きたら Render を Restart すれば消える（4.8）。いたずらが実際に起きたら対策案を入れる。
 - ブランチ運用・PR レビューが無い（ひとり運用のため）。2人以上になったら PR 運用に切り替える。
 - テストは最小限（運用スクリプト・hook・API・検索ページ）。UI の見た目は `/verify-ui` で目視。
