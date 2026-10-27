@@ -116,7 +116,7 @@ def build_html(variant):
           <div class="flist">
             <div class="fi"><div class="ico">{IC_SEARCH}</div><div><div class="t">リアルタイム検索</div><div class="d">曜日・時限・校舎を選ぶだけ</div></div></div>
             <div class="fi o"><div class="ico">{IC_FREE}</div><div><div class="t">登録不要・無料</div><div class="d">ブラウザだけですぐ使える</div></div></div>
-            <div class="fi"><div class="ico">{IC_BUILD}</div><div><div class="t">2校舎に対応</div><div class="d">タワースコラ／駿河台校舎</div></div></div>
+            <div class="fi"><div class="ico">{IC_BUILD}</div><div><div class="t">2校舎に対応</div><div class="d">タワー・スコラ／駿河台校舎1号館</div></div></div>
           </div>
           {rules}
         </div>
@@ -137,7 +137,7 @@ def build_html(variant):
     <div class="feats">
       <div class="feat"><div class="ico">{IC_SEARCH}</div><div><div class="t">リアルタイム検索</div><div class="d">曜日・時限・校舎を選ぶだけ</div></div></div>
       <div class="feat o"><div class="ico">{IC_FREE}</div><div><div class="t">登録不要・無料</div><div class="d">ブラウザだけですぐ使える</div></div></div>
-      <div class="feat"><div class="ico">{IC_BUILD}</div><div><div class="t">2校舎に対応</div><div class="d">タワースコラ / 駿河台校舎</div></div></div>
+      <div class="feat"><div class="ico">{IC_BUILD}</div><div><div class="t">2校舎に対応</div><div class="d">タワー・スコラ / 駿河台校舎1号館</div></div></div>
     </div>'''
     tight = bool(v.get("rules"))
     h1_size = "3.65rem" if tight else "4.1rem"
