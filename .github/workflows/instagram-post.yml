@@ -12,8 +12,9 @@ on:
           - feed
           - story
           - reel
+          - carousel
       image_url:
-        description: "投稿する画像の公開URL（https://...）。リールではカバー画像"
+        description: "投稿する画像の公開URL（https://...）。リールではカバー画像。カルーセルでは2〜10枚のURLを空白区切りで並べる"
         required: true
         type: string
       video_url:
@@ -71,6 +72,10 @@ jobs:
             python scripts/post_to_instagram.py \
               --image-url "$IMAGE_URL" \
               --story
+          elif [ "$POST_TYPE" = "carousel" ]; then
+            python scripts/post_to_instagram.py \
+              --carousel-urls "$IMAGE_URL" \
+              --caption "$CAPTION"
           elif [ "$POST_TYPE" = "reel" ]; then
             python scripts/post_to_instagram.py \
               --video-url "$VIDEO_URL" \

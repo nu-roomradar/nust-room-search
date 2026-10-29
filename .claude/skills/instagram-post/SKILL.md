@@ -17,8 +17,8 @@ argument-hint: "[feed|story|condolence|token] 投稿内容や相談の要点"
 ## ワークフロー入力（instagram-post.yml）
 | 入力 | 内容 |
 |---|---|
-| `post_type` | `feed` / `story` / `reel`（既定 feed） |
-| `image_url` | 投稿する画像の公開 URL（https://…）。必須。リールではカバー画像 |
+| `post_type` | `feed` / `story` / `reel` / `carousel`（既定 feed） |
+| `image_url` | 投稿する画像の公開 URL（https://…）。必須。リールではカバー画像。カルーセルでは2〜10枚の URL を空白区切り |
 | `video_url` | リールの動画（mp4）の公開 URL。`post_type=reel` のときだけ使う |
 | `caption` | キャプション。フィードのみ。ストーリーでは無視される |
 | `also_story` | フィード投稿時に告知ストーリー画像を生成する（既定 true。`post_type=feed` のときだけ有効） |
@@ -62,6 +62,12 @@ argument-hint: "[feed|story|condolence|token] 投稿内容や相談の要点"
 3. 入力値一式（post_type=reel, video_url, image_url, caption 全文）をユーザーに提示し、承認を得てから起動する。`also_story` はリールでは使われない。
 4. 動画は Instagram 側の変換に数分かかる。スクリプトは最大10分待つ。ログ冒頭の `[INFO] <URL> -> 200 video/mp4 …` で、Instagram が取りに行く URL が公開されていたかを確かめられる。
 5. BGM は著作権の心配がない自作の音（numpy で合成）か無音にする。既存の曲を入れない。Instagram アプリで曲を付けたいときは、アプリから手で投稿する（API からは Instagram の楽曲を付けられない）。
+
+## 手順E: カルーセル投稿（2026-10-29〜）
+1. 画像を2〜10枚、同じ縦横比（例 1080x1350）で作り、`assets/instagram/` にコミット・push する。縦横比は1枚目に合わせて切られるので、全部そろえる。
+2. `post_type=carousel`、`image_url` に**SHA 固定の raw URL を並べたい順に空白区切り**で入れる（`scripts/post_to_instagram.py --carousel-urls` に渡る）。`caption` は手順A と同じ規則（`#日大生プロジェクト` は自動付与）。`also_story` はカルーセルでは使われない（ストーリーは手順C で別に出す）。
+3. 入力値一式（post_type=carousel, image_url の並び, caption 全文）をユーザーに提示し、承認を得てから起動する。ログに `1枚目のコンテナID` … と `投稿完了！ メディアID` が出る。
+4. 「試験運用中・大学公式ではない」の表示は、少なくとも1枚目と最後の1枚に入れる（途中だけ見られることがあるので、できれば全部の画像に）。
 
 ## トークン失効（投稿・集計が急に失敗し出したとき）
 

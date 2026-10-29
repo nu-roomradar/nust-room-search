@@ -12,6 +12,8 @@ Instagram Graph APIへフィード・ストーリーズ・リールを投稿す�
   python post_to_instagram.py --image-url <公開URL> --story
   # リール投稿（--image-url はカバー画像。省略すると動画の先頭がカバーになる）
   python post_to_instagram.py --video-url <mp4の公開URL> --image-url <カバー画像の公開URL> --caption "<キャプション>"
+  # カルーセル投稿（複数の画像を1投稿に。2〜10枚、空白か改行で区切る。縦横比は1枚目にそろえる）
+  python post_to_instagram.py --carousel-urls "<1枚目のURL> <2枚目のURL> ..." --caption "<キャプション>"
 """
 import argparse
 import os
@@ -76,6 +78,36 @@ def create_media_container(host, account_id, access_token, image_url, caption, s
     return resp.json()["id"]
 
 
+CAROUSEL_MIN, CAROUSEL_MAX = 2, 10   # Instagram のカルーセルの枚数の範囲
+
+
+def parse_carousel_urls(text):
+    """空白・改行・カンマ区切りの URL を並びのまま取り出す"""
+    return [u for u in text.replace(",", " ").split() if u]
+
+
+def create_carousel_container(host, account_id, access_token, image_urls, caption):
+    """1枚ずつ子コンテナ（is_carousel_item）を作って準備完了を待ち、まとめた親コンテナ（CAROUSEL）を返す"""
+    children = []
+    for i, url in enumerate(image_urls, 1):
+        resp = requests.post(f"{host}/{API_VERSION}/{account_id}/media", data={
+            "access_token": access_token, "image_url": url, "is_carousel_item": "true"}, timeout=TIMEOUT)
+        if not resp.ok:
+            show_error(resp, f"カルーセルの{i}枚目のコンテナ作成")
+            resp.raise_for_status()
+        child = resp.json()["id"]
+        print(f"[INFO] {i}枚目のコンテナID: {child}")
+        wait_until_ready(host, child, access_token)
+        children.append(child)
+    resp = requests.post(f"{host}/{API_VERSION}/{account_id}/media", data={
+        "access_token": access_token, "media_type": "CAROUSEL", "children": ",".join(children), "caption": caption},
+        timeout=TIMEOUT)
+    if not resp.ok:
+        show_error(resp, "カルーセルのコンテナ作成")
+        resp.raise_for_status()
+    return resp.json()["id"]
+
+
 def check_public_url(url):
     """投稿前に、Instagram が取りに行く URL が公開されているかを見ておく（失敗時の切り分け用）"""
     try:
@@ -122,13 +154,23 @@ def main():
     parser.add_argument("--video-url", help="リールとして投稿する動画（mp4）の公開URL")
     parser.add_argument("--caption", default="", help="投稿のキャプション（フィード・リール）")
     parser.add_argument("--story", action="store_true", help="ストーリーズとして投稿する")
+    parser.add_argument("--carousel-urls", default="",
+                        help="カルーセルにする画像の公開URL（2〜10枚。空白・改行・カンマ区切り。並びのとおりに出る）")
     args = parser.parse_args()
+    args.carousel = parse_carousel_urls(args.carousel_urls)
+
+    if args.carousel and (args.story or args.video_url or args.image_url):
+        print("--carousel-urls は --image-url・--video-url・--story と同時に使えません。", file=sys.stderr)
+        sys.exit(1)
+    if args.carousel_urls and not CAROUSEL_MIN <= len(args.carousel) <= CAROUSEL_MAX:
+        print(f"カルーセルの画像は{CAROUSEL_MIN}〜{CAROUSEL_MAX}枚にしてください（いま{len(args.carousel)}枚）。", file=sys.stderr)
+        sys.exit(1)
 
     if args.video_url and args.story:
         print("--video-url と --story は同時に使えません。", file=sys.stderr)
         sys.exit(1)
-    if not args.video_url and not args.image_url:
-        print("--image-url（リールなら --video-url）が必要です。", file=sys.stderr)
+    if not args.video_url and not args.image_url and not args.carousel:
+        print("--image-url（リールなら --video-url、カルーセルなら --carousel-urls）が必要です。", file=sys.stderr)
         sys.exit(1)
     if not args.story and not args.caption:
         print("フィード・リールの投稿には --caption が必要です。", file=sys.stderr)
@@ -156,13 +198,17 @@ def post(args, account_id, access_token):
 
     caption = args.caption if args.story else ensure_required_tags(args.caption)
 
-    kind = "リール" if args.video_url else "ストーリーズ" if args.story else "フィード"
-    for url in (args.video_url, args.image_url):
+    kind = ("カルーセル" if args.carousel else "リール" if args.video_url
+            else "ストーリーズ" if args.story else "フィード")
+    for url in (args.video_url, args.image_url, *args.carousel):
         if url:
             check_public_url(url)
     print(f"メディアコンテナを作成しています...（{kind}）")
-    container_id = create_media_container(
-        host, account_id, access_token, args.image_url, caption, story=args.story, video_url=args.video_url)
+    if args.carousel:
+        container_id = create_carousel_container(host, account_id, access_token, args.carousel, caption)
+    else:
+        container_id = create_media_container(
+            host, account_id, access_token, args.image_url, caption, story=args.story, video_url=args.video_url)
     print(f"コンテナID: {container_id}")
 
     print("コンテナの準備完了を待機しています...")
