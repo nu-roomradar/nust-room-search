@@ -1,96 +1,108 @@
 {
- "updated": "2026-10-26",
+ "updated": "2026-10-30",
  "events": {
-  "search": 141,
-  "report_room": 4
+  "search": 742,
+  "report_room": 42,
+  "report_cancel": 9,
+  "feedback_submit": 3,
+  "purpose_study": 25,
+  "purpose_group": 10,
+  "purpose_meeting": 6,
+  "purpose_break": 9,
+  "purpose_other": 5,
+  "purpose_skip": 5
  },
  "purposes": [
   {
    "label": "study",
-   "count": 0
+   "count": 25
   },
   {
    "label": "group",
-   "count": 0
+   "count": 10
   },
   {
    "label": "meeting",
-   "count": 0
+   "count": 6
   },
   {
    "label": "break",
-   "count": 0
+   "count": 9
   },
   {
    "label": "other",
-   "count": 0
+   "count": 5
   }
  ],
- "purpose_skip": 0,
+ "purpose_skip": 5,
  "search_building": [
   {
    "label": "all",
-   "count": 60
-  },
-  {
-   "label": "main",
-   "count": 46
+   "count": 360
   },
   {
    "label": "funabashi",
-   "count": 22
+   "count": 145
   },
   {
    "label": "tower",
-   "count": 13
+   "count": 133
+  },
+  {
+   "label": "main",
+   "count": 104
   }
  ],
  "search_period": [
   {
-   "label": "2",
-   "count": 45
-  },
-  {
    "label": "3",
-   "count": 40
-  },
-  {
-   "label": "4",
-   "count": 27
-  },
-  {
-   "label": "5",
-   "count": 15
+   "count": 176
   },
   {
    "label": "1",
-   "count": 12
+   "count": 170
+  },
+  {
+   "label": "2",
+   "count": 126
+  },
+  {
+   "label": "4",
+   "count": 109
   },
   {
    "label": "6",
-   "count": 2
+   "count": 99
+  },
+  {
+   "label": "5",
+   "count": 62
   }
  ],
  "search_day": [
   {
-   "label": "火",
-   "count": 50
+   "label": "木",
+   "count": 384
   },
   {
    "label": "水",
-   "count": 32
+   "count": 167
   },
   {
    "label": "金",
-   "count": 26
+   "count": 71
   },
   {
-   "label": "木",
-   "count": 19
+   "label": "火",
+   "count": 69
   },
   {
    "label": "月",
-   "count": 14
+   "count": 40
+  },
+  {
+   "label": "土",
+   "count": 11
   }
  ],
  "report_rooms": [
@@ -100,32 +112,121 @@
    "count": 2
   },
   {
+   "label": "701752",
+   "building": "駿河台校舎",
+   "count": 2
+  },
+  {
+   "label": "841",
+   "building": "駿河台校舎",
+   "count": 2
+  },
+  {
+   "label": "S404",
+   "building": "タワースコラ",
+   "count": 2
+  },
+  {
+   "label": "1032",
+   "building": "船橋校舎",
+   "count": 1
+  },
+  {
+   "label": "1103",
+   "building": "船橋校舎",
+   "count": 1
+  },
+  {
+   "label": "1111",
+   "building": "船橋校舎",
+   "count": 1
+  },
+  {
+   "label": "1141",
+   "building": "船橋校舎",
+   "count": 1
+  },
+  {
    "label": "131",
    "building": "駿河台校舎",
    "count": 1
   },
   {
-   "label": "S1713",
-   "building": "タワースコラ",
+   "label": "134",
+   "building": "船橋校舎",
    "count": 1
   }
  ],
+ "report_slots": {
+  "月": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "火": [
+   0,
+   1,
+   0,
+   0,
+   0,
+   0
+  ],
+  "水": [
+   1,
+   0,
+   0,
+   0,
+   0,
+   8
+  ],
+  "木": [
+   6,
+   1,
+   3,
+   5,
+   1,
+   0
+  ],
+  "金": [
+   2,
+   1,
+   0,
+   0,
+   1,
+   0
+  ],
+  "土": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ]
+ },
  "channels": [
   {
    "label": "Referral",
-   "sessions": 138
-  },
-  {
-   "label": "Organic Social",
-   "sessions": 99
+   "sessions": 672
   },
   {
    "label": "Direct",
-   "sessions": 43
+   "sessions": 655
+  },
+  {
+   "label": "Organic Social",
+   "sessions": 96
   },
   {
    "label": "Organic Search",
-   "sessions": 2
+   "sessions": 51
+  },
+  {
+   "label": "Unassigned",
+   "sessions": 8
   }
  ]
 }
