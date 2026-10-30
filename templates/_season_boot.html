@@ -1,0 +1,3 @@
+{% if season %}<script>/* 季節の見た目を、この端末で「通常」に戻していたら、描画の前に外す（static/app.js の切り替えと対） */
+try { if (localStorage.getItem('rr_season_off') === '{{ season }}') document.body.classList.remove('theme-{{ season }}'); } catch (e) {}
+</script>{% endif %}

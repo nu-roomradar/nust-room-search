@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='room.css') }}?v={{ asset_version }}">
 </head>
 <body{% if season %} class="theme-{{ season }}"{% endif %}>
+{% include "_season_boot.html" %}
 <div class="wrap room-page">
     <div class="test-banner">
         <span class="test-tag">TEST</span>

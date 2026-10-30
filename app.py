@@ -236,10 +236,14 @@ ASSET_VERSION = _asset_version()
 
 # 期間限定の見た目（季節の着せ替え。2026-10-30 運営）。日本時間の日付で自動で切り替わり、期間が過ぎたら元に戻る。
 # (名前, (開始の月, 日), (終了の月, 日)) を毎年くり返す。中身は static/app.css の .theme-<名前> とテンプレートの飾り。
-# 期間は東京ディズニーリゾートのスペシャルイベントにそろえる（運営の希望）。2026年はハロウィーン 9/16〜10/31、
-# クリスマス 11/11〜12/25。毎年日付が変わるので、年に一度見直す。クリスマスの見た目は 11/11 までに作る
+# 期間は東京ディズニーリゾートのスペシャルイベントをもとに運営が決めた（2026-10-30）。ハロウィーン 9/16〜11/10、
+# クリスマス 11/11〜12/25（ディズニーは 2026年 ハロウィーン 9/16〜10/31、クリスマス 11/11〜12/25）。年に一度見直す。
+# 利用者は画面のスイッチで通常の見た目に戻せる（端末に保存。static/app.js の「季節の見た目の切り替え」）。
 # 環境変数 SEASON_THEME で上書きできる（"off" で止める、"halloween" などで期間外でも出す。確認用・緊急停止用）
-SEASON_THEMES = [("halloween", (9, 16), (10, 31)), ("christmas", (11, 11), (12, 25))]
+SEASON_THEMES = [("halloween", (9, 16), (11, 10)), ("christmas", (11, 11), (12, 25))]
+# 見た目を作り終えた季節だけ画面に出す（クリスマスは 11/11 までに作る）
+SEASON_READY = {"halloween"}
+SEASON_LABELS = {"halloween": "ハロウィーン仕様", "christmas": "クリスマス仕様"}
 
 
 def season_theme(now=None):
@@ -252,7 +256,9 @@ def season_theme(now=None):
 
 @app.context_processor
 def inject_season_theme():
-    return {"season": season_theme()}
+    season = season_theme()
+    season = season if season in SEASON_READY else None
+    return {"season": season, "season_label": SEASON_LABELS.get(season, "")}
 
 
 # ブラウザへの安全設定（2026-10 セキュリティ点検）。画面はインラインの script / onclick を使っているので、
