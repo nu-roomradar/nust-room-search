@@ -227,3 +227,20 @@ function showToast(msg) {
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2600);
 }
+
+// ── 季節の見た目の切り替え（ハロウィーンなど。iOS 風のスイッチ。選んだ状態はこの端末に保存し、
+//    次に開いたときは templates/_season_boot.html が描画の前に反映する。季節が変われば元に戻る） ──
+(function() {
+    const sw = document.getElementById('season-switch');
+    if (!sw) return;
+    const season = sw.dataset.season, cls = 'theme-' + season;
+    function sync() { sw.setAttribute('aria-checked', document.body.classList.contains(cls) ? 'true' : 'false'); }
+    sync();
+    sw.addEventListener('click', function() {
+        const on = !document.body.classList.contains(cls);
+        document.body.classList.toggle(cls, on);
+        try { if (on) localStorage.removeItem('rr_season_off'); else localStorage.setItem('rr_season_off', season); } catch (e) {}
+        sync();
+        if (typeof gtag === 'function') gtag('event', on ? 'season_theme_on' : 'season_theme_off', { season: season });
+    });
+})();

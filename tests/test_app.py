@@ -859,12 +859,11 @@ class SeasonThemeTests(unittest.TestCase):
         return datetime.datetime(2026, m, d, 12, 0, tzinfo=rr.JST)
 
     def test_periods_follow_tokyo_disney_resort(self):
-        """ハロウィーン 9/16〜10/31、クリスマス 11/11〜12/25（2026年の東京ディズニーリゾートにそろえる）"""
+        """ハロウィーン 9/16〜11/10、クリスマス 11/11〜12/25（東京ディズニーリゾートをもとに運営が決めた）"""
         self.assertIsNone(rr.season_theme(self.at(9, 15)))
         self.assertEqual(rr.season_theme(self.at(9, 16)), "halloween")
         self.assertEqual(rr.season_theme(self.at(10, 31)), "halloween")
-        self.assertIsNone(rr.season_theme(self.at(11, 1)))
-        self.assertIsNone(rr.season_theme(self.at(11, 10)))
+        self.assertEqual(rr.season_theme(self.at(11, 10)), "halloween")   # 運営の判断でディズニーより長く
         self.assertEqual(rr.season_theme(self.at(11, 11)), "christmas")
         self.assertEqual(rr.season_theme(self.at(12, 25)), "christmas")
         self.assertIsNone(rr.season_theme(self.at(12, 26)))
@@ -882,9 +881,24 @@ class SeasonThemeTests(unittest.TestCase):
             pages = [self.client.get(u).get_data(as_text=True) for u in ("/", "/room")]
         self.assertIn('class="theme-halloween"', pages[0])
         self.assertIn("Trick or Room?", pages[0])
+        self.assertIn('role="switch"', pages[0])                       # 通常の見た目に戻すスイッチ
+        self.assertIn("rr_season_off", pages[1])                       # どの画面でも、戻した選択が効く
         for html in pages:
             self.assertIn("大学が公式に提供するサービスではありません", html)
         with mock.patch.dict(os.environ, {"SEASON_THEME": "off"}):
             html = self.client.get("/").get_data(as_text=True)
         self.assertNotIn("theme-halloween", html)
         self.assertNotIn("Trick or Room?", html)
+        self.assertNotIn('role="switch"', html)
+
+    def test_unfinished_season_is_not_shown(self):
+        """見た目を作っていない季節（クリスマス）は、期間に入っても画面を変えない"""
+        with mock.patch.dict(os.environ, {"SEASON_THEME": "christmas"}):
+            html = self.client.get("/").get_data(as_text=True)
+        self.assertNotIn("theme-christmas", html)
+        self.assertNotIn('role="switch"', html)
+
+    def test_switch_script_saves_the_choice(self):
+        js = (Path(__file__).resolve().parents[1] / "static" / "app.js").read_text(encoding="utf-8")
+        self.assertIn("localStorage.setItem('rr_season_off', season)", js)
+        self.assertIn("aria-checked", js)

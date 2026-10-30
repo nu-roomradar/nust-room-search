@@ -452,39 +452,106 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
 .purpose-thanks { font-size: 0.78rem; color: var(--surugadai-color); }
 .disclaimer.below-results { margin-top: 18px; }
 
-/* ── 期間限定の見た目：ハロウィーン（app.py の SEASON_THEMES。表記・注意書き・校舎の色は変えない） ── */
+/* ── 期間限定の見た目：ハロウィーン（app.py の SEASON_THEMES。表記・注意書き・校舎の色は変えない。
+      飾り・帯・スイッチは季節のクラスが付いているときだけ出す。利用者がスイッチで切ると通常に戻る） ── */
+.season-deco, .season-ribbon, .logo-season, .icon-season { display: none; }
+.theme-halloween .season-deco { display: block; }
+.theme-halloween .season-ribbon { display: block; }
+.theme-halloween .logo-season { display: inline-block; }
+.theme-halloween .icon-season { display: inline; }
+.theme-halloween .icon-normal { display: none; }
+
 .theme-halloween {
-    --bg: #120a1f; --surface: #1a1029; --surface2: #23163a;
-    --border: rgba(251,146,60,0.16); --muted: #a08cc0; --accent: #f97316;
+    --bg: #120a1f; --surface: rgba(30,18,48,0.92); --surface2: #2a1942;
+    --border: rgba(251,146,60,0.20); --muted: #a891c7; --accent: #f97316;
     background:
-        radial-gradient(600px 420px at 85% -5%, rgba(253,224,71,0.10), transparent 70%),
-        radial-gradient(700px 520px at 0% 100%, rgba(249,115,22,0.10), transparent 70%),
-        radial-gradient(600px 500px at 100% 60%, rgba(124,58,237,0.16), transparent 70%),
-        var(--bg);
+        radial-gradient(700px 520px at 0% 100%, rgba(249,115,22,0.16), transparent 70%),
+        radial-gradient(640px 520px at 100% 55%, rgba(124,58,237,0.22), transparent 70%),
+        linear-gradient(180deg, #0d0719 0%, #1a0f30 45%, #120a1f 100%);
     background-attachment: fixed;
 }
-.theme-halloween .logo { background: linear-gradient(135deg, #fff 0%, #fb923c 70%, #fde047 100%); -webkit-background-clip: text; background-clip: text; }
-.theme-halloween .logo span { -webkit-text-fill-color: rgba(251,146,60,0.75); color: rgba(251,146,60,0.75); }
-.theme-halloween .btn-search { background: linear-gradient(90deg, #f97316, #fb923c); color: #1b0f38; }
+.theme-halloween .card { box-shadow: 0 0 0 1px rgba(251,146,60,0.10), 0 18px 40px rgba(0,0,0,0.45); }
+.theme-halloween .logo { background: linear-gradient(135deg, #fff 0%, #fb923c 65%, #fde047 100%); -webkit-background-clip: text; background-clip: text; }
+.theme-halloween .logo span { -webkit-text-fill-color: rgba(251,146,60,0.8); color: rgba(251,146,60,0.8); }
+.logo-season { font-size: 1.7rem; margin-left: 6px; vertical-align: 6px; animation: seasonWobble 3.2s ease-in-out infinite; }
+.theme-halloween .btn-search {
+    background: linear-gradient(90deg, #ea580c, #f97316 40%, #fb923c); color: #1b0f38;
+    box-shadow: 0 0 0 1px rgba(253,186,116,0.35), 0 8px 26px rgba(249,115,22,0.45);
+}
+.theme-halloween .btn-search .btn-text::before { content: '🎃 '; }
 .theme-halloween select:focus { border-color: #fb923c; }
-.season-ribbon {
-    margin-top: 10px; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 8px;
-    padding: 7px 14px; border-radius: 12px; font-size: 0.82rem; font-weight: 700; color: #fde68a;
-    background: rgba(249,115,22,0.12); border: 1px solid rgba(251,146,60,0.35);
-}
-.season-ribbon b { color: #fb923c; }
-.season-ribbon-sub { font-weight: 500; color: #d8b4fe; font-size: 0.76rem; }
-.season-deco { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-.season-deco span { position: absolute; font-size: 28px; opacity: 0.22; animation: seasonFloat 9s ease-in-out infinite; }
-.season-deco span:nth-child(1) { left: 6%;  top: 14%; }
-.season-deco span:nth-child(2) { right: 8%; top: 32%; animation-delay: -3s; font-size: 22px; }
-.season-deco span:nth-child(3) { left: 4%;  bottom: 12%; animation-delay: -5s; font-size: 34px; opacity: 0.18; }
-.season-deco span:nth-child(4) { right: 14%; bottom: 22%; animation-delay: -7s; font-size: 20px; }
-@keyframes seasonFloat { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-14px) rotate(4deg); } }
-@media (prefers-reduced-motion: reduce) { .season-deco span { animation: none; } }
-@media (max-width: 767px) {
-    /* スマホは中身が横幅いっぱいなので、文字の裏に来る左側の飾りは出さない */
-    .season-deco span:nth-child(1), .season-deco span:nth-child(3) { display: none; }
-    .season-deco span { opacity: 0.16; }
-}
 .theme-halloween .room-search-link { border-color: rgba(251,146,60,0.45); background: rgba(249,115,22,0.08); }
+.theme-halloween .now-badge .dot { background: #fb923c; }
+.theme-halloween .room-card { box-shadow: inset 0 -3px 0 rgba(249,115,22,0.18); }
+
+/* キャンディコーン（黄・オレンジ・白）の縞を上に付けた帯 */
+.season-ribbon {
+    margin-top: 12px; padding: 12px 16px 11px; border-radius: 14px; position: relative; overflow: hidden;
+    background: linear-gradient(135deg, rgba(249,115,22,0.20), rgba(124,58,237,0.22));
+    border: 1px solid rgba(251,146,60,0.45);
+}
+.season-ribbon::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 0; height: 5px;
+    background: repeating-linear-gradient(90deg, #fde047 0 18px, #f97316 18px 36px, #fff7ed 36px 54px);
+}
+.sr-main { font-weight: 900; font-size: 1rem; color: #fde68a; letter-spacing: 0.01em; }
+.sr-main b { color: #fb923c; font-size: 1.12rem; margin: 0 2px; white-space: nowrap; }
+.season-ribbon-sub { margin-top: 3px; font-weight: 600; color: #e9d5ff; font-size: 0.8rem; }
+
+/* 背景の飾り：月・クモの巣・飛ぶコウモリ・ただようおばけ・かぼちゃ */
+.season-deco { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.season-deco .moon {
+    position: absolute; right: 7%; top: 64px; width: 92px; height: 92px; border-radius: 50%;
+    background: radial-gradient(circle at 38% 36%, #fffbe6, #fde68a 55%, #f59e0b);
+    box-shadow: 0 0 60px 18px rgba(253,224,71,0.22); opacity: 0.85;
+}
+.season-deco .web { position: absolute; width: 200px; height: 200px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='%23d8b4fe' stroke-width='1.4' stroke-opacity='0.55'%3E%3Cpath d='M0 0L200 0M0 0L200 70M0 0L170 170M0 0L70 200M0 0L0 200'/%3E%3Cpath d='M40 0Q36 14 37 30Q24 30 14 37Q8 22 0 40'/%3E%3Cpath d='M85 0Q80 30 82 62Q55 62 40 80Q22 58 0 85'/%3E%3Cpath d='M135 0Q128 45 130 94Q90 92 66 120Q36 92 0 135'/%3E%3Cpath d='M185 0Q176 60 178 126Q120 122 92 160Q50 124 0 185'/%3E%3C/svg%3E") no-repeat; background-size: contain; opacity: 0.5; }
+.season-deco .web-tl { left: 0; top: 0; }
+.season-deco .web-br { right: 0; bottom: 0; transform: rotate(180deg); opacity: 0.35; }
+.season-deco span { position: absolute; line-height: 1; }
+.season-deco .bat { font-size: 26px; opacity: 0.55; animation: batFly 22s linear infinite; }
+.season-deco .b1 { top: 18%; animation-delay: -4s; }
+.season-deco .b2 { top: 34%; font-size: 20px; animation-duration: 28s; animation-delay: -15s; }
+.season-deco .b3 { top: 9%; font-size: 18px; animation-duration: 34s; animation-delay: -24s; }
+.season-deco .ghost { right: 5%; top: 46%; font-size: 40px; opacity: 0.30; animation: ghostFloat 7s ease-in-out infinite; }
+.season-deco .pk { bottom: 18px; font-size: 44px; opacity: 0.45; filter: drop-shadow(0 0 14px rgba(249,115,22,0.6)); }
+.season-deco .p1 { left: 3%; } .season-deco .p2 { right: 4%; font-size: 34px; }
+@keyframes batFly {
+    0%   { transform: translate(-12vw, 0) scale(1); }
+    25%  { transform: translate(22vw, -18px) scale(1.05); }
+    50%  { transform: translate(52vw, 10px) scale(0.95); }
+    75%  { transform: translate(82vw, -14px) scale(1.05); }
+    100% { transform: translate(112vw, 0) scale(1); }
+}
+@keyframes ghostFloat { 0%,100% { transform: translateY(0); opacity: 0.30; } 50% { transform: translateY(-18px); opacity: 0.45; } }
+@keyframes seasonWobble { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+
+/* 季節の見た目のスイッチ（iOS 風） */
+.season-switch {
+    display: inline-flex; align-items: center; gap: 8px; margin: 10px 0 0 8px; vertical-align: middle;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; padding: 4px 12px 4px 5px;
+    color: var(--muted); font: inherit; font-size: 0.78rem; cursor: pointer;
+}
+.season-switch .sw-track {
+    position: relative; width: 38px; height: 22px; border-radius: 99px; background: #4b5563; transition: background 0.2s; flex-shrink: 0;
+}
+.season-switch .sw-knob {
+    position: absolute; left: 2px; top: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4); transition: transform 0.2s;
+}
+.season-switch[aria-checked="true"] .sw-track { background: #f97316; }
+.season-switch[aria-checked="true"] .sw-knob { transform: translateX(16px); }
+.season-switch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (max-width: 767px) {
+    /* スマホは中身が横幅いっぱいなので、飾りは小さく・薄く */
+    .season-deco .web { width: 130px; height: 130px; opacity: 0.35; }
+    .season-deco .moon { width: 52px; height: 52px; top: 92px; right: 5%; opacity: 0.6; }
+    .season-deco .ghost, .season-deco .p1 { display: none; }
+    .season-deco .bat { opacity: 0.4; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .season-deco .bat, .season-deco .ghost, .logo-season { animation: none; }
+    .season-deco .b1 { left: 12%; } .season-deco .b2 { left: 70%; } .season-deco .b3 { left: 40%; }
+    .season-switch .sw-track, .season-switch .sw-knob { transition: none; }
+}

@@ -31,7 +31,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}?v={{ asset_version }}">
 </head>
 <body{% if season %} class="theme-{{ season }}"{% endif %}>
-{% if season == 'halloween' %}<div class="season-deco" aria-hidden="true"><span>🦇</span><span>🦇</span><span>🎃</span><span>🦇</span></div>{% endif %}
+{% include "_season_boot.html" %}
+{% if season == 'halloween' %}<div class="season-deco" aria-hidden="true">
+  <i class="moon"></i><i class="web web-tl"></i><i class="web web-br"></i>
+  <span class="bat b1">🦇</span><span class="bat b2">🦇</span><span class="bat b3">🦇</span>
+  <span class="ghost g1">👻</span><span class="pk p1">🎃</span><span class="pk p2">🎃</span>
+</div>{% endif %}
 <div class="wrap">
 
     <!-- 試験運用中で大学公式ではないことの明示（誤認防止・控えめ表記。文言は 2026-10-22 に理工学部学生課が提案） -->
@@ -42,11 +47,12 @@
 
     <!-- ヘッダー -->
     <header>
-        <a href="https://nu-roomradar.github.io/nust-room-search/" class="logo-link"><div class="logo">RoomRadar <span>β</span></div></a>
+        <a href="https://nu-roomradar.github.io/nust-room-search/" class="logo-link"><div class="logo">RoomRadar <span>β</span></div></a>{% if season == 'halloween' %}<span class="logo-season" aria-hidden="true">🎃</span>{% endif %}
         <div class="subtitle">日大理工学部 · 空き教室リアルタイム検索</div>
         {% if season == 'halloween' %}
         <!-- 期間限定の飾り（ハロウィン。app.py の SEASON_THEMES で自動で出し入れ） -->
-        <div class="season-ribbon"><span aria-hidden="true">🎃</span> Happy Halloween！ <b>Trick or Room?</b> <span class="season-ribbon-sub">開ける前に、ドア越しにチラッと確認を👻</span></div>
+        <div class="season-ribbon"><div class="sr-main"><span aria-hidden="true">🎃</span> Happy Halloween！ <b>Trick or Room?</b> <span aria-hidden="true">👻</span></div>
+            <div class="season-ribbon-sub">開ける前に、ドア越しにチラッと確認を🚪</div></div>
         {% endif %}
         <div class="now-badge">
             <span class="dot"></span>
@@ -54,6 +60,12 @@
             <span>·</span>
             <span id="now-period">現在時限 検出中…</span>
         </div>
+        {% if season %}
+        <!-- 季節の見た目のスイッチ（オフで通常の見た目に戻す。この端末に保存） -->
+        <button type="button" class="season-switch" id="season-switch" role="switch" aria-checked="true" data-season="{{ season }}">
+            <span class="sw-track" aria-hidden="true"><span class="sw-knob"></span></span><span class="sw-label">{{ season_label }}</span>
+        </button>
+        {% endif %}
     </header>
 
     <!-- PC: 2カラム / スマホ・タブレット: 1カラム -->
@@ -219,7 +231,7 @@
 
             {% if not empty_rooms %}
             <div class="empty-state">
-                <span class="icon">{% if season == 'halloween' %}👻{% else %}🔍{% endif %}</span>
+                <span class="icon">{% if season == 'halloween' %}<span class="icon-season">👻</span>{% endif %}<span class="icon-normal">🔍</span></span>
                 条件に合う空き教室はありませんでした。
             </div>
             {% endif %}
