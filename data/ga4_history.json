@@ -4,160 +4,430 @@
   "active_users": 9,
   "new_users": 6,
   "page_views": 13,
-  "sessions": 9
+  "sessions": 9,
+  "lp": {
+   "active_users": 5,
+   "new_users": 4,
+   "page_views": 5,
+   "sessions": 5
+  },
+  "app": {
+   "active_users": 4,
+   "new_users": 2,
+   "page_views": 8,
+   "sessions": 4
+  }
  },
  {
   "date": "2026-10-05",
   "active_users": 19,
   "new_users": 7,
   "page_views": 37,
-  "sessions": 28
+  "sessions": 28,
+  "app": {
+   "active_users": 10,
+   "new_users": 1,
+   "page_views": 23,
+   "sessions": 14
+  },
+  "lp": {
+   "active_users": 9,
+   "new_users": 6,
+   "page_views": 14,
+   "sessions": 14
+  }
  },
  {
   "date": "2026-10-06",
   "active_users": 14,
   "new_users": 6,
   "page_views": 30,
-  "sessions": 18
+  "sessions": 18,
+  "app": {
+   "active_users": 8,
+   "new_users": 1,
+   "page_views": 22,
+   "sessions": 10
+  },
+  "lp": {
+   "active_users": 6,
+   "new_users": 5,
+   "page_views": 8,
+   "sessions": 8
+  }
  },
  {
   "date": "2026-10-07",
   "active_users": 8,
   "new_users": 3,
   "page_views": 15,
-  "sessions": 9
+  "sessions": 9,
+  "app": {
+   "active_users": 5,
+   "new_users": 1,
+   "page_views": 10,
+   "sessions": 5
+  },
+  "lp": {
+   "active_users": 3,
+   "new_users": 2,
+   "page_views": 5,
+   "sessions": 4
+  }
  },
  {
   "date": "2026-10-08",
   "active_users": 15,
   "new_users": 9,
   "page_views": 34,
-  "sessions": 19
+  "sessions": 19,
+  "lp": {
+   "active_users": 8,
+   "new_users": 6,
+   "page_views": 11,
+   "sessions": 10
+  },
+  "app": {
+   "active_users": 7,
+   "new_users": 3,
+   "page_views": 23,
+   "sessions": 9
+  }
  },
  {
   "date": "2026-10-09",
   "active_users": 4,
   "new_users": 1,
   "page_views": 10,
-  "sessions": 5
+  "sessions": 5,
+  "lp": {
+   "active_users": 2,
+   "new_users": 1,
+   "page_views": 3,
+   "sessions": 3
+  },
+  "app": {
+   "active_users": 2,
+   "new_users": 0,
+   "page_views": 7,
+   "sessions": 2
+  }
  },
  {
   "date": "2026-10-11",
   "active_users": 6,
   "new_users": 3,
   "page_views": 15,
-  "sessions": 9
+  "sessions": 9,
+  "lp": {
+   "active_users": 3,
+   "new_users": 2,
+   "page_views": 5,
+   "sessions": 5
+  },
+  "app": {
+   "active_users": 3,
+   "new_users": 1,
+   "page_views": 10,
+   "sessions": 4
+  }
  },
  {
   "date": "2026-10-12",
   "active_users": 18,
   "new_users": 11,
   "page_views": 36,
-  "sessions": 21
+  "sessions": 21,
+  "lp": {
+   "active_users": 10,
+   "new_users": 7,
+   "page_views": 15,
+   "sessions": 12
+  },
+  "app": {
+   "active_users": 8,
+   "new_users": 4,
+   "page_views": 21,
+   "sessions": 9
+  }
  },
  {
   "date": "2026-10-13",
   "active_users": 7,
   "new_users": 6,
   "page_views": 14,
-  "sessions": 9
+  "sessions": 9,
+  "app": {
+   "active_users": 4,
+   "new_users": 3,
+   "page_views": 10,
+   "sessions": 4
+  },
+  "lp": {
+   "active_users": 3,
+   "new_users": 3,
+   "page_views": 4,
+   "sessions": 5
+  }
  },
  {
   "date": "2026-10-14",
   "active_users": 0,
   "new_users": 0,
   "page_views": 0,
-  "sessions": 1
+  "sessions": 1,
+  "app": {
+   "active_users": 0,
+   "new_users": 0,
+   "page_views": 0,
+   "sessions": 1
+  }
  },
  {
   "date": "2026-10-15",
   "active_users": 9,
   "new_users": 5,
   "page_views": 14,
-  "sessions": 10
+  "sessions": 10,
+  "lp": {
+   "active_users": 5,
+   "new_users": 4,
+   "page_views": 5,
+   "sessions": 5
+  },
+  "app": {
+   "active_users": 4,
+   "new_users": 1,
+   "page_views": 9,
+   "sessions": 5
+  }
  },
  {
   "date": "2026-10-16",
   "active_users": 2,
   "new_users": 1,
   "page_views": 4,
-  "sessions": 3
+  "sessions": 3,
+  "lp": {
+   "active_users": 1,
+   "new_users": 1,
+   "page_views": 1,
+   "sessions": 1
+  },
+  "app": {
+   "active_users": 1,
+   "new_users": 0,
+   "page_views": 3,
+   "sessions": 2
+  }
  },
  {
   "date": "2026-10-18",
   "active_users": 4,
   "new_users": 0,
   "page_views": 11,
-  "sessions": 7
+  "sessions": 7,
+  "app": {
+   "active_users": 4,
+   "new_users": 0,
+   "page_views": 9,
+   "sessions": 5
+  },
+  "lp": {
+   "active_users": 0,
+   "new_users": 0,
+   "page_views": 2,
+   "sessions": 2
+  }
  },
  {
   "date": "2026-10-19",
   "active_users": 4,
   "new_users": 3,
   "page_views": 12,
-  "sessions": 6
+  "sessions": 6,
+  "lp": {
+   "active_users": 2,
+   "new_users": 2,
+   "page_views": 2,
+   "sessions": 2
+  },
+  "app": {
+   "active_users": 2,
+   "new_users": 1,
+   "page_views": 10,
+   "sessions": 4
+  }
  },
  {
   "date": "2026-10-20",
   "active_users": 8,
   "new_users": 6,
   "page_views": 20,
-  "sessions": 10
+  "sessions": 10,
+  "app": {
+   "active_users": 5,
+   "new_users": 3,
+   "page_views": 16,
+   "sessions": 6
+  },
+  "lp": {
+   "active_users": 3,
+   "new_users": 3,
+   "page_views": 4,
+   "sessions": 4
+  }
  },
  {
   "date": "2026-10-21",
   "active_users": 4,
   "new_users": 3,
   "page_views": 12,
-  "sessions": 5
+  "sessions": 5,
+  "lp": {
+   "active_users": 2,
+   "new_users": 2,
+   "page_views": 2,
+   "sessions": 2
+  },
+  "app": {
+   "active_users": 2,
+   "new_users": 1,
+   "page_views": 10,
+   "sessions": 3
+  }
  },
  {
   "date": "2026-10-22",
   "active_users": 9,
   "new_users": 3,
   "page_views": 19,
-  "sessions": 10
+  "sessions": 10,
+  "app": {
+   "active_users": 5,
+   "new_users": 0,
+   "page_views": 12,
+   "sessions": 6
+  },
+  "lp": {
+   "active_users": 4,
+   "new_users": 3,
+   "page_views": 7,
+   "sessions": 4
+  }
  },
  {
   "date": "2026-10-24",
   "active_users": 2,
   "new_users": 2,
   "page_views": 4,
-  "sessions": 2
+  "sessions": 2,
+  "lp": {
+   "active_users": 1,
+   "new_users": 1,
+   "page_views": 1,
+   "sessions": 1
+  },
+  "app": {
+   "active_users": 1,
+   "new_users": 1,
+   "page_views": 3,
+   "sessions": 1
+  }
  },
  {
   "date": "2026-10-25",
   "active_users": 12,
   "new_users": 5,
   "page_views": 26,
-  "sessions": 16
+  "sessions": 16,
+  "app": {
+   "active_users": 8,
+   "new_users": 2,
+   "page_views": 19,
+   "sessions": 9
+  },
+  "lp": {
+   "active_users": 4,
+   "new_users": 3,
+   "page_views": 7,
+   "sessions": 7
+  }
  },
  {
   "date": "2026-10-26",
   "active_users": 16,
   "new_users": 8,
   "page_views": 38,
-  "sessions": 21
+  "sessions": 21,
+  "app": {
+   "active_users": 11,
+   "new_users": 5,
+   "page_views": 33,
+   "sessions": 15
+  },
+  "lp": {
+   "active_users": 5,
+   "new_users": 3,
+   "page_views": 5,
+   "sessions": 6
+  }
  },
  {
   "date": "2026-10-27",
   "active_users": 11,
   "new_users": 4,
   "page_views": 31,
-  "sessions": 14
+  "sessions": 14,
+  "app": {
+   "active_users": 6,
+   "new_users": 1,
+   "page_views": 20,
+   "sessions": 7
+  },
+  "lp": {
+   "active_users": 5,
+   "new_users": 3,
+   "page_views": 11,
+   "sessions": 7
+  }
  },
  {
   "date": "2026-10-28",
   "active_users": 925,
   "new_users": 921,
   "page_views": 1976,
-  "sessions": 1115
+  "sessions": 1115,
+  "lp": {
+   "active_users": 519,
+   "new_users": 517,
+   "page_views": 658,
+   "sessions": 603
+  },
+  "app": {
+   "active_users": 406,
+   "new_users": 404,
+   "page_views": 1318,
+   "sessions": 511
+  }
  },
  {
   "date": "2026-10-29",
-  "active_users": 85,
-  "new_users": 68,
-  "page_views": 211,
-  "sessions": 129
+  "active_users": 88,
+  "new_users": 71,
+  "page_views": 216,
+  "sessions": 133,
+  "lp": {
+   "active_users": 46,
+   "new_users": 40,
+   "page_views": 71,
+   "sessions": 69
+  },
+  "app": {
+   "active_users": 42,
+   "new_users": 31,
+   "page_views": 145,
+   "sessions": 64
+  }
  }
 ]
