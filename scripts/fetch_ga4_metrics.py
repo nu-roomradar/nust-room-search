@@ -226,13 +226,29 @@ def fetch_week(client, prop, start, end):
     return w
 
 
+DAY_METRICS = ["activeUsers", "newUsers", "screenPageViews", "sessions"]
+DAY_KEYS = ["active_users", "new_users", "page_views", "sessions"]
+
+
+def daily_history(total_rows, host_rows):
+    """日ごとの推移。total_rows = [([日付], [4指標]), ...]、host_rows = [([日付, ホスト名], [4指標]), ...]
+
+    合計（active_users など）は従来どおり。LP とアプリはドメインが別で、LP からアプリへ移った人は両方で
+    数えられるので、合計の利用者数は人数より多めに出る。アプリ・LP ごとの数を app・lp に分けて残す（2026-10-30〜）"""
+    by_day = {}
+    for d, m in total_rows:
+        by_day[d[0]] = {"date": f"{d[0][:4]}-{d[0][4:6]}-{d[0][6:]}", **{k: int(v) for k, v in zip(DAY_KEYS, m)}}
+    for (day, host), m in host_rows:
+        key = next((k for k, h in HOSTS.items() if h == host), None)
+        if key and day in by_day:
+            by_day[day][key] = {k: int(v) for k, v in zip(DAY_KEYS, m)}
+    return [by_day[k] for k in sorted(by_day)]
+
+
 def fetch_dashboard(client, prop, today):
     start, end = today - datetime.timedelta(days=28), today - datetime.timedelta(days=1)
-    history = []
-    for d, m in report(client, prop, ["date"], ["activeUsers", "newUsers", "screenPageViews", "sessions"], start, end):
-        history.append({"date": f"{d[0][:4]}-{d[0][4:6]}-{d[0][6:]}", "active_users": int(m[0]),
-                        "new_users": int(m[1]), "page_views": int(m[2]), "sessions": int(m[3])})
-    history.sort(key=lambda h: h["date"])
+    history = daily_history(report(client, prop, ["date"], DAY_METRICS, start, end),
+                            report(client, prop, ["date", "hostName"], DAY_METRICS, start, end, limit=500))
     bd = {"updated": str(today)}
     ev = {d[0]: int(m[0]) for d, m in report(client, prop, ["eventName"], ["eventCount"], start, end)}
     bd["events"] = {k: ev[k] for k in EVENTS if k in ev}
