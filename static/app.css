@@ -59,7 +59,7 @@ body::before {
 }
 
 /* ── ヘッダー ── */
-header { margin-bottom: 28px; }
+header { margin: 8px 0 30px; }
 .logo {
     font-family: 'Syne', sans-serif;
     font-size: 2rem; font-weight: 800;
@@ -77,14 +77,14 @@ header { margin-bottom: 28px; }
     -webkit-text-fill-color: rgba(108,143,255,0.6); color: rgba(108,143,255,0.6);
 }
 .logo-link { text-decoration: none; display: inline-block; }
-.subtitle { color: var(--muted); font-size: 0.82rem; margin-top: 4px; letter-spacing: 0.03em; }
+.subtitle { color: var(--muted); font-size: 0.82rem; margin-top: 6px; letter-spacing: 0.03em; }
 
 /* ── 現在時刻バッジ ── */
 .now-badge {
     display: inline-flex; align-items: center; gap: 6px;
     background: var(--surface2); border: 1px solid var(--border);
     border-radius: 99px; padding: 5px 12px; font-size: 0.78rem;
-    color: var(--muted); margin-top: 10px;
+    color: var(--muted); margin-top: 14px;
 }
 .now-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #4dd9a0; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
@@ -450,7 +450,7 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
 }
 .purpose-chips button:hover, .purpose-chips button:focus-visible { border-color: var(--accent); background: rgba(108,143,255,0.12); }
 .purpose-thanks { font-size: 0.78rem; color: var(--surugadai-color); }
-.disclaimer.below-results { margin-top: 18px; }
+.disclaimer.below-results { margin-top: 32px; }
 
 /* ── 期間限定の見た目：ハロウィーン（app.py の SEASON_THEMES。表記・注意書き・校舎の色は変えない。
       飾り・帯・スイッチは季節のクラスが付いているときだけ出す。利用者がスイッチで切ると通常に戻る） ── */
@@ -486,8 +486,8 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
 
 /* ヘッダーの帯（1行の控えめな帯。運営が最初の版を採用） */
 .season-ribbon {
-    margin-top: 10px; flex-wrap: wrap; align-items: center; gap: 4px 8px;
-    padding: 7px 14px; border-radius: 12px; font-size: 0.82rem; font-weight: 700; color: #fde68a;
+    margin-top: 14px; flex-wrap: wrap; align-items: center; gap: 4px 8px;
+    padding: 8px 14px; border-radius: 12px; font-size: 0.82rem; font-weight: 700; color: #fde68a;
     background: rgba(249,115,22,0.12); border: 1px solid rgba(251,146,60,0.35);
 }
 .season-ribbon b { color: #fb923c; }
@@ -523,7 +523,7 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
 
 /* 季節の見た目のスイッチ（iOS 風） */
 .season-switch {
-    display: inline-flex; align-items: center; gap: 8px; margin: 10px 0 0 8px; vertical-align: middle;
+    display: inline-flex; align-items: center; gap: 8px; margin: 14px 0 0 8px; vertical-align: middle;
     background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; padding: 4px 12px 4px 5px;
     color: var(--muted); font: inherit; font-size: 0.78rem; cursor: pointer;
 }
@@ -541,7 +541,7 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
 @media (max-width: 767px) {
     /* スマホは中身が横幅いっぱいなので、飾りは小さく・薄く */
     .season-deco .web { width: 130px; height: 130px; opacity: 0.35; }
-    .season-deco .moon { width: 52px; height: 52px; top: 92px; right: 5%; opacity: 0.6; }
+    .season-deco .moon { width: 48px; height: 48px; top: 22px; right: 5%; opacity: 0.6; }
     .season-deco .ghost, .season-deco .p1 { display: none; }
     .season-deco .bat { opacity: 0.4; }
 }
@@ -550,3 +550,7 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
     .season-deco .b1 { left: 12%; } .season-deco .b2 { left: 70%; } .season-deco .b3 { left: 40%; }
     .season-switch .sw-track, .season-switch .sw-knob { transition: none; }
 }
+
+/* 試験運用中の表記を検索結果の下に置いたとき（2026-10-31）。注意書きとひとまとまりに見せ、使い方の欄とは間を空ける */
+.test-banner-bottom { margin: 14px 2px 8px; align-items: flex-start; }
+.test-banner-bottom .test-tag { margin-top: 2px; }

@@ -39,12 +39,6 @@
 </div>{% endif %}
 <div class="wrap">
 
-    <!-- 試験運用中で大学公式ではないことの明示（誤認防止・控えめ表記。文言は 2026-10-22 に理工学部学生課が提案） -->
-    <div class="test-banner">
-        <span class="test-tag">TEST</span>
-        <span>本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している<strong>試験運用中</strong>のサービスです。大学が公式に提供するサービスではありません。</span>
-    </div>
-
     <!-- ヘッダー -->
     <header>
         <a href="https://nu-roomradar.github.io/nust-room-search/" class="logo-link"><div class="logo">RoomRadar <span>β</span></div></a>{% if season == 'halloween' %}<span class="logo-season" aria-hidden="true">🎃</span>{% endif %}
@@ -242,6 +236,12 @@
             </div>
             {% endif %}
 
+        <!-- 試験運用中で大学公式ではないことの明示（誤認防止。文言は 2026-10-22 に理工学部学生課が提案）。
+             検索画面を使いやすくするため、2026-10-31 の運営判断で結果の下（ドア越し確認の注意の下）に置く。検索していないときも出す -->
+        <div class="test-banner test-banner-bottom">
+            <span class="test-tag">TEST</span>
+            <span>本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している<strong>試験運用中</strong>のサービスです。大学が公式に提供するサービスではありません。</span>
+        </div>
         </div><!-- /results-area -->
     </div><!-- /page-cols -->
 
