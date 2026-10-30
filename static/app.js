@@ -236,11 +236,35 @@ function showToast(msg) {
     const season = sw.dataset.season, cls = 'theme-' + season;
     function sync() { sw.setAttribute('aria-checked', document.body.classList.contains(cls) ? 'true' : 'false'); }
     sync();
+    const calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let busy = false;
+    // 切り替えの演出：スイッチの位置から円が広がって画面を覆い、覆いきった瞬間に見た目を替えて、ふっと晴れる。
+    // ハロウィーンにするときは、かぼちゃが弾んでコウモリが飛び立つ。「視差効果を減らす」設定では演出なしで替える
+    function play(on, apply) {
+        if (calm) { apply(); return; }
+        const r = sw.getBoundingClientRect();
+        const fx = document.createElement('div');
+        fx.className = 'season-fx' + (on ? ' fx-' + season : ' fx-normal');
+        fx.setAttribute('aria-hidden', 'true');
+        fx.style.setProperty('--fx-x', Math.round(r.left + 19) + 'px');
+        fx.style.setProperty('--fx-y', Math.round(r.top + r.height / 2) + 'px');
+        if (on && season === 'halloween') {
+            fx.innerHTML = '<span class="fx-pumpkin">🎃</span>' +
+                ['b1', 'b2', 'b3', 'b4', 'b5', 'b6'].map(function(c) { return '<span class="fx-bat ' + c + '">🦇</span>'; }).join('') +
+                '<span class="fx-text">Trick or Room?</span>';
+        }
+        document.body.appendChild(fx);
+        setTimeout(apply, 420);                                   // 円が画面を覆ったところで替える
+        setTimeout(function() { fx.classList.add('fx-out'); }, on ? 1150 : 560);
+        setTimeout(function() { fx.remove(); busy = false; }, on ? 1650 : 1000);
+    }
     sw.addEventListener('click', function() {
+        if (busy) return;
+        busy = !calm;
         const on = !document.body.classList.contains(cls);
-        document.body.classList.toggle(cls, on);
+        sw.setAttribute('aria-checked', on ? 'true' : 'false');  // スイッチはすぐ動かす
         try { if (on) localStorage.removeItem('rr_season_off'); else localStorage.setItem('rr_season_off', season); } catch (e) {}
-        sync();
         if (typeof gtag === 'function') gtag('event', on ? 'season_theme_on' : 'season_theme_off', { season: season });
+        play(on, function() { document.body.classList.toggle(cls, on); sync(); });
     });
 })();
