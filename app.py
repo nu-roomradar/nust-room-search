@@ -236,6 +236,25 @@ def _asset_version():
 ASSET_VERSION = _asset_version()
 
 
+# 期間限定の見た目（季節の着せ替え。2026-10-30 運営）。日本時間の日付で自動で切り替わり、期間が過ぎたら元に戻る。
+# (名前, (開始の月, 日), (終了の月, 日)) を毎年くり返す。中身は static/app.css の .theme-<名前> とテンプレートの飾り。
+# 環境変数 SEASON_THEME で上書きできる（"off" で止める、"halloween" などで期間外でも出す。確認用・緊急停止用）
+SEASON_THEMES = [("halloween", (10, 30), (10, 31))]
+
+
+def season_theme(now=None):
+    forced = os.environ.get("SEASON_THEME", "").strip()
+    if forced:
+        return None if forced == "off" else forced if forced in {n for n, _, _ in SEASON_THEMES} else None
+    md = ((now or datetime.datetime.now(JST)).month, (now or datetime.datetime.now(JST)).day)
+    return next((name for name, start, end in SEASON_THEMES if start <= md <= end), None)
+
+
+@app.context_processor
+def inject_season_theme():
+    return {"season": season_theme()}
+
+
 # ブラウザへの安全設定（2026-10 セキュリティ点検）。画面はインラインの script / onclick を使っているので、
 # script-src までは絞らず、他サイトへの埋め込み（クリックジャッキング）・MIME の推測・不要な機能だけを止める
 SECURITY_HEADERS = {

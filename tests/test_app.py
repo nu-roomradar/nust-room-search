@@ -841,3 +841,45 @@ class SecurityHardeningTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SeasonThemeTests(unittest.TestCase):
+    """期間限定の見た目（季節の着せ替え）が日付で切り替わり、期間外は元に戻るか（2026-10-30〜）"""
+
+    def setUp(self):
+        self.env = mock.patch.dict(os.environ, {"SEASON_THEME": ""})
+        self.env.start()
+        self.client = rr.app.test_client()
+
+    def tearDown(self):
+        self.env.stop()
+
+    @staticmethod
+    def at(m, d):
+        return datetime.datetime(2026, m, d, 12, 0, tzinfo=rr.JST)
+
+    def test_halloween_only_on_its_days(self):
+        self.assertEqual(rr.season_theme(self.at(10, 30)), "halloween")
+        self.assertEqual(rr.season_theme(self.at(10, 31)), "halloween")
+        self.assertIsNone(rr.season_theme(self.at(10, 29)))
+        self.assertIsNone(rr.season_theme(self.at(11, 1)))
+
+    def test_env_override(self):
+        with mock.patch.dict(os.environ, {"SEASON_THEME": "off"}):
+            self.assertIsNone(rr.season_theme(self.at(10, 31)))
+        with mock.patch.dict(os.environ, {"SEASON_THEME": "halloween"}):
+            self.assertEqual(rr.season_theme(self.at(5, 1)), "halloween")
+        with mock.patch.dict(os.environ, {"SEASON_THEME": "<script>"}):
+            self.assertIsNone(rr.season_theme(self.at(10, 31)))   # 知らない名前はクラスに入れない
+
+    def test_pages_keep_the_notice_while_themed(self):
+        with mock.patch.dict(os.environ, {"SEASON_THEME": "halloween"}):
+            pages = [self.client.get(u).get_data(as_text=True) for u in ("/", "/room")]
+        self.assertIn('class="theme-halloween"', pages[0])
+        self.assertIn("Trick or Room?", pages[0])
+        for html in pages:
+            self.assertIn("大学が公式に提供するサービスではありません", html)
+        with mock.patch.dict(os.environ, {"SEASON_THEME": "off"}):
+            html = self.client.get("/").get_data(as_text=True)
+        self.assertNotIn("theme-halloween", html)
+        self.assertNotIn("Trick or Room?", html)

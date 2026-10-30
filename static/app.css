@@ -451,3 +451,40 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
 .purpose-chips button:hover, .purpose-chips button:focus-visible { border-color: var(--accent); background: rgba(108,143,255,0.12); }
 .purpose-thanks { font-size: 0.78rem; color: var(--surugadai-color); }
 .disclaimer.below-results { margin-top: 18px; }
+
+/* ── 期間限定の見た目：ハロウィン（app.py の SEASON_THEMES。表記・注意書き・校舎の色は変えない） ── */
+.theme-halloween {
+    --bg: #120a1f; --surface: #1a1029; --surface2: #23163a;
+    --border: rgba(251,146,60,0.16); --muted: #a08cc0; --accent: #f97316;
+    background:
+        radial-gradient(600px 420px at 85% -5%, rgba(253,224,71,0.10), transparent 70%),
+        radial-gradient(700px 520px at 0% 100%, rgba(249,115,22,0.10), transparent 70%),
+        radial-gradient(600px 500px at 100% 60%, rgba(124,58,237,0.16), transparent 70%),
+        var(--bg);
+    background-attachment: fixed;
+}
+.theme-halloween .logo { background: linear-gradient(135deg, #fff 0%, #fb923c 70%, #fde047 100%); -webkit-background-clip: text; background-clip: text; }
+.theme-halloween .logo span { -webkit-text-fill-color: rgba(251,146,60,0.75); color: rgba(251,146,60,0.75); }
+.theme-halloween .btn-search { background: linear-gradient(90deg, #f97316, #fb923c); color: #1b0f38; }
+.theme-halloween select:focus { border-color: #fb923c; }
+.season-ribbon {
+    margin-top: 10px; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 8px;
+    padding: 7px 14px; border-radius: 12px; font-size: 0.82rem; font-weight: 700; color: #fde68a;
+    background: rgba(249,115,22,0.12); border: 1px solid rgba(251,146,60,0.35);
+}
+.season-ribbon b { color: #fb923c; }
+.season-ribbon-sub { font-weight: 500; color: #d8b4fe; font-size: 0.76rem; }
+.season-deco { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.season-deco span { position: absolute; font-size: 28px; opacity: 0.22; animation: seasonFloat 9s ease-in-out infinite; }
+.season-deco span:nth-child(1) { left: 6%;  top: 14%; }
+.season-deco span:nth-child(2) { right: 8%; top: 32%; animation-delay: -3s; font-size: 22px; }
+.season-deco span:nth-child(3) { left: 4%;  bottom: 12%; animation-delay: -5s; font-size: 34px; opacity: 0.18; }
+.season-deco span:nth-child(4) { right: 14%; bottom: 22%; animation-delay: -7s; font-size: 20px; }
+@keyframes seasonFloat { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-14px) rotate(4deg); } }
+@media (prefers-reduced-motion: reduce) { .season-deco span { animation: none; } }
+@media (max-width: 767px) {
+    /* スマホは中身が横幅いっぱいなので、文字の裏に来る左側の飾りは出さない */
+    .season-deco span:nth-child(1), .season-deco span:nth-child(3) { display: none; }
+    .season-deco span { opacity: 0.16; }
+}
+.theme-halloween .room-search-link { border-color: rgba(251,146,60,0.45); background: rgba(249,115,22,0.08); }

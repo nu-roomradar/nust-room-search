@@ -30,7 +30,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}?v={{ asset_version }}">
 </head>
-<body>
+<body{% if season %} class="theme-{{ season }}"{% endif %}>
+{% if season == 'halloween' %}<div class="season-deco" aria-hidden="true"><span>🦇</span><span>🦇</span><span>🎃</span><span>🦇</span></div>{% endif %}
 <div class="wrap">
 
     <!-- 試験運用中で大学公式ではないことの明示（誤認防止・控えめ表記。文言は 2026-10-22 に理工学部学生課が提案） -->
@@ -43,6 +44,10 @@
     <header>
         <a href="https://nu-roomradar.github.io/nust-room-search/" class="logo-link"><div class="logo">RoomRadar <span>β</span></div></a>
         <div class="subtitle">日大理工学部 · 空き教室リアルタイム検索</div>
+        {% if season == 'halloween' %}
+        <!-- 期間限定の飾り（ハロウィン。app.py の SEASON_THEMES で自動で出し入れ） -->
+        <div class="season-ribbon"><span aria-hidden="true">🎃</span> Happy Halloween！ <b>Trick or Room?</b> <span class="season-ribbon-sub">開ける前に、ドア越しにチラッと確認を👻</span></div>
+        {% endif %}
         <div class="now-badge">
             <span class="dot"></span>
             <span id="clock">--:--</span>
@@ -214,7 +219,7 @@
 
             {% if not empty_rooms %}
             <div class="empty-state">
-                <span class="icon">🔍</span>
+                <span class="icon">{% if season == 'halloween' %}👻{% else %}🔍{% endif %}</span>
                 条件に合う空き教室はありませんでした。
             </div>
             {% endif %}
