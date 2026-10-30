@@ -858,11 +858,16 @@ class SeasonThemeTests(unittest.TestCase):
     def at(m, d):
         return datetime.datetime(2026, m, d, 12, 0, tzinfo=rr.JST)
 
-    def test_halloween_only_on_its_days(self):
-        self.assertEqual(rr.season_theme(self.at(10, 30)), "halloween")
+    def test_periods_follow_tokyo_disney_resort(self):
+        """ハロウィーン 9/16〜10/31、クリスマス 11/11〜12/25（2026年の東京ディズニーリゾートにそろえる）"""
+        self.assertIsNone(rr.season_theme(self.at(9, 15)))
+        self.assertEqual(rr.season_theme(self.at(9, 16)), "halloween")
         self.assertEqual(rr.season_theme(self.at(10, 31)), "halloween")
-        self.assertIsNone(rr.season_theme(self.at(10, 29)))
         self.assertIsNone(rr.season_theme(self.at(11, 1)))
+        self.assertIsNone(rr.season_theme(self.at(11, 10)))
+        self.assertEqual(rr.season_theme(self.at(11, 11)), "christmas")
+        self.assertEqual(rr.season_theme(self.at(12, 25)), "christmas")
+        self.assertIsNone(rr.season_theme(self.at(12, 26)))
 
     def test_env_override(self):
         with mock.patch.dict(os.environ, {"SEASON_THEME": "off"}):

@@ -452,7 +452,7 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
 .purpose-thanks { font-size: 0.78rem; color: var(--surugadai-color); }
 .disclaimer.below-results { margin-top: 18px; }
 
-/* ── 期間限定の見た目：ハロウィン（app.py の SEASON_THEMES。表記・注意書き・校舎の色は変えない） ── */
+/* ── 期間限定の見た目：ハロウィーン（app.py の SEASON_THEMES。表記・注意書き・校舎の色は変えない） ── */
 .theme-halloween {
     --bg: #120a1f; --surface: #1a1029; --surface2: #23163a;
     --border: rgba(251,146,60,0.16); --muted: #a08cc0; --accent: #f97316;
