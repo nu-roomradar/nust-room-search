@@ -101,6 +101,20 @@ class ReportRoomTests(unittest.TestCase):
         self.assertNotIn("報告の多い教室", g.to_markdown([]))
 
 
+class DailyHistoryTests(unittest.TestCase):
+    def test_totals_kept_and_app_lp_split_added(self):
+        total = [(["20261028"], ["925", "921", "1976", "1115"]), (["20261027"], ["11", "4", "31", "14"])]
+        hosts = [(["20261028", "nust-room-search.onrender.com"], ["600", "590", "1200", "700"]),
+                 (["20261028", "nu-roomradar.github.io"], ["400", "398", "776", "415"]),
+                 (["20261028", "evil.example"], ["9", "9", "9", "9"])]          # 知らないホストは捨てる
+        h = g.daily_history(total, hosts)
+        self.assertEqual([d["date"] for d in h], ["2026-10-27", "2026-10-28"])
+        self.assertEqual(h[1]["active_users"], 925)
+        self.assertEqual(h[1]["app"], {"active_users": 600, "new_users": 590, "page_views": 1200, "sessions": 700})
+        self.assertEqual(h[1]["lp"]["page_views"], 776)
+        self.assertNotIn("app", h[0])
+
+
 class ReportCancelAndSlotTests(unittest.TestCase):
     """2026-10-26〜: 報告の取り消しを引き、報告の曜日・時限を数える"""
 
