@@ -468,8 +468,12 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
         radial-gradient(700px 520px at 0% 100%, rgba(249,115,22,0.16), transparent 70%),
         radial-gradient(640px 520px at 100% 55%, rgba(124,58,237,0.22), transparent 70%),
         linear-gradient(180deg, #0d0719 0%, #1a0f30 45%, #120a1f 100%);
+    background-color: #0d0719;   /* 引っ張ったときの画面の外（iOS のはみ出し）を白にしない */
     background-attachment: fixed;
 }
+/* 画面の外の色は html の背景で決まる。通常は黒、ハロウィーンは夜の紫にそろえる */
+html { background-color: #0a0a0f; }
+html:has(> body.theme-halloween) { background-color: #0d0719; }
 .theme-halloween .card { box-shadow: 0 0 0 1px rgba(251,146,60,0.10), 0 18px 40px rgba(0,0,0,0.45); }
 .theme-halloween .logo { background: linear-gradient(135deg, #fff 0%, #fb923c 65%, #fde047 100%); -webkit-background-clip: text; background-clip: text; }
 .theme-halloween .logo span { -webkit-text-fill-color: rgba(251,146,60,0.8); color: rgba(251,146,60,0.8); }
@@ -554,3 +558,37 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
 /* 試験運用中の表記を検索結果の下に置いたとき（2026-10-31）。注意書きとひとまとまりに見せ、使い方の欄とは間を空ける */
 .test-banner-bottom { margin: 14px 2px 8px; align-items: flex-start; }
 .test-banner-bottom .test-tag { margin-top: 2px; }
+
+/* 季節の見た目を切り替えるときの演出（static/app.js の play）。スイッチの位置から円が広がって画面を覆い、晴れる */
+.season-fx {
+    position: fixed; inset: 0; z-index: 200; pointer-events: none; overflow: hidden;
+    clip-path: circle(0px at var(--fx-x) var(--fx-y));
+    animation: fxWipe 0.42s cubic-bezier(0.55, 0, 0.3, 1) forwards;
+}
+.season-fx.fx-halloween { background: radial-gradient(circle at var(--fx-x) var(--fx-y), #2a1550 0%, #160b2b 45%, #0d0719 100%); }
+.season-fx.fx-normal { background: #0a0a0f; }
+.season-fx.fx-out { animation: fxWipe 0.42s cubic-bezier(0.55, 0, 0.3, 1) forwards, fxOut 0.45s ease forwards; }
+@keyframes fxWipe { to { clip-path: circle(150vmax at var(--fx-x) var(--fx-y)); } }
+@keyframes fxOut { to { opacity: 0; } }
+.season-fx span { position: absolute; left: 50%; top: 46%; line-height: 1; }
+.season-fx .fx-pumpkin {
+    font-size: 96px; transform: translate(-50%, -50%) scale(0);
+    filter: drop-shadow(0 0 30px rgba(249,115,22,0.75));
+    animation: fxPop 0.6s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.season-fx .fx-text {
+    top: calc(46% + 72px); transform: translate(-50%, 0); opacity: 0; white-space: nowrap;
+    font-family: 'Noto Sans JP', sans-serif; font-weight: 900; font-size: 1.5rem; color: #fb923c; letter-spacing: 0.02em;
+    animation: fxText 0.45s 0.55s ease forwards;
+}
+.season-fx .fx-bat { font-size: 30px; opacity: 0; transform: translate(-50%, -50%); animation: fxBat 0.95s 0.42s ease-out forwards; }
+.season-fx .b1 { --dx: -42vw; --dy: -30vh; } .season-fx .b2 { --dx: 40vw; --dy: -34vh; animation-delay: 0.48s; }
+.season-fx .b3 { --dx: -46vw; --dy: 8vh; animation-delay: 0.52s; } .season-fx .b4 { --dx: 46vw; --dy: 4vh; animation-delay: 0.45s; }
+.season-fx .b5 { --dx: -22vw; --dy: -44vh; animation-delay: 0.58s; font-size: 22px; } .season-fx .b6 { --dx: 24vw; --dy: -46vh; animation-delay: 0.55s; font-size: 24px; }
+@keyframes fxPop { 0% { transform: translate(-50%, -50%) scale(0) rotate(-20deg); } 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); } }
+@keyframes fxText { to { opacity: 1; transform: translate(-50%, -6px); } }
+@keyframes fxBat {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.2); }
+}
