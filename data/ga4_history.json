@@ -1,33 +1,5 @@
 [
  {
-  "date": "2026-09-28",
-  "active_users": 20,
-  "new_users": 13,
-  "page_views": 49,
-  "sessions": 31
- },
- {
-  "date": "2026-09-29",
-  "active_users": 19,
-  "new_users": 9,
-  "page_views": 39,
-  "sessions": 29
- },
- {
-  "date": "2026-09-30",
-  "active_users": 23,
-  "new_users": 17,
-  "page_views": 45,
-  "sessions": 24
- },
- {
-  "date": "2026-10-01",
-  "active_users": 12,
-  "new_users": 6,
-  "page_views": 25,
-  "sessions": 16
- },
- {
   "date": "2026-10-04",
   "active_users": 9,
   "new_users": 6,
@@ -155,9 +127,37 @@
  },
  {
   "date": "2026-10-25",
-  "active_users": 0,
-  "new_users": 0,
-  "page_views": 0,
-  "sessions": 2
+  "active_users": 12,
+  "new_users": 5,
+  "page_views": 26,
+  "sessions": 16
+ },
+ {
+  "date": "2026-10-26",
+  "active_users": 16,
+  "new_users": 8,
+  "page_views": 38,
+  "sessions": 21
+ },
+ {
+  "date": "2026-10-27",
+  "active_users": 11,
+  "new_users": 4,
+  "page_views": 31,
+  "sessions": 14
+ },
+ {
+  "date": "2026-10-28",
+  "active_users": 925,
+  "new_users": 921,
+  "page_views": 1976,
+  "sessions": 1115
+ },
+ {
+  "date": "2026-10-29",
+  "active_users": 85,
+  "new_users": 68,
+  "page_views": 211,
+  "sessions": 129
  }
 ]
