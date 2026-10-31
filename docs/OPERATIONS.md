@@ -92,7 +92,7 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 
 | 症状 | まず見る場所 | 対応 |
 |---|---|---|
-| アプリが開かない・遅い | Render ダッシュボードの Events / Logs・UptimeRobot の週次メール | **UptimeRobot が本番 URL を定期的に開いているので、Free プランでも眠らない**（2026-10 時点。週次メールで稼働率と応答時間が届く。10/18〜24 は稼働率 100%・平均 460ms）。UptimeRobot が止まっていると、Free プランではスリープ復帰に数十秒かかり、眠るたびに報告も消える。落ちていれば Manual Deploy → Deploy latest commit |
+| アプリが開かない・遅い | Render ダッシュボードの Events / Logs・UptimeRobot の週次メール | **UptimeRobot が本番 URL を定期的に開いているので、Free プランでも眠らない**（ただし Free は**ワークスペース全体で月750時間**まで。眠らない無料サービス1つで31日の月は744時間なので、ぎりぎり収まる。**無料のサービスをもう1つ動かすと月の途中で止まる**。2026-10-30 に「697/750時間」の警告メールが来たが、月末までの残りで収まる計算。止まると翌月1日まで止まったままなので、確実にしたいときは Starter に上げる）（2026-10 時点。週次メールで稼働率と応答時間が届く。10/18〜24 は稼働率 100%・平均 460ms）。UptimeRobot が止まっていると、Free プランではスリープ復帰に数十秒かかり、眠るたびに報告も消える。落ちていれば Manual Deploy → Deploy latest commit |
 | 「試験運用中・大学公式ではない」表記が本番から消えた | ヘルスチェックの Issue | 学生課・教務課と協議中のため即対応。`CLAUDE.md` ルール1。Claude Code なら hook が編集を止めるので、消えるとすれば手作業か外部要因 |
 | Actions が失敗している | GitHub → Actions → 該当 run のログ | Instagram 系なら 9 割トークン失効。CI の失敗はテストが落ちている＝直すまで `main` に入れない |
 | Instagram に投稿できない | Actions のログの `[ERROR]` 行 | `code=190` / `OAuthException` → トークン再発行。それ以外は `.claude/skills/instagram-post/SKILL.md` |
