@@ -1,21 +1,21 @@
 {
- "updated": "2026-10-30",
+ "updated": "2026-11-02",
  "events": {
-  "search": 743,
+  "search": 772,
   "report_room": 42,
   "report_cancel": 9,
   "feedback_submit": 3,
-  "purpose_study": 25,
+  "purpose_study": 26,
   "purpose_group": 10,
   "purpose_meeting": 6,
-  "purpose_break": 9,
+  "purpose_break": 10,
   "purpose_other": 5,
-  "purpose_skip": 5
+  "purpose_skip": 6
  },
  "purposes": [
   {
    "label": "study",
-   "count": 25
+   "count": 26
   },
   {
    "label": "group",
@@ -27,44 +27,44 @@
   },
   {
    "label": "break",
-   "count": 9
+   "count": 10
   },
   {
    "label": "other",
    "count": 5
   }
  ],
- "purpose_skip": 5,
+ "purpose_skip": 6,
  "search_building": [
   {
    "label": "all",
-   "count": 360
+   "count": 379
   },
   {
    "label": "funabashi",
-   "count": 145
+   "count": 148
   },
   {
    "label": "tower",
-   "count": 134
+   "count": 135
   },
   {
    "label": "main",
-   "count": 104
+   "count": 110
   }
  ],
  "search_period": [
   {
    "label": "3",
-   "count": 176
+   "count": 186
   },
   {
    "label": "1",
-   "count": 171
+   "count": 175
   },
   {
    "label": "2",
-   "count": 126
+   "count": 131
   },
   {
    "label": "4",
@@ -72,11 +72,11 @@
   },
   {
    "label": "6",
-   "count": 99
+   "count": 103
   },
   {
    "label": "5",
-   "count": 62
+   "count": 68
   }
  ],
  "search_day": [
@@ -86,23 +86,23 @@
   },
   {
    "label": "水",
-   "count": 167
+   "count": 168
   },
   {
    "label": "金",
-   "count": 72
+   "count": 89
   },
   {
    "label": "火",
-   "count": 69
+   "count": 71
   },
   {
    "label": "月",
-   "count": 40
+   "count": 47
   },
   {
    "label": "土",
-   "count": 11
+   "count": 13
   }
  ],
  "report_rooms": [
@@ -210,11 +210,11 @@
  "channels": [
   {
    "label": "Referral",
-   "sessions": 674
+   "sessions": 756
   },
   {
    "label": "Direct",
-   "sessions": 657
+   "sessions": 735
   },
   {
    "label": "Organic Social",
@@ -222,11 +222,11 @@
   },
   {
    "label": "Organic Search",
-   "sessions": 51
+   "sessions": 52
   },
   {
    "label": "Unassigned",
-   "sessions": 8
+   "sessions": 1
   }
  ]
 }
