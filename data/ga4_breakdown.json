@@ -1,114 +1,161 @@
 {
- "updated": "2026-11-02",
+ "updated": "2026-11-06",
+ "period": {
+  "start": "2026-10-09",
+  "end": "2026-11-05"
+ },
+ "totals": {
+  "all": {
+   "active_users": 1470,
+   "new_users": 1441,
+   "sessions": 2160,
+   "page_views": 3741,
+   "events": 13099
+  },
+  "lp": {
+   "active_users": 810,
+   "new_users": 804,
+   "sessions": 1113,
+   "page_views": 1214,
+   "events": 4025
+  },
+  "app": {
+   "active_users": 660,
+   "new_users": 637,
+   "sessions": 1050,
+   "page_views": 2527,
+   "events": 9074
+  }
+ },
  "events": {
-  "search": 772,
-  "report_room": 42,
-  "report_cancel": 9,
+  "search": 1060,
+  "report_room": 66,
+  "report_cancel": 13,
   "feedback_submit": 3,
-  "purpose_study": 26,
-  "purpose_group": 10,
-  "purpose_meeting": 6,
-  "purpose_break": 10,
+  "purpose_study": 46,
+  "purpose_group": 12,
+  "purpose_meeting": 7,
+  "purpose_break": 14,
   "purpose_other": 5,
-  "purpose_skip": 6
+  "purpose_skip": 7
  },
  "purposes": [
   {
    "label": "study",
-   "count": 26
+   "count": 46
   },
   {
    "label": "group",
-   "count": 10
+   "count": 12
   },
   {
    "label": "meeting",
-   "count": 6
+   "count": 7
   },
   {
    "label": "break",
-   "count": 10
+   "count": 14
   },
   {
    "label": "other",
    "count": 5
   }
  ],
- "purpose_skip": 6,
+ "purpose_skip": 7,
  "search_building": [
   {
    "label": "all",
-   "count": 379
-  },
-  {
-   "label": "funabashi",
-   "count": 148
+   "count": 502
   },
   {
    "label": "tower",
-   "count": 135
+   "count": 209
+  },
+  {
+   "label": "funabashi",
+   "count": 193
   },
   {
    "label": "main",
-   "count": 110
+   "count": 156
   }
  ],
  "search_period": [
   {
    "label": "3",
-   "count": 186
+   "count": 286
   },
   {
    "label": "1",
-   "count": 175
+   "count": 198
   },
   {
    "label": "2",
-   "count": 131
+   "count": 197
   },
   {
    "label": "4",
-   "count": 109
+   "count": 167
   },
   {
    "label": "6",
-   "count": 103
+   "count": 111
   },
   {
    "label": "5",
-   "count": 68
+   "count": 101
   }
  ],
  "search_day": [
   {
    "label": "木",
-   "count": 384
+   "count": 477
   },
   {
    "label": "水",
-   "count": 168
-  },
-  {
-   "label": "金",
-   "count": 89
+   "count": 258
   },
   {
    "label": "火",
-   "count": 71
+   "count": 119
   },
   {
    "label": "月",
-   "count": 47
+   "count": 104
+  },
+  {
+   "label": "金",
+   "count": 87
   },
   {
    "label": "土",
-   "count": 13
+   "count": 15
   }
  ],
  "report_rooms": [
   {
+   "label": "S201",
+   "building": "タワースコラ",
+   "count": 3
+  },
+  {
+   "label": "S401",
+   "building": "タワースコラ",
+   "count": 3
+  },
+  {
    "label": "1042",
    "building": "船橋校舎",
+   "count": 2
+  },
+  {
+   "label": "131",
+   "building": "駿河台校舎",
+   "count": 2
+  },
+  {
+   "label": "142",
+   "building": "駿河台校舎",
    "count": 2
   },
   {
@@ -122,39 +169,19 @@
    "count": 2
   },
   {
-   "label": "S404",
+   "label": "S101",
    "building": "タワースコラ",
    "count": 2
   },
   {
-   "label": "1032",
-   "building": "船橋校舎",
-   "count": 1
+   "label": "S302",
+   "building": "タワースコラ",
+   "count": 2
   },
   {
-   "label": "1103",
-   "building": "船橋校舎",
-   "count": 1
-  },
-  {
-   "label": "1111",
-   "building": "船橋校舎",
-   "count": 1
-  },
-  {
-   "label": "1141",
-   "building": "船橋校舎",
-   "count": 1
-  },
-  {
-   "label": "131",
-   "building": "駿河台校舎",
-   "count": 1
-  },
-  {
-   "label": "134",
-   "building": "船橋校舎",
-   "count": 1
+   "label": "S306",
+   "building": "タワースコラ",
+   "count": 2
   }
  ],
  "report_slots": {
@@ -162,7 +189,7 @@
    0,
    0,
    0,
-   0,
+   5,
    0,
    0
   ],
@@ -175,20 +202,20 @@
    0
   ],
   "水": [
-   1,
-   0,
-   0,
+   2,
+   2,
+   2,
    0,
    0,
    8
   ],
   "木": [
    6,
-   1,
-   3,
-   5,
-   1,
-   0
+   2,
+   6,
+   7,
+   4,
+   1
   ],
   "金": [
    2,
@@ -210,23 +237,23 @@
  "channels": [
   {
    "label": "Referral",
-   "sessions": 756
+   "sessions": 1020
   },
   {
    "label": "Direct",
-   "sessions": 735
+   "sessions": 1004
   },
   {
    "label": "Organic Social",
-   "sessions": 96
+   "sessions": 81
   },
   {
    "label": "Organic Search",
-   "sessions": 52
+   "sessions": 59
   },
   {
    "label": "Unassigned",
-   "sessions": 1
+   "sessions": 3
   }
  ]
 }

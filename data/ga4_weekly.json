@@ -150,23 +150,23 @@
   "week_start": "2026-10-26",
   "week_end": "2026-11-01",
   "app": {
-   "users": 483,
-   "sessions": 679,
-   "page_views": 1645
+   "users": 512,
+   "sessions": 723,
+   "page_views": 1753
   },
   "lp": {
-   "users": 610,
-   "sessions": 775,
-   "page_views": 841
+   "users": 640,
+   "sessions": 821,
+   "page_views": 889
   },
   "events": {
-   "search": 668,
-   "report_room": 39,
+   "search": 722,
+   "report_room": 45,
    "report_cancel": 9,
    "reserve_room": 0,
    "feedback_submit": 3,
-   "purpose_study": 26,
-   "purpose_group": 10,
+   "purpose_study": 30,
+   "purpose_group": 11,
    "purpose_meeting": 6,
    "purpose_break": 10,
    "purpose_other": 5,
