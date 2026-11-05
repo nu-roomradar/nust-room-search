@@ -245,11 +245,28 @@ def daily_history(total_rows, host_rows):
     return [by_day[k] for k in sorted(by_day)]
 
 
+TOTAL_METRICS = ["activeUsers", "newUsers", "sessions", "screenPageViews", "eventCount"]
+TOTAL_KEYS = ["active_users", "new_users", "sessions", "page_views", "events"]
+
+
+def period_totals(total_rows, host_rows):
+    """直近28日の合計（利用者数は期間内の重複なし）。all は GA4 の「レポートのスナップショット」と同じ数。
+    LP からアプリへ移った人は両方で数えられるので、「使った人」を言うときはアプリ（app）の数を使う（2026-11-06〜）"""
+    out = {"all": {k: int(v) for k, v in zip(TOTAL_KEYS, total_rows[0][1])} if total_rows else dict.fromkeys(TOTAL_KEYS, 0)}
+    for (host,), m in host_rows:
+        key = next((k for k, h in HOSTS.items() if h == host), None)
+        if key:
+            out[key] = {k: int(v) for k, v in zip(TOTAL_KEYS, m)}
+    return out
+
+
 def fetch_dashboard(client, prop, today):
     start, end = today - datetime.timedelta(days=28), today - datetime.timedelta(days=1)
     history = daily_history(report(client, prop, ["date"], DAY_METRICS, start, end),
                             report(client, prop, ["date", "hostName"], DAY_METRICS, start, end, limit=500))
-    bd = {"updated": str(today)}
+    bd = {"updated": str(today), "period": {"start": str(start), "end": str(end)}}
+    bd["totals"] = period_totals(report(client, prop, [], TOTAL_METRICS, start, end),
+                                 report(client, prop, ["hostName"], TOTAL_METRICS, start, end, limit=50))
     ev = {d[0]: int(m[0]) for d, m in report(client, prop, ["eventName"], ["eventCount"], start, end)}
     bd["events"] = {k: ev[k] for k in EVENTS if k in ev}
     bd["purposes"] = [{"label": code, "count": ev.get(f"purpose_{code}", 0)} for code, _ in PURPOSES]
@@ -305,6 +322,9 @@ def main(argv=None):
             f.write("\n")
     with open(WEEKLY_MD, "w", encoding="utf-8") as f:
         f.write(to_markdown(weeks, breakdown.get("report_rooms"), breakdown.get("report_slots")))
+    t = breakdown["totals"]
+    print(f"[INFO] 直近28日 {breakdown['period']['start']}〜{breakdown['period']['end']}: {json.dumps(t, ensure_ascii=False)}"
+          f" / 検索 {breakdown['events'].get('search', 0)}")
     for w in new:
         print(f"[INFO] {w['week_start']}〜{w['week_end']}: アプリ 利用者{w['app']['users']}・訪問{w['app']['sessions']} / "
               f"LP 利用者{w['lp']['users']}・訪問{w['lp']['sessions']} / イベント {w['events']}")
