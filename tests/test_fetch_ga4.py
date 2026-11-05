@@ -115,6 +115,23 @@ class DailyHistoryTests(unittest.TestCase):
         self.assertNotIn("app", h[0])
 
 
+class PeriodTotalsTests(unittest.TestCase):
+    def test_all_and_app_lp_totals(self):
+        total = [([], ["1461", "1430", "2100", "4200", "13000"])]
+        hosts = [(["nust-room-search.onrender.com"], ["700", "690", "1000", "2800", "9000"]),
+                 (["nu-roomradar.github.io"], ["800", "790", "1100", "1400", "4000"]),
+                 (["evil.example"], ["5", "5", "5", "5", "5"])]                   # 知らないホストは捨てる
+        t = g.period_totals(total, hosts)
+        self.assertEqual(t["all"], {"active_users": 1461, "new_users": 1430, "sessions": 2100,
+                                    "page_views": 4200, "events": 13000})
+        self.assertEqual(t["app"]["active_users"], 700)
+        self.assertEqual(t["lp"]["events"], 4000)
+        self.assertEqual(set(t), {"all", "app", "lp"})
+
+    def test_empty_period(self):
+        self.assertEqual(g.period_totals([], [])["all"]["events"], 0)
+
+
 class ReportCancelAndSlotTests(unittest.TestCase):
     """2026-10-26〜: 報告の取り消しを引き、報告の曜日・時限を数える"""
 
