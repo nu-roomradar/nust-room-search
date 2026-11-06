@@ -252,6 +252,11 @@ function showToast(msg) {
             fx.innerHTML = '<span class="fx-pumpkin">🎃</span>' +
                 ['b1', 'b2', 'b3', 'b4', 'b5', 'b6'].map(function(c) { return '<span class="fx-bat ' + c + '">🦇</span>'; }).join('') +
                 '<span class="fx-text">Trick or Room?</span>';
+        } else if (on && season === 'christmas') {
+            // クリスマスにするときは、ツリーが弾んで雪の結晶が舞う
+            fx.innerHTML = '<span class="fx-pop">🎄</span>' +
+                ['b1', 'b2', 'b3', 'b4', 'b5', 'b6'].map(function(c) { return '<span class="fx-flake ' + c + '">❄️</span>'; }).join('') +
+                '<span class="fx-text">Merry Christmas!</span>';
         }
         document.body.appendChild(fx);
         setTimeout(apply, 420);                                   // 円が画面を覆ったところで替える
