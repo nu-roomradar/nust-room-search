@@ -228,34 +228,42 @@ function showToast(msg) {
     setTimeout(() => t.classList.remove('show'), 2600);
 }
 
-// ── 季節の見た目の切り替え（ハロウィーンなど。iOS 風のスイッチ。選んだ状態はこの端末に保存し、
-//    次に開いたときは templates/_season_boot.html が描画の前に反映する。オン・オフは季節をまたいで引き継ぐ） ──
+// ── 見た目の切り替え（通常｜🎃｜🎄。2026-11-07 運営）。始まった季節の見た目だけ選べる。選んだものはこの端末に保存し、
+//    次に開いたときは templates/_season_boot.html が描画の前に反映する ──
 (function() {
-    const sw = document.getElementById('season-switch');
-    if (!sw) return;
-    const season = sw.dataset.season, cls = 'theme-' + season;
-    function sync() { sw.setAttribute('aria-checked', document.body.classList.contains(cls) ? 'true' : 'false'); }
+    const picker = document.getElementById('theme-picker');
+    if (!picker) return;
+    const current = picker.dataset.current;                  // いまの時期の季節（日付で決まる）
+    const buttons = Array.prototype.slice.call(picker.querySelectorAll('[data-theme]'));
+    const themes = buttons.map(function(b) { return b.dataset.theme; }).filter(function(t) { return t !== 'off'; });
+    function active() {
+        for (let i = 0; i < themes.length; i++) if (document.body.classList.contains('theme-' + themes[i])) return themes[i];
+        return 'off';
+    }
+    function sync() { const a = active(); buttons.forEach(function(b) { b.setAttribute('aria-checked', b.dataset.theme === a ? 'true' : 'false'); }); }
     sync();
     const calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let busy = false;
-    // 切り替えの演出：スイッチの位置から円が広がって画面を覆い、覆いきった瞬間に見た目を替えて、ふっと晴れる。
-    // ハロウィーンにするときは、かぼちゃが弾んでコウモリが飛び立つ。「視差効果を減らす」設定では演出なしで替える
-    function play(on, apply) {
+    // 切り替えの演出：押したボタンの位置から円が広がって画面を覆い、覆いきった瞬間に見た目を替えて、ふっと晴れる。
+    // ハロウィーンはかぼちゃが弾んでコウモリが飛び立ち、クリスマスはツリーが弾んで雪の結晶が舞う。
+    // 「視差効果を減らす」設定では演出なしで替える
+    function play(theme, btn, apply) {
         if (calm) { apply(); return; }
-        const r = sw.getBoundingClientRect();
+        const on = theme !== 'off';
+        const r = btn.getBoundingClientRect();
         const fx = document.createElement('div');
-        fx.className = 'season-fx' + (on ? ' fx-' + season : ' fx-normal');
+        fx.className = 'season-fx ' + (on ? 'fx-' + theme : 'fx-normal');
         fx.setAttribute('aria-hidden', 'true');
-        fx.style.setProperty('--fx-x', Math.round(r.left + 19) + 'px');
+        fx.style.setProperty('--fx-x', Math.round(r.left + r.width / 2) + 'px');
         fx.style.setProperty('--fx-y', Math.round(r.top + r.height / 2) + 'px');
-        if (on && season === 'halloween') {
+        const six = ['b1', 'b2', 'b3', 'b4', 'b5', 'b6'];
+        if (theme === 'halloween') {
             fx.innerHTML = '<span class="fx-pumpkin">🎃</span>' +
-                ['b1', 'b2', 'b3', 'b4', 'b5', 'b6'].map(function(c) { return '<span class="fx-bat ' + c + '">🦇</span>'; }).join('') +
+                six.map(function(c) { return '<span class="fx-bat ' + c + '">🦇</span>'; }).join('') +
                 '<span class="fx-text">Trick or Room?</span>';
-        } else if (on && season === 'christmas') {
-            // クリスマスにするときは、ツリーが弾んで雪の結晶が舞う
+        } else if (theme === 'christmas') {
             fx.innerHTML = '<span class="fx-pop">🎄</span>' +
-                ['b1', 'b2', 'b3', 'b4', 'b5', 'b6'].map(function(c) { return '<span class="fx-flake ' + c + '">❄️</span>'; }).join('') +
+                six.map(function(c) { return '<span class="fx-flake ' + c + '">❄️</span>'; }).join('') +
                 '<span class="fx-text">Merry Christmas!</span>';
         }
         document.body.appendChild(fx);
@@ -263,17 +271,24 @@ function showToast(msg) {
         setTimeout(function() { fx.classList.add('fx-out'); }, on ? 1150 : 560);
         setTimeout(function() { fx.remove(); busy = false; }, on ? 1650 : 1000);
     }
-    sw.addEventListener('click', function() {
-        if (busy) return;
-        busy = !calm;
-        const on = !document.body.classList.contains(cls);
-        sw.setAttribute('aria-checked', on ? 'true' : 'false');  // スイッチはすぐ動かす
-        // 着せ替えのオン・オフを、季節をまたいでまとめて残す（オンにした人は次の季節も着せ替える。2026-11-06 運営）
-        try {
-            localStorage.setItem('rr_theme', on ? 'on' : 'off');
-            localStorage.removeItem('rr_season_on'); localStorage.removeItem('rr_season_off');   // 前の作りの記録
-        } catch (e) {}
-        if (typeof gtag === 'function') gtag('event', on ? 'season_theme_on' : 'season_theme_off', { season: season });
-        play(on, function() { document.body.classList.toggle(cls, on); sync(); });
+    buttons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const t = btn.dataset.theme;
+            if (busy || t === active()) return;
+            busy = !calm;
+            buttons.forEach(function(b) { b.setAttribute('aria-checked', b === btn ? 'true' : 'false'); });  // ボタンはすぐ動かす
+            // いまの季節を選んだら「季節に合わせる」（次の季節も着せ替え）、前の季節を選んだらその見た目で固定、通常はオフ
+            const pref = t === 'off' ? 'off' : (t === current ? 'on' : t);
+            try {
+                localStorage.setItem('rr_theme', pref);
+                localStorage.removeItem('rr_season_on'); localStorage.removeItem('rr_season_off');   // 前の作りの記録
+            } catch (e) {}
+            if (typeof gtag === 'function') gtag('event', t === 'off' ? 'season_theme_off' : 'season_theme_on', { season: t === 'off' ? current : t });
+            play(t, btn, function() {
+                themes.forEach(function(n) { document.body.classList.remove('theme-' + n); });
+                if (t !== 'off') document.body.classList.add('theme-' + t);
+                sync();
+            });
+        });
     });
 })();

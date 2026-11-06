@@ -455,10 +455,11 @@ details.biweekly p { margin: 8px 0; line-height: 1.6; }
 /* ── 期間限定の見た目：ハロウィーン（app.py の SEASON_THEMES。表記・注意書き・校舎の色は変えない。
       飾り・帯・スイッチは季節のクラスが付いているときだけ出す。利用者がスイッチで切ると通常に戻る） ── */
 .season-deco, .season-ribbon, .logo-season, .icon-season { display: none; }
-.theme-halloween .season-deco { display: block; }
-.theme-halloween .season-ribbon { display: inline-flex; }
-.theme-halloween .logo-season { display: inline-block; }
-.theme-halloween .icon-season { display: inline; }
+/* 飾りは季節ごとに s-<名前> を付け、選んでいる見た目のものだけ出す（2026-11-07〜 通常｜🎃｜🎄 の切り替え） */
+.theme-halloween .season-deco.s-halloween { display: block; }
+.theme-halloween .season-ribbon.s-halloween { display: inline-flex; }
+.theme-halloween .logo-season.s-halloween { display: inline-block; }
+.theme-halloween .icon-season.s-halloween { display: inline; }
 .theme-halloween .icon-normal { display: none; }
 
 .theme-halloween {
@@ -525,22 +526,20 @@ html:has(> body.theme-halloween) { background-color: #0d0719; }
 @keyframes ghostFloat { 0%,100% { transform: translateY(0); opacity: 0.30; } 50% { transform: translateY(-18px); opacity: 0.45; } }
 @keyframes seasonWobble { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
 
-/* 季節の見た目のスイッチ（iOS 風） */
-.season-switch {
-    display: inline-flex; align-items: center; gap: 8px; margin: 14px 0 0 8px; vertical-align: middle;
-    background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; padding: 4px 12px 4px 5px;
-    color: var(--muted); font: inherit; font-size: 0.78rem; cursor: pointer;
+/* 見た目の切り替え（通常｜🎃｜🎄。2026-11-07 運営。選んでいるものが光る） */
+.theme-picker {
+    display: inline-flex; align-items: center; gap: 2px; margin: 14px 0 0 8px; vertical-align: middle; padding: 3px;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 99px;
 }
-.season-switch .sw-track {
-    position: relative; width: 38px; height: 22px; border-radius: 99px; background: #4b5563; transition: background 0.2s; flex-shrink: 0;
+.theme-picker button {
+    border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 0.78rem; line-height: 1;
+    min-width: 38px; padding: 6px 11px; border-radius: 99px; cursor: pointer; transition: background 0.2s, color 0.2s;
 }
-.season-switch .sw-knob {
-    position: absolute; left: 2px; top: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.4); transition: transform 0.2s;
-}
-.season-switch[aria-checked="true"] .sw-track { background: #f97316; }
-.season-switch[aria-checked="true"] .sw-knob { transform: translateX(16px); }
-.season-switch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.theme-picker button:not([data-theme="off"]) { font-size: 1rem; padding: 4px 10px; }
+.theme-picker button[aria-checked="true"] { background: rgba(255,255,255,0.14); color: #fff; font-weight: 700; }
+.theme-picker button[data-theme="halloween"][aria-checked="true"] { background: #f97316; }
+.theme-picker button[data-theme="christmas"][aria-checked="true"] { background: #dc2626; }
+.theme-picker button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 @media (max-width: 767px) {
     /* スマホは中身が横幅いっぱいなので、飾りは小さく・薄く */
@@ -552,15 +551,15 @@ html:has(> body.theme-halloween) { background-color: #0d0719; }
 @media (prefers-reduced-motion: reduce) {
     .season-deco .bat, .season-deco .ghost, .logo-season { animation: none; }
     .season-deco .b1 { left: 12%; } .season-deco .b2 { left: 70%; } .season-deco .b3 { left: 40%; }
-    .season-switch .sw-track, .season-switch .sw-knob { transition: none; }
+    .theme-picker button { transition: none; }
 }
 
 /* ── 期間限定の見た目：クリスマス（2026-11-06 運営が選んだ「雪の夜のイルミネーション」＋「夜空→もみの森」の色）。
       ハロウィーンと同じく、表記・注意書き・校舎の色は変えない。飾りは季節のクラスが付いているときだけ ── */
-.theme-christmas .season-deco { display: block; }
-.theme-christmas .season-ribbon { display: inline-flex; }
-.theme-christmas .logo-season { display: inline-block; }
-.theme-christmas .icon-season { display: inline; }
+.theme-christmas .season-deco.s-christmas { display: block; }
+.theme-christmas .season-ribbon.s-christmas { display: inline-flex; }
+.theme-christmas .logo-season.s-christmas { display: inline-block; }
+.theme-christmas .icon-season.s-christmas { display: inline; }
 .theme-christmas .icon-normal { display: none; }
 .theme-christmas {
     --bg: #08202a; --surface: rgba(12,36,52,0.92); --surface2: #123247;
@@ -589,7 +588,6 @@ html:has(> body.theme-christmas) { background-color: #081633; }
 .theme-christmas .season-ribbon { color: #fef3c7; background: rgba(251,191,36,0.10); border-color: rgba(253,224,71,0.40); }
 .theme-christmas .season-ribbon b { color: #fbbf24; }
 .theme-christmas .season-ribbon-sub { color: #bae6fd; }
-.theme-christmas .season-switch[aria-checked="true"] .sw-track { background: #dc2626; }
 /* 背景の飾り：上の電飾・ゆっくり降る雪・空を横切るそり・星・ツリー・プレゼント */
 .season-deco .x-snow {
     position: absolute; inset: -180px 0 0 0; opacity: 0.55; animation: xmasSnow 18s linear infinite;

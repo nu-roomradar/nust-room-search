@@ -881,7 +881,7 @@ class SeasonThemeTests(unittest.TestCase):
             pages = [self.client.get(u).get_data(as_text=True) for u in ("/", "/room")]
         self.assertIn('class="theme-halloween"', pages[0])
         self.assertIn("Trick or Room?", pages[0])
-        self.assertIn('role="switch"', pages[0])                       # 通常の見た目に戻すスイッチ
+        self.assertIn('id="theme-picker"', pages[0])                   # 見た目の切り替え（通常に戻せる）
         self.assertIn("rr_theme", pages[1])                            # どの画面でも、選んだ状態が効く
         for html in pages:
             self.assertIn("大学が公式に提供するサービスではありません", html)
@@ -889,14 +889,14 @@ class SeasonThemeTests(unittest.TestCase):
             html = self.client.get("/").get_data(as_text=True)
         self.assertNotIn("theme-halloween", html)
         self.assertNotIn("Trick or Room?", html)
-        self.assertNotIn('role="switch"', html)
+        self.assertNotIn('id="theme-picker"', html)
 
     def test_unfinished_season_is_not_shown(self):
         """見た目を作っていない季節（クリスマス）は、期間に入っても画面を変えない"""
         with mock.patch.dict(os.environ, {"SEASON_THEME": "christmas"}), mock.patch.object(rr, "SEASON_READY", {"halloween"}):
             html = self.client.get("/").get_data(as_text=True)
         self.assertNotIn("theme-christmas", html)
-        self.assertNotIn('role="switch"', html)
+        self.assertNotIn('id="theme-picker"', html)
 
     def test_christmas_look(self):
         """クリスマス：11/11〜11/30 は選んだ人だけ、12/1〜12/25 は既定で。表記はそのまま（2026-11-06 運営）"""
@@ -907,7 +907,7 @@ class SeasonThemeTests(unittest.TestCase):
         self.assertIn('class="theme-christmas"', html)
         self.assertIn("Room for you.", html)
         self.assertIn('class="x-lights"', html)
-        self.assertIn('role="switch"', html)
+        self.assertIn('id="theme-picker"', html)
         self.assertIn("大学が公式に提供するサービスではありません", html)
         js = (Path(__file__).resolve().parents[1] / "static" / "app.js").read_text(encoding="utf-8")
         self.assertIn("Merry Christmas!", js)
@@ -929,15 +929,33 @@ class SeasonThemeTests(unittest.TestCase):
         self.assertFalse(rr.season_default_on("halloween", self.at(11, 10)))
         self.assertFalse(rr.season_default_on("christmas", self.at(11, 20)))
         self.assertTrue(rr.season_default_on("christmas", self.at(12, 1)))
-        with mock.patch.object(rr, "current_season", return_value=("halloween", False)):
+        with mock.patch.object(rr, "current_season", return_value=("halloween", False)), \
+                mock.patch.object(rr, "season_choices", return_value=["halloween"]):
             pages = [self.client.get(u).get_data(as_text=True) for u in ("/", "/room")]
         self.assertNotIn('class="theme-halloween"', pages[0])
-        self.assertIn('role="switch" aria-checked="false"', pages[0])     # スイッチは残る（オフの状態）
+        self.assertIn('data-theme="off" aria-checked="true"', pages[0])     # 切り替えは残る（通常を選んだ状態）
+        self.assertIn('data-theme="halloween" aria-checked="false"', pages[0])
         for html in pages:
             self.assertIn("rr_theme", html)                                # 選んだ人には描画前に付ける
             self.assertIn("大学が公式に提供するサービスではありません", html)
 
+    def test_picker_offers_seasons_that_have_started(self):
+        """通常｜🎃｜🎄 の切り替え：10月はハロウィーンだけ、11/11 からはクリスマスも。先の季節は先取りしない（2026-11-07 運営）"""
+        self.assertEqual(rr.season_choices(self.at(10, 20)), ["halloween"])
+        self.assertEqual(rr.season_choices(self.at(11, 20)), ["halloween", "christmas"])
+        self.assertEqual(rr.season_choices(self.at(12, 26)), [])
+        with mock.patch.object(rr, "current_season", return_value=("christmas", True)), \
+                mock.patch.object(rr, "season_choices", return_value=["halloween", "christmas"]):
+            html = self.client.get("/").get_data(as_text=True)
+        self.assertIn('class="theme-christmas"', html)
+        self.assertIn('data-theme="christmas" aria-checked="true"', html)
+        self.assertIn('data-theme="halloween" aria-checked="false"', html)
+        self.assertIn('class="season-deco s-halloween"', html)                 # 選び直せるよう、両方の飾りを持つ
+        self.assertIn('class="season-deco s-christmas"', html)
+        self.assertIn('["halloween", "christmas"]', html)                       # 描画前の反映で選べる見た目
+
     def test_switch_script_saves_the_choice(self):
         js = (Path(__file__).resolve().parents[1] / "static" / "app.js").read_text(encoding="utf-8")
-        self.assertIn("localStorage.setItem('rr_theme', on ? 'on' : 'off')", js)   # 季節をまたいでまとめて覚える
+        self.assertIn("localStorage.setItem('rr_theme', pref)", js)        # 季節をまたいでまとめて覚える
+        self.assertIn("t === current ? 'on' : t", js)                      # いまの季節＝季節に合わせる、前の季節＝固定
         self.assertIn("aria-checked", js)
