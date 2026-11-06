@@ -555,6 +555,77 @@ html:has(> body.theme-halloween) { background-color: #0d0719; }
     .season-switch .sw-track, .season-switch .sw-knob { transition: none; }
 }
 
+/* ── 期間限定の見た目：クリスマス（2026-11-06 運営が選んだ「雪の夜のイルミネーション」＋「夜空→もみの森」の色）。
+      ハロウィーンと同じく、表記・注意書き・校舎の色は変えない。飾りは季節のクラスが付いているときだけ ── */
+.theme-christmas .season-deco { display: block; }
+.theme-christmas .season-ribbon { display: inline-flex; }
+.theme-christmas .logo-season { display: inline-block; }
+.theme-christmas .icon-season { display: inline; }
+.theme-christmas .icon-normal { display: none; }
+.theme-christmas {
+    --bg: #08202a; --surface: rgba(12,36,52,0.92); --surface2: #123247;
+    --border: rgba(253,224,71,0.20); --muted: #a9c6d6; --accent: #fbbf24;
+    background:
+        radial-gradient(700px 520px at 0% 100%, rgba(251,191,36,0.14), transparent 70%),
+        radial-gradient(640px 520px at 100% 30%, rgba(56,189,248,0.12), transparent 70%),
+        linear-gradient(180deg, #081633 0%, #0b2242 28%, #0a2d38 55%, #0b3a2c 85%, #0a3326 100%);   /* 上は紺の夜空、下はもみの森 */
+    background-color: #081633;
+    background-attachment: fixed;
+}
+html:has(> body.theme-christmas) { background-color: #081633; }
+.theme-christmas .card { box-shadow: 0 0 0 1px rgba(253,224,71,0.10), 0 18px 40px rgba(0,0,0,0.45); }
+.theme-christmas .logo { background: linear-gradient(135deg, #fff 0%, #fde68a 60%, #fbbf24 100%); -webkit-background-clip: text; background-clip: text; }
+.theme-christmas .logo span { -webkit-text-fill-color: #fde68a; color: #fde68a; }
+.theme-christmas .logo-season { animation: xmasTwinkle 2.6s ease-in-out infinite; filter: drop-shadow(0 0 8px rgba(253,224,71,0.7)); }
+.theme-christmas .btn-search {
+    background: linear-gradient(90deg, #b91c1c, #dc2626 45%, #ef4444); color: #fff;
+    box-shadow: 0 0 0 1px rgba(253,224,71,0.45), 0 8px 26px rgba(220,38,38,0.45);
+}
+.theme-christmas .btn-search .btn-text::before { content: '🎁 '; }
+.theme-christmas select:focus { border-color: #fbbf24; }
+.theme-christmas .room-search-link { border-color: rgba(253,224,71,0.45); background: rgba(251,191,36,0.07); }
+.theme-christmas .now-badge .dot { background: #fbbf24; }
+.theme-christmas .room-card { box-shadow: inset 0 -3px 0 rgba(251,191,36,0.22); }
+.theme-christmas .season-ribbon { color: #fef3c7; background: rgba(251,191,36,0.10); border-color: rgba(253,224,71,0.40); }
+.theme-christmas .season-ribbon b { color: #fbbf24; }
+.theme-christmas .season-ribbon-sub { color: #bae6fd; }
+.theme-christmas .season-switch[aria-checked="true"] .sw-track { background: #dc2626; }
+/* 背景の飾り：上の電飾・ゆっくり降る雪・空を横切るそり・星・ツリー・プレゼント */
+.season-deco .x-snow {
+    position: absolute; inset: -180px 0 0 0; opacity: 0.55; animation: xmasSnow 18s linear infinite;
+    background-image: radial-gradient(2px 2px at 20px 30px, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 90px 80px, #fff 50%, transparent 51%),
+                      radial-gradient(2.5px 2.5px at 150px 20px, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 60px 140px, #fff 50%, transparent 51%);
+    background-size: 180px 180px;
+}
+.season-deco .x-s2 { background-size: 260px 260px; opacity: 0.35; animation-duration: 28s; }
+.season-deco .x-wire { position: absolute; left: 0; right: 0; top: 8px; height: 14px; border-bottom: 1.5px solid rgba(203,213,225,0.35); border-radius: 0 0 50% 50% / 0 0 100% 100%; }
+.season-deco .x-lights {
+    position: absolute; left: 0; right: 0; top: 0; height: 34px; animation: xmasLights 2.4s ease-in-out infinite;
+    background: radial-gradient(ellipse 6px 9px at 20px 20px, #f87171 60%, transparent 62%) 0 0 / 160px 34px,
+                radial-gradient(ellipse 6px 9px at 60px 24px, #fde047 60%, transparent 62%) 0 0 / 160px 34px,
+                radial-gradient(ellipse 6px 9px at 100px 20px, #4ade80 60%, transparent 62%) 0 0 / 160px 34px,
+                radial-gradient(ellipse 6px 9px at 140px 24px, #60a5fa 60%, transparent 62%) 0 0 / 160px 34px;
+    filter: drop-shadow(0 0 6px rgba(253,224,71,0.8));
+}
+.season-deco .x-sleigh { top: 13%; font-size: 26px; opacity: 0.6; animation: xmasSleigh 26s linear infinite; animation-delay: -6s; }
+.season-deco .x-star { right: 7%; top: 64px; font-size: 54px; opacity: 0.9; filter: drop-shadow(0 0 22px rgba(253,224,71,0.8)); animation: xmasTwinkle 3.2s ease-in-out infinite; }
+.season-deco .x-tree { left: 3%; bottom: 14px; font-size: 54px; opacity: 0.55; filter: drop-shadow(0 0 14px rgba(74,222,128,0.5)); }
+.season-deco .x-gift { right: 4%; bottom: 16px; font-size: 36px; opacity: 0.5; }
+@keyframes xmasSnow { to { transform: translateY(180px); } }
+@keyframes xmasLights { 0%,100% { opacity: 0.95; } 50% { opacity: 0.65; } }
+@keyframes xmasTwinkle { 0%,100% { opacity: 0.9; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+@keyframes xmasSleigh { 0% { transform: translate(-14vw, 0); } 50% { transform: translate(50vw, -16px); } 100% { transform: translate(114vw, 0); } }
+@media (max-width: 767px) {
+    /* スマホは右上の星がロゴに重なるので出さない。ツリーも下の隅だけに */
+    .season-deco .x-star, .season-deco .x-tree { display: none; }
+    .season-deco .x-sleigh { font-size: 20px; opacity: 0.45; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .season-deco .x-snow, .season-deco .x-lights, .season-deco .x-sleigh, .season-deco .x-star,
+    .theme-christmas .logo-season { animation: none; }
+    .season-deco .x-sleigh { left: 60%; }
+}
+
 /* 試験運用中の表記を検索結果の下に置いたとき（2026-10-31）。注意書きとひとまとまりに見せ、使い方の欄とは間を空ける */
 .test-banner-bottom { margin: 14px 2px 8px; align-items: flex-start; }
 .test-banner-bottom .test-tag { margin-top: 2px; }
@@ -566,12 +637,13 @@ html:has(> body.theme-halloween) { background-color: #0d0719; }
     animation: fxWipe 0.42s cubic-bezier(0.55, 0, 0.3, 1) forwards;
 }
 .season-fx.fx-halloween { background: radial-gradient(circle at var(--fx-x) var(--fx-y), #2a1550 0%, #160b2b 45%, #0d0719 100%); }
+.season-fx.fx-christmas { background: radial-gradient(circle at var(--fx-x) var(--fx-y), #14405a 0%, #0b2242 45%, #081633 100%); }
 .season-fx.fx-normal { background: #0a0a0f; }
 .season-fx.fx-out { animation: fxWipe 0.42s cubic-bezier(0.55, 0, 0.3, 1) forwards, fxOut 0.45s ease forwards; }
 @keyframes fxWipe { to { clip-path: circle(150vmax at var(--fx-x) var(--fx-y)); } }
 @keyframes fxOut { to { opacity: 0; } }
 .season-fx span { position: absolute; left: 50%; top: 46%; line-height: 1; }
-.season-fx .fx-pumpkin {
+.season-fx .fx-pumpkin, .season-fx .fx-pop {
     font-size: 96px; transform: translate(-50%, -50%) scale(0);
     filter: drop-shadow(0 0 30px rgba(249,115,22,0.75));
     animation: fxPop 0.6s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
@@ -581,7 +653,9 @@ html:has(> body.theme-halloween) { background-color: #0d0719; }
     font-family: 'Noto Sans JP', sans-serif; font-weight: 900; font-size: 1.5rem; color: #fb923c; letter-spacing: 0.02em;
     animation: fxText 0.45s 0.55s ease forwards;
 }
-.season-fx .fx-bat { font-size: 30px; opacity: 0; transform: translate(-50%, -50%); animation: fxBat 0.95s 0.42s ease-out forwards; }
+.season-fx.fx-christmas .fx-pop { filter: drop-shadow(0 0 30px rgba(253,224,71,0.75)); }
+.season-fx.fx-christmas .fx-text { color: #fde68a; }
+.season-fx .fx-bat, .season-fx .fx-flake { font-size: 30px; opacity: 0; transform: translate(-50%, -50%); animation: fxBat 0.95s 0.42s ease-out forwards; }
 .season-fx .b1 { --dx: -42vw; --dy: -30vh; } .season-fx .b2 { --dx: 40vw; --dy: -34vh; animation-delay: 0.48s; }
 .season-fx .b3 { --dx: -46vw; --dy: 8vh; animation-delay: 0.52s; } .season-fx .b4 { --dx: 46vw; --dy: 4vh; animation-delay: 0.45s; }
 .season-fx .b5 { --dx: -22vw; --dy: -44vh; animation-delay: 0.58s; font-size: 22px; } .season-fx .b6 { --dx: 24vw; --dy: -46vh; animation-delay: 0.55s; font-size: 24px; }

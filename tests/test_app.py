@@ -893,14 +893,29 @@ class SeasonThemeTests(unittest.TestCase):
 
     def test_unfinished_season_is_not_shown(self):
         """見た目を作っていない季節（クリスマス）は、期間に入っても画面を変えない"""
-        with mock.patch.dict(os.environ, {"SEASON_THEME": "christmas"}):
+        with mock.patch.dict(os.environ, {"SEASON_THEME": "christmas"}), mock.patch.object(rr, "SEASON_READY", {"halloween"}):
             html = self.client.get("/").get_data(as_text=True)
         self.assertNotIn("theme-christmas", html)
         self.assertNotIn('role="switch"', html)
 
+    def test_christmas_look(self):
+        """クリスマス：11/11〜11/30 は選んだ人だけ、12/1〜12/25 は既定で。表記はそのまま（2026-11-06 運営）"""
+        self.assertEqual(rr.current_season(self.at(11, 20)), ("christmas", False))
+        self.assertEqual(rr.current_season(self.at(12, 5)), ("christmas", True))
+        with mock.patch.dict(os.environ, {"SEASON_THEME": "christmas"}):
+            html = self.client.get("/").get_data(as_text=True)
+        self.assertIn('class="theme-christmas"', html)
+        self.assertIn("Room for you.", html)
+        self.assertIn('class="x-lights"', html)
+        self.assertIn('role="switch"', html)
+        self.assertIn("大学が公式に提供するサービスではありません", html)
+        js = (Path(__file__).resolve().parents[1] / "static" / "app.js").read_text(encoding="utf-8")
+        self.assertIn("Merry Christmas!", js)
+
     def test_switch_stays_until_next_season_is_ready(self):
         """クリスマスの見た目ができるまでは、11/11 以降もハロウィーンをスイッチで選べる（スイッチを消さない。2026-11-06 運営）"""
-        self.assertEqual(rr.current_season(self.at(11, 20)), ("halloween", False))
+        with mock.patch.object(rr, "SEASON_READY", {"halloween"}):
+            self.assertEqual(rr.current_season(self.at(11, 20)), ("halloween", False))
         self.assertEqual(rr.current_season(self.at(12, 26)), (None, False))   # 季節の期間の外は出さない
         with mock.patch.object(rr, "SEASON_READY", {"halloween", "christmas"}):
             self.assertEqual(rr.current_season(self.at(11, 20)), ("christmas", False))   # 11月は選んだ人だけ
