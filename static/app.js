@@ -229,7 +229,7 @@ function showToast(msg) {
 }
 
 // ── 季節の見た目の切り替え（ハロウィーンなど。iOS 風のスイッチ。選んだ状態はこの端末に保存し、
-//    次に開いたときは templates/_season_boot.html が描画の前に反映する。季節が変われば元に戻る） ──
+//    次に開いたときは templates/_season_boot.html が描画の前に反映する。オン・オフは季節をまたいで引き継ぐ） ──
 (function() {
     const sw = document.getElementById('season-switch');
     if (!sw) return;
@@ -263,10 +263,10 @@ function showToast(msg) {
         busy = !calm;
         const on = !document.body.classList.contains(cls);
         sw.setAttribute('aria-checked', on ? 'true' : 'false');  // スイッチはすぐ動かす
-        // 通常に戻した（rr_season_off）か、季節の見た目にした（rr_season_on）かを残す。既定が通常の期間は後者だけが効く
+        // 着せ替えのオン・オフを、季節をまたいでまとめて残す（オンにした人は次の季節も着せ替える。2026-11-06 運営）
         try {
-            if (on) { localStorage.removeItem('rr_season_off'); localStorage.setItem('rr_season_on', season); }
-            else { localStorage.setItem('rr_season_off', season); localStorage.removeItem('rr_season_on'); }
+            localStorage.setItem('rr_theme', on ? 'on' : 'off');
+            localStorage.removeItem('rr_season_on'); localStorage.removeItem('rr_season_off');   // 前の作りの記録
         } catch (e) {}
         if (typeof gtag === 'function') gtag('event', on ? 'season_theme_on' : 'season_theme_off', { season: season });
         play(on, function() { document.body.classList.toggle(cls, on); sync(); });

@@ -882,7 +882,7 @@ class SeasonThemeTests(unittest.TestCase):
         self.assertIn('class="theme-halloween"', pages[0])
         self.assertIn("Trick or Room?", pages[0])
         self.assertIn('role="switch"', pages[0])                       # 通常の見た目に戻すスイッチ
-        self.assertIn("rr_season_off", pages[1])                       # どの画面でも、戻した選択が効く
+        self.assertIn("rr_theme", pages[1])                            # どの画面でも、選んだ状態が効く
         for html in pages:
             self.assertIn("大学が公式に提供するサービスではありません", html)
         with mock.patch.dict(os.environ, {"SEASON_THEME": "off"}):
@@ -898,23 +898,31 @@ class SeasonThemeTests(unittest.TestCase):
         self.assertNotIn("theme-christmas", html)
         self.assertNotIn('role="switch"', html)
 
+    def test_switch_stays_until_next_season_is_ready(self):
+        """クリスマスの見た目ができるまでは、11/11 以降もハロウィーンをスイッチで選べる（スイッチを消さない。2026-11-06 運営）"""
+        self.assertEqual(rr.current_season(self.at(11, 20)), ("halloween", False))
+        self.assertEqual(rr.current_season(self.at(12, 26)), (None, False))   # 季節の期間の外は出さない
+        with mock.patch.object(rr, "SEASON_READY", {"halloween", "christmas"}):
+            self.assertEqual(rr.current_season(self.at(11, 20)), ("christmas", False))   # 11月は選んだ人だけ
+            self.assertEqual(rr.current_season(self.at(12, 1)), ("christmas", True))     # 12/1 から既定で
+            self.assertEqual(rr.current_season(self.at(12, 25)), ("christmas", True))
+
     def test_halloween_is_opt_in_after_october(self):
         """11/1〜11/10 は既定で通常の見た目。スイッチは残り、選んだ人だけハロウィーンにする（2026-11-06 運営）"""
         self.assertTrue(rr.season_default_on("halloween", self.at(10, 31)))
         self.assertFalse(rr.season_default_on("halloween", self.at(11, 1)))
         self.assertFalse(rr.season_default_on("halloween", self.at(11, 10)))
-        self.assertTrue(rr.season_default_on("christmas", self.at(11, 20)))
-        with mock.patch.object(rr, "season_theme", return_value="halloween"), \
-                mock.patch.object(rr, "season_default_on", return_value=False):
+        self.assertFalse(rr.season_default_on("christmas", self.at(11, 20)))
+        self.assertTrue(rr.season_default_on("christmas", self.at(12, 1)))
+        with mock.patch.object(rr, "current_season", return_value=("halloween", False)):
             pages = [self.client.get(u).get_data(as_text=True) for u in ("/", "/room")]
         self.assertNotIn('class="theme-halloween"', pages[0])
         self.assertIn('role="switch" aria-checked="false"', pages[0])     # スイッチは残る（オフの状態）
         for html in pages:
-            self.assertIn("rr_season_on", html)                            # 選んだ人には描画前に付ける
+            self.assertIn("rr_theme", html)                                # 選んだ人には描画前に付ける
             self.assertIn("大学が公式に提供するサービスではありません", html)
 
     def test_switch_script_saves_the_choice(self):
         js = (Path(__file__).resolve().parents[1] / "static" / "app.js").read_text(encoding="utf-8")
-        self.assertIn("localStorage.setItem('rr_season_off', season)", js)
-        self.assertIn("localStorage.setItem('rr_season_on', season)", js)
+        self.assertIn("localStorage.setItem('rr_theme', on ? 'on' : 'off')", js)   # 季節をまたいでまとめて覚える
         self.assertIn("aria-checked", js)
