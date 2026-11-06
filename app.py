@@ -246,6 +246,7 @@ SEASON_THEMES = [("halloween", (9, 16), (11, 10)), ("christmas", (11, 11), (12, 
 # （スイッチを消さない。2026-11-06 運営）。クリスマスは「雪の夜のイルミネーション」＋「夜空→もみの森」の色（2026-11-06 運営）
 SEASON_READY = {"halloween", "christmas"}
 SEASON_LABELS = {"halloween": "ハロウィーン仕様", "christmas": "クリスマス仕様"}
+SEASON_EMOJI = {"halloween": "🎃", "christmas": "🎄"}
 # 何も選んでいない人にも着せ替えを出す期間（既定でオン）。季節の期間のうちこれ以外は、スイッチで選んだ人だけ。
 # ハロウィーンは 10/31 まで、クリスマスは 12/1〜12/25（11/11〜11/30 は選んだ人だけ）。2026-11-06 運営
 SEASON_DEFAULT_ON = {"halloween": ((9, 16), (10, 31)), "christmas": ((12, 1), (12, 25))}
@@ -285,10 +286,25 @@ def current_season(now=None):
     return None, False
 
 
+def season_choices(now=None):
+    """画面の切り替え（通常｜🎃｜🎄）で選べる見た目。季節の期間に入っていれば、その年にもう始まった
+    （見た目のできている）季節を全部出す。10月はハロウィーンだけ、11/11 からはハロウィーンとクリスマス。
+    先の季節は先取りしない。季節の期間の外は出さない（2026-11-07 運営）"""
+    now = now or datetime.datetime.now(JST)
+    season, _ = current_season(now)
+    if season is None:
+        return []
+    if os.environ.get("SEASON_THEME", "").strip():
+        return [season]                                  # 確認用に強制したときは、その季節だけ
+    md = (now.month, now.day)
+    return [n for n, start, _ in SEASON_THEMES if n in SEASON_READY and start <= md]
+
+
 @app.context_processor
 def inject_season_theme():
     season, on = current_season()
-    return {"season": season, "season_label": SEASON_LABELS.get(season, ""), "season_on": bool(season) and on}
+    return {"season": season, "season_label": SEASON_LABELS.get(season, ""), "season_on": bool(season) and on,
+            "season_choices": season_choices(), "season_labels": SEASON_LABELS, "season_emoji": SEASON_EMOJI}
 
 
 # ブラウザへの安全設定（2026-10 セキュリティ点検）。画面はインラインの script / onclick を使っているので、

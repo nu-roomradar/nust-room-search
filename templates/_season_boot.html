@@ -1,8 +1,13 @@
-{% if season %}<script>/* 季節の着せ替えを、この端末で選んだとおりに描画の前に反映する（static/app.js の切り替えと対）。
-選んだ状態は季節をまたいで rr_theme（on / off）にまとめて残す。何も選んでいなければ、その時期の既定のまま */
+{% if season_choices %}<script>/* 見た目を、この端末で選んだとおりに描画の前に反映する（static/app.js の切り替えと対）。
+rr_theme：off＝通常、on＝季節に合わせる（その時期の季節の見た目）、halloween などの名前＝その見た目で固定。
+何も選んでいなければ、その時期の既定のまま。選んだ見た目が選べない時期なら既定に戻す */
 try { var t = localStorage.getItem('rr_theme');
   if (!t) t = localStorage.getItem('rr_season_on') ? 'on' : localStorage.getItem('rr_season_off') ? 'off' : '';  /* 前の作りで選んだ人 */
-  if (t === 'on') document.body.classList.add('theme-{{ season }}');
-  else if (t === 'off') document.body.classList.remove('theme-{{ season }}');
+  var avail = {{ season_choices|tojson }}, pick = null;
+  if (t === 'off') pick = ''; else if (t === 'on') pick = '{{ season }}'; else if (avail.indexOf(t) >= 0) pick = t;
+  if (pick !== null) {
+    avail.forEach(function (n) { document.body.classList.remove('theme-' + n); });
+    if (pick) document.body.classList.add('theme-' + pick);
+  }
 } catch (e) {}
 </script>{% endif %}
