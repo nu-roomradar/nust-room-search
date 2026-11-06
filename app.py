@@ -246,6 +246,9 @@ SEASON_THEMES = [("halloween", (9, 16), (11, 10)), ("christmas", (11, 11), (12, 
 # 見た目を作り終えた季節だけ画面に出す（クリスマスは 11/11 までに作る）
 SEASON_READY = {"halloween"}
 SEASON_LABELS = {"halloween": "ハロウィーン仕様", "christmas": "クリスマス仕様"}
+# 期間の途中から「既定は通常の見た目」にする季節。スイッチは残し、自分で選んだ人だけ季節の見た目にする。
+# ハロウィーンは 10/31 まで既定で着せ替え、11/1〜11/10 はスイッチで選べるだけにする（2026-11-06 運営）
+SEASON_DEFAULT_UNTIL = {"halloween": (10, 31)}
 
 
 def season_theme(now=None):
@@ -256,11 +259,23 @@ def season_theme(now=None):
     return next((name for name, start, end in SEASON_THEMES if start <= md <= end), None)
 
 
+def season_default_on(season, now=None):
+    """その季節の見た目を、何も選んでいない人にも出すか。SEASON_THEME で強制したとき（確認用）は出す"""
+    if os.environ.get("SEASON_THEME", "").strip():
+        return True
+    until = SEASON_DEFAULT_UNTIL.get(season)
+    if until is None:
+        return True
+    now = now or datetime.datetime.now(JST)
+    return (now.month, now.day) <= until
+
+
 @app.context_processor
 def inject_season_theme():
     season = season_theme()
     season = season if season in SEASON_READY else None
-    return {"season": season, "season_label": SEASON_LABELS.get(season, "")}
+    return {"season": season, "season_label": SEASON_LABELS.get(season, ""),
+            "season_on": bool(season) and season_default_on(season)}
 
 
 # ブラウザへの安全設定（2026-10 セキュリティ点検）。画面はインラインの script / onclick を使っているので、

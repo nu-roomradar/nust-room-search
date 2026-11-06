@@ -898,7 +898,23 @@ class SeasonThemeTests(unittest.TestCase):
         self.assertNotIn("theme-christmas", html)
         self.assertNotIn('role="switch"', html)
 
+    def test_halloween_is_opt_in_after_october(self):
+        """11/1〜11/10 は既定で通常の見た目。スイッチは残り、選んだ人だけハロウィーンにする（2026-11-06 運営）"""
+        self.assertTrue(rr.season_default_on("halloween", self.at(10, 31)))
+        self.assertFalse(rr.season_default_on("halloween", self.at(11, 1)))
+        self.assertFalse(rr.season_default_on("halloween", self.at(11, 10)))
+        self.assertTrue(rr.season_default_on("christmas", self.at(11, 20)))
+        with mock.patch.object(rr, "season_theme", return_value="halloween"), \
+                mock.patch.object(rr, "season_default_on", return_value=False):
+            pages = [self.client.get(u).get_data(as_text=True) for u in ("/", "/room")]
+        self.assertNotIn('class="theme-halloween"', pages[0])
+        self.assertIn('role="switch" aria-checked="false"', pages[0])     # スイッチは残る（オフの状態）
+        for html in pages:
+            self.assertIn("rr_season_on", html)                            # 選んだ人には描画前に付ける
+            self.assertIn("大学が公式に提供するサービスではありません", html)
+
     def test_switch_script_saves_the_choice(self):
         js = (Path(__file__).resolve().parents[1] / "static" / "app.js").read_text(encoding="utf-8")
         self.assertIn("localStorage.setItem('rr_season_off', season)", js)
+        self.assertIn("localStorage.setItem('rr_season_on', season)", js)
         self.assertIn("aria-checked", js)
