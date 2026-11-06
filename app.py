@@ -240,15 +240,17 @@ ASSET_VERSION = _asset_version()
 # (名前, (開始の月, 日), (終了の月, 日)) を毎年くり返す。中身は static/app.css の .theme-<名前> とテンプレートの飾り。
 # 期間は東京ディズニーリゾートのスペシャルイベントをもとに運営が決めた（2026-10-30）。ハロウィーン 9/16〜11/10、
 # クリスマス 11/11〜12/25（ディズニーは 2026年 ハロウィーン 9/16〜10/31、クリスマス 11/11〜12/25）。年に一度見直す。
-# 利用者は画面のスイッチで通常の見た目に戻せる（端末に保存。static/app.js の「季節の見た目の切り替え」）。
+# 利用者は画面のスイッチで着せ替えのオン・オフを選べる。選んだ状態は季節をまたいでまとめて覚える（端末に rr_theme。
+# オンにした人は次の季節も着せ替え、オフにした人は通常のまま。2026-11-06 運営。static/app.js「季節の見た目の切り替え」）。
 # 環境変数 SEASON_THEME で上書きできる（"off" で止める、"halloween" などで期間外でも出す。確認用・緊急停止用）
 SEASON_THEMES = [("halloween", (9, 16), (11, 10)), ("christmas", (11, 11), (12, 25))]
-# 見た目を作り終えた季節だけ画面に出す（クリスマスは 11/11 までに作る）
+# 見た目を作り終えた季節だけ画面に出す。作り終えていない季節の期間は、直前の季節の見た目をスイッチで選べるようにする
+# （スイッチを消さない。2026-11-06 運営）
 SEASON_READY = {"halloween"}
 SEASON_LABELS = {"halloween": "ハロウィーン仕様", "christmas": "クリスマス仕様"}
-# 期間の途中から「既定は通常の見た目」にする季節。スイッチは残し、自分で選んだ人だけ季節の見た目にする。
-# ハロウィーンは 10/31 まで既定で着せ替え、11/1〜11/10 はスイッチで選べるだけにする（2026-11-06 運営）
-SEASON_DEFAULT_UNTIL = {"halloween": (10, 31)}
+# 何も選んでいない人にも着せ替えを出す期間（既定でオン）。季節の期間のうちこれ以外は、スイッチで選んだ人だけ。
+# ハロウィーンは 10/31 まで、クリスマスは 12/1〜12/25（11/11〜11/30 は選んだ人だけ）。2026-11-06 運営
+SEASON_DEFAULT_ON = {"halloween": ((9, 16), (10, 31)), "christmas": ((12, 1), (12, 25))}
 
 
 def season_theme(now=None):
@@ -263,19 +265,32 @@ def season_default_on(season, now=None):
     """その季節の見た目を、何も選んでいない人にも出すか。SEASON_THEME で強制したとき（確認用）は出す"""
     if os.environ.get("SEASON_THEME", "").strip():
         return True
-    until = SEASON_DEFAULT_UNTIL.get(season)
-    if until is None:
+    window = SEASON_DEFAULT_ON.get(season)
+    if window is None:
         return True
     now = now or datetime.datetime.now(JST)
-    return (now.month, now.day) <= until
+    return window[0] <= (now.month, now.day) <= window[1]
+
+
+def current_season(now=None):
+    """画面に出す季節と、既定でオンにするか。見た目ができていない季節の期間は、
+    直前のできている季節を「選んだ人だけ」で出す（スイッチを消さないため）"""
+    now = now or datetime.datetime.now(JST)
+    season = season_theme(now)
+    if season in SEASON_READY:
+        return season, season_default_on(season, now)
+    if season and not os.environ.get("SEASON_THEME", "").strip():
+        names = [n for n, _, _ in SEASON_THEMES]
+        for prev in reversed(names[:names.index(season)]):
+            if prev in SEASON_READY:
+                return prev, False
+    return None, False
 
 
 @app.context_processor
 def inject_season_theme():
-    season = season_theme()
-    season = season if season in SEASON_READY else None
-    return {"season": season, "season_label": SEASON_LABELS.get(season, ""),
-            "season_on": bool(season) and season_default_on(season)}
+    season, on = current_season()
+    return {"season": season, "season_label": SEASON_LABELS.get(season, ""), "season_on": bool(season) and on}
 
 
 # ブラウザへの安全設定（2026-10 セキュリティ点検）。画面はインラインの script / onclick を使っているので、

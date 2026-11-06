@@ -1,4 +1,8 @@
-{% if season %}<script>/* 季節の見た目を、この端末で選んだとおりに描画の前に反映する（static/app.js の切り替えと対）。
-既定で着せ替える期間は「通常に戻した」人だけ外し、既定が通常の期間は「季節の見た目にした」人だけ付ける */
-try { {% if season_on %}if (localStorage.getItem('rr_season_off') === '{{ season }}') document.body.classList.remove('theme-{{ season }}');{% else %}if (localStorage.getItem('rr_season_on') === '{{ season }}') document.body.classList.add('theme-{{ season }}');{% endif %} } catch (e) {}
+{% if season %}<script>/* 季節の着せ替えを、この端末で選んだとおりに描画の前に反映する（static/app.js の切り替えと対）。
+選んだ状態は季節をまたいで rr_theme（on / off）にまとめて残す。何も選んでいなければ、その時期の既定のまま */
+try { var t = localStorage.getItem('rr_theme');
+  if (!t) t = localStorage.getItem('rr_season_on') ? 'on' : localStorage.getItem('rr_season_off') ? 'off' : '';  /* 前の作りで選んだ人 */
+  if (t === 'on') document.body.classList.add('theme-{{ season }}');
+  else if (t === 'off') document.body.classList.remove('theme-{{ season }}');
+} catch (e) {}
 </script>{% endif %}
