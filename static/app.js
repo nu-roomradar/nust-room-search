@@ -263,7 +263,11 @@ function showToast(msg) {
         busy = !calm;
         const on = !document.body.classList.contains(cls);
         sw.setAttribute('aria-checked', on ? 'true' : 'false');  // スイッチはすぐ動かす
-        try { if (on) localStorage.removeItem('rr_season_off'); else localStorage.setItem('rr_season_off', season); } catch (e) {}
+        // 通常に戻した（rr_season_off）か、季節の見た目にした（rr_season_on）かを残す。既定が通常の期間は後者だけが効く
+        try {
+            if (on) { localStorage.removeItem('rr_season_off'); localStorage.setItem('rr_season_on', season); }
+            else { localStorage.setItem('rr_season_off', season); localStorage.removeItem('rr_season_on'); }
+        } catch (e) {}
         if (typeof gtag === 'function') gtag('event', on ? 'season_theme_on' : 'season_theme_off', { season: season });
         play(on, function() { document.body.classList.toggle(cls, on); sync(); });
     });
