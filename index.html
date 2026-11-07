@@ -39,1038 +39,9 @@
   .reveal { opacity: 1 !important; transform: none !important; }
   .step-num { transform: none !important; }
 </style></noscript>
-<style>
-/* ════════════════════════════════════════════
-   CSS変数
-════════════════════════════════════════════ */
-:root {
-  --bg:      #f5f3ee;
-  --ink:     #1a1814;
-  --muted:   #6b665a;
-  --accent:  #2563eb;
-  --accent2: #f97316;
-  --card:    #ffffff;
-  --border:  rgba(26,24,20,0.1);
-  --tower:   #2563eb;
-  --suruga:  #16a34a;
-  --funa:    #ea580c;
-}
-
-/* ════════════════════════════════════════════
-   リセット・ベース
-════════════════════════════════════════════ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  font-family: 'Noto Sans JP', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Meiryo', sans-serif;
-  background: var(--bg);
-  color: var(--ink);
-  overflow-x: hidden;
-}
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 3px; }
-
-/* ════════════════════════════════════════════
-   言語切替
-════════════════════════════════════════════ */
-.ja { display: block; }
-.en { display: none;  }
-.zh { display: none;  }
-span.ja { display: inline; }
-span.en { display: none;   }
-span.zh { display: none;   }
-
-body.lang-en .ja    { display: none;   }
-body.lang-en .en    { display: block;  }
-body.lang-en span.ja{ display: none;   }
-body.lang-en span.en{ display: inline; }
-
-body.lang-zh .ja    { display: none;   }
-body.lang-zh .zh    { display: block;  }
-body.lang-zh span.ja{ display: none;   }
-body.lang-zh span.zh{ display: inline; }
-
-/* ── 言語別タイポグラフィ調整 ── */
-body.lang-en .hero-title       { font-size: clamp(2.2rem, 6vw, 5rem); letter-spacing: -0.03em; }
-body.lang-en .hero-title .small{ font-size: 0.3em; font-weight: 600; letter-spacing: 0em; }
-body.lang-zh .hero-title .small{ font-size: 0.38em; letter-spacing: 0.02em; }
-
-/* ════════════════════════════════════════════
-   ロゴ
-════════════════════════════════════════════ */
-.logo-fixed {
-  position: fixed; top: 20px; left: 24px; z-index: 100;
-  display: flex; align-items: center;
-  height: 62px;
-}
-.logo-fixed img {
-  height: 62px; width: auto;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.08));
-  transition: transform 0.3s ease;
-}
-.logo-fixed img:hover {
-  transform: scale(1.05);
-}
-
-/* ════════════════════════════════════════════
-   セクションナビバー（Apple風）
-════════════════════════════════════════════ */
-.section-nav {
-  position: absolute; top: 0; left: 0; right: 0; z-index: 99;
-  display: flex; align-items: center; justify-content: space-between;
-  height: 56px; padding: 0 20px;
-  background: rgba(245,243,238,0.72);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid rgba(26,24,20,0.06);
-}
-.nav-logo { display: flex; align-items: center; flex: 1; min-width: 0; }
-.nav-logo img {
-  height: 38px; width: auto; display: block;
-  transition: transform 0.3s ease;
-}
-.nav-logo img:hover { transform: scale(1.05); }
-.nav-links {
-  display: flex; align-items: center; gap: 2px;
-  flex: 0 0 auto;
-}
-.nav-links a {
-  font-size: 0.82rem; font-weight: 600; color: var(--muted);
-  text-decoration: none; padding: 7px 14px; border-radius: 99px;
-  white-space: nowrap; transition: color 0.2s, background 0.2s;
-}
-.nav-links a:hover { color: var(--ink); background: rgba(26,24,20,0.05); }
-.nav-links a.active { color: var(--accent); }
-.nav-right { flex: 1; display: flex; justify-content: flex-end; }
-@media (max-width: 820px) {
-  .section-nav { height: 52px; padding: 0 12px; }
-  .nav-logo img { height: 32px; }
-  .nav-links {
-    flex: 1 1 auto; min-width: 0; justify-content: flex-start;
-    overflow-x: auto; -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; -ms-overflow-style: none;
-    margin: 0 6px;
-    /* 右端をフェードさせて「横にスワイプできる」ことを示す。末尾の項目が隠れないよう余白を足す */
-    padding-right: 28px;
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
-    mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
-  }
-  .nav-links::-webkit-scrollbar { display: none; }
-  .nav-links a { padding: 6px 9px; font-size: 0.74rem; }
-  .lang-btn { padding: 5px 10px; font-size: 0.68rem; }
-}
-@media (max-width: 520px) {
-  .nav-logo { flex: 0 0 auto; }
-  .nav-right { flex: 0 0 auto; }
-}
-
-/* ════════════════════════════════════════════
-   言語トグル
-════════════════════════════════════════════ */
-.lang-toggle {
-  position: static;
-  display: flex;
-  border: 1.5px solid var(--border); border-radius: 99px;
-  background: var(--card); overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-}
-.lang-btn {
-  padding: 7px 16px; font-size: 0.75rem; font-weight: 700;
-  font-family: 'DM Mono', 'Noto Sans JP', monospace; cursor: pointer;
-  border: none; background: transparent; color: var(--muted);
-  transition: all 0.2s; letter-spacing: 0.05em;
-}
-.lang-btn.active { background: var(--ink); color: #fff; border-radius: 99px; }
-
-/* ════════════════════════════════════════════
-   Hero
-════════════════════════════════════════════ */
-.hero {
-  min-height: 100vh;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 80px 24px;
-  position: relative; overflow: hidden;
-  text-align: center;
-}
-.hero::before {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
-  background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 78%, transparent 100%);
-}
-.bg-circle {
-  position: absolute; border-radius: 50%;
-  pointer-events: none; filter: blur(80px); opacity: 0.15;
-}
-.bg-circle-1 { width: 600px; height: 600px; background: var(--accent);  top: -200px; right: -200px; }
-.bg-circle-2 { width: 400px; height: 400px; background: var(--accent2); bottom: -100px; left: -100px; }
-
-.hero-inner {
-  max-width: 800px; width: 100%;
-  position: relative; z-index: 1;
-  margin: 0 auto;
-}
-
-.hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-family: 'DM Mono', 'Noto Sans JP', monospace; font-size: 0.75rem;
-  color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase;
-  background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.2);
-  padding: 6px 14px; border-radius: 99px; margin-bottom: 28px;
-  opacity: 0; animation: fadeUp 0.6s 0.1s ease forwards;
-}
-.hero-eyebrow .dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--accent); animation: pulse 2s infinite;
-}
-
-.hero-title {
-  font-family: 'Syne', 'Noto Sans JP', 'Arial Black', sans-serif;
-  font-size: clamp(2.4rem, 7vw, 5.5rem);
-  font-weight: 800; line-height: 1.0; letter-spacing: -0.04em;
-  opacity: 0; animation: fadeUp 0.7s 0.2s ease forwards;
-  /* RoomとRadarを折り返し可能にする */
-  display: flex; flex-wrap: wrap; justify-content: center;
-  align-items: baseline; gap: 0 0.08em;
-}
-.title-room, .title-radar { display: inline; }
-.hero-title .accent { color: var(--accent); }
-.hero-title .small {
-  font-size: 0.45em; color: var(--muted);
-  display: block; font-weight: 700;
-  margin-top: 4px; letter-spacing: -0.02em;
-  width: 100%; /* flex折り返し後に全幅で下に来る */
-  text-align: center;
-}
-
-.hero-desc {
-  font-size: clamp(1rem, 2.5vw, 1.2rem); color: var(--muted);
-  line-height: 1.8; margin: 24px auto 40px; max-width: 560px;
-  opacity: 0; animation: fadeUp 0.7s 0.35s ease forwards;
-}
-
-.hero-cta {
-  display: inline-flex; align-items: center; gap: 10px;
-  background: var(--ink); color: #fff;
-  font-size: 1rem; font-weight: 700; padding: 16px 32px;
-  border-radius: 99px; text-decoration: none;
-  box-shadow: 0 4px 20px rgba(26,24,20,0.2);
-  transition: transform 0.2s, box-shadow 0.2s;
-  opacity: 0; animation: fadeUp 0.7s 0.5s ease forwards;
-}
-.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(26,24,20,0.25); }
-.hero-cta .arrow { font-size: 1.2em; transition: transform 0.2s; }
-.hero-cta:hover .arrow { transform: translateX(4px); }
-
-/* 試験運用中で大学公式ではないことの明示（控えめ表記） */
-.hero-note {
-  display: flex; width: fit-content; align-items: center; gap: 8px; flex-wrap: wrap;
-  justify-content: center; margin: 18px auto 0; max-width: 520px;
-  font-size: 0.72rem; font-weight: 500; color: var(--muted); line-height: 1.5;
-  opacity: 0; animation: fadeUp 0.7s 0.6s ease forwards;
-}
-.hero-note-tag {
-  flex-shrink: 0; font-family: 'Syne', 'Noto Sans JP', sans-serif; font-weight: 700;
-  font-size: 0.56rem; letter-spacing: 0.1em;
-  background: rgba(26,24,20,0.05); color: var(--muted);
-  border: 1px solid var(--border);
-  padding: 2px 7px; border-radius: 5px;
-}
-
-.hero-stats {
-  display: flex; justify-content: center; gap: 32px;
-  margin-top: 56px; flex-wrap: wrap;
-  opacity: 0; animation: fadeUp 0.7s 0.65s ease forwards;
-}
-.stat { text-align: center; }
-.stat-num {
-  font-family: 'Syne', 'Noto Sans JP', sans-serif; font-size: 2.2rem; font-weight: 800;
-  color: var(--ink); line-height: 1;
-}
-.stat-num span:not(.num) { color: var(--accent); }
-.stat-label {
-  font-size: 0.75rem; color: var(--muted);
-  margin-top: 4px; font-family: 'DM Mono', 'Noto Sans JP', monospace;
-}
-.stat-divider { width: 1px; background: var(--border); align-self: stretch; }
-
-/* タイプライター（キャッチコピー） */
-.hero-typewriter {
-  font-family: 'DM Mono', 'Noto Sans JP', monospace; font-size: 0.85rem; font-weight: 500;
-  color: var(--accent2); letter-spacing: 0.04em;
-  min-height: 1.4em; margin-bottom: 8px;
-  opacity: 0; animation: fadeUp 0.7s 0.15s ease forwards;
-}
-.hero-typewriter .cursor {
-  display: inline-block; width: 2px; height: 1em;
-  background: var(--accent2); margin-left: 2px;
-  vertical-align: text-bottom; animation: blink 0.85s steps(1) infinite;
-}
-@keyframes blink { 50% { opacity: 0; } }
-
-
-/* ════════════════════════════════════════════
-   アニメーション
-════════════════════════════════════════════ */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes pulse { 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
-
-/* ── 背景の動き ── */
-@keyframes drift1 {
-  0%,100% { transform: translate(0,0) scale(1); }
-  50%     { transform: translate(-40px, 36px) scale(1.12); }
-}
-@keyframes drift2 {
-  0%,100% { transform: translate(0,0) scale(1); }
-  50%     { transform: translate(48px, -28px) scale(1.08); }
-}
-.bg-circle-1 { animation: drift1 20s ease-in-out infinite; }
-.bg-circle-2 { animation: drift2 26s ease-in-out infinite; }
-
-@keyframes gridPan {
-  from { background-position: 0 0, 0 0; }
-  to   { background-position: 48px 48px, 48px 48px; }
-}
-.hero::before { animation: gridPan 9s linear infinite; }
-
-/* ── レーダーのping ── */
-.ping-layer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
-.ping {
-  position: absolute; width: 320px; height: 320px;
-  margin: -160px 0 0 -160px;
-  border: 1.5px solid rgba(37,99,235,0.22); border-radius: 50%;
-  opacity: 0; animation: ping 6s ease-out infinite;
-}
-.ping.p1 { top: 28%; left: 22%; }
-.ping.p2 { top: 64%; left: 78%; animation-delay: 2s; border-color: rgba(249,115,22,0.2); }
-.ping.p3 { top: 78%; left: 30%; animation-delay: 4s; }
-@keyframes ping {
-  0%   { transform: scale(0.15); opacity: 0.55; }
-  70%  { opacity: 0; }
-  100% { transform: scale(1.5); opacity: 0; }
-}
-
-/* ── 浮遊する記号 ── */
-.symbols { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
-.symbol {
-  position: absolute; font-family: 'DM Mono', 'Noto Sans JP', monospace;
-  color: rgba(37,99,235,0.16); user-select: none;
-  animation: floatY 13s ease-in-out infinite;
-}
-.symbol.orange { color: rgba(249,115,22,0.16); }
-@keyframes floatY {
-  0%,100% { transform: translateY(0) rotate(0deg); }
-  50%     { transform: translateY(-26px) rotate(10deg); }
-}
-
-/* ── タイトルのスイープ（青系・配色は維持） ── */
-.hero-title .title-radar {
-  background: linear-gradient(90deg, var(--accent) 30%, #7aa2ff 50%, var(--accent) 70%);
-  background-size: 220% 100%;
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent; color: transparent;
-  animation: sweep 4.5s linear infinite;
-}
-@keyframes sweep { from { background-position: 220% 0; } to { background-position: -220% 0; } }
-
-/* アクセシビリティ: 動きを減らす設定を尊重 */
-@media (prefers-reduced-motion: reduce) {
-  .bg-circle-1, .bg-circle-2, .hero::before, .ping, .symbol, .hero-title .title-radar, .hero-typewriter .cursor,
-  .cta-particles span, .cta-btn, .feedback-thanks .check {
-    animation: none !important;
-  }
-  .hero-title .title-radar { color: var(--accent); -webkit-text-fill-color: var(--accent); }
-}
-
-.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
-.reveal.visible { opacity: 1; transform: translateY(0); }
-.reveal-delay-1 { transition-delay: 0.1s; }
-.reveal-delay-2 { transition-delay: 0.2s; }
-.reveal-delay-3 { transition-delay: 0.3s; }
-.reveal-delay-4 { transition-delay: 0.4s; }
-
-/* ════════════════════════════════════════════
-   セクション共通
-════════════════════════════════════════════ */
-section { padding: 100px 24px; }
-.section-inner { max-width: 1000px; margin: 0 auto; }
-.section-eyebrow {
-  font-family: 'DM Mono', 'Noto Sans JP', monospace; font-size: 0.72rem;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--accent); margin-bottom: 16px;
-}
-.section-title {
-  font-family: 'Syne', 'Noto Sans JP', sans-serif;
-  font-size: clamp(1.8rem, 5vw, 3rem);
-  font-weight: 800; letter-spacing: -0.03em;
-  line-height: 1.15; margin-bottom: 48px;
-}
-
-/* ════════════════════════════════════════════
-   問題提起
-════════════════════════════════════════════ */
-.problem { background: #2e3a55; color: #fff; }
-/* セクション間のグラデーションつなぎ帯 */
-.blend-band {
-  position: relative; overflow: hidden; pointer-events: none;
-  line-height: 0; height: 36px;
-}
-.blend-band.tall { height: 60px; }
-.blend-band .glow {
-  position: absolute; width: 130px; height: 130px; border-radius: 50%;
-  filter: blur(40px); opacity: 0.18; top: -30px;
-}
-@media (prefers-reduced-motion: reduce) {
-  .blend-band .glow { display: none; }
-}
-.problem .section-eyebrow { color: var(--accent2); }
-.problem .section-title { color: #fff; }
-.problem-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-}
-.problem-card {
-  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 16px; padding: 28px; transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
-}
-.problem-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.25); }
-.problem-card.reveal { transform: translateY(30px) rotate(-2deg); }
-.problem-card.reveal:nth-child(2) { transform: translateY(30px) rotate(0deg); }
-.problem-card.reveal:nth-child(3) { transform: translateY(30px) rotate(2deg); }
-.problem-card.reveal.visible { transform: translateY(0) rotate(0deg); }
-.problem-card.reveal.visible:hover { transform: translateY(-6px) rotate(0deg); }
-.problem-icon { font-size: 2rem; margin-bottom: 14px; display: block; }
-.problem-text { font-size: 1rem; line-height: 1.7; color: rgba(255,255,255,0.8); }
-
-/* ════════════════════════════════════════════
-   特徴
-════════════════════════════════════════════ */
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-}
-.feature-card {
-  background: var(--card); border: 1.5px solid var(--border);
-  border-radius: 20px; padding: 32px;
-  position: relative; overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.feature-card::before {
-  content: ''; position: absolute;
-  top: 0; left: 0; right: 0; height: 3px;
-}
-.feature-card.blue::before   { background: var(--tower); }
-.feature-card.green::before  { background: var(--suruga); }
-.feature-card.orange::before { background: var(--funa); }
-.feature-card.purple::before { background: #7c3aed; }
-.feature-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
-.feature-card::after {
-  content: ''; position: absolute; inset: 0; border-radius: inherit;
-  background: radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(37,99,235,0.08), transparent 70%);
-  opacity: 0; transition: opacity 0.3s; pointer-events: none;
-}
-.feature-card:hover::after { opacity: 1; }
-.feature-card:hover .feature-icon { animation: iconBounce 0.5s ease; }
-@keyframes iconBounce {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  30% { transform: translateY(-6px) rotate(-8deg); }
-  60% { transform: translateY(0) rotate(6deg); }
-}
-.feature-num {
-  font-family: 'Syne', 'Noto Sans JP', sans-serif; font-size: 3rem; font-weight: 800;
-  opacity: 0.07; position: absolute; top: 16px; right: 20px; line-height: 1;
-}
-.feature-icon { font-size: 1.8rem; margin-bottom: 16px; display: block; }
-.feature-title {
-  font-family: 'Syne', 'Noto Sans JP', sans-serif; font-size: 1.15rem;
-  font-weight: 700; margin-bottom: 10px;
-}
-.feature-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.8; }
-
-/* ════════════════════════════════════════════
-   校舎バッジ
-════════════════════════════════════════════ */
-.buildings {
-  display: flex; justify-content: center;
-  gap: 12px; flex-wrap: wrap; margin-top: 48px;
-}
-.building-badge {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 20px; border-radius: 99px;
-  font-size: 0.85rem; font-weight: 700; border: 2px solid;
-}
-.building-badge.tower  { border-color: var(--tower);  color: var(--tower);  background: rgba(37,99,235,0.06); }
-.building-badge.suruga { border-color: var(--suruga); color: var(--suruga); background: rgba(22,163,74,0.06); }
-.building-badge.funa   { border-color: var(--funa);   color: var(--funa);   background: rgba(234,88,12,0.06); }
-.building-badge .dot { width: 8px; height: 8px; border-radius: 50%; }
-.tower  .dot { background: var(--tower); }
-.suruga .dot { background: var(--suruga); }
-.funa   .dot { background: var(--funa); }
-
-/* ════════════════════════════════════════════
-   使い方
-════════════════════════════════════════════ */
-.howto { background: linear-gradient(135deg, #eef2ff 0%, #fef9f0 100%); }
-.steps {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0; position: relative;
-}
-.steps::before {
-  content: ''; position: absolute;
-  top: 40px; left: 10%; right: 10%; height: 2px;
-  background: repeating-linear-gradient(
-    90deg, var(--accent) 0, var(--accent) 8px, transparent 8px, transparent 16px
-  );
-  pointer-events: none;
-  transform-origin: left center; transform: scaleX(0);
-  transition: transform 1.2s ease 0.3s;
-}
-.steps.visible::before { transform: scaleX(1); }
-.step { text-align: center; padding: 32px 20px; }
-.step-num {
-  width: 56px; height: 56px; border-radius: 50%;
-  background: var(--accent); color: #fff;
-  font-family: 'Syne', 'Noto Sans JP', sans-serif; font-size: 1.3rem; font-weight: 800;
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 20px; position: relative; z-index: 1;
-  box-shadow: 0 4px 16px rgba(37,99,235,0.3);
-  transform: scale(0); transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.step.visible .step-num, .reveal.visible .step-num { transform: scale(1); }
-.step-title { font-family: 'Syne', 'Noto Sans JP', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
-.step-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
-
-/* ════════════════════════════════════════════
-   メンバー
-════════════════════════════════════════════ */
-.members-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
-}
-.member-card {
-  background: var(--card); border: 1.5px solid var(--border);
-  border-radius: 16px; padding: 28px 20px; text-align: center;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.member-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(37,99,235,0.18); }
-.member-avatar {
-  width: 64px; height: 64px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  margin: 0 auto 16px;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Syne', 'Noto Sans JP', sans-serif; font-size: 1.4rem; font-weight: 800; color: #fff;
-  transition: transform 0.3s ease;
-}
-.member-card:hover .member-avatar { transform: scale(1.12) rotate(-4deg); }
-.member-name { font-family: 'Syne', 'Noto Sans JP', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
-.member-role {
-  display: inline-block; font-size: 0.7rem; font-weight: 700;
-  font-family: 'DM Mono', 'Noto Sans JP', monospace; letter-spacing: 0.06em;
-  background: rgba(37,99,235,0.08); color: var(--accent);
-  padding: 3px 10px; border-radius: 99px; margin-bottom: 8px;
-}
-.member-dept { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
-
-/* ════════════════════════════════════════════
-   意見箱
-════════════════════════════════════════════ */
-.feedback { background: linear-gradient(135deg, #fef9f0 0%, #eef2ff 100%); }
-.feedback-card {
-  max-width: 620px; margin: 0 auto;
-  background: var(--card); border: 1.5px solid var(--border);
-  border-radius: 24px; padding: 40px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.06);
-  position: relative; overflow: hidden;
-}
-.feedback-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-}
-.feedback-field { margin-bottom: 20px; text-align: left; }
-.feedback-field label {
-  display: block; font-family: 'DM Mono', 'Noto Sans JP', monospace;
-  font-size: 0.74rem; font-weight: 700; letter-spacing: 0.06em;
-  color: var(--ink); margin-bottom: 8px;
-}
-.feedback-field label .req { color: var(--accent2); }
-.feedback-field select,
-.feedback-field textarea,
-.feedback-field input {
-  width: 100%; border: 1.5px solid var(--border); border-radius: 12px;
-  padding: 12px 14px; font-family: inherit;
-  font-size: 0.92rem; background: var(--bg); color: var(--ink);
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.feedback-field textarea { resize: vertical; min-height: 120px; line-height: 1.7; }
-.feedback-field select:focus,
-.feedback-field textarea:focus,
-.feedback-field input:focus {
-  outline: none; border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
-}
-.feedback-submit {
-  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  width: 100%; border: none; cursor: pointer;
-  background: var(--ink); color: #fff;
-  font-family: inherit;
-  font-size: 1rem; font-weight: 700; padding: 16px 32px;
-  border-radius: 99px; box-shadow: 0 4px 20px rgba(26,24,20,0.2);
-  transition: transform 0.2s, box-shadow 0.2s;
-  position: relative; overflow: hidden;
-}
-.feedback-submit .ripple {
-  position: absolute; border-radius: 50%; background: rgba(255,255,255,0.45);
-  transform: scale(0); animation: rippleAnim 0.6s ease-out;
-  pointer-events: none;
-}
-@keyframes rippleAnim { to { transform: scale(1); opacity: 0; } }
-.feedback-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(26,24,20,0.25); }
-.feedback-submit:disabled { opacity: 0.6; cursor: default; transform: none; }
-.feedback-note {
-  font-size: 0.72rem; color: var(--muted); margin-top: 14px;
-  text-align: center; line-height: 1.7;
-}
-.feedback-thanks {
-  display: none; text-align: center; padding: 30px 10px;
-}
-.feedback-thanks .check {
-  font-size: 2.6rem; display: block; margin-bottom: 12px;
-  animation: thanksPulse 1.6s ease-in-out infinite;
-}
-@keyframes thanksPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.15); opacity: 0.7; }
-}
-.feedback-thanks .msg {
-  font-family: 'Syne', 'Noto Sans JP', sans-serif; font-size: 1.2rem; font-weight: 700;
-  color: var(--ink);
-}
-.feedback-card.sent .feedback-form  { display: none; }
-.feedback-card.sent .feedback-thanks { display: block; }
-
-/* ════════════════════════════════════════════
-   CTA
-════════════════════════════════════════════ */
-.cta-section {
-  background: #2e3a55; color: #fff;
-  text-align: center; padding: 100px 24px;
-  position: relative; overflow: hidden;
-}
-.cta-particles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
-.cta-particles span {
-  position: absolute; border-radius: 50%; background: rgba(255,255,255,0.18);
-  animation: ctaFloat 14s ease-in-out infinite;
-}
-.cta-particles span:nth-child(odd) { background: rgba(249,115,22,0.18); }
-@keyframes ctaFloat {
-  0%, 100% { transform: translateY(0) translateX(0); }
-  50% { transform: translateY(-40px) translateX(20px); }
-}
-.cta-title, .cta-desc, .cta-btn, .cta-badge { position: relative; z-index: 1; }
-.cta-title {
-  font-family: 'Syne', 'Noto Sans JP', sans-serif;
-  font-size: clamp(2rem, 6vw, 4.5rem);
-  font-weight: 800; letter-spacing: -0.04em;
-  line-height: 1.1; margin-bottom: 20px;
-}
-.cta-title .accent { color: var(--accent2); }
-.cta-desc { color: rgba(255,255,255,0.5); font-size: 1rem; margin-bottom: 40px; }
-.cta-btn {
-  display: inline-flex; align-items: center; gap: 10px;
-  background: #fff; color: var(--ink);
-  font-size: 1.05rem; font-weight: 700; padding: 18px 40px;
-  border-radius: 99px; text-decoration: none;
-  box-shadow: 0 4px 24px rgba(255,255,255,0.15);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.cta-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(255,255,255,0.2); }
-.cta-btn { animation: ctaGlow 3s ease-in-out infinite; }
-@keyframes ctaGlow {
-  0%, 100% { box-shadow: 0 4px 24px rgba(255,255,255,0.15); }
-  50% { box-shadow: 0 4px 32px rgba(255,255,255,0.35); }
-}
-.cta-badge {
-  display: inline-block; margin-top: 20px;
-  font-family: 'DM Mono', 'Noto Sans JP', monospace; font-size: 0.72rem;
-  color: rgba(255,255,255,0.3); letter-spacing: 0.08em;
-}
-
-/* ════════════════════════════════════════════
-   Instagramフォロー（ヒーロー直下）
-════════════════════════════════════════════ */
-.social { background: linear-gradient(135deg, #eef2ff 0%, #fef9f0 100%); }
-.social-card {
-  max-width: 720px; margin: 0 auto;
-  display: flex; align-items: center; gap: 40px;
-  background: var(--card); border: 1.5px solid var(--border);
-  border-radius: 28px; padding: 44px;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.07);
-  position: relative; overflow: hidden;
-}
-.social-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
-  background: linear-gradient(90deg, #feda75, #fa7e1e 25%, #d62976 55%, #962fbf 78%, #4f5bd5);
-}
-.social-qr-wrap { flex-shrink: 0; width: 156px; text-align: center; }
-.social-qr {
-  display: block; width: 156px; height: 156px; border-radius: 20px;
-  background: #fff; padding: 9px;
-  background-image: linear-gradient(#fff, #fff), linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
-  background-origin: border-box; background-clip: content-box, border-box;
-  border: 3px solid transparent;
-  box-shadow: 0 12px 30px rgba(214,41,118,0.18);
-  transition: transform 0.25s, box-shadow 0.25s;
-}
-.social-qr img { width: 100%; height: 100%; display: block; border-radius: 12px; }
-.social-qr:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(214,41,118,0.28); }
-.social-qr-hint {
-  display: block; font-family: 'DM Mono', 'Noto Sans JP', monospace; font-size: 0.64rem;
-  color: var(--muted); margin-top: 10px; letter-spacing: 0.16em;
-}
-.social-body { flex: 1; min-width: 0; text-align: left; }
-.social-label {
-  display: inline-flex; align-items: center; gap: 9px;
-  font-family: 'DM Mono', 'Noto Sans JP', monospace; font-size: 0.72rem; letter-spacing: 0.14em;
-  text-transform: uppercase;
-  background: linear-gradient(45deg, #fa7e1e, #d62976 55%, #962fbf);
-  -webkit-background-clip: text; background-clip: text;
-  -webkit-text-fill-color: transparent; color: transparent;
-  font-weight: 700; margin-bottom: 12px;
-}
-.social-label .ig {
-  width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0;
-  background: linear-gradient(135deg, #feda75, #fa7e1e 30%, #d62976 60%, #962fbf 80%, #4f5bd5);
-  position: relative;
-}
-.social-label .ig::before {
-  content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  width: 8px; height: 8px; border: 1.8px solid #fff; border-radius: 50%;
-}
-.social-label .ig::after {
-  content: ''; position: absolute; top: 3.5px; right: 3.5px;
-  width: 2.2px; height: 2.2px; background: #fff; border-radius: 50%;
-}
-.social-handle {
-  font-family: 'Syne', 'Noto Sans JP', sans-serif; font-weight: 800; font-size: 1.55rem;
-  color: var(--ink); margin-bottom: 8px; line-height: 1.1;
-}
-.social-sub { font-size: 0.92rem; color: var(--muted); line-height: 1.7; margin-bottom: 22px; }
-.social-btn {
-  display: inline-flex; align-items: center; gap: 10px;
-  background: linear-gradient(45deg, #fa7e1e, #d62976 50%, #962fbf);
-  color: #fff;
-  font-size: 0.95rem; font-weight: 700; padding: 13px 28px;
-  border-radius: 99px; text-decoration: none;
-  box-shadow: 0 6px 22px rgba(214,41,118,0.30);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.social-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(214,41,118,0.42); }
-.social-btn .ig-ico {
-  width: 19px; height: 19px; flex-shrink: 0;
-  border: 2.2px solid #fff; border-radius: 6px; position: relative;
-}
-.social-btn .ig-ico::before {
-  content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  width: 8px; height: 8px; border: 2.2px solid #fff; border-radius: 50%;
-}
-.social-btn .ig-ico::after {
-  content: ''; position: absolute; top: 2px; right: 2px;
-  width: 2.6px; height: 2.6px; background: #fff; border-radius: 50%;
-}
-.social-btn .arrow { transition: transform 0.2s; }
-.social-btn:hover .arrow { transform: translateX(4px); }
-
-/* ════════════════════════════════════════════
-   フッター
-════════════════════════════════════════════ */
-footer {
-  background: var(--bg); border-top: 1px solid var(--border);
-  padding: 32px 24px; text-align: center;
-  font-family: 'DM Mono', 'Noto Sans JP', monospace; font-size: 0.72rem;
-  color: var(--muted); letter-spacing: 0.06em;
-}
-
-/* ════════════════════════════════════════════
-   レスポンシブ — スマホ (〜767px)
-════════════════════════════════════════════ */
-@media (max-width: 767px) {
-  .lang-toggle { top: 12px; right: 12px; }
-  .lang-btn { padding: 5px 10px; font-size: 0.7rem; }
-
-  .hero { padding: 72px 20px 56px; min-height: 100svh; }
-  .hero-eyebrow { font-size: 0.68rem; padding: 5px 12px; margin-bottom: 20px; }
-  .hero-title { font-size: clamp(2.6rem, 13vw, 3.8rem); }
-  body.lang-en .hero-title { font-size: clamp(2.2rem, 11vw, 3.2rem); }
-  .hero-title .small { font-size: 0.35em; }
-  .hero-desc { font-size: 0.92rem; margin: 18px auto 28px; }
-  .hero-cta { font-size: 0.95rem; padding: 14px 26px; }
-  .hero-stats { gap: 16px; margin-top: 40px; }
-  .stat-num { font-size: 1.8rem; }
-  .stat-divider { display: none; }
-
-  section { padding: 64px 20px; }
-  .section-title { font-size: clamp(1.6rem, 7vw, 2.2rem); margin-bottom: 32px; }
-
-  .problem-grid { grid-template-columns: 1fr; gap: 14px; }
-  .problem-card { padding: 22px; }
-
-  .features-grid { grid-template-columns: 1fr; gap: 14px; }
-  .feature-card { padding: 24px; }
-
-  .steps { grid-template-columns: 1fr; }
-  .steps::before { display: none; }
-  .step { padding: 20px 16px; text-align: left; display: flex; gap: 16px; align-items: flex-start; }
-  .step-num { margin: 0; flex-shrink: 0; width: 44px; height: 44px; font-size: 1.1rem; }
-
-  .buildings { gap: 8px; }
-  .building-badge { font-size: 0.78rem; padding: 8px 14px; }
-
-  .members-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .member-card { padding: 20px 14px; }
-  .member-avatar { width: 52px; height: 52px; font-size: 1.2rem; }
-
-  .cta-section { padding: 72px 20px; }
-  .cta-title { font-size: clamp(1.8rem, 8vw, 3rem); }
-  .cta-btn { font-size: 0.95rem; padding: 15px 28px; }
-  .social-card { flex-direction: column; text-align: center; gap: 24px; padding: 32px 24px; }
-  .social-body { text-align: center; }
-  .social-label { justify-content: center; }
-}
-
-/* ════════════════════════════════════════════
-   レスポンシブ — 小型スマホ (〜375px)
-════════════════════════════════════════════ */
-@media (max-width: 375px) {
-  .hero-title { font-size: 2.4rem; }
-  .members-grid { grid-template-columns: 1fr; }
-}
-
-/* ════════════════════════════════════════════
-   レスポンシブ — iPad (768px〜1099px)
-════════════════════════════════════════════ */
-@media (min-width: 768px) and (max-width: 1099px) {
-  .lang-toggle { top: 16px; right: 20px; }
-
-  .hero { padding: 100px 48px 80px; }
-  .hero-title { font-size: clamp(2.8rem, 6.5vw, 4.5rem); letter-spacing: -0.03em; }
-  body.lang-en .hero-title { font-size: clamp(2.4rem, 5.5vw, 3.8rem); }
-  .hero-desc { font-size: 1.05rem; }
-  .hero-stats { gap: 24px; }
-
-  section { padding: 80px 48px; }
-  .section-inner { max-width: 880px; }
-  .section-title { font-size: clamp(2rem, 4.5vw, 2.8rem); }
-
-  .problem-grid  { grid-template-columns: repeat(3, 1fr); }
-  .features-grid { grid-template-columns: repeat(2, 1fr); }
-  .members-grid  { grid-template-columns: repeat(3, 1fr); }
-  .steps         { grid-template-columns: repeat(3, 1fr); }
-
-  .cta-title { font-size: clamp(2.4rem, 5vw, 3.8rem); }
-}
-
-/* ════════════════════════════════════════════
-   レスポンシブ — PC (1100px〜)
-════════════════════════════════════════════ */
-@media (min-width: 1100px) {
-  .hero { padding: 120px 60px 100px; }
-  .hero-inner { max-width: 900px; }
-  .hero-title { font-size: clamp(4rem, 6.5vw, 6rem); }
-  body.lang-en .hero-title { font-size: clamp(3.5rem, 6vw, 5.5rem); }
-  .hero-desc { font-size: 1.15rem; max-width: 600px; }
-  .hero-stats { gap: 40px; }
-  .stat-num { font-size: 2.6rem; }
-
-  section { padding: 120px 60px; }
-  .section-inner { max-width: 1100px; }
-
-  .problem-grid  { grid-template-columns: repeat(3, 1fr); gap: 24px; }
-  .features-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; }
-  .members-grid  { grid-template-columns: repeat(5, 1fr); gap: 16px; }
-  .member-card { padding: 32px 20px; }
-
-  .cta-title { font-size: clamp(3.5rem, 5vw, 5rem); }
-}
-
-/* ════════════════════════════════════════════
-   2026-09 の改善（読みやすさ・軽さ・スマホ）
-════════════════════════════════════════════ */
-/* 必須の「試験運用中・大学公式ではない」表記を読める大きさに */
-.hero-note { font-size: 0.82rem; word-break: auto-phrase; }   /* 長い表示文を言葉の途中で折り返さない */
-.hero-note-tag { font-size: 0.68rem; }
-footer { font-size: 0.8rem; line-height: 1.7; word-break: auto-phrase; }
-.cta-desc { color: rgba(255,255,255,0.75); }
-.cta-badge { color: rgba(255,255,255,0.7); }
-.stat-note { margin-top: 14px; font-size: 0.72rem; color: var(--muted); }
-
-/* 重いアニメーションを軽く: 背景の方眼は background-position ではなく transform で動かす。
-   タイトルの流れる光と CTA の光る影は止める（毎フレーム描き直しになり、古いスマホで重い） */
-.hero::before { inset: -48px 0 0 -48px; animation: gridPanT 9s linear infinite; }
-@keyframes gridPanT { from { transform: translate(0, 0); } to { transform: translate(48px, 48px); } }
-.hero-title .title-radar { animation: none; background: none; color: var(--accent); -webkit-text-fill-color: var(--accent); }
-.cta-btn { animation: none; }
-
-/* 機能は6枚。PC は3列 */
-@media (min-width: 1100px) { .features-grid { grid-template-columns: repeat(3, 1fr); } }
-
-/* 実際のアプリ画面 */
-.app-shot { display: flex; flex-direction: column; align-items: center; margin: 0 auto 48px; }
-.app-shot .phone {
-  width: 260px; border-radius: 36px; padding: 10px; background: #1a1814;
-  box-shadow: 0 24px 60px rgba(26,24,20,0.25);
-}
-.app-shot img { display: block; width: 100%; height: auto; border-radius: 28px; }
-.app-shot figcaption { margin-top: 14px; font-size: 0.78rem; color: var(--muted); text-align: center; line-height: 1.6; }
-
-/* このサービスについて */
-.about { background: #eef2ff; }  /* 意見箱の終わりと、最後の案内のつなぎ帯の色に合わせる */
-.about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-.about-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 16px; padding: 24px; }
-.about-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
-.about-card p { font-size: 0.86rem; color: var(--muted); line-height: 1.8; }
-
-/* 意見箱の送信失敗 */
-.feedback-error { display: none; margin-top: 12px; font-size: 0.85rem; color: #b42318; text-align: center; line-height: 1.6; }
-.feedback-error.show { display: block; }
-
-/* 言語ボタン: 「中文」が折れない・押しやすい */
-.lang-btn { white-space: nowrap; }
-
-/* スマホで、スクロール中も「RoomRadar を開く」を押せるように */
-.sticky-cta { display: none; }
-@media (max-width: 767px) {
-  .sticky-cta {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 98;
-    min-height: 52px; border-radius: 99px; text-decoration: none;
-    background: var(--ink); color: #fff; font-weight: 700; font-size: 0.98rem;
-    box-shadow: 0 8px 28px rgba(26,24,20,0.3);
-    transform: translateY(140%); transition: transform 0.25s ease;
-  }
-  .sticky-cta.show { transform: translateY(0); }
-
-  .lang-btn { min-height: 40px; }
-  /* 使い方: 番号の横に見出しと説明を並べる（見出しが「サイ／トを」と細切れに折れていた） */
-  .step { display: grid; grid-template-columns: 44px 1fr; gap: 4px 16px; align-items: start; }
-  .step-num { grid-row: span 2; }
-  .step-title, .step-desc { grid-column: 2; }
-  /* スマホで自分の画面の QR は読めないので隠し、フォローボタンだけにする */
-  .social-qr-wrap { display: none; }
-  /* iOS は 16px 未満の入力欄にフォーカスすると勝手に拡大する */
-  .feedback-field select, .feedback-field textarea, .feedback-field input { font-size: 16px; }
-  .feedback-card { padding: 28px 22px; }
-  .app-shot .phone { width: 230px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .hero::before { animation: none !important; }
-  .sticky-cta { transition: none; }
-}
-.app-shot { margin: 48px auto 0; }
-/* ヒーローの統計: スマホでは 2×2 */
-@media (max-width: 767px) {
-  .hero-stats { display: grid; grid-template-columns: repeat(2, auto); justify-content: center; gap: 16px 32px; }
-  footer { padding-bottom: 96px; }
-  .lang-btn { border: 7px solid transparent; border-width: 7px 2px; padding: 0 8px; }
-  .lang-btn.active { background-clip: padding-box; }
-}
-/* このサービスについて: 3枚が 2＋1 で空かないように */
-.about-grid { grid-template-columns: 1fr; }
-@media (min-width: 576px) and (max-width: 1099px) {
-  .about-grid { grid-template-columns: repeat(2, 1fr); }
-  .about-card:last-child { grid-column: 1 / -1; }
-}
-@media (min-width: 1100px) { .about-grid { grid-template-columns: repeat(3, 1fr); } }
-/* TEST 札を文の先頭に入れて、札だけ別の行にならないように */
-.hero-note { display: block; max-width: 600px; text-align: center; }
-.hero-note-tag { display: inline-block; margin-right: 6px; vertical-align: 0.1em; }
-/* TEST 札は1行目に単独で、文は改行して中央ぞろえ */
-.hero-note .hero-note-tag { display: table; margin: 0 auto 8px; }
-/* ヒーローの「今すぐ使う」: 落ち着いた黒のボタンに細い光沢と控えめな影。触れたときだけ矢印が進む */
-.hero-cta {
-  font-size: 1.05rem; font-weight: 700; letter-spacing: 0.04em;
-  padding: 17px 30px 17px 36px; gap: 14px;
-  background: linear-gradient(180deg, #2a2723 0%, #1a1814 100%);
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset, 0 12px 30px -10px rgba(26,24,20,0.55);
-}
-.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset, 0 18px 36px -12px rgba(26,24,20,0.6); }
-.hero-cta .arrow {
-  display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
-  background: var(--accent); color: #fff; font-size: 0.9rem;
-  transition: transform 0.25s ease;
-}
-.hero-cta:hover .arrow { transform: translateX(4px); }
-@media (max-width: 767px) { .hero-cta { font-size: 1rem; padding: 15px 24px 15px 30px; } }
-/* 統計の数字: 横に広い Syne をやめ、本文と同じ Noto Sans JP の太字で詰めすぎず並べる */
-.stat-num { font-family: 'Noto Sans JP', sans-serif; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-.stat-num span:not(.num) { font-size: 0.6em; margin-left: 2px; }
-/* 「今すぐ使う」の上下に余白 */
-/* ヒーローの余白: 説明文→ボタン→数字→TEST 表記を、同じ調子の間隔で並べる */
-.hero-typewriter { margin-bottom: 12px; }
-.hero-desc { margin: 20px auto 36px; }
-.hero-stats { margin-top: 48px; }
-@media (max-width: 767px) {
-  .hero-desc { margin: 16px auto 32px; }
-  .hero-stats { margin-top: 40px; }
-  .hero-note { margin-top: 48px !important; }
-}
-/* TEST 表記は数字の下。しっかり間を空ける */
-.hero-note { margin-top: 68px; text-align: center; opacity: 1; animation: fadeUp 0.7s 0.75s ease both; }
-.stat-note { margin-top: 12px; }
-
-/* ════════════════════════════════════════════
-   3つの校舎（3D 模型）
-════════════════════════════════════════════ */
-.campus { padding-top: 72px; }
-.campus-stage {
-  position: relative; height: clamp(320px, 56vh, 560px);
-  background: #F0EEE6; border: 1px solid var(--border); border-radius: 20px; overflow: hidden;
-}
-.campus-stage rr-campus { position: absolute; inset: 0; height: 100%; }
-.campus-fallback { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 0.85rem; }
-.campus-stage.loaded .campus-fallback { display: none; }
-.campus-picks { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
-.campus-pick {
-  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px;
-  border-radius: 99px; border: 1.5px solid var(--border); background: var(--card); color: var(--ink);
-  font: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: border-color .2s, background .2s;
-}
-.campus-pick .n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 0.75rem; }
-.campus-pick em { font-style: normal; font-weight: 500; color: var(--muted); font-size: 0.8rem; }
-.campus-pick.tower[aria-pressed=true]  { border-color: var(--tower);  background: rgba(37,99,235,0.07); }
-.campus-pick.suruga[aria-pressed=true] { border-color: var(--suruga); background: rgba(22,163,74,0.07); }
-.campus-pick.funa[aria-pressed=true]   { border-color: var(--funa);   background: rgba(234,88,12,0.07); }
-.campus-note { margin: 14px auto 0; max-width: 720px; font-size: 0.74rem; color: var(--muted); line-height: 1.7; text-align: center; }
-@media (max-width: 767px) {
-  .campus { padding-top: 56px; }
-  .campus-stage { height: clamp(300px, 62vw, 420px); border-radius: 16px; }
-  .campus-pick { font-size: 0.8rem; padding: 0 12px; }
-}
-/* スマホの Instagram 欄: 余白を詰め、ハンドル名がカードからはみ出さないように */
-@media (max-width: 767px) {
-  .social { padding: 40px 20px 48px; }
-  .social-card { padding: 28px 22px 26px; gap: 0; border-radius: 22px; }
-  .social-body { width: 100%; }
-  .social-label { margin-bottom: 8px; }
-  .social-handle { font-size: 1.2rem; overflow-wrap: anywhere; margin-bottom: 10px; }
-  .social-sub { font-size: 0.86rem; line-height: 1.75; margin-bottom: 18px; }
-  .social-btn { padding: 12px 26px; }
-}
-/* 「探しに行こ／う。」のように途中で折れないように */
-.cta-title .accent { display: inline-block; }
-</style>
+<!-- CLAUDE.md ルール1：「試験運用中・大学公式ではない」表記は、ヒーロー（TEST のカード）・このサービスについて・フッターに置く。
+     見た目（試験運用中の表記のカードなど）は assets/lp/lp.css。詳しい説明は about.html（2026-11-07 に分けた） -->
+<link rel="stylesheet" href="assets/lp/lp.css?v=20261107">
 </head>
 <body>
 
@@ -1080,13 +51,12 @@ footer { font-size: 0.8rem; line-height: 1.7; word-break: auto-phrase; }
     <img src="assets/lp/logo-nav.png" alt="RoomRadar" width="130" height="76">
   </a>
   <nav class="nav-links" id="navLinks">
-    <a href="#social"><span class="ja">Instagram</span><span class="en">Instagram</span><span class="zh">Instagram</span></a>
-    <a href="#problem"><span class="ja">課題</span><span class="en">Problem</span><span class="zh">问题</span></a>
     <a href="#features"><span class="ja">機能</span><span class="en">Features</span><span class="zh">功能</span></a>
     <a href="#howto"><span class="ja">使い方</span><span class="en">How&nbsp;to</span><span class="zh">使用方法</span></a>
-    <a href="#team"><span class="ja">メンバー</span><span class="en">Team</span><span class="zh">成员</span></a>
+    <a href="#manners"><span class="ja">みんなで使う</span><span class="en">Shared&nbsp;space</span><span class="zh">共享空间</span></a>
+    <a href="#social"><span class="ja">Instagram</span><span class="en">Instagram</span><span class="zh">Instagram</span></a>
     <a href="#feedback"><span class="ja">意見箱</span><span class="en">Feedback</span><span class="zh">意见箱</span></a>
-    <a href="#about"><span class="ja">このサービスについて</span><span class="en">About</span><span class="zh">关于</span></a>
+    <a href="about.html"><span class="ja">このサービスについて</span><span class="en">About</span><span class="zh">关于</span></a>
   </nav>
   <div class="nav-right">
     <div class="lang-toggle">
@@ -1150,6 +120,7 @@ footer { font-size: 0.8rem; line-height: 1.7; word-break: auto-phrase; }
       <span class="zh">立即使用</span>
       <span class="arrow">→</span>
     </a>
+    <p class="hero-free"><span class="ja">登録不要・無料・ブラウザで開くだけ</span><span class="en">No sign-up · Free · Opens in your browser</span><span class="zh">无需注册 · 免费 · 浏览器直接打开</span></p>
 
     <div class="hero-stats">
       <div class="stat">
@@ -1205,9 +176,105 @@ footer { font-size: 0.8rem; line-height: 1.7; word-break: auto-phrase; }
 </section>
 
 <!-- ════════════════════════════════════════════
-     Instagramフォロー
+     課題（2026-11 整理：濃い帯をやめ、明るい面で3つを短く）
 ════════════════════════════════════════════ -->
-<div class="blend-band tall" style="background:linear-gradient(180deg,#f5f3ee 0%,#eef2ff 100%)"><span class="glow" style="background:var(--accent2);left:5%;top:-80px;opacity:0.13"></span></div>
+<section class="sec sec-problem" id="problem">
+  <div class="sec-inner">
+    <p class="sec-eyebrow reveal"><span class="ja">課題</span><span class="en">The problem</span><span class="zh">问题所在</span></p>
+    <h2 class="sec-title reveal"><span class="ja">こんな経験、ありませんか？</span><span class="en">Sound familiar?</span><span class="zh">有过这样的经历吗？</span></h2>
+    <ul class="p-list">
+      <li class="p-item reveal"><span class="p-ico" aria-hidden="true">🚶</span><span><span class="ja">空き教室を探して、タワー・スコラを上から下まで歩き回った。</span><span class="en">Wandered up and down Tower Schola looking for an empty room.</span><span class="zh">为了找空教室，把塔楼从上到下跑了个遍。</span></span></li>
+      <li class="p-item reveal"><span class="p-ico" aria-hidden="true">😬</span><span><span class="ja">「空き」だと思って入ったら、授業中だった。</span><span class="en">Walked into a class that was in session.</span><span class="zh">以为是空教室推门进去，结果正在上课。</span></span></li>
+      <li class="p-item reveal"><span class="p-ico" aria-hidden="true">⏱</span><span><span class="ja">教室探しだけで、平均15〜20分を毎回ロスしている。</span><span class="en">Losing 15–20 minutes on average just to find a room.</span><span class="zh">光是找教室平均就要花15〜20分钟。</span><small><span class="ja">運営の非公式アンケートより</span><span class="en">From our unofficial survey</span><span class="zh">来自运营方的非官方问卷</span></small></span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     できること（6つ → 主な4つ＋小さな一覧。実際の画面つき）
+════════════════════════════════════════════ -->
+<section class="sec sec-white" id="features">
+  <div class="sec-inner f-layout">
+    <div>
+      <p class="sec-eyebrow reveal"><span class="ja">機能</span><span class="en">Features</span><span class="zh">功能介绍</span></p>
+      <h2 class="sec-title reveal"><span class="ja">RoomRadarでできること</span><span class="en">What RoomRadar does</span><span class="zh">RoomRadar能做什么</span></h2>
+      <div class="f-grid">
+        <div class="f-card reveal">
+          <span class="f-ico" aria-hidden="true">⚡</span>
+          <div><h3 class="f-title"><span class="ja">開くだけで、いま使える教室</span><span class="en">Open it, see what's free</span><span class="zh">打开即看可用教室</span></h3>
+          <p class="f-desc"><span class="ja">検索ボタンを押さなくても、開いた瞬間に今の時限（休み時間なら次の時限）の空き教室が出ます。</span><span class="en">No need to press Search: rooms free in the current period (or the next one during breaks) appear right away.</span><span class="zh">无需点击搜索，打开即显示当前时段（课间则为下一时段）的空教室。</span></p></div>
+        </div>
+        <div class="f-card reveal">
+          <span class="f-ico" aria-hidden="true">⏱</span>
+          <div><h3 class="f-title"><span class="ja">続けて空いている教室も</span><span class="en">Free for 2+ periods</span><span class="zh">连续空闲的教室</span></h3>
+          <p class="f-desc"><span class="ja">「続けて使う」で2〜3コマを選ぶと、その間ずっと空いている教室だけに。「〜6限」で何限まで空いているかも分かります。</span><span class="en">Pick 2–3 periods under 「続けて使う」 to see rooms free the whole time. A 「〜6限」 badge shows how long each stays free.</span><span class="zh">在“続けて使う”中选择2〜3节，只显示一直空着的教室。“〜6限”标签显示可用到第几节。</span></p></div>
+        </div>
+        <div class="f-card reveal">
+          <span class="f-ico" aria-hidden="true">🏫</span>
+          <div><h3 class="f-title"><span class="ja">教室ごとの1週間</span><span class="en">Any room's week</span><span class="zh">单个教室的一周</span></h3>
+          <p class="f-desc"><span class="ja">教室名や番号（例: S303）で探すと、その教室の月〜土×1〜6限の空きを表で確かめられます。</span><span class="en">Search a room (e.g. S303) to see its week at a glance, Mon–Sat × periods 1–6.</span><span class="zh">按教室名称或编号（如S303）搜索，即可查看该教室周一至周六×第1〜6节的空闲表。</span></p></div>
+        </div>
+        <div class="f-card reveal">
+          <span class="f-ico" aria-hidden="true">⚠</span>
+          <div><h3 class="f-title"><span class="ja">使われていたら報告</span><span class="en">Report a busy room</span><span class="zh">被占用时举报</span></h3>
+          <p class="f-desc"><span class="ja">時間割にない授業などで使われていたら報告できます。2件以上で「使用中の可能性」と表示され、ほかの人に伝わります。</span><span class="en">If a room is in use (e.g. an unscheduled class), report it. With 2+ reports it's marked 「使用中の可能性」 for others.</span><span class="zh">如发现教室被占用（如课表外授课），可以举报。2条以上后会显示“使用中の可能性”，提醒其他人。</span></p></div>
+        </div>
+      </div>
+      <ul class="f-more reveal">
+        <li><span class="ja">隔週の授業だけの教室は別枠で表示</span><span class="en">Rooms with alternate-week classes are listed separately</span><span class="zh">只有隔周课程的教室单独显示</span></li>
+        <li><span class="ja">年度・学期を切り替えられる</span><span class="en">Switch the academic year and term</span><span class="zh">可切换学年和学期</span></li>
+        <li><span class="ja">運営が確認できた教室変更を反映</span><span class="en">Room changes we've confirmed are reflected</span><span class="zh">反映运营方已确认的教室变更</span></li>
+      </ul>
+      <p class="f-note reveal"><span class="ja">「空き」は時間割上の空きで、使ってよいという許可ではありません。</span><span class="en">“Free” means free on the timetable, not permission to use the room.</span><span class="zh">“空闲”仅指课表上空闲，并非使用许可。</span></p>
+    </div>
+    <figure class="f-shot reveal">
+      <div class="f-phone"><img src="assets/lp/app-screen.webp" width="780" height="1688" loading="lazy"
+        alt="RoomRadar の画面。曜日・時限・校舎を選ぶ欄と、空いている教室の一覧"></div>
+      <figcaption><span class="ja">実際の画面（水曜3限・駿河台校舎を選んだ例）</span><span class="en">The actual app (Wednesday, 3rd period, Surugadai). The app itself is in Japanese only.</span><span class="zh">实际画面（周三第3节·骏河台校舍的示例）。应用界面仅提供日语。</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     使い方（3ステップ）
+════════════════════════════════════════════ -->
+<section class="sec sec-howto" id="howto">
+  <div class="sec-inner">
+    <p class="sec-eyebrow reveal"><span class="ja">使い方</span><span class="en">How to use</span><span class="zh">使用方法</span></p>
+    <h2 class="sec-title reveal"><span class="ja">3ステップで使える</span><span class="en">3 simple steps</span><span class="zh">三步即可使用</span></h2>
+    <ol class="s-list">
+        <li class="s-step reveal"><span class="s-num">1</span>
+          <div><h3 class="s-title"><span class="ja">サイトを開く</span><span class="en">Open the site</span><span class="zh">打开网站</span></h3><p class="s-desc"><span class="ja">開いた瞬間に、いま使える教室が出ます。登録やインストールは要りません。</span><span class="en">Rooms free right now appear immediately. No sign-up or install.</span><span class="zh">打开后立即显示现在可用的教室。无需注册或安装。</span></p></div></li>
+        <li class="s-step reveal"><span class="s-num">2</span>
+          <div><h3 class="s-title"><span class="ja">必要なら条件を変える</span><span class="en">Change the search if needed</span><span class="zh">需要时更改条件</span></h3><p class="s-desc"><span class="ja">曜日・時限・校舎や「続けて使う」コマ数を選んで「空き教室を検索」。</span><span class="en">Pick the day, period, building or how many periods in a row, then tap 「空き教室を検索」.</span><span class="zh">选择星期、时段、教学楼或连续节数，点击“空き教室を検索”。</span></p></div></li>
+        <li class="s-step reveal"><span class="s-num">3</span>
+          <div><h3 class="s-title"><span class="ja">ドア越しに確認して使う</span><span class="en">Check at the door</span><span class="zh">在门口确认后使用</span></h3><p class="s-desc"><span class="ja">時間割にない授業や急な変更もあるので、入る前にドア越しに確認を。</span><span class="en">There may be unscheduled classes or changes, so check through the door first.</span><span class="zh">可能有课表外的课程或临时变更，进门前请先确认。</span></p></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     空き教室は、みんなで使う場所です（2026-11 新設。ポスターと同じ考え方を LP にも）
+════════════════════════════════════════════ -->
+<section class="sec sec-white" id="manners">
+  <div class="sec-inner">
+    <p class="sec-eyebrow reveal"><span class="ja">みんなで使う</span><span class="en">Shared space</span><span class="zh">共享空间</span></p>
+    <h2 class="sec-title reveal"><span class="ja">空き教室は、<br>みんなで使う場所です。</span><span class="en">Empty classrooms are shared spaces.</span><span class="zh">空教室是大家共用的地方。</span></h2>
+    <div class="m-card reveal">
+      <p class="m-lead"><span class="ja">使う目的は人それぞれ。お互いの目的を尊重して、周りに配慮して使いましょう。</span><span class="en">Everyone uses them differently. Respect each other and be considerate.</span><span class="zh">使用目的因人而异。请互相尊重，照顾周围的人。</span></p>
+      <div class="m-chips" aria-label="使い方の例"><span class="m-chip"><span class="ja">個人学習</span><span class="en">Solo study</span><span class="zh">个人学习</span></span><span class="m-chip"><span class="ja">グループワーク</span><span class="en">Group work</span><span class="zh">小组作业</span></span><span class="m-chip"><span class="ja">学生同士の打合せ</span><span class="en">Student meetings</span><span class="zh">学生讨论</span></span><span class="m-chip"><span class="ja">授業の合間の休憩</span><span class="en">A break between classes</span><span class="zh">课间休息</span></span></div>
+      <ul class="m-list">
+          <li><span class="m-ico" aria-hidden="true">🚪</span><span><span class="ja">授業が優先です。空きと出ていても使われていることがあるので、入る前に必ずドア越しに確認を。</span><span class="en">Classes come first. A room shown as free may still be in use, so always check through the door first.</span><span class="zh">课程优先。即使显示空闲也可能有人在用，进门前请务必确认。</span></span></li>
+          <li><span class="m-ico" aria-hidden="true">🤫</span><span><span class="ja">静かに学習したいときは、図書館か1号館のCSTギャラリーへ。</span><span class="en">For quiet study, head to the library or the CST Gallery in Building 1.</span><span class="zh">需要安静学习时，请前往图书馆或1号馆的CST Gallery。</span></span></li>
+          <li><span class="m-ico" aria-hidden="true">🧪</span><span><span class="ja">テスト運用中（12/19まで予定）のため、検索結果が実際の使用状況と違うことがあります。</span><span class="en">This is a trial (planned until Dec 19), so results may differ from actual use.</span><span class="zh">目前为试运营（预计至12月19日），搜索结果可能与实际使用情况不同。</span></span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     Instagram（ヒーロー直後から、使い方のあとへ移した）
+════════════════════════════════════════════ -->
 <section class="social" id="social">
   <div class="section-inner">
     <div class="social-card reveal">
@@ -1237,332 +304,17 @@ footer { font-size: 0.8rem; line-height: 1.7; word-break: auto-phrase; }
 </section>
 
 <!-- ════════════════════════════════════════════
-     問題提起
-════════════════════════════════════════════ -->
-<div class="blend-band tall" style="background:linear-gradient(180deg,#fef9f0 0%,#2e3a55 100%)"><span class="glow" style="background:var(--accent2);left:60%"></span></div>
-<section class="problem" id="problem">
-  <div class="section-inner">
-    <div class="section-eyebrow reveal">
-      <span class="ja">課題</span>
-      <span class="en">The Problem</span>
-      <span class="zh">问题所在</span>
-    </div>
-    <h2 class="section-title reveal">
-      <span class="ja">こんな経験、ありませんか？</span>
-      <span class="en">Sound familiar?</span>
-      <span class="zh">有过这样的经历吗？</span>
-    </h2>
-    <div class="problem-grid">
-      <div class="problem-card reveal reveal-delay-1">
-        <span class="problem-icon">🚶</span>
-        <p class="problem-text">
-          <span class="ja">空き教室を探して、タワースコラを上から下まで歩き回った。</span>
-          <span class="en">Wandered up and down Tower Schola looking for an empty room.</span>
-          <span class="zh">为了找空教室，把塔楼从上到下跑了个遍。</span>
-        </p>
-      </div>
-      <div class="problem-card reveal reveal-delay-2">
-        <span class="problem-icon">😬</span>
-        <p class="problem-text">
-          <span class="ja">「空き」だと思って入ったら、授業中だった。</span>
-          <span class="en">Accidentally walked into a class that was in session.</span>
-          <span class="zh">以为是空教室推门进去，结果正在上课。</span>
-        </p>
-      </div>
-      <div class="problem-card reveal reveal-delay-3">
-        <span class="problem-icon">⏱</span>
-        <p class="problem-text">
-          <span class="ja">教室探しだけで、平均15〜20分を毎回ロスしている（運営の非公式アンケートより）。</span>
-          <span class="en">Losing 15–20 minutes on average just to find a place to study (from our unofficial survey).</span>
-          <span class="zh">光是找教室平均就要花15〜20分钟（来自运营方的非官方问卷）。</span>
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="blend-band tall" style="background:linear-gradient(180deg,#2e3a55 0%,#f5f3ee 100%)"><span class="glow" style="background:var(--accent);left:25%"></span></div>
-<!-- ════════════════════════════════════════════
-     3つの校舎（3D 模型）
-════════════════════════════════════════════ -->
-<section class="campus" id="campus" aria-labelledby="campus-title">
-  <div class="section-inner">
-    <div class="section-eyebrow reveal">Campus</div>
-    <h2 class="section-title reveal" id="campus-title">
-      <span class="ja">駿河台キャンパスの空き教室を、まとめて。</span>
-      <span class="en">Surugadai campus, one search.</span>
-      <span class="zh">骏河台校区的空教室，一次查完。</span>
-    </h2>
-    <div class="campus-stage reveal" id="campusStage">
-      <!-- 3D は画面に近づいてから読み込む（three.js が約 750KB あるため）。使えない環境ではこの静止表示のまま -->
-      <div class="campus-fallback" id="campusFallback">
-        <span class="campus-loading ja">校舎の模型を読み込み中…</span>
-        <span class="campus-loading en">Loading the campus model…</span>
-        <span class="campus-loading zh">正在加载校舎模型…</span>
-      </div>
-    </div>
-    <div class="campus-picks" role="group" aria-label="校舎">
-      <button type="button" class="campus-pick tower" data-id="tower" aria-pressed="false"><span class="n">1</span>
-        <span class="ja">タワー・スコラ</span><span class="en">Tower Schola</span><span class="zh">Tower Schola</span><em>38<span class="ja">室</span><span class="en"> rooms</span><span class="zh">间</span></em></button>
-      <button type="button" class="campus-pick suruga" data-id="ichi" aria-pressed="false"><span class="n">2</span>
-        <span class="ja">駿河台校舎</span><span class="en">Surugadai</span><span class="zh">骏河台校舍</span><em>27<span class="ja">室</span><span class="en"> rooms</span><span class="zh">间</span></em></button>
-    </div>
-    <p class="campus-note">
-      <span class="ja">※ 模型は公開情報の階数・高さをもとにした模式図で、実測ではありません（駿河台校舎は1号館を表示）。光っている階は空き教室のイメージで、実際の空き状況ではありません。教室数は2026年度の検索対象の数です。</span>
-      <span class="en">* A schematic model based on public floor counts and heights, not a survey (Surugadai shows Building 1). Lit floors are only an illustration, not live availability. Room counts are the rooms searchable for AY2026.</span>
-      <span class="zh">※ 模型根据公开的楼层数和高度制作，仅为示意，并非实测（骏河台校舍显示1号馆）。发光的楼层只是空教室的示意，不代表实际空闲情况。教室数为2026学年可搜索的教室数。</span>
-    </p>
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════════
-     特徴
-════════════════════════════════════════════ -->
-<section id="features">
-  <div class="section-inner">
-    <div class="section-eyebrow reveal">
-      <span class="ja">機能</span>
-      <span class="en">Features</span>
-      <span class="zh">功能介绍</span>
-    </div>
-    <h2 class="section-title reveal">
-      <span class="ja">RoomRadarでできること</span>
-      <span class="en">What RoomRadar does</span>
-      <span class="zh">RoomRadar能做什么</span>
-    </h2>
-    <div class="features-grid">
-      <div class="feature-card blue reveal reveal-delay-1">
-        <span class="feature-num">01</span>
-        <span class="feature-icon" aria-hidden="true">⚡</span>
-        <h3 class="feature-title">
-          <span class="ja">開くだけで、いま使える教室</span>
-          <span class="en">Open it, see what's free</span>
-          <span class="zh">打开即看可用教室</span>
-        </h3>
-        <p class="feature-desc">
-          <span class="ja">検索ボタンを押さなくても、開いた瞬間に今の時限（休み時間なら次の時限）の空き教室が出ます。授業後・日曜は次の授業日の1限を表示します。</span>
-          <span class="en">No need to press Search: rooms free in the current period (or the next one during breaks) appear as soon as you open it. After classes and on Sundays, it shows the next class day's 1st period.</span>
-          <span class="zh">无需点击搜索，打开即显示当前时段（课间则为下一时段）的空教室。下课后和周日显示下一个上课日的第1节。</span>
-        </p>
-      </div>
-      <div class="feature-card green reveal reveal-delay-2">
-        <span class="feature-num">02</span>
-        <span class="feature-icon" aria-hidden="true">⏱</span>
-        <h3 class="feature-title">
-          <span class="ja">2コマ続けて使える教室</span>
-          <span class="en">Rooms free for 2+ periods</span>
-          <span class="zh">连续2节可用的教室</span>
-        </h3>
-        <p class="feature-desc">
-          <span class="ja">「続けて使う」で2コマ・3コマを選ぶと、その間ずっと空いている教室だけに絞れます。「〜6限」バッジで何限まで空いているかも一目でわかります。</span>
-          <span class="en">Choose 2 or 3 periods under 「続けて使う」 (Consecutive) to see only rooms free the whole time. An 「〜6限」 (until P6) badge shows how long each room stays free.</span>
-          <span class="zh">在“続けて使う”（连续使用）中选择2节或3节，只显示这段时间一直空着的教室。“〜6限”（到第6节）标签显示可用到第几节。</span>
-        </p>
-      </div>
-      <div class="feature-card orange reveal reveal-delay-3">
-        <span class="feature-num">03</span>
-        <span class="feature-icon" aria-hidden="true">🏫</span>
-        <h3 class="feature-title">
-          <span class="ja">個別の教室を検索</span>
-          <span class="en">Look up any room</span>
-          <span class="zh">查询单个教室</span>
-        </h3>
-        <p class="feature-desc">
-          <span class="ja">教室名や番号（例: S303）で探すと、その教室の1週間の空きを月〜土×1〜6限の表で確かめられます。</span>
-          <span class="en">Search by room name or number (e.g. S303) to see that room's week at a glance, Mon–Sat × periods 1–6.</span>
-          <span class="zh">按教室名称或编号（如S303）搜索，即可用周一至周六×第1〜6节的表格查看该教室一周的空闲情况。</span>
-        </p>
-      </div>
-      <div class="feature-card purple reveal reveal-delay-1">
-        <span class="feature-num">04</span>
-        <span class="feature-icon" aria-hidden="true">📝</span>
-        <h3 class="feature-title">
-          <span class="ja">教室変更も反映</span>
-          <span class="en">Room changes reflected</span>
-          <span class="zh">反映教室变更</span>
-        </h3>
-        <p class="feature-desc">
-          <span class="ja">学期の途中で決まった教室変更のうち、運営が確認できたものは空き教室の判定に反映します（すべての変更を反映しているわけではありません）。</span>
-          <span class="en">Mid-term room changes that the team has confirmed are reflected in the results (not every change is covered).</span>
-          <span class="zh">学期中途确定的教室变更中，运营方已确认的会反映到空教室判断中（并非所有变更都已反映）。</span>
-        </p>
-      </div>
-      <div class="feature-card orange reveal reveal-delay-2">
-        <span class="feature-num">05</span>
-        <span class="feature-icon" aria-hidden="true">⚠</span>
-        <h3 class="feature-title">
-          <span class="ja">使われていたら報告</span>
-          <span class="en">Report a busy room</span>
-          <span class="zh">教室被占用时举报</span>
-        </h3>
-        <p class="feature-desc">
-          <span class="ja">時間割にない授業などで使われていたら報告できます。2件以上の報告で「使用中の可能性」と表示され、他の利用者に知らせます。</span>
-          <span class="en">If a room turns out to be in use (e.g. an unscheduled class), report it. With 2+ reports it's marked 「使用中の可能性」 (may be in use) for others.</span>
-          <span class="zh">如发现教室因课表外授课等被占用，可以举报。2条以上举报后会显示“使用中の可能性”（可能正在使用），提醒其他用户。</span>
-        </p>
-      </div>
-      <div class="feature-card blue reveal reveal-delay-3">
-        <span class="feature-num">06</span>
-        <span class="feature-icon" aria-hidden="true">🔁</span>
-        <h3 class="feature-title">
-          <span class="ja">隔週の授業・年度もわかる</span>
-          <span class="en">Alternate weeks & years</span>
-          <span class="zh">隔周课程与学年切换</span>
-        </h3>
-        <p class="feature-desc">
-          <span class="ja">隔週の授業だけが入っている教室は「週によっては空き」として別枠に表示。年度・学期も切り替えられます。</span>
-          <span class="en">Rooms with only alternate-week classes are listed separately as 「週によっては空き」 (free some weeks). You can also switch the academic year and term.</span>
-          <span class="zh">只有隔周课程的教室会单独列为“週によっては空き”（部分周空闲）。还可以切换学年和学期。</span>
-        </p>
-      </div>
-    </div>
-    <figure class="app-shot reveal">
-      <div class="phone"><img src="assets/lp/app-screen.webp" width="600" height="1298" loading="lazy"
-        alt="RoomRadar の画面。いまから使える教室が校舎ごとに並んでいる"></div>
-      <figcaption>
-        <span class="ja">実際の画面（2026年度後期・水曜3限に開いた例）</span>
-        <span class="en">The actual app (opened on a Wednesday, 3rd period, AY2026 fall). The app itself is in Japanese only.</span>
-        <span class="zh">实际画面（2026学年后期·周三第3节打开时的示例）。应用界面仅提供日语。</span>
-      </figcaption>
-    </figure>
-    <div class="buildings reveal">
-      <div class="building-badge tower"><span class="dot"></span>タワースコラ · Tower Schola</div>
-      <div class="building-badge suruga"><span class="dot"></span>駿河台校舎 · Surugadai</div>
-    </div>
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════════
-     使い方
-════════════════════════════════════════════ -->
-<div class="blend-band" style="background:linear-gradient(180deg,#f5f3ee 0%,#eef2ff 100%)"></div>
-<section class="howto" id="howto">
-  <div class="section-inner">
-    <div class="section-eyebrow reveal">
-      <span class="ja">使い方</span>
-      <span class="en">How to Use</span>
-      <span class="zh">使用方法</span>
-    </div>
-    <h2 class="section-title reveal">
-      <span class="ja">3ステップで使える</span>
-      <span class="en">3 Simple Steps</span>
-      <span class="zh">三步即可使用</span>
-    </h2>
-    <div class="steps reveal">
-      <div class="step reveal reveal-delay-1">
-        <div class="step-num">1</div>
-        <h3 class="step-title">
-          <span class="ja">サイトを開く</span>
-          <span class="en">Open the site</span>
-          <span class="zh">打开网站</span>
-        </h3>
-        <p class="step-desc">
-          <span class="ja">開いた瞬間に、いま（休み時間なら次の時限）使える教室が出ます。登録やインストールは要りません。</span>
-          <span class="en">The rooms free now (or in the next period during breaks) appear right away. No sign-up or install.</span>
-          <span class="zh">打开后立即显示现在（课间则为下一节）可用的教室。无需注册或安装。</span>
-        </p>
-      </div>
-      <div class="step reveal reveal-delay-2">
-        <div class="step-num">2</div>
-        <h3 class="step-title">
-          <span class="ja">必要なら条件を変える</span>
-          <span class="en">Change the search if needed</span>
-          <span class="zh">需要时更改条件</span>
-        </h3>
-        <p class="step-desc">
-          <span class="ja">曜日・時限・校舎や「続けて使う」コマ数を選んで「空き教室を検索」。教室名から、その教室の1週間を見ることもできます。</span>
-          <span class="en">Pick the day, period, building or how many periods in a row, then tap 「空き教室を検索」 (Search). You can also look up a room by name to see its week.</span>
-          <span class="zh">选择星期、时段、教学楼或连续节数，点击“空き教室を検索”（搜索空教室）。也可以按教室名查看该教室一周的情况。</span>
-        </p>
-      </div>
-      <div class="step reveal reveal-delay-3">
-        <div class="step-num">3</div>
-        <h3 class="step-title">
-          <span class="ja">ドア越しに確認して使う</span>
-          <span class="en">Check at the door, then use it</span>
-          <span class="zh">先在门口确认再使用</span>
-        </h3>
-        <p class="step-desc">
-          <span class="ja">時間割にない授業や急な変更もあるので、入る前にドア越しに確認を。</span>
-          <span class="en">There may be unscheduled classes or last-minute changes, so check through the door before going in.</span>
-          <span class="zh">可能有课表外的课程或临时变更，进门前请先在门口确认。</span>
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="blend-band" style="background:linear-gradient(180deg,#fef9f0 0%,#f5f3ee 100%)"></div>
-<!-- ════════════════════════════════════════════
-     メンバー
-════════════════════════════════════════════ -->
-<section id="team">
-  <div class="section-inner">
-    <div class="section-eyebrow reveal">
-      <span class="ja">開発メンバー</span>
-      <span class="en">The Team</span>
-      <span class="zh">开发成员</span>
-    </div>
-    <h2 class="section-title reveal">
-      <span class="ja">学生が作った、学生のための<br>サービスです。</span>
-      <span class="en">Built by students,<br>for students.</span>
-      <span class="zh">由学生开发，<br>为学生服务。</span>
-    </h2>
-    <div class="members-grid">
-      <div class="member-card reveal reveal-delay-1">
-        <div class="member-avatar">二</div>
-        <div class="member-name">二川 航大</div>
-        <div class="member-role">統括 / Dev</div>
-        <div class="member-dept">理工学部<br>物理学科 2年</div>
-      </div>
-      <div class="member-card reveal reveal-delay-2">
-        <div class="member-avatar">川</div>
-        <div class="member-name">川口 ひろき</div>
-        <div class="member-role">会計</div>
-        <div class="member-dept">商学部<br>経営学科 3年</div>
-      </div>
-      <div class="member-card reveal reveal-delay-3">
-        <div class="member-avatar">町</div>
-        <div class="member-name">町野 翼</div>
-        <div class="member-role">Dev</div>
-        <div class="member-dept">理工学部<br>物理学科 2年</div>
-      </div>
-      <div class="member-card reveal reveal-delay-4">
-        <div class="member-avatar">山</div>
-        <div class="member-name">山田 倖大</div>
-        <div class="member-role">広報</div>
-        <div class="member-dept">理工学部<br>物理学科 2年</div>
-      </div>
-      <div class="member-card reveal reveal-delay-4">
-        <div class="member-avatar">松</div>
-        <div class="member-name">松島 福航</div>
-        <div class="member-role">広報</div>
-        <div class="member-dept">生産工学部<br>環境安全工学科 2年</div>
-      </div>
-      <div class="member-card reveal reveal-delay-4">
-        <div class="member-avatar">古</div>
-        <div class="member-name">古川 尚登</div>
-        <div class="member-role">CM</div>
-        <div class="member-dept">理工学部<br>物理学科 2年</div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ════════════════════════════════════════════
      意見箱
 ════════════════════════════════════════════ -->
-<div class="blend-band" style="background:linear-gradient(180deg,#f5f3ee 0%,#fef9f0 100%)"></div>
 <section class="feedback" id="feedback">
   <div class="section-inner">
-    <div class="section-eyebrow reveal" style="text-align:center;">
+    <div class="section-eyebrow reveal">
       <span class="ja">意見箱</span>
       <span class="en">Feedback</span>
       <span class="zh">意见箱</span>
     </div>
-    <h2 class="section-title reveal" style="text-align:center;">
-      <span class="ja">あなたの声で、もっと良くなる。</span>
+    <h2 class="section-title reveal">
+      <span class="ja">あなたの声で、<br>もっと良くなる。</span>
       <span class="en">Help us make it better.</span>
       <span class="zh">你的反馈让它更好。</span>
     </h2>
@@ -1628,52 +380,22 @@ footer { font-size: 0.8rem; line-height: 1.7; word-break: auto-phrase; }
   </div>
 </section>
 
-
 <!-- ════════════════════════════════════════════
-     このサービスについて
+     このサービスについて（短く。詳しくは about.html）
 ════════════════════════════════════════════ -->
-<section class="about" id="about" aria-labelledby="about-title">
-  <div class="section-inner">
-    <div class="section-eyebrow reveal">
-      About
-    </div>
-    <h2 class="section-title reveal" id="about-title">
-      <span class="ja">このサービスについて</span>
-      <span class="en">About this service</span>
-      <span class="zh">关于本服务</span>
-    </h2>
-    <div class="about-grid">
-      <div class="about-card reveal">
-        <h3><span class="ja">運営</span><span class="en">Who runs it</span><span class="zh">运营</span></h3>
-        <p>
-          <span class="ja">本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。理工学部の学生が中心になって開発・運営しています。</span>
-          <span class="en">This service is developed and run by students as part of Nihon University's student project program and is currently in trial operation. It is not an official service provided by the university. It is developed and run mainly by students of the College of Science and Technology.</span>
-          <span class="zh">本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。主要由理工学部的学生开发和运营。</span>
-        </p>
-      </div>
-      <div class="about-card reveal">
-        <h3><span class="ja">データ</span><span class="en">Data</span><span class="zh">数据</span></h3>
-        <p>
-          <span class="ja">教務ページで公開されている時間割表（2025・2026年度）をもとに、授業が入っていない教室を表示しています。「空き」は時間割上の空きで、使ってよいという許可ではありません。休講・補講・教室変更・試験・時間割にない授業は反映されないので、入る前にドア越しに確認してください。</span>
-          <span class="en">Based on the published class timetables (AY2025–2026), it lists rooms with no scheduled class. “Free” means free on the timetable, not permission to use the room. Cancellations, make-up classes, room changes, exams and unscheduled use are not reflected — please check at the door.</span>
-          <span class="zh">根据公开的课程表（2025・2026学年）显示没有排课的教室。“空闲”仅指课表上空闲，并非使用许可。停课、补课、教室变更、考试及课表外使用不会反映，请在门口确认后再进入。</span>
-        </p>
-      </div>
-      <div class="about-card reveal">
-        <h3><span class="ja">情報の扱い</span><span class="en">Your data</span><span class="zh">信息处理</span></h3>
-        <p>
-          <span class="ja">「使われていた」の報告は、その時限が終わると自動で消えます。意見箱の内容は、改善のために運営メンバーが確認します。このページと検索アプリでは、利用状況を知るために Google アナリティクス（Cookie）を使っています。</span>
-          <span class="en">Reports are deleted automatically when the period ends. Feedback is read by the team to improve the service. This page and the app use Google Analytics (cookies) to understand usage.</span>
-          <span class="zh">举报会在该时段结束后自动删除。意见箱的内容由运营成员查看并用于改进。本页面和搜索应用使用Google Analytics（Cookie）了解使用情况。</span>
-        </p>
-      </div>
-    </div>
+<section class="sec sec-about" id="about" aria-labelledby="about-title">
+  <div class="sec-inner">
+    <p class="sec-eyebrow reveal">About</p>
+    <h2 class="sec-title reveal" id="about-title"><span class="ja">このサービスについて</span><span class="en">About this service</span><span class="zh">关于本服务</span></h2>
+    <p class="a-text reveal"><span class="ja">本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</span><span class="en">This service is developed and run by students as part of Nihon University's student project program and is currently in trial operation. It is not an official service provided by the university.</span><span class="zh">本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。</span></p>
+    <p class="a-text reveal"><span class="ja">教務ページで公開されている時間割表（2025・2026年度）をもとに、授業が入っていない教室を表示しています。</span><span class="en">It lists rooms with no scheduled class, based on the published timetables (AY2025–2026).</span><span class="zh">根据公开的课程表（2025・2026学年）显示没有排课的教室。</span></p>
+    <a class="a-link reveal" href="about.html"><span class="ja">運営・データ・情報の扱い・開発メンバー</span><span class="en">Team, data &amp; privacy</span><span class="zh">运营·数据·信息处理·开发成员</span> <span aria-hidden="true">→</span></a>
   </div>
 </section>
+
 <!-- ════════════════════════════════════════════
-     CTA
+     最後の案内
 ════════════════════════════════════════════ -->
-<div class="blend-band tall" style="background:linear-gradient(180deg,#eef2ff 0%,#2e3a55 100%)"><span class="glow" style="background:var(--accent);left:30%"></span></div>
 <section class="cta-section" id="cta">
   <div class="cta-particles">
     <span style="width:8px; height:8px; top:20%; left:15%; animation-delay:0s;"></span>
@@ -1720,9 +442,14 @@ footer { font-size: 0.8rem; line-height: 1.7; word-break: auto-phrase; }
 
 <!-- フッター -->
 <footer>
-  <span class="ja">© 2026 RoomRadar — 本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</span>
+  <nav class="foot-links" aria-label="ページ内の案内">
+    <a href="about.html"><span class="ja">このサービスについて</span><span class="en">About</span><span class="zh">关于</span></a>
+    <a href="https://www.instagram.com/roomradar_nust/" target="_blank" rel="noopener">Instagram</a>
+    <a href="#feedback"><span class="ja">意見箱</span><span class="en">Feedback</span><span class="zh">意见箱</span></a>
+  </nav>
+  <p class="foot-note"><span class="ja">© 2026 RoomRadar — 本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</span>
   <span class="en">© 2026 RoomRadar — This service is developed and run by students as part of Nihon University's student project program and is currently in trial operation. It is not an official service provided by the university.</span>
-  <span class="zh">© 2026 RoomRadar — 本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。</span>
+  <span class="zh">© 2026 RoomRadar — 本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。</span></p>
 </footer>
 
 <script>
@@ -1735,12 +462,16 @@ function setLang(lang) {
   const btn = document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`);
   btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true');
   document.documentElement.lang = lang === 'ja' ? 'ja' : lang === 'zh' ? 'zh-Hans' : 'en';
+  try { localStorage.setItem('rr_lp_lang', lang); } catch (e) {}   // about.html と同じ言語で開く
   // 「動きを減らす」設定のときはタイプライターが止まっているので、ここで言語を差し替える
   if (typeof reduceMotion !== 'undefined' && reduceMotion) {
     const tw = document.querySelector('#heroTypewriter .tw-text');
     if (tw) tw.textContent = TW_PHRASES[lang][0];
   }
 }
+
+// 前に選んだ言語で開く（端末に保存。2026-11-07）
+try { const saved = localStorage.getItem('rr_lp_lang'); if (saved === 'en' || saved === 'zh') setLang(saved); } catch (e) {}
 
 // スクロールアニメーション
 const observer = new IntersectionObserver(
@@ -1919,46 +650,7 @@ const GOOGLE_FORM = {
   document.addEventListener('focusout', () => { typing = false; update(); });
 })();
 
-// ════════════════════════════════════════════
-// 3つの校舎の 3D 模型: 画面に近づいてから読み込む。WebGL が使えなければ静止表示のまま
-// ════════════════════════════════════════════
-(function () {
-  const stage = document.getElementById('campusStage');
-  if (!stage || !('IntersectionObserver' in window)) return;
-  const picks = document.querySelectorAll('.campus-pick');
-  let el = null, overview = true;
-  const DEF = { tower: '2-5F', ichi: '3-5F', funa: 'bldg' };
-  function mark(id) { picks.forEach(b => b.setAttribute('aria-pressed', b.dataset.id === id ? 'true' : 'false')); }
-  function make(mode, id) {
-    const n = document.createElement('rr-campus');
-    n.setAttribute('mode', mode); n.setAttribute('theme', 'day');
-    n.setAttribute('aria-label', '日本大学理工学部 駿河台キャンパスの2つの校舎の模型（模式図）');
-    n.setAttribute('campuses', 'tower ichi');   // テスト運用は駿河台キャンパスの2校舎だけが対象（2026-10 学生課と協議）
-    if (mode === 'overview') n.setAttribute('badges', '');
-    else { n.setAttribute('focus', id); n.setAttribute('zone', DEF[id]); }
-    n.addEventListener('ready', () => stage.classList.add('loaded'));
-    n.addEventListener('error', () => { stage.classList.remove('loaded'); n.remove(); });
-    n.addEventListener('pick', e => show(e.detail.id));
-    if (el) el.remove();
-    stage.appendChild(n); el = n;
-  }
-  // 校舎を選ぶと、その校舎だけの模型に切り替える。同じボタンをもう一度押すと全体に戻る
-  function show(id) {
-    if (!el) return;
-    const same = !overview && el.getAttribute('focus') === id;
-    if (same) { overview = true; make('overview'); mark(null); return; }
-    if (overview) { overview = false; make('single', id); }
-    else { el.setAttribute('zone', DEF[id]); el.setAttribute('focus', id); }
-    mark(id);
-  }
-  picks.forEach(b => b.addEventListener('click', () => show(b.dataset.id)));
-  const io = new IntersectionObserver(entries => {
-    if (!entries.some(e => e.isIntersecting)) return;
-    io.disconnect();
-    import('./assets/lp/rr-campus3d.js').then(() => make('overview')).catch(() => {});
-  }, { rootMargin: '300px 0px' });
-  io.observe(stage);
-})();
+
 </script>
 </body>
 </html>

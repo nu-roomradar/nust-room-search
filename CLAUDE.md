@@ -6,7 +6,7 @@
 
 - リポジトリは Organization **`nu-roomradar`** 所有（2026-08、個人アカウント名がLPのURLに露出していたため移管）。セッションの `origin` が旧個人アカウントを指していてもリダイレクトされる。
 - `app.py` — Flask検索アプリ本体。**Render**（https://nust-room-search.onrender.com ）でホスティング。Renderの参照元は `nu-roomradar/nust-room-search` の `main`。**Render の自動デプロイは切ってあり、`render-deploy.yml` が main のアプリの変更を授業のない時間（月〜土 20:30 以降・朝 9:00 まで・日曜）にだけ Deploy Hook で反映する**（2026-10-26。授業中に入った変更はその夜 20:40 に。`docs/OPERATIONS.md` 4.10）。
-- `index.html` / `dashboard.html` — LPと運営用アナリティクス。**GitHub Pages**（https://nu-roomradar.github.io/nust-room-search/ ）で配信。
+- `index.html` / `about.html` / `dashboard.html` — LP（紹介ページ）とその「このサービスについて」（運営・データ・情報の扱い・開発メンバー・校舎の模型。2026-11-07 に LP から分けた。CSS は `assets/lp/lp.css` を共有）と運営用アナリティクス。**GitHub Pages**（https://nu-roomradar.github.io/nust-room-search/ ）で配信。
 - `schedule_final.db` — 時間割DB。**複数年度を同居させ、`年度` 列を持つ**（`schedules.年度` / `classrooms.年度`）。教室は年度で増減するので、教室マスタも年度ごと。アプリは年度と学期を利用者に選ばせ、既定は「いまの年度・いまの学期」。原本は `data/source/<年度>/` の `<区分>_<学部>_<学科>_..._時間割表N面_*.xls`（教務ページ配布の時間割表。区分 1=理工学部 2=短期大学部 3=博士前期 4=博士後期）。原本が入っている年度フォルダを**全部**読む（`--year` で1年度に絞れる）。`python scripts/build_schedule_db.py --report` で原本から作り直せる。既定では本番DBを上書きせず `schedule_final.new.db` に出す。教室名は**全角・半角の違いを NFKC で統一**し、「1456/7/8」のような**合同教室の略記は 1456・1457・1458 に分けて**入れる（2026-09、ユーザー指示。`build_schedule_db.py` の規則D・`ROOM_FIXES`）。本番DBは全区分のビルド結果と完全に一致する（`test_full_build_reproduces_production_db_exactly`）。差し替え時は `tests/test_schedule_db.py` と `tests/test_build_schedule_db.py` が検査する。手順は `docs/OPERATIONS.md`。
 - **短期大学部は船橋校舎を理工学部と共用している。** 短大の授業が入った教室を「空き」と出さないよう schedules には取り込むが、**教室マスタ（検索結果に出る教室）は理工学部・大学院からだけ作る**（短大専用教室は行っても使えるとは限らないため安全側に倒す）。この方針を変えると空き判定の意味が変わるので、変更前にユーザーに確認する。
 - `school_bookings.py` — 教務課の教室使用予定（授業以外の予約）を取り込み、その時間帯の教室を「空き」に出さない部品。**仮の実装**で、環境変数 `SCHOOL_BOOKINGS_URL`／`SCHOOL_BOOKINGS_FILE` が無ければ何もしない（2026-10-22。データの形式が学生課から来たら最終調整して出す）。予約者名などは読んだその場で捨て、データはリポジトリにもディスクにも置かない。手順は `docs/OPERATIONS.md` 4.9。
@@ -18,7 +18,7 @@
 
 ## 守るべきルール
 
-1. **「試験運用中・大学公式ではない」表記を消さない**: 検索アプリの画面（`templates/index.html`・`room.html`・`room_search.html`）・LP（`index.html`）・dashboard.html・ポスターに常設。誤認防止のため必須。文言は 2026-10-22 に理工学部学生課が提案したもの（「本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。」）にそろえる。動画・Instagram も同じ趣旨にする。
+1. **「試験運用中・大学公式ではない」表記を消さない**: 検索アプリの画面（`templates/index.html`・`room.html`・`room_search.html`）・LP（`index.html`・`about.html`）・dashboard.html・ポスターに常設。誤認防止のため必須。文言は 2026-10-22 に理工学部学生課が提案したもの（「本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。」）にそろえる。動画・Instagram も同じ趣旨にする。
 2. **Instagram投稿キャプションには `#日大生プロジェクト` が必須**（自主創造プロジェクトの規定）。`scripts/post_to_instagram.py` が自動付与するので、この機構を壊さない。ストーリーズにはキャプション自体が無いので対象外。
 3. **仮予約は廃止（2026-10、学生課との協議）。再導入しない**: 公開文言で「予約」「確保」と書かない。後継の「利用人数の目安」（授業のない教室を何人くらいが使っているかの共有）は裏で作ってよいが、**公開は学生課の了承を得てから**（テスト運用中に新機能として出す方向で相談する。2026-10-20 運営方針）。人数は大まかな段階で示し、一人で使っている人が分からないようにする（安心感。`docs/OPERATIONS.md` 2.5）。
 4. コミットは `git config user.email noreply@anthropic.com && git config user.name Claude` で行う（Verified表示のため）。
