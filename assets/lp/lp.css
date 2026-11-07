@@ -1147,3 +1147,5 @@ footer { display: grid; gap: 10px; justify-items: center; }
   .t-list > div { grid-template-columns: 1fr; gap: 4px; }
   .about-page .about, .about-page #team, .about-page .campus { padding: 56px 20px; }
 }
+/* 最後の案内：小さな「日本大学理工学部・学生プロジェクト」はボタンの下の行に */
+.cta-badge { display: block; margin-top: 22px; }
