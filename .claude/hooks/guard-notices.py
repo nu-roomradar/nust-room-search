@@ -39,6 +39,7 @@ GUARDED = {
     "templates/room.html":          ["試験運用中", "大学が公式に提供するサービスではありません"],   # 教室の1週間
     "templates/room_search.html":   ["試験運用中", "大学が公式に提供するサービスではありません"],   # 教室から探す
     "index.html":                   ["試験運用中", "大学が公式に提供するサービスではありません"],
+    "about.html":                   ["試験運用中", "大学が公式に提供するサービスではありません"],   # LP の「このサービスについて」（2026-11-07）
     "dashboard.html":               ["試験運用中", "大学が公式に提供するサービスではありません"],
     "scripts/post_to_instagram.py": ["#日大生プロジェクト", "REQUIRED_TAGS", "ensure_required_tags"],
     "scripts/make_poster.py":       ["#日大生プロジェクト"],
@@ -49,6 +50,7 @@ RULE_OF = {
     "templates/room.html": "ルール1（試験運用中・大学公式ではない表記）",
     "templates/room_search.html": "ルール1（試験運用中・大学公式ではない表記）",
     "index.html": "ルール1（試験運用中・大学公式ではない表記）",
+    "about.html": "ルール1（試験運用中・大学公式ではない表記）",
     "dashboard.html": "ルール1（試験運用中・大学公式ではない表記）",
     "scripts/post_to_instagram.py": "ルール2（#日大生プロジェクト の自動付与）",
     "scripts/make_poster.py": "ポスターの必須要素（#日大生プロジェクト）",

@@ -6,10 +6,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LP = (ROOT / "index.html").read_text(encoding="utf-8")
+ABOUT = (ROOT / "about.html").read_text(encoding="utf-8")   # 運営・データ・開発メンバー・校舎の模型（2026-11-07 に LP から移した）
 
 
-def lang_spans(cls):
-    return re.findall(rf'<span class="{cls}">(.*?)</span>', LP, re.S)
+def lang_spans(cls, html=None):
+    return re.findall(rf'<span class="{cls}">(.*?)</span>', html or LP, re.S)
 
 
 class LandingPageTests(unittest.TestCase):
@@ -31,20 +32,33 @@ class LandingPageTests(unittest.TestCase):
     def test_no_tentative_hold_and_no_funabashi(self):
         """仮予約は廃止。船橋校舎はテスト運用の対象外なので LP に載せない（2026-10 学生課と協議）。
         検索アプリでは船橋校舎も選べるが、周知物（LP・ポスター）では扱わない"""
-        visible = " ".join(lang_spans("ja") + lang_spans("en") + lang_spans("zh"))
-        for bad in ("仮予約", "Tentative hold", "tentative hold", "临时占用", "船橋", "Funabashi", "船桥"):
-            self.assertNotIn(bad, visible, bad)
-        for bad in ("Room Reservation", "reserve it", "it's taken", "已被占用", "仮予約"):
-            self.assertNotIn(bad, LP)
-        self.assertIn("campuses', 'tower ichi'", LP)   # 3D 模型も駿河台の2校舎だけ
+        for page in (LP, ABOUT):
+            visible = " ".join(lang_spans("ja", page) + lang_spans("en", page) + lang_spans("zh", page))
+            for bad in ("仮予約", "Tentative hold", "tentative hold", "临时占用", "船橋", "Funabashi", "船桥", "予約", "確保"):
+                self.assertNotIn(bad, visible, bad)
+            for bad in ("Room Reservation", "reserve it", "it's taken", "已被占用", "仮予約"):
+                self.assertNotIn(bad, page)
+        self.assertIn("campuses', 'tower ichi'", ABOUT)   # 3D 模型も駿河台の2校舎だけ（about.html へ移した）
 
     def test_no_overclaiming_real_time_or_official_data(self):
-        for bad in ("リアルタイム", "real-time", "in real time", "实时", "大学公式の時間割", "official timetable"):
-            self.assertNotIn(bad, LP)
+        for page in (LP, ABOUT):
+            for bad in ("リアルタイム", "real-time", "in real time", "实时", "大学公式の時間割", "official timetable"):
+                self.assertNotIn(bad, page)
+
+    def test_lp_links_to_about_page_and_shares_css(self):
+        """2026-11-07 整理：詳しい説明は about.html。CSS は assets/lp/lp.css を共有。学生課の「みんなで使う場所」を LP に"""
+        self.assertIn('href="about.html"', LP)
+        self.assertIn('href="index.html"', ABOUT)
+        for page in (LP, ABOUT):
+            self.assertIn('assets/lp/lp.css', page)
+            self.assertIn("G-L1T1CDZ05N", page)                 # どちらのページも利用状況を計測
+        self.assertTrue((ROOT / "assets/lp/lp.css").exists())
+        self.assertIn('id="manners"', LP)
+        self.assertIn("CSTギャラリー", LP)
 
     def test_share_preview_and_icons_exist(self):
         for rel in re.findall(r'(?:href|src|content)="(?:https://nu-roomradar\.github\.io/nust-room-search/)?(assets/lp/[^"]+)"', LP):
-            self.assertTrue((ROOT / rel).exists(), rel)
+            self.assertTrue((ROOT / rel.split("?")[0]).exists(), rel)   # ?v=… はキャッシュよけ
         for tag in ('property="og:image"', 'property="og:description"', 'name="description"', 'rel="apple-touch-icon"'):
             self.assertIn(tag, LP)
         og = re.search(r'property="og:description" content="([^"]+)"', LP).group(1)
