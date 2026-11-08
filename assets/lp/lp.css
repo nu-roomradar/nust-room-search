@@ -1149,3 +1149,48 @@ footer { display: grid; gap: 10px; justify-items: center; }
 }
 /* 最後の案内：小さな「日本大学理工学部・学生プロジェクト」はボタンの下の行に */
 .cta-badge { display: block; margin-top: 22px; }
+
+/* ════════════════════════════════════════════
+   2026-11-08 背景をヒーローとそろえる（運営の依頼）。
+   ヒーローの方眼（ゆっくり流れる）をページ全体の背景にし、各ブロックの色の背景を外して、
+   ヒーローと同じ淡い青・橙の光を交互に置く。最後の案内の紺の帯も同じ明るい背景に
+════════════════════════════════════════════ */
+body::before {
+  content: ''; position: fixed; inset: -48px 0 0 -48px; z-index: -1; pointer-events: none;
+  background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: gridPanT 9s linear infinite;
+}
+.hero::before { display: none; }            /* 方眼は body の1枚だけにする（二重にしない） */
+.sec, .sec-white, .social, .feedback, .about, #team, .campus, .cta-section, footer {
+  background: transparent !important; position: relative; overflow-x: clip;
+}
+footer { border-top-color: var(--border); }
+/* 淡い光（ヒーローの .bg-circle と同じ大きさ・ぼかし・濃さ）。中身は光より手前に */
+.sec::after, .social::after, .feedback::after, .cta-section::after, .about-page #team::after {
+  content: ''; position: absolute; width: 520px; height: 520px; border-radius: 50%;
+  filter: blur(80px); opacity: 0.13; pointer-events: none; z-index: 0;
+  background: var(--accent); right: -220px; top: -120px;
+}
+.sec:nth-of-type(even)::after, .feedback::after, .about-page #team::after { background: var(--accent2); left: -220px; right: auto; top: auto; bottom: -160px; }
+.cta-section::after { background: var(--accent2); left: 50%; right: auto; top: 10%; margin-left: -260px; opacity: 0.10; }
+.sec-inner, .section-inner { position: relative; z-index: 1; }
+/* 最後の案内：明るい背景に合わせて文字とボタンの色を替える（ボタンはヒーローの「今すぐ使う」と同じ黒） */
+.cta-section { color: var(--ink); }
+.cta-title { color: var(--ink); }
+.cta-desc { color: var(--muted); }
+.cta-badge { color: var(--muted); }
+.cta-particles span { background: rgba(37,99,235,0.16); }
+.cta-particles span:nth-child(odd) { background: rgba(249,115,22,0.18); }
+.cta-btn {
+  color: #fff; background: linear-gradient(180deg, #2a2723 0%, #1a1814 100%);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset, 0 12px 30px -10px rgba(26,24,20,0.55);
+}
+.cta-btn:hover { box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset, 0 18px 36px -12px rgba(26,24,20,0.6); }
+@media (max-width: 767px) {
+  .sec::after, .social::after, .feedback::after, .cta-section::after, .about-page #team::after { width: 360px; height: 360px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none !important; }
+}
