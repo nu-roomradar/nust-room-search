@@ -12,6 +12,8 @@ import logging
 import unicodedata
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 
+import school_bookings   # 教務課の教室使用予定（仮。環境変数が無ければ何もしない）
+
 app = Flask(__name__)
 # 送られてくる本文の上限。報告の JSON は数百バイトしかない。上限が無いと、巨大な本文を
 # 何本か送るだけでメモリを使い切らせて落とせる（2026-10-22 セキュリティ点検）
@@ -502,6 +504,17 @@ def index():
         all_rooms = cur.fetchall()
         conn.close()
 
+        # 教務課の教室使用予定（授業以外の予約）が入っている教室も、空きには出さない（仮。school_bookings.py）。
+        # 予定は日付で来るので、いまの年度・学期を見ているときだけ、この曜日・時限が次に来る日の分を使う
+        booked_here = set()
+        if school_bookings.enabled() and is_current_view(year, term):
+            booked = school_bookings.booked_rooms(period_end_dt(day, period).date(), PERIODS, known_room_keys())
+            for p_, keys in booked.items():
+                names = {str(r[0]) for r in all_rooms if normalize_room(str(r[0])) in keys}
+                occupied_at[p_].update(names)
+                if p_ == period:
+                    booked_here = names
+
         empty_rooms = sorted(
             [{"name": r[0], "building": r[1],
               "free_until": free_until(str(r[0]), period, occupied_at)}
@@ -516,7 +529,8 @@ def index():
         # 隔週の授業が2つ以上ある（A週・B週で交互に使う等）教室は毎週埋まりうるので出さない。
         biweekly_rooms = sorted(
             [{"name": r[0], "building": r[1]} for r in all_rooms
-             if len(subjects_here.get(str(r[0]), ())) == 1
+             if str(r[0]) not in booked_here
+             and len(subjects_here.get(str(r[0]), ())) == 1
              and is_biweekly(next(iter(subjects_here[str(r[0])])))],
             key=lambda x: (x['building'] != 'タワースコラ', x['building'] != '駿河台校舎', x['name'])
         ) if span == 1 else []
@@ -609,6 +623,21 @@ def list_rooms(year):
 def known_room_names():
     """報告を受け付ける教室名（全年度の教室マスタ）。時間割DBはデプロイ中に変わらないので1回だけ読む"""
     return frozenset(r["name"] for r in list_rooms(None))
+
+
+@functools.lru_cache(maxsize=1)
+def known_room_keys():
+    """教務課の使用予定と照合する教室名の鍵（全年度の教室マスタと時間割の教室。表記ゆれは normalize_room で吸収）"""
+    keys = {normalize_room(n) for n in known_room_names()}
+    try:
+        conn = sqlite3.connect(f"file:{DB_NAME}?mode=ro", uri=True)
+        try:
+            keys.update(normalize_room(str(r[0])) for r in conn.execute("SELECT DISTINCT 教室 FROM schedules"))
+        finally:
+            conn.close()
+    except sqlite3.Error as e:
+        logging.error(f"RoomRadar known_room_keys error: {e}")
+    return frozenset(keys)
 
 
 def find_rooms(query, rooms):
