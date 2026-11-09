@@ -1,43 +1,5 @@
 [
  {
-  "date": "2026-10-09",
-  "active_users": 4,
-  "new_users": 1,
-  "page_views": 10,
-  "sessions": 5,
-  "lp": {
-   "active_users": 2,
-   "new_users": 1,
-   "page_views": 3,
-   "sessions": 3
-  },
-  "app": {
-   "active_users": 2,
-   "new_users": 0,
-   "page_views": 7,
-   "sessions": 2
-  }
- },
- {
-  "date": "2026-10-11",
-  "active_users": 6,
-  "new_users": 3,
-  "page_views": 15,
-  "sessions": 9,
-  "lp": {
-   "active_users": 3,
-   "new_users": 2,
-   "page_views": 5,
-   "sessions": 5
-  },
-  "app": {
-   "active_users": 3,
-   "new_users": 1,
-   "page_views": 10,
-   "sessions": 4
-  }
- },
- {
   "date": "2026-10-12",
   "active_users": 18,
   "new_users": 11,
@@ -451,21 +413,78 @@
  },
  {
   "date": "2026-11-05",
-  "active_users": 20,
-  "new_users": 9,
-  "page_views": 46,
-  "sessions": 34,
+  "active_users": 109,
+  "new_users": 69,
+  "page_views": 260,
+  "sessions": 159,
   "app": {
-   "active_users": 13,
-   "new_users": 6,
-   "page_views": 33,
-   "sessions": 21
+   "active_users": 61,
+   "new_users": 35,
+   "page_views": 184,
+   "sessions": 87
   },
   "lp": {
-   "active_users": 7,
+   "active_users": 48,
+   "new_users": 34,
+   "page_views": 76,
+   "sessions": 72
+  }
+ },
+ {
+  "date": "2026-11-06",
+  "active_users": 39,
+  "new_users": 23,
+  "page_views": 119,
+  "sessions": 71,
+  "app": {
+   "active_users": 20,
+   "new_users": 9,
+   "page_views": 81,
+   "sessions": 33
+  },
+  "lp": {
+   "active_users": 19,
+   "new_users": 14,
+   "page_views": 38,
+   "sessions": 38
+  }
+ },
+ {
+  "date": "2026-11-07",
+  "active_users": 14,
+  "new_users": 9,
+  "page_views": 47,
+  "sessions": 36,
+  "lp": {
+   "active_users": 8,
+   "new_users": 6,
+   "page_views": 29,
+   "sessions": 23
+  },
+  "app": {
+   "active_users": 6,
    "new_users": 3,
-   "page_views": 13,
+   "page_views": 18,
    "sessions": 13
+  }
+ },
+ {
+  "date": "2026-11-08",
+  "active_users": 8,
+  "new_users": 7,
+  "page_views": 28,
+  "sessions": 24,
+  "app": {
+   "active_users": 7,
+   "new_users": 6,
+   "page_views": 23,
+   "sessions": 19
+  },
+  "lp": {
+   "active_users": 1,
+   "new_users": 1,
+   "page_views": 5,
+   "sessions": 5
   }
  }
 ]
