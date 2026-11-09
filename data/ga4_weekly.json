@@ -178,16 +178,16 @@
   "week_end": "2026-11-08",
   "app": {
    "users": 232,
-   "sessions": 397,
-   "page_views": 908
+   "sessions": 399,
+   "page_views": 911
   },
   "lp": {
    "users": 221,
-   "sessions": 363,
-   "page_views": 402
+   "sessions": 364,
+   "page_views": 403
   },
   "events": {
-   "search": 382,
+   "search": 383,
    "report_room": 31,
    "report_cancel": 5,
    "reserve_room": 0,

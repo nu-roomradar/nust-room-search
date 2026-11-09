@@ -8,27 +8,27 @@
   "all": {
    "active_users": 1565,
    "new_users": 1536,
-   "sessions": 2396,
-   "page_views": 4124,
-   "events": 14313
+   "sessions": 2399,
+   "page_views": 4128,
+   "events": 14323
   },
   "lp": {
    "active_users": 858,
    "new_users": 853,
-   "sessions": 1229,
-   "page_views": 1341,
-   "events": 4372
+   "sessions": 1230,
+   "page_views": 1342,
+   "events": 4374
   },
   "app": {
    "active_users": 707,
    "new_users": 683,
-   "sessions": 1172,
-   "page_views": 2783,
-   "events": 9941
+   "sessions": 1174,
+   "page_views": 2786,
+   "events": 9949
   }
  },
  "events": {
-  "search": 1160,
+  "search": 1161,
   "report_room": 79,
   "report_cancel": 14,
   "feedback_submit": 3,
@@ -65,7 +65,7 @@
  "search_building": [
   {
    "label": "all",
-   "count": 549
+   "count": 550
   },
   {
    "label": "tower",
@@ -87,7 +87,7 @@
   },
   {
    "label": "1",
-   "count": 211
+   "count": 212
   },
   {
    "label": "2",
@@ -125,7 +125,7 @@
   },
   {
    "label": "月",
-   "count": 105
+   "count": 106
   },
   {
    "label": "土",
@@ -237,11 +237,11 @@
  "channels": [
   {
    "label": "Referral",
-   "sessions": 1132
+   "sessions": 1133
   },
   {
    "label": "Direct",
-   "sessions": 1115
+   "sessions": 1117
   },
   {
    "label": "Organic Social",

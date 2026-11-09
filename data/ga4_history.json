@@ -470,21 +470,21 @@
  },
  {
   "date": "2026-11-08",
-  "active_users": 8,
+  "active_users": 9,
   "new_users": 7,
-  "page_views": 28,
-  "sessions": 24,
+  "page_views": 32,
+  "sessions": 27,
   "app": {
-   "active_users": 7,
+   "active_users": 8,
    "new_users": 6,
-   "page_views": 23,
-   "sessions": 19
+   "page_views": 26,
+   "sessions": 21
   },
   "lp": {
    "active_users": 1,
    "new_users": 1,
-   "page_views": 5,
-   "sessions": 5
+   "page_views": 6,
+   "sessions": 6
   }
  }
 ]
