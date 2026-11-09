@@ -1,0 +1,2498 @@
+{
+ "updated": "2026-11-09",
+ "period": {
+  "start": "2026-10-12",
+  "end": "2026-11-08"
+ },
+ "errors": [],
+ "new_vs_returning": [
+  {
+   "hostName": "nu-roomradar.github.io",
+   "newVsReturning": "new",
+   "activeUsers": 852.0,
+   "sessions": 855.0,
+   "engagedSessions": 446.0,
+   "userEngagementDuration": 12316.0,
+   "screenPageViews": 945.0,
+   "eventCount": 3424.0
+  },
+  {
+   "hostName": "nust-room-search.onrender.com",
+   "newVsReturning": "new",
+   "activeUsers": 684.0,
+   "sessions": 684.0,
+   "engagedSessions": 597.0,
+   "userEngagementDuration": 34251.0,
+   "screenPageViews": 1859.0,
+   "eventCount": 7010.0
+  },
+  {
+   "hostName": "nust-room-search.onrender.com",
+   "newVsReturning": "returning",
+   "activeUsers": 216.0,
+   "sessions": 387.0,
+   "engagedSessions": 237.0,
+   "userEngagementDuration": 11370.0,
+   "screenPageViews": 824.0,
+   "eventCount": 2720.0
+  },
+  {
+   "hostName": "nu-roomradar.github.io",
+   "newVsReturning": "returning",
+   "activeUsers": 141.0,
+   "sessions": 219.0,
+   "engagedSessions": 81.0,
+   "userEngagementDuration": 1363.0,
+   "screenPageViews": 247.0,
+   "eventCount": 632.0
+  },
+  {
+   "hostName": "nu-roomradar.github.io",
+   "newVsReturning": "",
+   "activeUsers": 0.0,
+   "sessions": 5.0,
+   "engagedSessions": 0.0,
+   "userEngagementDuration": 0.0,
+   "screenPageViews": 5.0,
+   "eventCount": 10.0
+  },
+  {
+   "hostName": "nu-roomradar.github.io",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 152.0,
+   "engagedSessions": 1.0,
+   "userEngagementDuration": 0.0,
+   "screenPageViews": 145.0,
+   "eventCount": 308.0
+  },
+  {
+   "hostName": "nust-room-search.onrender.com",
+   "newVsReturning": "",
+   "activeUsers": 0.0,
+   "sessions": 14.0,
+   "engagedSessions": 0.0,
+   "userEngagementDuration": 0.0,
+   "screenPageViews": 13.0,
+   "eventCount": 28.0
+  },
+  {
+   "hostName": "nust-room-search.onrender.com",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 93.0,
+   "engagedSessions": 3.0,
+   "userEngagementDuration": 0.0,
+   "screenPageViews": 90.0,
+   "eventCount": 191.0
+  }
+ ],
+ "app_daily_nvr": [
+  {
+   "date": "20261028",
+   "newVsReturning": "new",
+   "activeUsers": 404.0,
+   "sessions": 404.0
+  },
+  {
+   "date": "20261028",
+   "newVsReturning": "returning",
+   "activeUsers": 84.0,
+   "sessions": 105.0
+  },
+  {
+   "date": "20261103",
+   "newVsReturning": "new",
+   "activeUsers": 46.0,
+   "sessions": 46.0
+  },
+  {
+   "date": "20261104",
+   "newVsReturning": "new",
+   "activeUsers": 41.0,
+   "sessions": 41.0
+  },
+  {
+   "date": "20261029",
+   "newVsReturning": "new",
+   "activeUsers": 40.0,
+   "sessions": 40.0
+  },
+  {
+   "date": "20261101",
+   "newVsReturning": "new",
+   "activeUsers": 37.0,
+   "sessions": 37.0
+  },
+  {
+   "date": "20261105",
+   "newVsReturning": "new",
+   "activeUsers": 37.0,
+   "sessions": 37.0
+  },
+  {
+   "date": "20261103",
+   "newVsReturning": "returning",
+   "activeUsers": 36.0,
+   "sessions": 45.0
+  },
+  {
+   "date": "20261105",
+   "newVsReturning": "returning",
+   "activeUsers": 31.0,
+   "sessions": 39.0
+  },
+  {
+   "date": "20261104",
+   "newVsReturning": "returning",
+   "activeUsers": 30.0,
+   "sessions": 40.0
+  },
+  {
+   "date": "20261102",
+   "newVsReturning": "new",
+   "activeUsers": 29.0,
+   "sessions": 29.0
+  },
+  {
+   "date": "20261102",
+   "newVsReturning": "returning",
+   "activeUsers": 18.0,
+   "sessions": 28.0
+  },
+  {
+   "date": "20261029",
+   "newVsReturning": "returning",
+   "activeUsers": 17.0,
+   "sessions": 27.0
+  },
+  {
+   "date": "20261106",
+   "newVsReturning": "returning",
+   "activeUsers": 13.0,
+   "sessions": 20.0
+  },
+  {
+   "date": "20261101",
+   "newVsReturning": "returning",
+   "activeUsers": 12.0,
+   "sessions": 14.0
+  },
+  {
+   "date": "20261106",
+   "newVsReturning": "new",
+   "activeUsers": 10.0,
+   "sessions": 10.0
+  },
+  {
+   "date": "20261026",
+   "newVsReturning": "returning",
+   "activeUsers": 7.0,
+   "sessions": 10.0
+  },
+  {
+   "date": "20261030",
+   "newVsReturning": "new",
+   "activeUsers": 7.0,
+   "sessions": 7.0
+  },
+  {
+   "date": "20261030",
+   "newVsReturning": "returning",
+   "activeUsers": 7.0,
+   "sessions": 12.0
+  },
+  {
+   "date": "20261025",
+   "newVsReturning": "returning",
+   "activeUsers": 6.0,
+   "sessions": 6.0
+  },
+  {
+   "date": "20261108",
+   "newVsReturning": "new",
+   "activeUsers": 6.0,
+   "sessions": 6.0
+  },
+  {
+   "date": "20261012",
+   "newVsReturning": "returning",
+   "activeUsers": 5.0,
+   "sessions": 5.0
+  },
+  {
+   "date": "20261022",
+   "newVsReturning": "returning",
+   "activeUsers": 5.0,
+   "sessions": 6.0
+  },
+  {
+   "date": "20261026",
+   "newVsReturning": "new",
+   "activeUsers": 5.0,
+   "sessions": 5.0
+  },
+  {
+   "date": "20261027",
+   "newVsReturning": "returning",
+   "activeUsers": 5.0,
+   "sessions": 6.0
+  },
+  {
+   "date": "20261031",
+   "newVsReturning": "new",
+   "activeUsers": 5.0,
+   "sessions": 5.0
+  },
+  {
+   "date": "20261012",
+   "newVsReturning": "new",
+   "activeUsers": 4.0,
+   "sessions": 4.0
+  },
+  {
+   "date": "20261018",
+   "newVsReturning": "returning",
+   "activeUsers": 4.0,
+   "sessions": 5.0
+  },
+  {
+   "date": "20261107",
+   "newVsReturning": "returning",
+   "activeUsers": 4.0,
+   "sessions": 5.0
+  },
+  {
+   "date": "20261013",
+   "newVsReturning": "new",
+   "activeUsers": 3.0,
+   "sessions": 3.0
+  },
+  {
+   "date": "20261015",
+   "newVsReturning": "returning",
+   "activeUsers": 3.0,
+   "sessions": 3.0
+  },
+  {
+   "date": "20261020",
+   "newVsReturning": "new",
+   "activeUsers": 3.0,
+   "sessions": 3.0
+  },
+  {
+   "date": "20261107",
+   "newVsReturning": "new",
+   "activeUsers": 3.0,
+   "sessions": 3.0
+  },
+  {
+   "date": "20261020",
+   "newVsReturning": "returning",
+   "activeUsers": 2.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261021",
+   "newVsReturning": "returning",
+   "activeUsers": 2.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261025",
+   "newVsReturning": "new",
+   "activeUsers": 2.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261031",
+   "newVsReturning": "returning",
+   "activeUsers": 2.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261108",
+   "newVsReturning": "returning",
+   "activeUsers": 2.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261013",
+   "newVsReturning": "returning",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261015",
+   "newVsReturning": "new",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261016",
+   "newVsReturning": "returning",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261019",
+   "newVsReturning": "new",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261019",
+   "newVsReturning": "returning",
+   "activeUsers": 1.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261021",
+   "newVsReturning": "new",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261024",
+   "newVsReturning": "new",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261027",
+   "newVsReturning": "new",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261014",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261015",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261016",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261019",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261020",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261025",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261028",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261029",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 25.0
+  },
+  {
+   "date": "20261030",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 9.0
+  },
+  {
+   "date": "20261031",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 8.0
+  },
+  {
+   "date": "20261101",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 7.0
+  },
+  {
+   "date": "20261102",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 6.0
+  },
+  {
+   "date": "20261103",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 6.0
+  },
+  {
+   "date": "20261104",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 5.0
+  },
+  {
+   "date": "20261105",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 11.0
+  },
+  {
+   "date": "20261106",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 3.0
+  },
+  {
+   "date": "20261107",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 5.0
+  },
+  {
+   "date": "20261108",
+   "newVsReturning": "",
+   "activeUsers": 0.0,
+   "sessions": 14.0
+  }
+ ],
+ "lp_daily_nvr": [
+  {
+   "date": "20261028",
+   "newVsReturning": "new",
+   "activeUsers": 518.0,
+   "sessions": 519.0
+  },
+  {
+   "date": "20261028",
+   "newVsReturning": "returning",
+   "activeUsers": 62.0,
+   "sessions": 84.0
+  },
+  {
+   "date": "20261029",
+   "newVsReturning": "new",
+   "activeUsers": 51.0,
+   "sessions": 51.0
+  },
+  {
+   "date": "20261103",
+   "newVsReturning": "new",
+   "activeUsers": 51.0,
+   "sessions": 51.0
+  },
+  {
+   "date": "20261104",
+   "newVsReturning": "new",
+   "activeUsers": 50.0,
+   "sessions": 50.0
+  },
+  {
+   "date": "20261101",
+   "newVsReturning": "new",
+   "activeUsers": 37.0,
+   "sessions": 37.0
+  },
+  {
+   "date": "20261105",
+   "newVsReturning": "new",
+   "activeUsers": 34.0,
+   "sessions": 34.0
+  },
+  {
+   "date": "20261102",
+   "newVsReturning": "new",
+   "activeUsers": 33.0,
+   "sessions": 33.0
+  },
+  {
+   "date": "20261104",
+   "newVsReturning": "returning",
+   "activeUsers": 18.0,
+   "sessions": 21.0
+  },
+  {
+   "date": "20261103",
+   "newVsReturning": "returning",
+   "activeUsers": 17.0,
+   "sessions": 24.0
+  },
+  {
+   "date": "20261105",
+   "newVsReturning": "returning",
+   "activeUsers": 17.0,
+   "sessions": 23.0
+  },
+  {
+   "date": "20261030",
+   "newVsReturning": "new",
+   "activeUsers": 15.0,
+   "sessions": 15.0
+  },
+  {
+   "date": "20261029",
+   "newVsReturning": "returning",
+   "activeUsers": 14.0,
+   "sessions": 17.0
+  },
+  {
+   "date": "20261106",
+   "newVsReturning": "new",
+   "activeUsers": 14.0,
+   "sessions": 14.0
+  },
+  {
+   "date": "20261102",
+   "newVsReturning": "returning",
+   "activeUsers": 11.0,
+   "sessions": 11.0
+  },
+  {
+   "date": "20261031",
+   "newVsReturning": "new",
+   "activeUsers": 9.0,
+   "sessions": 9.0
+  },
+  {
+   "date": "20261012",
+   "newVsReturning": "new",
+   "activeUsers": 7.0,
+   "sessions": 7.0
+  },
+  {
+   "date": "20261101",
+   "newVsReturning": "returning",
+   "activeUsers": 7.0,
+   "sessions": 7.0
+  },
+  {
+   "date": "20261107",
+   "newVsReturning": "new",
+   "activeUsers": 6.0,
+   "sessions": 6.0
+  },
+  {
+   "date": "20261030",
+   "newVsReturning": "returning",
+   "activeUsers": 5.0,
+   "sessions": 8.0
+  },
+  {
+   "date": "20261106",
+   "newVsReturning": "returning",
+   "activeUsers": 5.0,
+   "sessions": 6.0
+  },
+  {
+   "date": "20261012",
+   "newVsReturning": "returning",
+   "activeUsers": 4.0,
+   "sessions": 5.0
+  },
+  {
+   "date": "20261015",
+   "newVsReturning": "new",
+   "activeUsers": 4.0,
+   "sessions": 4.0
+  },
+  {
+   "date": "20261026",
+   "newVsReturning": "new",
+   "activeUsers": 4.0,
+   "sessions": 4.0
+  },
+  {
+   "date": "20261107",
+   "newVsReturning": "returning",
+   "activeUsers": 4.0,
+   "sessions": 5.0
+  },
+  {
+   "date": "20261013",
+   "newVsReturning": "new",
+   "activeUsers": 3.0,
+   "sessions": 3.0
+  },
+  {
+   "date": "20261020",
+   "newVsReturning": "new",
+   "activeUsers": 3.0,
+   "sessions": 3.0
+  },
+  {
+   "date": "20261022",
+   "newVsReturning": "new",
+   "activeUsers": 3.0,
+   "sessions": 3.0
+  },
+  {
+   "date": "20261025",
+   "newVsReturning": "new",
+   "activeUsers": 3.0,
+   "sessions": 3.0
+  },
+  {
+   "date": "20261027",
+   "newVsReturning": "new",
+   "activeUsers": 3.0,
+   "sessions": 3.0
+  },
+  {
+   "date": "20261019",
+   "newVsReturning": "new",
+   "activeUsers": 2.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261021",
+   "newVsReturning": "new",
+   "activeUsers": 2.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261026",
+   "newVsReturning": "returning",
+   "activeUsers": 2.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261027",
+   "newVsReturning": "returning",
+   "activeUsers": 2.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261015",
+   "newVsReturning": "returning",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261016",
+   "newVsReturning": "new",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261022",
+   "newVsReturning": "returning",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261024",
+   "newVsReturning": "new",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261025",
+   "newVsReturning": "returning",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261031",
+   "newVsReturning": "returning",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261108",
+   "newVsReturning": "new",
+   "activeUsers": 1.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261013",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261018",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261020",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 1.0
+  },
+  {
+   "date": "20261025",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 3.0
+  },
+  {
+   "date": "20261027",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 2.0
+  },
+  {
+   "date": "20261029",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 20.0
+  },
+  {
+   "date": "20261030",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 9.0
+  },
+  {
+   "date": "20261031",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 21.0
+  },
+  {
+   "date": "20261101",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 11.0
+  },
+  {
+   "date": "20261102",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 11.0
+  },
+  {
+   "date": "20261103",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 15.0
+  },
+  {
+   "date": "20261104",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 10.0
+  },
+  {
+   "date": "20261105",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 15.0
+  },
+  {
+   "date": "20261106",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 18.0
+  },
+  {
+   "date": "20261107",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 12.0
+  },
+  {
+   "date": "20261108",
+   "newVsReturning": "",
+   "activeUsers": 0.0,
+   "sessions": 5.0
+  }
+ ],
+ "app_events_nvr": [
+  {
+   "eventName": "page_view",
+   "newVsReturning": "new",
+   "eventCount": 1859.0,
+   "totalUsers": 684.0
+  },
+  {
+   "eventName": "search",
+   "newVsReturning": "new",
+   "eventCount": 827.0,
+   "totalUsers": 511.0
+  },
+  {
+   "eventName": "page_view",
+   "newVsReturning": "returning",
+   "eventCount": 824.0,
+   "totalUsers": 201.0
+  },
+  {
+   "eventName": "user_engagement",
+   "newVsReturning": "new",
+   "eventCount": 731.0,
+   "totalUsers": 335.0
+  },
+  {
+   "eventName": "first_visit",
+   "newVsReturning": "new",
+   "eventCount": 683.0,
+   "totalUsers": 683.0
+  },
+  {
+   "eventName": "session_start",
+   "newVsReturning": "new",
+   "eventCount": 683.0,
+   "totalUsers": 683.0
+  },
+  {
+   "eventName": "session_start",
+   "newVsReturning": "returning",
+   "eventCount": 387.0,
+   "totalUsers": 215.0
+  },
+  {
+   "eventName": "search",
+   "newVsReturning": "returning",
+   "eventCount": 334.0,
+   "totalUsers": 119.0
+  },
+  {
+   "eventName": "scroll",
+   "newVsReturning": "new",
+   "eventCount": 306.0,
+   "totalUsers": 208.0
+  },
+  {
+   "eventName": "user_engagement",
+   "newVsReturning": "returning",
+   "eventCount": 258.0,
+   "totalUsers": 90.0
+  },
+  {
+   "eventName": "scroll",
+   "newVsReturning": "returning",
+   "eventCount": 116.0,
+   "totalUsers": 53.0
+  },
+  {
+   "eventName": "session_start",
+   "newVsReturning": "(not set)",
+   "eventCount": 93.0,
+   "totalUsers": 64.0
+  },
+  {
+   "eventName": "page_view",
+   "newVsReturning": "(not set)",
+   "eventCount": 90.0,
+   "totalUsers": 61.0
+  },
+  {
+   "eventName": "season_theme_off",
+   "newVsReturning": "new",
+   "eventCount": 58.0,
+   "totalUsers": 51.0
+  },
+  {
+   "eventName": "report_room",
+   "newVsReturning": "new",
+   "eventCount": 51.0,
+   "totalUsers": 36.0
+  },
+  {
+   "eventName": "purpose_study",
+   "newVsReturning": "new",
+   "eventCount": 42.0,
+   "totalUsers": 42.0
+  },
+  {
+   "eventName": "season_theme_off",
+   "newVsReturning": "returning",
+   "eventCount": 29.0,
+   "totalUsers": 23.0
+  },
+  {
+   "eventName": "report_room",
+   "newVsReturning": "returning",
+   "eventCount": 28.0,
+   "totalUsers": 18.0
+  },
+  {
+   "eventName": "season_theme_on",
+   "newVsReturning": "new",
+   "eventCount": 27.0,
+   "totalUsers": 23.0
+  },
+  {
+   "eventName": "season_theme_on",
+   "newVsReturning": "returning",
+   "eventCount": 22.0,
+   "totalUsers": 19.0
+  },
+  {
+   "eventName": "click",
+   "newVsReturning": "new",
+   "eventCount": 17.0,
+   "totalUsers": 17.0
+  },
+  {
+   "eventName": "session_start",
+   "newVsReturning": "",
+   "eventCount": 14.0,
+   "totalUsers": 9.0
+  },
+  {
+   "eventName": "page_view",
+   "newVsReturning": "",
+   "eventCount": 13.0,
+   "totalUsers": 9.0
+  },
+  {
+   "eventName": "report_cancel",
+   "newVsReturning": "new",
+   "eventCount": 11.0,
+   "totalUsers": 11.0
+  },
+  {
+   "eventName": "purpose_study",
+   "newVsReturning": "returning",
+   "eventCount": 10.0,
+   "totalUsers": 10.0
+  },
+  {
+   "eventName": "purpose_group",
+   "newVsReturning": "new",
+   "eventCount": 9.0,
+   "totalUsers": 9.0
+  },
+  {
+   "eventName": "click",
+   "newVsReturning": "returning",
+   "eventCount": 8.0,
+   "totalUsers": 6.0
+  },
+  {
+   "eventName": "purpose_break",
+   "newVsReturning": "new",
+   "eventCount": 8.0,
+   "totalUsers": 8.0
+  },
+  {
+   "eventName": "purpose_break",
+   "newVsReturning": "returning",
+   "eventCount": 7.0,
+   "totalUsers": 7.0
+  },
+  {
+   "eventName": "purpose_meeting",
+   "newVsReturning": "new",
+   "eventCount": 6.0,
+   "totalUsers": 6.0
+  },
+  {
+   "eventName": "purpose_skip",
+   "newVsReturning": "new",
+   "eventCount": 6.0,
+   "totalUsers": 6.0
+  },
+  {
+   "eventName": "scroll",
+   "newVsReturning": "(not set)",
+   "eventCount": 5.0,
+   "totalUsers": 4.0
+  },
+  {
+   "eventName": "purpose_skip",
+   "newVsReturning": "returning",
+   "eventCount": 4.0,
+   "totalUsers": 4.0
+  },
+  {
+   "eventName": "purpose_group",
+   "newVsReturning": "returning",
+   "eventCount": 3.0,
+   "totalUsers": 3.0
+  },
+  {
+   "eventName": "purpose_meeting",
+   "newVsReturning": "returning",
+   "eventCount": 3.0,
+   "totalUsers": 3.0
+  },
+  {
+   "eventName": "purpose_other",
+   "newVsReturning": "returning",
+   "eventCount": 3.0,
+   "totalUsers": 3.0
+  },
+  {
+   "eventName": "report_cancel",
+   "newVsReturning": "returning",
+   "eventCount": 3.0,
+   "totalUsers": 3.0
+  },
+  {
+   "eventName": "user_engagement",
+   "newVsReturning": "(not set)",
+   "eventCount": 3.0,
+   "totalUsers": 3.0
+  },
+  {
+   "eventName": "purpose_other",
+   "newVsReturning": "new",
+   "eventCount": 2.0,
+   "totalUsers": 2.0
+  },
+  {
+   "eventName": "user_engagement",
+   "newVsReturning": "",
+   "eventCount": 1.0,
+   "totalUsers": 1.0
+  }
+ ],
+ "lp_events": [
+  {
+   "eventName": "page_view",
+   "linkDomain": "",
+   "eventCount": 1342.0,
+   "totalUsers": 860.0
+  },
+  {
+   "eventName": "session_start",
+   "linkDomain": "",
+   "eventCount": 1225.0,
+   "totalUsers": 860.0
+  },
+  {
+   "eventName": "first_visit",
+   "linkDomain": "",
+   "eventCount": 853.0,
+   "totalUsers": 851.0
+  },
+  {
+   "eventName": "click",
+   "linkDomain": "nust-room-search.onrender.com",
+   "eventCount": 598.0,
+   "totalUsers": 461.0
+  },
+  {
+   "eventName": "user_engagement",
+   "linkDomain": "",
+   "eventCount": 214.0,
+   "totalUsers": 178.0
+  },
+  {
+   "eventName": "scroll",
+   "linkDomain": "",
+   "eventCount": 114.0,
+   "totalUsers": 94.0
+  },
+  {
+   "eventName": "click",
+   "linkDomain": "instagram.com",
+   "eventCount": 16.0,
+   "totalUsers": 15.0
+  },
+  {
+   "eventName": "feedback_submit",
+   "linkDomain": "",
+   "eventCount": 3.0,
+   "totalUsers": 1.0
+  },
+  {
+   "eventName": "session_start",
+   "linkDomain": "nust-room-search.onrender.com",
+   "eventCount": 2.0,
+   "totalUsers": 2.0
+  },
+  {
+   "eventName": "session_start",
+   "linkDomain": "instagram.com",
+   "eventCount": 1.0,
+   "totalUsers": 1.0
+  }
+ ],
+ "app_channels_nvr": [
+  {
+   "sessionDefaultChannelGroup": "Referral",
+   "sessionSource": "nu-roomradar.github.io",
+   "newVsReturning": "new",
+   "sessions": 641.0,
+   "activeUsers": 641.0,
+   "engagedSessions": 576.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Referral",
+   "sessionSource": "nu-roomradar.github.io",
+   "newVsReturning": "returning",
+   "sessions": 352.0,
+   "activeUsers": 204.0,
+   "engagedSessions": 212.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Referral",
+   "sessionSource": "nu-roomradar.github.io",
+   "newVsReturning": "(not set)",
+   "sessions": 93.0,
+   "activeUsers": 0.0,
+   "engagedSessions": 3.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Direct",
+   "sessionSource": "(direct)",
+   "newVsReturning": "new",
+   "sessions": 41.0,
+   "activeUsers": 41.0,
+   "engagedSessions": 20.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Direct",
+   "sessionSource": "(direct)",
+   "newVsReturning": "returning",
+   "sessions": 32.0,
+   "activeUsers": 11.0,
+   "engagedSessions": 25.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Referral",
+   "sessionSource": "nu-roomradar.github.io",
+   "newVsReturning": "",
+   "sessions": 13.0,
+   "activeUsers": 0.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Unassigned",
+   "sessionSource": "(not set)",
+   "newVsReturning": "returning",
+   "sessions": 2.0,
+   "activeUsers": 2.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Direct",
+   "sessionSource": "(direct)",
+   "newVsReturning": "",
+   "sessions": 1.0,
+   "activeUsers": 0.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Organic Search",
+   "sessionSource": "bing",
+   "newVsReturning": "new",
+   "sessions": 1.0,
+   "activeUsers": 1.0,
+   "engagedSessions": 1.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Unassigned",
+   "sessionSource": "(not set)",
+   "newVsReturning": "new",
+   "sessions": 1.0,
+   "activeUsers": 1.0,
+   "engagedSessions": 0.0
+  }
+ ],
+ "lp_channels_nvr": [
+  {
+   "sessionDefaultChannelGroup": "Direct",
+   "sessionSource": "(direct)",
+   "newVsReturning": "new",
+   "sessions": 731.0,
+   "activeUsers": 729.0,
+   "engagedSessions": 360.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Direct",
+   "sessionSource": "(direct)",
+   "newVsReturning": "returning",
+   "sessions": 177.0,
+   "activeUsers": 115.0,
+   "engagedSessions": 58.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Direct",
+   "sessionSource": "(direct)",
+   "newVsReturning": "(not set)",
+   "sessions": 131.0,
+   "activeUsers": 0.0,
+   "engagedSessions": 1.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Organic Social",
+   "sessionSource": "ig",
+   "newVsReturning": "new",
+   "sessions": 63.0,
+   "activeUsers": 63.0,
+   "engagedSessions": 48.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Organic Search",
+   "sessionSource": "google",
+   "newVsReturning": "new",
+   "sessions": 44.0,
+   "activeUsers": 44.0,
+   "engagedSessions": 27.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Referral",
+   "sessionSource": "nust-room-search.onrender.com",
+   "newVsReturning": "returning",
+   "sessions": 14.0,
+   "activeUsers": 9.0,
+   "engagedSessions": 9.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Organic Search",
+   "sessionSource": "google",
+   "newVsReturning": "returning",
+   "sessions": 13.0,
+   "activeUsers": 8.0,
+   "engagedSessions": 6.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Organic Social",
+   "sessionSource": "ig",
+   "newVsReturning": "returning",
+   "sessions": 12.0,
+   "activeUsers": 7.0,
+   "engagedSessions": 7.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Organic Social",
+   "sessionSource": "ig",
+   "newVsReturning": "(not set)",
+   "sessions": 9.0,
+   "activeUsers": 0.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Referral",
+   "sessionSource": "nust-room-search.onrender.com",
+   "newVsReturning": "(not set)",
+   "sessions": 8.0,
+   "activeUsers": 0.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Referral",
+   "sessionSource": "nust-room-search.onrender.com",
+   "newVsReturning": "new",
+   "sessions": 5.0,
+   "activeUsers": 5.0,
+   "engagedSessions": 3.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Direct",
+   "sessionSource": "(direct)",
+   "newVsReturning": "",
+   "sessions": 4.0,
+   "activeUsers": 0.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Referral",
+   "sessionSource": "mail.google.com",
+   "newVsReturning": "new",
+   "sessions": 4.0,
+   "activeUsers": 4.0,
+   "engagedSessions": 2.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Organic Social",
+   "sessionSource": "l.instagram.com",
+   "newVsReturning": "new",
+   "sessions": 3.0,
+   "activeUsers": 3.0,
+   "engagedSessions": 3.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Organic Search",
+   "sessionSource": "google",
+   "newVsReturning": "(not set)",
+   "sessions": 2.0,
+   "activeUsers": 0.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Referral",
+   "sessionSource": "mail.google.com",
+   "newVsReturning": "(not set)",
+   "sessions": 2.0,
+   "activeUsers": 0.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Organic Search",
+   "sessionSource": "bing",
+   "newVsReturning": "new",
+   "sessions": 1.0,
+   "activeUsers": 1.0,
+   "engagedSessions": 1.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Organic Social",
+   "sessionSource": "facebook.com",
+   "newVsReturning": "new",
+   "sessions": 1.0,
+   "activeUsers": 1.0,
+   "engagedSessions": 1.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Organic Social",
+   "sessionSource": "ig",
+   "newVsReturning": "",
+   "sessions": 1.0,
+   "activeUsers": 0.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Organic Social",
+   "sessionSource": "l.instagram.com",
+   "newVsReturning": "returning",
+   "sessions": 1.0,
+   "activeUsers": 1.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Organic Social",
+   "sessionSource": "m.facebook.com",
+   "newVsReturning": "new",
+   "sessions": 1.0,
+   "activeUsers": 1.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Referral",
+   "sessionSource": "nu.instructure.com",
+   "newVsReturning": "returning",
+   "sessions": 1.0,
+   "activeUsers": 1.0,
+   "engagedSessions": 1.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Unassigned",
+   "sessionSource": "(not set)",
+   "newVsReturning": "new",
+   "sessions": 1.0,
+   "activeUsers": 1.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "sessionDefaultChannelGroup": "Unassigned",
+   "sessionSource": "(not set)",
+   "newVsReturning": "returning",
+   "sessions": 1.0,
+   "activeUsers": 1.0,
+   "engagedSessions": 0.0
+  }
+ ],
+ "app_hour": [
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "3",
+   "sessions": 165.0,
+   "activeUsers": 162.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "4",
+   "sessions": 48.0,
+   "activeUsers": 48.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "18",
+   "sessions": 43.0,
+   "activeUsers": 42.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "23",
+   "sessions": 41.0,
+   "activeUsers": 39.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "17",
+   "sessions": 37.0,
+   "activeUsers": 35.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "21",
+   "sessions": 37.0,
+   "activeUsers": 36.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "20",
+   "sessions": 31.0,
+   "activeUsers": 31.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "19",
+   "sessions": 30.0,
+   "activeUsers": 29.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "5",
+   "sessions": 30.0,
+   "activeUsers": 29.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "22",
+   "sessions": 28.0,
+   "activeUsers": 26.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "6",
+   "sessions": 27.0,
+   "activeUsers": 27.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "0",
+   "sessions": 26.0,
+   "activeUsers": 23.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "16",
+   "sessions": 21.0,
+   "activeUsers": 20.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "7",
+   "sessions": 20.0,
+   "activeUsers": 20.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "1",
+   "sessions": 19.0,
+   "activeUsers": 15.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "17",
+   "sessions": 19.0,
+   "activeUsers": 18.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "22",
+   "sessions": 18.0,
+   "activeUsers": 17.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "21",
+   "sessions": 17.0,
+   "activeUsers": 14.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "19",
+   "sessions": 17.0,
+   "activeUsers": 15.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "8",
+   "sessions": 17.0,
+   "activeUsers": 17.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "20",
+   "sessions": 16.0,
+   "activeUsers": 15.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "18",
+   "sessions": 16.0,
+   "activeUsers": 14.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "19",
+   "sessions": 15.0,
+   "activeUsers": 15.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "18",
+   "sessions": 15.0,
+   "activeUsers": 12.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "23",
+   "sessions": 15.0,
+   "activeUsers": 14.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "22",
+   "sessions": 14.0,
+   "activeUsers": 12.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "22",
+   "sessions": 14.0,
+   "activeUsers": 14.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "22",
+   "sessions": 13.0,
+   "activeUsers": 13.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "21",
+   "sessions": 13.0,
+   "activeUsers": 12.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "19",
+   "sessions": 13.0,
+   "activeUsers": 12.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "23",
+   "sessions": 12.0,
+   "activeUsers": 11.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "20",
+   "sessions": 11.0,
+   "activeUsers": 10.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "21",
+   "sessions": 10.0,
+   "activeUsers": 10.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "23",
+   "sessions": 10.0,
+   "activeUsers": 10.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "2",
+   "sessions": 10.0,
+   "activeUsers": 8.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "0",
+   "sessions": 10.0,
+   "activeUsers": 9.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "20",
+   "sessions": 9.0,
+   "activeUsers": 9.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "0",
+   "sessions": 9.0,
+   "activeUsers": 8.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "15",
+   "sessions": 9.0,
+   "activeUsers": 9.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "9",
+   "sessions": 9.0,
+   "activeUsers": 9.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "20",
+   "sessions": 8.0,
+   "activeUsers": 7.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "16",
+   "sessions": 8.0,
+   "activeUsers": 5.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "17",
+   "sessions": 8.0,
+   "activeUsers": 6.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "3",
+   "sessions": 8.0,
+   "activeUsers": 7.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "0",
+   "sessions": 7.0,
+   "activeUsers": 5.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "17",
+   "sessions": 7.0,
+   "activeUsers": 7.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "19",
+   "sessions": 7.0,
+   "activeUsers": 7.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "23",
+   "sessions": 7.0,
+   "activeUsers": 5.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "20",
+   "sessions": 7.0,
+   "activeUsers": 6.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "4",
+   "sessions": 6.0,
+   "activeUsers": 4.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "4",
+   "sessions": 6.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "5",
+   "sessions": 6.0,
+   "activeUsers": 4.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "21",
+   "sessions": 6.0,
+   "activeUsers": 6.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "14",
+   "sessions": 6.0,
+   "activeUsers": 6.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "1",
+   "sessions": 5.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "14",
+   "sessions": 5.0,
+   "activeUsers": 4.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "2",
+   "sessions": 5.0,
+   "activeUsers": 5.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "18",
+   "sessions": 5.0,
+   "activeUsers": 5.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "0",
+   "sessions": 5.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "5",
+   "sessions": 5.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "15",
+   "sessions": 5.0,
+   "activeUsers": 5.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "21",
+   "sessions": 4.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "23",
+   "sessions": 4.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "7",
+   "sessions": 4.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "0",
+   "sessions": 4.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "16",
+   "sessions": 4.0,
+   "activeUsers": 4.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "1",
+   "sessions": 4.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "17",
+   "sessions": 4.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "2",
+   "sessions": 4.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "8",
+   "sessions": 4.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "16",
+   "sessions": 4.0,
+   "activeUsers": 4.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "2",
+   "sessions": 4.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "11",
+   "sessions": 4.0,
+   "activeUsers": 4.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "12",
+   "sessions": 4.0,
+   "activeUsers": 4.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "16",
+   "sessions": 3.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "19",
+   "sessions": 3.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "22",
+   "sessions": 3.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "4",
+   "sessions": 3.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "5",
+   "sessions": 3.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "20",
+   "sessions": 3.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "3",
+   "sessions": 3.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "4",
+   "sessions": 3.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "7",
+   "sessions": 3.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "16",
+   "sessions": 3.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "3",
+   "sessions": 3.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "6",
+   "sessions": 3.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "7",
+   "sessions": 3.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "6",
+   "sessions": 3.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "7",
+   "sessions": 3.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "15",
+   "sessions": 3.0,
+   "activeUsers": 3.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "2",
+   "sessions": 3.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "17",
+   "sessions": 2.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "2",
+   "sessions": 2.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "0",
+   "sessions": 2.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "1",
+   "sessions": 2.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "16",
+   "sessions": 2.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "18",
+   "sessions": 2.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "19",
+   "sessions": 2.0,
+   "activeUsers": 0.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "22",
+   "sessions": 2.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "15",
+   "sessions": 2.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "18",
+   "sessions": 2.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "4",
+   "sessions": 2.0,
+   "activeUsers": 0.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "8",
+   "sessions": 2.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "14",
+   "sessions": 2.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "1",
+   "sessions": 2.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "5",
+   "sessions": 2.0,
+   "activeUsers": 2.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "1",
+   "sessions": 2.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "15",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "18",
+   "sessions": 1.0,
+   "activeUsers": 0.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "3",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Friday",
+   "hour": "8",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "11",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "12",
+   "sessions": 1.0,
+   "activeUsers": 0.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "14",
+   "sessions": 1.0,
+   "activeUsers": 0.0
+  },
+  {
+   "dayOfWeekName": "Monday",
+   "hour": "15",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "14",
+   "sessions": 1.0,
+   "activeUsers": 0.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "2",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "23",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "5",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Saturday",
+   "hour": "8",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Sunday",
+   "hour": "10",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Thursday",
+   "hour": "10",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "13",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "3",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "4",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "6",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "7",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Tuesday",
+   "hour": "8",
+   "sessions": 1.0,
+   "activeUsers": 0.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "10",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  },
+  {
+   "dayOfWeekName": "Wednesday",
+   "hour": "13",
+   "sessions": 1.0,
+   "activeUsers": 1.0
+  }
+ ],
+ "app_device_nvr": [
+  {
+   "deviceCategory": "mobile",
+   "operatingSystem": "iOS",
+   "newVsReturning": "new",
+   "activeUsers": 465.0,
+   "sessions": 465.0,
+   "engagedSessions": 394.0
+  },
+  {
+   "deviceCategory": "mobile",
+   "operatingSystem": "iOS",
+   "newVsReturning": "returning",
+   "activeUsers": 164.0,
+   "sessions": 285.0,
+   "engagedSessions": 176.0
+  },
+  {
+   "deviceCategory": "desktop",
+   "operatingSystem": "Windows",
+   "newVsReturning": "new",
+   "activeUsers": 102.0,
+   "sessions": 102.0,
+   "engagedSessions": 93.0
+  },
+  {
+   "deviceCategory": "mobile",
+   "operatingSystem": "Android",
+   "newVsReturning": "new",
+   "activeUsers": 95.0,
+   "sessions": 95.0,
+   "engagedSessions": 89.0
+  },
+  {
+   "deviceCategory": "mobile",
+   "operatingSystem": "Android",
+   "newVsReturning": "returning",
+   "activeUsers": 30.0,
+   "sessions": 54.0,
+   "engagedSessions": 39.0
+  },
+  {
+   "deviceCategory": "desktop",
+   "operatingSystem": "Windows",
+   "newVsReturning": "returning",
+   "activeUsers": 15.0,
+   "sessions": 26.0,
+   "engagedSessions": 11.0
+  },
+  {
+   "deviceCategory": "desktop",
+   "operatingSystem": "Macintosh",
+   "newVsReturning": "new",
+   "activeUsers": 14.0,
+   "sessions": 14.0,
+   "engagedSessions": 14.0
+  },
+  {
+   "deviceCategory": "tablet",
+   "operatingSystem": "iOS",
+   "newVsReturning": "new",
+   "activeUsers": 8.0,
+   "sessions": 8.0,
+   "engagedSessions": 8.0
+  },
+  {
+   "deviceCategory": "tablet",
+   "operatingSystem": "iOS",
+   "newVsReturning": "returning",
+   "activeUsers": 4.0,
+   "sessions": 16.0,
+   "engagedSessions": 10.0
+  },
+  {
+   "deviceCategory": "desktop",
+   "operatingSystem": "Macintosh",
+   "newVsReturning": "returning",
+   "activeUsers": 3.0,
+   "sessions": 5.0,
+   "engagedSessions": 1.0
+  },
+  {
+   "deviceCategory": "desktop",
+   "operatingSystem": "Macintosh",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 1.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "deviceCategory": "desktop",
+   "operatingSystem": "Windows",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 2.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "deviceCategory": "mobile",
+   "operatingSystem": "Android",
+   "newVsReturning": "",
+   "activeUsers": 0.0,
+   "sessions": 2.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "deviceCategory": "mobile",
+   "operatingSystem": "Android",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 4.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "deviceCategory": "mobile",
+   "operatingSystem": "iOS",
+   "newVsReturning": "",
+   "activeUsers": 0.0,
+   "sessions": 12.0,
+   "engagedSessions": 0.0
+  },
+  {
+   "deviceCategory": "mobile",
+   "operatingSystem": "iOS",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 79.0,
+   "engagedSessions": 3.0
+  },
+  {
+   "deviceCategory": "tablet",
+   "operatingSystem": "iOS",
+   "newVsReturning": "(not set)",
+   "activeUsers": 0.0,
+   "sessions": 7.0,
+   "engagedSessions": 0.0
+  }
+ ],
+ "app_landing": [
+  {
+   "landingPage": "/",
+   "newVsReturning": "new",
+   "sessions": 684.0,
+   "engagedSessions": 597.0,
+   "activeUsers": 684.0
+  },
+  {
+   "landingPage": "/",
+   "newVsReturning": "returning",
+   "sessions": 360.0,
+   "engagedSessions": 236.0,
+   "activeUsers": 201.0
+  },
+  {
+   "landingPage": "/",
+   "newVsReturning": "(not set)",
+   "sessions": 90.0,
+   "engagedSessions": 3.0,
+   "activeUsers": 0.0
+  },
+  {
+   "landingPage": "(not set)",
+   "newVsReturning": "returning",
+   "sessions": 26.0,
+   "engagedSessions": 1.0,
+   "activeUsers": 25.0
+  },
+  {
+   "landingPage": "/",
+   "newVsReturning": "",
+   "sessions": 13.0,
+   "engagedSessions": 0.0,
+   "activeUsers": 0.0
+  },
+  {
+   "landingPage": "(not set)",
+   "newVsReturning": "(not set)",
+   "sessions": 3.0,
+   "engagedSessions": 0.0,
+   "activeUsers": 0.0
+  },
+  {
+   "landingPage": "",
+   "newVsReturning": "",
+   "sessions": 1.0,
+   "engagedSessions": 0.0,
+   "activeUsers": 0.0
+  }
+ ],
+ "cohorts": {
+  "2026-10-26": {
+   "size": 5,
+   "days": {
+    "0": 5
+   },
+   "scope": "app"
+  },
+  "2026-10-27": {
+   "size": 1,
+   "days": {
+    "0": 1
+   },
+   "scope": "app"
+  },
+  "2026-10-28": {
+   "size": 404,
+   "days": {
+    "0": 404,
+    "6": 20,
+    "7": 15,
+    "1": 13,
+    "8": 13,
+    "4": 7,
+    "5": 7,
+    "9": 6,
+    "2": 2,
+    "3": 0,
+    "10": 0
+   },
+   "scope": "app"
+  },
+  "2026-10-29": {
+   "size": 40,
+   "days": {
+    "0": 40,
+    "1": 1,
+    "2": 1,
+    "3": 1,
+    "4": 1,
+    "5": 1
+   },
+   "scope": "app"
+  },
+  "2026-10-30": {
+   "size": 7,
+   "days": {
+    "0": 7,
+    "7": 1,
+    "2": 0,
+    "3": 0
+   },
+   "scope": "app"
+  },
+  "2026-10-31": {
+   "size": 5,
+   "days": {
+    "0": 5,
+    "1": 1
+   },
+   "scope": "app"
+  },
+  "2026-11-01": {
+   "size": 36,
+   "days": {
+    "0": 36,
+    "4": 3,
+    "1": 2,
+    "2": 2
+   },
+   "scope": "app"
+  },
+  "2026-11-02": {
+   "size": 29,
+   "days": {
+    "0": 29,
+    "1": 2,
+    "3": 1,
+    "4": 1,
+    "2": 0
+   },
+   "scope": "app"
+  },
+  "2026-11-03": {
+   "size": 46,
+   "days": {
+    "0": 46,
+    "1": 3,
+    "2": 3
+   },
+   "scope": "app"
+  },
+  "2026-11-04": {
+   "size": 41,
+   "days": {
+    "0": 41,
+    "1": 3,
+    "2": 1,
+    "3": 1
+   },
+   "scope": "app"
+  },
+  "2026-11-05": {
+   "size": 35,
+   "days": {
+    "0": 35,
+    "1": 1,
+    "2": 1
+   },
+   "scope": "app"
+  },
+  "2026-11-06": {
+   "size": 9,
+   "days": {
+    "0": 9,
+    "1": 1
+   },
+   "scope": "app"
+  },
+  "2026-11-07": {
+   "size": 3,
+   "days": {
+    "0": 3
+   },
+   "scope": "app"
+  }
+ }
+}
