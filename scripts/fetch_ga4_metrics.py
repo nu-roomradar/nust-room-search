@@ -6,6 +6,8 @@ GA4 Data API から利用状況を取り、週ごとの記録を残す（毎週�
   data/ga4_weekly.md    … 同じ内容の表（GitHub 上でそのまま読める）
   data/ga4_history.json … 直近28日の日次推移（dashboard.html が読む）
   data/ga4_breakdown.json … 直近28日のイベント数・検索条件・流入元（dashboard.html が読む）
+  data/ga4_retention.json … 新しく来た人が戻ってくるか（新規／再訪、最初に来た日ごとの再来、入口、時間帯）。
+                            画面には出さない運営の分析用（2026-11-09〜）
 
 LP（nu-roomradar.github.io）とアプリ（nust-room-search.onrender.com）はドメインが別で、
 同じ人でも別々に数えられる。合計は意味がないので、ホスト名で分けて記録する。
@@ -32,6 +34,7 @@ WEEKLY_JSON = os.path.join(DATA_DIR, "ga4_weekly.json")
 WEEKLY_MD = os.path.join(DATA_DIR, "ga4_weekly.md")
 HISTORY_FILE = os.path.join(DATA_DIR, "ga4_history.json")
 BREAKDOWN_FILE = os.path.join(DATA_DIR, "ga4_breakdown.json")
+RETENTION_FILE = os.path.join(DATA_DIR, "ga4_retention.json")
 SCHEDULE_DB = os.path.join(ROOT, "schedule_final.db")
 REPORT_ROOMS_TOP = 10
 
@@ -300,6 +303,114 @@ def fetch_dashboard(client, prop, today):
     return history, bd
 
 
+# ── 定着の分析（2026-11-09〜）。新しく来た人が戻ってくるかを見るための材料。失敗しても他の記録は残す ──
+import re as _re
+
+RETENTION_EVENTS = set(EVENTS) | {"page_view", "first_visit", "session_start", "user_engagement", "scroll", "click",
+                                  "season_theme_on", "season_theme_off"}
+COHORT_DAYS = 14          # 最初に来た日から何日後まで追うか
+
+
+def clean_label(v, n=80):
+    """GA4 には外部の誰でも値を送れるので、記録に残す文字列は安全な文字だけに切り詰める"""
+    return _re.sub(r"[^\w\-./:()@ ]", "", str(v))[:n]
+
+
+def cohort_rows_to_table(rows):
+    """[([cohort名, n日目], [活動した人, 組の人数]), ...] → {cohort名: {"size": 組の人数, "days": {n: 活動した人}}}"""
+    out = {}
+    for (name, nth), (active, total) in rows:
+        c = out.setdefault(name, {"size": 0, "days": {}})
+        c["size"] = max(c["size"], int(total))
+        c["days"][int(nth)] = int(active)
+    return out
+
+
+def _host_filter(key):
+    from google.analytics.data_v1beta.types import Filter, FilterExpression
+    return FilterExpression(filter=Filter(field_name="hostName",
+                                          string_filter=Filter.StringFilter(value=HOSTS[key])))
+
+
+def _report_f(client, prop, dims, mets, start, end, host=None, limit=None):
+    from google.analytics.data_v1beta.types import DateRange, Dimension, Metric, RunReportRequest
+    req = RunReportRequest(property=f"properties/{prop}", dimensions=[Dimension(name=d) for d in dims],
+                           metrics=[Metric(name=m) for m in mets],
+                           date_ranges=[DateRange(start_date=str(start), end_date=str(end))], limit=limit,
+                           dimension_filter=_host_filter(host) if host else None)
+    resp = client.run_report(req)
+    return [([d.value for d in r.dimension_values], [m.value for m in r.metric_values]) for r in resp.rows]
+
+
+def _cohort(client, prop, day, end, host):
+    from google.analytics.data_v1beta.types import (Cohort, CohortSpec, CohortsRange, DateRange, Dimension, Metric,
+                                                    RunReportRequest)
+    n = min(COHORT_DAYS, (end - day).days)
+    req = RunReportRequest(
+        property=f"properties/{prop}", dimensions=[Dimension(name="cohort"), Dimension(name="cohortNthDay")],
+        metrics=[Metric(name="cohortActiveUsers"), Metric(name="cohortTotalUsers")],
+        cohort_spec=CohortSpec(cohorts=[Cohort(name=str(day), dimension="firstSessionDate",
+                                               date_range=DateRange(start_date=str(day), end_date=str(day)))],
+                               cohorts_range=CohortsRange(granularity=CohortsRange.Granularity.DAILY,
+                                                          start_offset=0, end_offset=n)),
+        dimension_filter=_host_filter(host) if host else None)
+    resp = client.run_report(req)
+    return [([d.value for d in r.dimension_values], [m.value for m in r.metric_values]) for r in resp.rows]
+
+
+def fetch_retention(client, prop, today):
+    start, end = today - datetime.timedelta(days=28), today - datetime.timedelta(days=1)
+    out = {"updated": str(today), "period": {"start": str(start), "end": str(end)}, "errors": []}
+
+    def safe(key, fn):
+        try:
+            out[key] = fn()
+        except Exception as e:  # noqa: BLE001
+            out["errors"].append(f"{key}: {type(e).__name__}: {clean_label(e, 240)}")
+
+    def rows(dims, mets, host=None, limit=None, keep=None):
+        res = []
+        for d, m in _report_f(client, prop, dims, mets, start, end, host, limit):
+            if keep and not keep(d):
+                continue
+            res.append({**{k: clean_label(v) for k, v in zip(dims, d)}, **{k: float(v) for k, v in zip(mets, m)}})
+        return res
+
+    base = ["activeUsers", "sessions", "engagedSessions", "userEngagementDuration", "screenPageViews", "eventCount"]
+    safe("new_vs_returning", lambda: rows(["hostName", "newVsReturning"], base,
+                                          keep=lambda d: d[0] in HOSTS.values()))
+    safe("app_daily_nvr", lambda: rows(["date", "newVsReturning"], ["activeUsers", "sessions"], host="app"))
+    safe("lp_daily_nvr", lambda: rows(["date", "newVsReturning"], ["activeUsers", "sessions"], host="lp"))
+    safe("app_events_nvr", lambda: rows(["eventName", "newVsReturning"], ["eventCount", "totalUsers"], host="app",
+                                        keep=lambda d: d[0] in RETENTION_EVENTS))
+    safe("lp_events", lambda: rows(["eventName", "linkDomain"], ["eventCount", "totalUsers"], host="lp", limit=50,
+                                   keep=lambda d: d[0] in RETENTION_EVENTS))
+    safe("app_channels_nvr", lambda: rows(["sessionDefaultChannelGroup", "sessionSource", "newVsReturning"],
+                                          ["sessions", "activeUsers", "engagedSessions"], host="app", limit=40))
+    safe("lp_channels_nvr", lambda: rows(["sessionDefaultChannelGroup", "sessionSource", "newVsReturning"],
+                                         ["sessions", "activeUsers", "engagedSessions"], host="lp", limit=40))
+    safe("app_hour", lambda: rows(["dayOfWeekName", "hour"], ["sessions", "activeUsers"], host="app", limit=200))
+    safe("app_device_nvr", lambda: rows(["deviceCategory", "operatingSystem", "newVsReturning"],
+                                        ["activeUsers", "sessions", "engagedSessions"], host="app", limit=40))
+    safe("app_landing", lambda: rows(["landingPage", "newVsReturning"], ["sessions", "engagedSessions", "activeUsers"],
+                                     host="app", limit=30))
+    # 最初に来た日ごとの組（アプリ）。1日ずつ別に頼む（まとめると上限に当たることがある）
+    cohorts, notes = {}, []
+    day = max(start, datetime.date(2026, 10, 26))
+    while day <= end - datetime.timedelta(days=1):
+        for host in ("app", None):
+            try:
+                cohorts.update({k: {**v, "scope": host or "all"} for k, v in
+                                cohort_rows_to_table(_cohort(client, prop, day, end, host)).items()})
+                break
+            except Exception as e:  # noqa: BLE001
+                notes.append(f"{day} {host or 'all'}: {type(e).__name__}: {clean_label(e, 160)}")
+        day += datetime.timedelta(days=1)
+    out["cohorts"] = cohorts
+    out["errors"] += notes
+    return out
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[1])
     ap.add_argument("--weeks", type=int, default=1, help="直前の何週ぶんを取り直すか（既定 1）")
@@ -316,7 +427,14 @@ def main(argv=None):
     history, breakdown = fetch_dashboard(client, prop, today)
 
     os.makedirs(DATA_DIR, exist_ok=True)
-    for path, obj in ((WEEKLY_JSON, weeks), (HISTORY_FILE, history), (BREAKDOWN_FILE, breakdown)):
+    try:
+        retention = fetch_retention(client, prop, today)
+    except Exception as e:  # noqa: BLE001  分析用なので、失敗しても週次の記録は残す
+        retention = {"updated": str(today), "errors": [f"fetch_retention: {type(e).__name__}: {clean_label(e, 240)}"]}
+    print(f"[INFO] 定着の分析: 項目 {len(retention) - 3} ・ 組 {len(retention.get('cohorts', {}))} ・ エラー {len(retention['errors'])}")
+    for err in retention["errors"][:8]:
+        print(f"[WARN] {err}", file=sys.stderr)
+    for path, obj in ((WEEKLY_JSON, weeks), (HISTORY_FILE, history), (BREAKDOWN_FILE, breakdown), (RETENTION_FILE, retention)):
         with open(path, "w", encoding="utf-8") as f:
             json.dump(obj, f, ensure_ascii=False, indent=1)
             f.write("\n")
