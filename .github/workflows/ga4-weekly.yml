@@ -37,7 +37,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/ga4_weekly.json data/ga4_weekly.md data/ga4_history.json data/ga4_breakdown.json
+          git add data/ga4_weekly.json data/ga4_weekly.md data/ga4_history.json data/ga4_breakdown.json data/ga4_retention.json
           if git diff --staged --quiet; then echo "変更なし"; exit 0; fi
           git commit -m "chore: GA4 週次の記録を更新 ($(TZ=Asia/Tokyo date +%Y-%m-%d))"
           git pull --rebase origin main && git push

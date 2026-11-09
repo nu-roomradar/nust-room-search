@@ -115,6 +115,20 @@ class DailyHistoryTests(unittest.TestCase):
         self.assertNotIn("app", h[0])
 
 
+class RetentionTests(unittest.TestCase):
+    def test_cohort_rows_to_table(self):
+        rows = [(["2026-10-28", "0000"], ["406", "406"]), (["2026-10-28", "0001"], ["31", "406"]),
+                (["2026-10-28", "0007"], ["12", "406"])]
+        t = g.cohort_rows_to_table(rows)
+        self.assertEqual(t["2026-10-28"]["size"], 406)
+        self.assertEqual(t["2026-10-28"]["days"], {0: 406, 1: 31, 7: 12})
+
+    def test_labels_are_cleaned(self):
+        self.assertEqual(g.clean_label("<script>alert(1)</script>"), "scriptalert(1)/script")
+        self.assertEqual(g.clean_label("instagram.com / referral"), "instagram.com / referral")
+        self.assertEqual(len(g.clean_label("x" * 500)), 80)
+
+
 class PeriodTotalsTests(unittest.TestCase):
     def test_all_and_app_lp_totals(self):
         total = [([], ["1461", "1430", "2100", "4200", "13000"])]
