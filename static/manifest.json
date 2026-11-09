@@ -1,0 +1,25 @@
+{
+  "name": "RoomRadar — 日大理工 空き教室",
+  "short_name": "RoomRadar",
+  "description": "日大理工の空き教室を、開いた瞬間に一覧表示（学生開発・試験運用中。大学が公式に提供するサービスではありません）",
+  "lang": "ja",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "icons": [
+    {
+      "src": "/static/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

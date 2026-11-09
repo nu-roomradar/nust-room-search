@@ -17,6 +17,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+{% include "_head_icons.html" %}
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-L1T1CDZ05N"></script>
     <script>
@@ -155,6 +156,10 @@
                 <span class="result-label">{% if auto_note %}<span class="result-note">{{ auto_note }}</span>次は {% elif auto %}いまから使える · {% endif %}{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }} {{ selected_day }}曜 {{ selected_period }}限{% if selected_span > 1 %}から{{ selected_span }}コマ続けて{% endif %} の空き教室</span>
                 <span class="count-chip" id="count-chip"><em>{{ empty_rooms|length }}</em> 室</span>
             </div>
+            {% if remembered %}
+            <!-- 前に選んだ校舎・コマ数で開いたことの案内（2026-11-09 定着の改善 A3） -->
+            <p class="pref-note">前回の条件（{{ {'all': 'すべての校舎', 'tower': 'タワースコラ', 'main': '駿河台校舎', 'funabashi': '船橋校舎'}[selected_building] }}{% if selected_span > 1 %}・{{ selected_span }}コマ続けて{% endif %}）で表示しています · <a href="/?building=all&amp;span=1">すべての校舎で見る</a></p>
+            {% endif %}
 
             {% if ask_purpose %}
             <!-- 使った目的のワンタップ調査（任意・匿名。1台1日1回まで。答えは全体の集計にだけ使う） -->

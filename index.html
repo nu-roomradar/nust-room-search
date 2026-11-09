@@ -124,7 +124,7 @@
 
     <div class="hero-stats">
       <div class="stat">
-        <div class="stat-num" data-count="65" id="stat-rooms"><span class="num">65</span></div>
+        <div class="stat-num" data-count="64" id="stat-rooms"><span class="num">64</span></div>
         <div class="stat-label">
           <span class="ja">駿河台の教室（2026年度）</span>
           <span class="en">Surugadai rooms (AY2026)</span>
@@ -472,6 +472,15 @@ function setLang(lang) {
 
 // 前に選んだ言語で開く（端末に保存。2026-11-07）
 try { const saved = localStorage.getItem('rr_lp_lang'); if (saved === 'en' || saved === 'zh') setLang(saved); } catch (e) {}
+
+// アプリを開くボタンが押されたら記録する（どのボタンか。2026-11-09 定着の改善 A5）
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('a[href^="https://nust-room-search.onrender.com"]');
+  if (!a || typeof gtag !== 'function') return;
+  const place = a.classList.contains('hero-cta') ? 'hero' : a.classList.contains('sticky-cta') ? 'sticky'
+              : a.classList.contains('cta-btn') ? 'cta' : (a.className || 'other');
+  gtag('event', 'open_app', { place: String(place).slice(0, 40), page: location.pathname.endsWith('about.html') ? 'about' : 'lp' });
+});
 
 // スクロールアニメーション
 const observer = new IntersectionObserver(
