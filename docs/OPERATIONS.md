@@ -161,6 +161,17 @@ RoomRadar を引き継ぐ人・一緒に運営する人のための1枚。**「�
 
 **失敗したとき**: `Secrets … が設定されていません` → 手順7。`PERMISSION_DENIED` → 手順5（閲覧者の追加漏れ・別プロパティ）。`API has not been used` → 手順2。
 
+## 4.62 定着の改善と計測（2026-11-09〜）
+
+分析は `docs/retention-analysis-2026-11.md`。週次の材料は `data/ga4_retention.json`（`fetch_ga4_metrics.py` の `fetch_retention`）。
+- **アプリが覚えること**：選んだ校舎と「続けて使う」を Cookie `rr_pref`（半年・この端末だけ）に。次に開いたときもその条件で出し、「前回の条件で表示しています · すべての校舎で見る」と知らせる。`/?building=tower&span=2` のように URL でも渡せる（ブックマーク・ポスターの QR に使える）。年度・学期は覚えない。
+- **ホーム画面**：`static/manifest.json` と `templates/_head_icons.html`（アイコンは `static/icon-*.png`）。
+- **送っているイベント**：`results_view`（mode=auto/manual、in_view=一覧が最初の画面に入ったか、remembered、display=standalone/browser）、`room_open`（room・building）、`stale_refresh`（mode=auto/manual_notice）、LP・about の `open_app`（place=hero/sticky/cta…、page）。
+- **運営者の作業（GA4 管理画面・iPad でできる）**：
+  1. 「管理 → プロパティの詳細 → レポートのタイムゾーン」を **日本** にする（2026-11 時点では米国太平洋時間で、日付が日本時間16〜17時で切れていた）。変えた日をここに書く。
+  2. 「管理 → カスタム定義 → カスタム ディメンションを作成」で、範囲「イベント」として `mode`・`in_view`・`remembered`・`display`・`place` を登録する（登録した日から GA4 の画面で内訳が見られる）。
+- **毎週見る数字**：分析の「4. 測り続ける数字」。とくに再訪/新規の比（いま 0.32）と、直接・ホーム画面からの再訪（いま 11台）。
+
 ## 4.65 使った目的のワンタップ調査（2026-10-26〜）
 
 **ねらい**: テスト運用の結果報告（2027-01-08）で、空き教室が何に使われたかを数字で示す。分け方は学生課長が挙げた使い方の例をもとに、個人学習／グループワーク／学生同士の打合せ／授業の合間の休憩／その他の5つ（「課題についての相談」は帯を短くするため運営判断で外した。2026-10-25）。
