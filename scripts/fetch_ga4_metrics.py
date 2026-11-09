@@ -307,7 +307,8 @@ def fetch_dashboard(client, prop, today):
 import re as _re
 
 RETENTION_EVENTS = set(EVENTS) | {"page_view", "first_visit", "session_start", "user_engagement", "scroll", "click",
-                                  "season_theme_on", "season_theme_off"}
+                                  "season_theme_on", "season_theme_off",
+                                  "results_view", "room_open", "stale_refresh", "open_app"}   # 2026-11-09 A5
 COHORT_DAYS = 14          # 最初に来た日から何日後まで追うか
 
 

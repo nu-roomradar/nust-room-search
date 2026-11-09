@@ -959,3 +959,56 @@ class SeasonThemeTests(unittest.TestCase):
         self.assertIn("localStorage.setItem('rr_theme', pref)", js)        # 季節をまたいでまとめて覚える
         self.assertIn("t === current ? 'on' : t", js)                      # いまの季節＝季節に合わせる、前の季節＝固定
         self.assertIn("aria-checked", js)
+
+
+class RetentionImprovementTests(unittest.TestCase):
+    """2026-11-09 定着の改善：ホーム画面のアイコン（A2）・校舎を覚える（A3）・結果の出し直しと計測（A4・A5）"""
+
+    def setUp(self):
+        self.client = rr.app.test_client()
+
+    def test_parse_pref(self):
+        self.assertEqual(rr.parse_pref("tower|2"), ("tower", 2))
+        self.assertEqual(rr.parse_pref("main|9"), ("main", 1))          # 変なコマ数は1
+        self.assertEqual(rr.parse_pref("<x>|2"), (None, 1))             # 知らない校舎は覚えていない扱い
+        self.assertEqual(rr.parse_pref(None), (None, 1))
+
+    def test_search_is_remembered_and_used_on_next_open(self):
+        r = self.client.post("/", data={"day": "水", "period": "3", "building": "tower", "span": "2"})
+        self.assertIn("rr_pref=tower|2", r.headers.get("Set-Cookie", ""))
+        html = self.client.get("/").get_data(as_text=True)
+        self.assertIn('value="tower"     selected', html)
+        self.assertIn("前回の条件（タワースコラ・2コマ続けて）", html)
+        self.assertIn('"remembered": true', html)
+
+    def test_url_parameters_override_and_are_checked(self):
+        html = self.client.get("/?building=main&span=1").get_data(as_text=True)
+        self.assertIn('value="main"      selected', html)
+        self.assertNotIn("前回の条件", html)                             # URL で選んだときは案内を出さない
+        html = self.client.get("/?building=<script>&span=x").get_data(as_text=True)
+        self.assertNotIn("<script>&", html)
+        self.assertIn('"building": "all"', html)
+
+    def test_plain_open_without_cookie_shows_all(self):
+        html = rr.app.test_client().get("/").get_data(as_text=True)
+        self.assertIn('"building": "all"', html)
+        self.assertNotIn("前回の条件", html)
+
+    def test_home_screen_icon_and_manifest(self):
+        for url in ("/", "/room"):
+            html = self.client.get(url).get_data(as_text=True)
+            self.assertIn('rel="manifest"', html)
+            self.assertIn('rel="apple-touch-icon"', html)
+        m = self.client.get("/static/manifest.json")
+        self.assertEqual(m.status_code, 200)
+        data = m.get_json(force=True)
+        self.assertEqual(data["display"], "standalone")
+        self.assertIn("大学が公式に提供するサービスではありません", data["description"])
+        for icon in data["icons"]:
+            self.assertEqual(self.client.get(icon["src"]).status_code, 200)
+
+    def test_scripts_refresh_and_measure(self):
+        js = (Path(__file__).resolve().parents[1] / "static" / "app.js").read_text(encoding="utf-8")
+        self.assertNotIn("location.reload()", js)                       # POST の画面で再送信の確認を出さない
+        for name in ("results_view", "room_open", "stale_refresh", "visibilitychange"):
+            self.assertIn(name, js)

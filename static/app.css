@@ -664,3 +664,13 @@ html:has(> body.theme-christmas) { background-color: #081633; }
     20% { opacity: 1; }
     100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.2); }
 }
+
+/* 前回の条件で開いたことの案内（2026-11-09 定着の改善 A3） */
+.pref-note { margin: -4px 2px 12px; font-size: 0.78rem; color: var(--muted); }
+.pref-note a { color: var(--accent); font-weight: 700; text-decoration: none; }
+.pref-note a:hover { text-decoration: underline; }
+
+/* 開いたままの画面に戻ったとき、自分で検索した結果が前の時限のものだと知らせる帯（2026-11-09 A4） */
+.stale-bar { margin: 0 0 10px; padding: 9px 12px; border-radius: 10px; font-size: 0.82rem;
+  background: rgba(251,191,36,0.10); border: 1px solid rgba(251,191,36,0.35); color: #fde68a; }
+.stale-bar a { color: #fbbf24; font-weight: 700; }

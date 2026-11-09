@@ -99,9 +99,9 @@
       <div class="about-card reveal">
         <h3><span class="ja">情報の扱い</span><span class="en">Your data</span><span class="zh">信息处理</span></h3>
         <p>
-          <span class="ja">「使われていた」の報告は、その時限が終わると自動で消えます。意見箱の内容は、改善のために運営メンバーが確認します。このページと検索アプリでは、利用状況を知るために Google アナリティクス（Cookie）を使っています。</span>
-          <span class="en">Reports are deleted automatically when the period ends. Feedback is read by the team to improve the service. This page and the app use Google Analytics (cookies) to understand usage.</span>
-          <span class="zh">举报会在该时段结束后自动删除。意见箱的内容由运营成员查看并用于改进。本页面和搜索应用使用Google Analytics（Cookie）了解使用情况。</span>
+          <span class="ja">「使われていた」の報告は、その時限が終わると自動で消えます。意見箱の内容は、改善のために運営メンバーが確認します。検索アプリでは、次に開いたときに同じ校舎で表示するため、選んだ校舎とコマ数をこの端末（Cookie）にだけ保存します。このページと検索アプリでは、利用状況を知るために Google アナリティクス（Cookie）を使っています。</span>
+          <span class="en">Reports are deleted automatically when the period ends. Feedback is read by the team to improve the service. The app remembers your chosen building and number of periods on this device only (a cookie) so it opens the same way next time. This page and the app use Google Analytics (cookies) to understand usage.</span>
+          <span class="zh">举报会在该时段结束后自动删除。意见箱的内容由运营成员查看并用于改进。搜索应用会把您选择的教学楼和节数仅保存在本设备（Cookie）中，以便下次以相同条件打开。本页面和搜索应用使用Google Analytics（Cookie）了解使用情况。</span>
         </p>
       </div>
     </div>
@@ -194,7 +194,7 @@
       <button type="button" class="campus-pick tower" data-id="tower" aria-pressed="false"><span class="n">1</span>
         <span class="ja">タワー・スコラ</span><span class="en">Tower Schola</span><span class="zh">Tower Schola</span><em>38<span class="ja">室</span><span class="en"> rooms</span><span class="zh">间</span></em></button>
       <button type="button" class="campus-pick suruga" data-id="ichi" aria-pressed="false"><span class="n">2</span>
-        <span class="ja">駿河台校舎</span><span class="en">Surugadai</span><span class="zh">骏河台校舍</span><em>27<span class="ja">室</span><span class="en"> rooms</span><span class="zh">间</span></em></button>
+        <span class="ja">駿河台校舎</span><span class="en">Surugadai</span><span class="zh">骏河台校舍</span><em>26<span class="ja">室</span><span class="en"> rooms</span><span class="zh">间</span></em></button>
     </div>
     <p class="campus-note">
       <span class="ja">※ 模型は公開情報の階数・高さをもとにした模式図で、実測ではありません（駿河台校舎は1号館を表示）。光っている階は空き教室のイメージで、実際の空き状況ではありません。教室数は2026年度の検索対象の数です。</span>
@@ -237,6 +237,15 @@ function setLang(lang) {
 
 // 前に選んだ言語で開く（端末に保存。2026-11-07）
 try { const saved = localStorage.getItem('rr_lp_lang'); if (saved === 'en' || saved === 'zh') setLang(saved); } catch (e) {}
+
+// アプリを開くボタンが押されたら記録する（どのボタンか。2026-11-09 定着の改善 A5）
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('a[href^="https://nust-room-search.onrender.com"]');
+  if (!a || typeof gtag !== 'function') return;
+  const place = a.classList.contains('hero-cta') ? 'hero' : a.classList.contains('sticky-cta') ? 'sticky'
+              : a.classList.contains('cta-btn') ? 'cta' : (a.className || 'other');
+  gtag('event', 'open_app', { place: String(place).slice(0, 40), page: location.pathname.endsWith('about.html') ? 'about' : 'lp' });
+});
 
 // スクロールアニメーション
 const observer = new IntersectionObserver(

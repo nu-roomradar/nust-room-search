@@ -123,6 +123,7 @@ function openModal(room, building) {
         building + ' · ' + RR.day + '曜 ' + RR.period + '限';
     document.getElementById('modal').classList.add('open');
     updateReportButton();
+    if (typeof gtag === 'function') gtag('event', 'room_open', { room: room, building: building });   // 2026-11-09 A5
 }
 
 // 教室カード（data-room）を押す・Enter で開く。「使用中の可能性」になったカードは開かない
@@ -173,7 +174,7 @@ async function submitReport() {
             }
             closeModal();
             showToast('✓ 報告を取り消しました');
-            setTimeout(() => location.reload(), 1000);
+            setTimeout(refreshResults, 1000);
         }
         return;
     }
@@ -199,7 +200,7 @@ async function submitReport() {
         }
         closeModal();
         showToast('⚠ 報告しました。ありがとうございます！');
-        setTimeout(() => location.reload(), 1000);
+        setTimeout(refreshResults, 1000);
     }
 }
 
@@ -290,5 +291,69 @@ function showToast(msg) {
                 sync();
             });
         });
+    });
+})();
+
+// ── 結果の出し直し（2026-11-09 定着の改善 A4） ──
+// 報告のあとに結果を取り直す。開いた直後の画面（GET）はそのまま読み直し、検索した結果（POST）は同じ条件で検索し直す
+// （location.reload だと POST の画面で「再送信しますか」が出るため）
+function refreshResults() {
+    const form = document.getElementById('search-form');
+    if (RR.auto || !form) location.replace(location.href);
+    else form.submit();
+}
+
+// いまの（休み時間なら次の）曜日と時限。app.py の upcoming_period と同じ決め方。日曜と授業の後は次の授業日の1限
+function currentSlot() {
+    const jst = new Date(new Date().toLocaleString('en', {timeZone: 'Asia/Tokyo'}));
+    const wd = jst.getDay(), cur = jst.getHours() * 60 + jst.getMinutes();
+    let p = null;
+    for (const [k, [, e]] of Object.entries(PERIODS)) { if (cur <= toMin(e)) { p = Number(k); break; } }
+    if (wd === 0) return '月|1';
+    if (p === null) return (wd === 6 ? '月' : DAYS[wd + 1]) + '|1';
+    return DAYS[wd] + '|' + p;
+}
+
+// 開いたままの画面に戻ったとき、時限が変わっていたら、開いた直後の画面はいまの時限で取り直す。
+// 自分で検索した結果は消さずに「この結果は○限のもの」と知らせる
+(function() {
+    if (!RR.searched || RR.error) return;
+    const shown = RR.day + '|' + RR.period;
+    const loaded = currentSlot();
+    let noticed = false;
+    function check() {
+        if (document.visibilityState === 'hidden') return;
+        const now = currentSlot();
+        if (RR.auto) {
+            if (now !== shown) {
+                if (typeof gtag === 'function') gtag('event', 'stale_refresh', { mode: 'auto' });
+                location.replace(location.pathname + location.search);
+            }
+        } else if (now !== loaded && !noticed) {
+            noticed = true;
+            const meta = document.getElementById('result-meta');
+            if (!meta) return;
+            const bar = document.createElement('div');
+            bar.className = 'stale-bar';
+            bar.innerHTML = 'この結果は <b></b> のものです · <a href="/">いまの空きを見る</a>';
+            bar.querySelector('b').textContent = RR.day + '曜 ' + RR.period + '限';
+            meta.parentNode.insertBefore(bar, meta);
+            if (typeof gtag === 'function') gtag('event', 'stale_refresh', { mode: 'manual_notice' });
+        }
+    }
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('pageshow', function(e) { if (e.persisted) check(); });
+})();
+
+// ── 計測（2026-11-09 定着の改善 A5）。結果が出たとき、一覧が最初の画面に入っていたか・ホーム画面から開いたか ──
+(function() {
+    if (!RR.searched || RR.error || typeof gtag !== 'function') return;
+    const first = document.querySelector('.room-card');
+    const standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+    gtag('event', 'results_view', {
+        mode: RR.auto ? 'auto' : 'manual',
+        in_view: first && first.getBoundingClientRect().top < window.innerHeight ? 'yes' : 'no',
+        remembered: RR.remembered ? 'yes' : 'no',
+        display: standalone ? 'standalone' : 'browser',
     });
 })();

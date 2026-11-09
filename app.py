@@ -10,7 +10,7 @@ import functools
 import time
 import logging
 import unicodedata
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, make_response
 
 import school_bookings   # 教務課の教室使用予定（仮。環境変数が無ければ何もしない）
 
@@ -180,6 +180,20 @@ MAX_PERIOD = max(PERIODS)
 def is_biweekly(subject):
     """時間割表の授業名に付く「【前期隔週】」「{後隔}」などの印で隔週の授業を見分ける"""
     return "隔週" in subject or "後隔" in subject or "前隔" in subject
+
+PREF_COOKIE = "rr_pref"
+PREF_MAX_AGE = 60 * 60 * 24 * 180   # 半年
+
+
+def parse_pref(raw):
+    """Cookie「校舎|コマ数」を検査して (校舎, コマ数) に。覚えていない・変な値なら (None, 1)"""
+    if not raw or "|" not in raw:
+        return None, 1
+    b, s = raw.split("|", 1)
+    if b not in VALID_BUILDINGS:
+        return None, 1
+    return b, resolve_span(s)
+
 
 def resolve_span(requested):
     """「続けて使う」コマ数。1〜3。不正な値は1（絞り込みなし）"""
@@ -452,6 +466,19 @@ def index():
     term = get_current_term_label()
     span = 1
 
+    # 前に選んだ校舎と「続けて使う」を覚えておき、次に開いたとき（GET）もその条件で出す（2026-11-09 定着の改善 A3）。
+    # URL の ?building=&span= でも渡せる（ホーム画面・ブックマーク用）。どちらも検査して、変な値は既定に戻す
+    remembered = False
+    pref_building, pref_span = parse_pref(request.cookies.get(PREF_COOKIE))
+    if request.method == 'GET':
+        q_building, q_span = request.args.get('building'), request.args.get('span')
+        if q_building is not None or q_span is not None:
+            building = q_building if q_building in VALID_BUILDINGS else 'all'
+            span = resolve_span(q_span)
+        elif pref_building:
+            building, span = pref_building, pref_span
+            remembered = building != 'all' or span > 1
+
     if request.method == 'POST':
         searched = True
         # 不正な値は既定値に戻す。以前は period が数字でないと 500 になっていた（2026-10 セキュリティ点検）
@@ -560,11 +587,12 @@ def index():
         'year': year, 'term': term, 'building': building,
         'periods': {p: [s, e] for p, (s, e) in PERIODS.items()},
         'ask_purpose': ask_purpose,
+        'remembered': remembered,
     }
 
-    return render_template(
+    resp = make_response(render_template(
         'index.html',
-        rr_config=rr_config,
+        rr_config=rr_config, remembered=remembered,
         biweekly_rooms=biweekly_rooms,
         auto=auto, auto_note=auto_note,
         asset_version=ASSET_VERSION,
@@ -584,7 +612,12 @@ def index():
         # いま（実時間）と違う年度・学期を見ているときに注意を出すための材料
         is_current_view=is_current_view(year, term),
         current_year=get_current_year(),
-    )
+    ))
+    # 自分で選んだとき（検索・URL で指定）だけ覚える。年度・学期は覚えない（次に開くときは「いま」を出すため）
+    if request.method == 'POST' or request.args.get('building') is not None or request.args.get('span') is not None:
+        resp.set_cookie(PREF_COOKIE, f"{building}|{span}", max_age=PREF_MAX_AGE, httponly=True, samesite='Lax',
+                        secure=request.headers.get('X-Forwarded-Proto', request.scheme) == 'https')
+    return resp
 
 WEEK_DAYS = ["月", "火", "水", "木", "金", "土"]
 BUILDING_ORDER = ["タワースコラ", "駿河台校舎", "船橋校舎"]
