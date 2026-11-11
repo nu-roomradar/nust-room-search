@@ -742,12 +742,33 @@ header { margin: 36px 0 38px; }
 .theme-picker button { height: 28px; display: inline-flex; align-items: center; justify-content: center; padding-top: 0; padding-bottom: 0; }
 @media (max-width: 767px) { header { margin: 34px 0 34px !important; } }
 
-/* 通常の見た目の手直し（2026-11-12。季節の見た目には当てない）：
-   上の余白を詰める・選んでいるものを教室名の青と別の色（白）にする・背景に薄い色の変化 */
-body:not([class*="theme-"]) { background: linear-gradient(180deg, #111a33 0%, #0c1122 320px, #0a0a0f 760px) no-repeat #0a0a0f; }
-body:not([class*="theme-"]) header { margin: 20px 0 26px !important; }
-body:not([class*="theme-"]) .subtitle { margin-top: 8px; }
-body:not([class*="theme-"]) .now-badge, body:not([class*="theme-"]) .theme-picker { margin-top: 16px; }
-body:not([class*="theme-"]) .slot-chips a.on { border-color: #fff; background: rgba(255,255,255,0.10); }
-body:not([class*="theme-"]) .slot-chips a.on small { color: #fff; }
-body:not([class*="theme-"]) .bldg-tabs a.on { color: #0a0a0f; background: #fff; border-color: #fff; }
+/* ── 通常の見た目にも、季節の見た目と同じ配置の飾りと帯を置く（2026-11-12 運営。通常だけ上が空いて見えたため）。
+      季節の見た目を選んでいるとき（body に theme-…）は出ない。色は通常の青のまま ── */
+body:not([class*="theme-"]) .season-deco.s-normal { display: block; }
+body:not([class*="theme-"]) .season-ribbon.s-normal { display: inline-flex; }
+body:not([class*="theme-"]) { background: linear-gradient(180deg, #0f1730 0%, #0b0f1e 340px, #0a0a0f 780px) no-repeat #0a0a0f; }
+.season-ribbon.s-normal { color: #e6ecff; background: rgba(108,143,255,0.10); border-color: rgba(108,143,255,0.38); }
+.season-ribbon.s-normal b { color: #9db5ff; }
+.season-ribbon.s-normal .season-ribbon-sub { color: #9aa3c7; }
+.season-deco .n-radar {
+    position: absolute; right: 7%; top: 64px; width: 92px; height: 92px; border-radius: 50%; opacity: 0.9;
+    background:
+        radial-gradient(circle, rgba(108,143,255,0.95) 0 3px, transparent 4px),
+        repeating-radial-gradient(circle, transparent 0 13px, rgba(108,143,255,0.38) 13px 14px),
+        radial-gradient(circle, rgba(108,143,255,0.16), rgba(108,143,255,0.03) 70%);
+    box-shadow: 0 0 50px 12px rgba(108,143,255,0.14);
+}
+.season-deco .n-radar::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(108,143,255,0.55), transparent 28%);
+    animation: radarSweep 5s linear infinite;
+}
+.season-deco .n-dots {
+    position: absolute; inset: 0; opacity: 0.5;
+    background-image: radial-gradient(rgba(160,180,255,0.55) 1px, transparent 1.4px), radial-gradient(rgba(160,180,255,0.35) 1px, transparent 1.4px);
+    background-size: 190px 170px, 130px 210px; background-position: 30px 40px, 90px 120px;
+    -webkit-mask-image: linear-gradient(180deg, #000 0, transparent 520px); mask-image: linear-gradient(180deg, #000 0, transparent 520px);
+}
+@keyframes radarSweep { to { transform: rotate(360deg); } }
+@media (max-width: 767px) { .season-deco .n-radar { width: 64px; height: 64px; top: 12px; right: 4%; opacity: 0.75; } }
+@media (prefers-reduced-motion: reduce) { .season-deco .n-radar::after { animation: none; } }
