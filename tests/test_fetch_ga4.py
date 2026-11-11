@@ -115,6 +115,17 @@ class DailyHistoryTests(unittest.TestCase):
         self.assertNotIn("app", h[0])
 
 
+class ReportHotspotTests(unittest.TestCase):
+    def test_same_room_and_slot_reports_are_listed(self):
+        rows = [(["report_room", "S401", "木", "1"], ["3"]), (["report_cancel", "S401", "木", "1"], ["1"]),
+                (["report_room", "S201", "水", "6"], ["1"]),                 # 1件だけは出さない
+                (["report_room", "<x>", "木", "1"], ["9"]),                  # 教室マスタに無い名前は落とす
+                (["report_room", "S401", "(not set)", "1"], ["5"])]
+        self.assertEqual(g.report_hotspots(rows, {"S401", "S201"}), [{"room": "S401", "day": "木", "period": "1", "count": 2}])
+        md = g.to_markdown([], hotspots=[{"room": "S401", "day": "木", "period": "1", "count": 2}])
+        self.assertIn("| S401 | 木 | 1限 | 2 |", md)
+
+
 class RetentionTests(unittest.TestCase):
     def test_cohort_rows_to_table(self):
         rows = [(["2026-10-28", "0000"], ["406", "406"]), (["2026-10-28", "0001"], ["31", "406"]),

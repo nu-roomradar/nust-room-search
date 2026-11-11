@@ -181,6 +181,13 @@ def is_biweekly(subject):
     """時間割表の授業名に付く「【前期隔週】」「{後隔}」などの印で隔週の授業を見分ける"""
     return "隔週" in subject or "後隔" in subject or "前隔" in subject
 
+def room_order_key(name):
+    """教室を「階 → 番号」の順に並べるキー（2026-11-11 B5）。名前の最初の数字を数として比べるので、
+    S201 < S706 < S1201（2階 < 7階 < 12階）、152 < 701 < 1511 になる。数字で始まらない教室（ホール・製図室など）は最後"""
+    m = re.match(r"[A-Za-z]?(\d+)", str(name))
+    return (0, int(m.group(1)), str(name)) if m else (1, 0, str(name))
+
+
 PREF_COOKIE = "rr_pref"
 PREF_MAX_AGE = 60 * 60 * 24 * 180   # 半年
 
@@ -449,6 +456,7 @@ def index():
         day = "月" if now.weekday() == 5 else DAY_NAMES[now.weekday() + 1]
         auto_note = "本日の授業は終了しました"
 
+    base_period_note = auto_note      # 日曜・授業の後（自動表示が「次の授業日の1限」になっている）
     building = "all"
     empty_rooms = None
     biweekly_rooms = []
@@ -470,6 +478,16 @@ def index():
     # URL の ?building=&span= でも渡せる（ホーム画面・ブックマーク用）。どちらも検査して、変な値は既定に戻す
     remembered = False
     pref_building, pref_span = parse_pref(request.cookies.get(PREF_COOKIE))
+    # 時限の切り替え［いま｜次｜明日］と校舎のタブ（2026-11-11 B1・B4）。どれも GET のリンクで、?day=&period= を検査して受ける
+    base_day, base_period = day, period
+    if request.method == 'GET':
+        q_day = request.args.get('day')
+        try:
+            q_period = int(request.args.get('period', ''))
+        except ValueError:
+            q_period = None
+        if q_day in VALID_DAYS and q_period in VALID_PERIODS and (q_day, q_period) != (base_day, base_period):
+            day, period, auto, auto_note = q_day, q_period, False, None
     if request.method == 'GET':
         q_building, q_span = request.args.get('building'), request.args.get('span')
         if q_building is not None or q_span is not None:
@@ -546,7 +564,7 @@ def index():
             [{"name": r[0], "building": r[1],
               "free_until": free_until(str(r[0]), period, occupied_at)}
              for r in all_rooms if str(r[0]) not in occupied],
-            key=lambda x: (x['building'] != 'タワースコラ', x['building'] != '駿河台校舎', x['name'])
+            key=lambda x: (x['building'] != 'タワースコラ', x['building'] != '駿河台校舎', room_order_key(x['name']))
         )
         # 「続けて使う」で絞る。span=2 なら、この時限と次の時限の両方が空いている教室だけ
         empty_rooms = [r for r in empty_rooms if r["free_until"] - period + 1 >= span]
@@ -590,9 +608,27 @@ def index():
         'remembered': remembered,
     }
 
+    # 時限の切り替えと校舎のタブ。いまの年度・学期を見ているときだけ出す
+    slot_chips, building_tabs = [], []
+    if is_current_view(year, term) and not error_message:
+        def slot_url(d, p, b=None):
+            q = {} if (d, p) == (base_day, base_period) else {"day": d, "period": p}
+            if b is not None:
+                q.update(building=b, span=span)
+            return url_for('index', **q)
+        slots = [("次" if base_period_note else "いま", base_day, base_period)]
+        if not base_period_note and base_period < MAX_PERIOD:
+            slots.append(("次", base_day, base_period + 1))
+        if not base_period_note:
+            nd = "月" if now.weekday() >= 5 else DAY_NAMES[now.weekday() + 1]
+            slots.append(("明日" if now.weekday() < 5 else "月曜", nd, 1))
+        slot_chips = [{"tag": t, "label": f"{d}曜{p}限", "href": slot_url(d, p), "on": (d, p) == (day, period)} for t, d, p in slots]
+        building_tabs = [{"label": lb, "href": slot_url(day, period, code), "on": building == code, "code": code}
+                         for code, lb in (("all", "すべて"), ("tower", "タワースコラ"), ("main", "駿河台校舎"), ("funabashi", "船橋校舎"))]
+
     resp = make_response(render_template(
         'index.html',
-        rr_config=rr_config, remembered=remembered,
+        rr_config=rr_config, remembered=remembered, slot_chips=slot_chips, building_tabs=building_tabs,
         biweekly_rooms=biweekly_rooms,
         auto=auto, auto_note=auto_note,
         asset_version=ASSET_VERSION,
@@ -632,7 +668,7 @@ def normalize_room(text):
 
 def room_sort_key(room):
     b = room["building"]
-    return (BUILDING_ORDER.index(b) if b in BUILDING_ORDER else len(BUILDING_ORDER), room["name"])
+    return (BUILDING_ORDER.index(b) if b in BUILDING_ORDER else len(BUILDING_ORDER), room_order_key(room["name"]))
 
 
 def list_rooms(year):

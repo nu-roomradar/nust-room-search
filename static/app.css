@@ -674,3 +674,52 @@ html:has(> body.theme-christmas) { background-color: #081633; }
 .stale-bar { margin: 0 0 10px; padding: 9px 12px; border-radius: 10px; font-size: 0.82rem;
   background: rgba(251,191,36,0.10); border: 1px solid rgba(251,191,36,0.35); color: #fde68a; }
 .stale-bar a { color: #fbbf24; font-weight: 700; }
+
+/* ── 2026-11-11 テスト運用中の改善（B1〜B8） ── */
+.basis-note { margin: -6px 2px 12px; font-size: 0.76rem; color: var(--muted); }
+/* 時限の切り替え［いま｜次｜明日］と校舎のタブ */
+.slot-chips, .bldg-tabs { display: flex; gap: 8px; margin: 0 0 10px; overflow-x: auto; scrollbar-width: none; }
+.slot-chips::-webkit-scrollbar, .bldg-tabs::-webkit-scrollbar { display: none; }
+.slot-chips a { flex: 1; min-width: 0; text-align: center; padding: 8px 6px; border-radius: 12px; text-decoration: none; white-space: nowrap;
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text, #e5e7eb); font-weight: 700; font-size: 0.9rem; }
+.slot-chips a small { display: block; font-size: 0.66rem; font-weight: 600; color: var(--muted); margin-bottom: 1px; }
+.slot-chips a.on { border-color: var(--accent); background: rgba(99,140,255,0.16); }
+.slot-chips a.on small { color: var(--accent); }
+.bldg-tabs { margin-bottom: 14px; }
+.bldg-tabs a { flex-shrink: 0; padding: 7px 14px; border-radius: 99px; text-decoration: none; font-size: 0.82rem; font-weight: 700;
+    color: var(--muted); border: 1px solid var(--border); white-space: nowrap; }
+.bldg-tabs a.on { color: #fff; background: var(--accent); border-color: var(--accent); }
+/* 条件の欄（スマホでは畳む） */
+.form-fold > summary { display: none; }
+@media (max-width: 1099px) {
+    .form-fold > summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; list-style: none;
+        padding: 12px 16px; margin-bottom: 14px; border-radius: 14px; background: var(--surface2); border: 1px solid var(--border);
+        font-weight: 700; font-size: 0.9rem; }
+    .form-fold > summary::-webkit-details-marker { display: none; }
+    .form-fold > summary::after { content: '＋'; color: var(--accent); font-weight: 800; }
+    .form-fold[open] > summary::after { content: '−'; }
+    .form-fold > summary small { flex: 1; font-weight: 500; font-size: 0.72rem; color: var(--muted); }
+    .form-fold:not([open]) + script + .pc-qr { display: none; }
+}
+/* PC で開いた人に、スマホで開く QR */
+.pc-qr { display: none; }
+@media (min-width: 1100px) {
+    .pc-qr { display: flex; gap: 14px; align-items: center; margin-top: 16px; padding: 14px; border-radius: 16px; background: var(--surface2); border: 1px solid var(--border); }
+    .pc-qr img { border-radius: 8px; background: #fff; flex-shrink: 0; }
+    .pc-qr b { display: block; font-size: 0.88rem; margin-bottom: 4px; }
+    .pc-qr span { font-size: 0.74rem; color: var(--muted); line-height: 1.6; }
+}
+/* 報告のあとの「別の空き教室」 */
+.alt-rooms p { margin: 6px 0 12px; font-size: 0.9rem; line-height: 1.6; }
+.alt-rooms p b { display: block; }
+.alt-rooms p span { color: var(--muted); font-size: 0.8rem; }
+.alt-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.alt-list a { display: block; text-align: center; padding: 12px 4px; border-radius: 12px; text-decoration: none; font-weight: 800;
+    color: var(--accent); background: var(--surface2); border: 1px solid var(--border); }
+.alt-list a small { display: block; font-size: 0.68rem; font-weight: 600; color: var(--muted); margin-top: 2px; }
+.alt-rooms .btn-cancel { width: 100%; }
+/* ホーム画面に追加の案内 */
+.a2hs { position: relative; margin: 18px 0 0; padding: 14px 40px 14px 16px; border-radius: 14px; background: rgba(99,140,255,0.10); border: 1px solid rgba(99,140,255,0.35); }
+.a2hs b { display: block; font-size: 0.9rem; margin-bottom: 4px; }
+.a2hs span { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+.a2hs-close { position: absolute; right: 8px; top: 6px; width: 32px; height: 32px; border: 0; background: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; }

@@ -97,6 +97,20 @@ def top_report_rooms(rows, known, top=REPORT_ROOMS_TOP):
     return [{"label": r, "building": bldg[r], "count": n} for r, n in ranked]
 
 
+def report_hotspots(rows, known, min_count=2, top=15):
+    """同じ教室・同じ曜日・同じ時限に報告が重なっているところ（時間割データを確かめる候補。2026-11-11 B7）。
+    rows = [([イベント名, 教室, 曜日, 時限], [件数]), ...]。取り消しは引き、min_count 件以上だけを多い順に返す"""
+    days, periods = ORDERED["search_day"], ORDERED["search_period"]
+    counts = {}
+    for (event, room, day, period), (n,) in rows:
+        if event not in REPORT_SIGN or room not in known or day not in days or period not in periods:
+            continue
+        k = (room, day, period)
+        counts[k] = counts.get(k, 0) + REPORT_SIGN[event] * int(n)
+    ranked = sorted(((k, n) for k, n in counts.items() if n >= min_count), key=lambda kv: (-kv[1], kv[0]))[:top]
+    return [{"room": r, "day": d, "period": p, "count": n} for (r, d, p), n in ranked]
+
+
 def report_slots(rows):
     """「実は使われていた」報告を曜日×時限ごとに数える（取り消しは引く）。rows = [([イベント名, 曜日, 時限], [件数]), ...]
 
@@ -147,7 +161,7 @@ def fmt_change(cur, prev):
     return f"{(cur - prev) / prev * 100:+.0f}%"
 
 
-def to_markdown(weeks, report_rooms=None, slots=None):
+def to_markdown(weeks, report_rooms=None, slots=None, hotspots=None):
     lines = ["# GA4 週次の記録（自動更新・毎週月曜）", "",
              "アプリ＝検索アプリ（onrender.com）、LP＝紹介ページ（github.io）。ドメインが別なので合計しない。",
              "利用者数は端末・ブラウザの数で、人数ではない。前週比はアプリの訪問回数。",
@@ -184,6 +198,11 @@ def to_markdown(weeks, report_rooms=None, slots=None):
                   "| 時限 | " + " | ".join(days) + " |", "|---|" + "---|" * len(days)]
         lines += [f"| {p}限 | " + " | ".join(str(slots[d][i]) if slots[d][i] else "·" for d in days) + " |"
                   for i, p in enumerate(periods)]
+    if hotspots:
+        lines += ["", "## 要確認：同じ教室・同じコマに報告が重なっているところ（直近28日）", "",
+                  "時間割にない授業や教室変更の可能性。運営が確かめて、分かったものは `data/room_changes.csv` に足す。", "",
+                  "| 教室 | 曜日 | 時限 | 報告 |", "|---|---|---|---|"]
+        lines += [f"| {h['room']} | {h['day']} | {h['period']}限 | {h['count']} |" for h in hotspots]
     return "\n".join(lines) + "\n"
 
 
@@ -298,6 +317,12 @@ def fetch_dashboard(client, prop, today):
         bd["report_slots"] = report_slots(rows)
     except Exception as e:  # noqa: BLE001
         print(f"[WARN] 報告の曜日・時限別の件数を取れません: {e}", file=sys.stderr)
+    try:
+        rows = report(client, prop, ["eventName", "customEvent:room", "customEvent:search_day", "customEvent:search_period"],
+                      ["eventCount"], start, end, limit=2000)
+        bd["report_hotspots"] = report_hotspots(rows, known_rooms())
+    except Exception as e:  # noqa: BLE001
+        print(f"[WARN] 報告の重なり（教室×曜日×時限）を取れません: {e}", file=sys.stderr)
     rows = report(client, prop, ["sessionDefaultChannelGroup"], ["sessions"], start, end, limit=10)
     bd["channels"] = sorted([{"label": d[0], "sessions": int(m[0])} for d, m in rows], key=lambda x: -x["sessions"])
     return history, bd
@@ -308,7 +333,8 @@ import re as _re
 
 RETENTION_EVENTS = set(EVENTS) | {"page_view", "first_visit", "session_start", "user_engagement", "scroll", "click",
                                   "season_theme_on", "season_theme_off",
-                                  "results_view", "room_open", "stale_refresh", "open_app"}   # 2026-11-09 A5
+                                  "results_view", "room_open", "stale_refresh", "open_app",
+                                  "alt_room_click", "a2hs_shown", "a2hs_dismiss"}   # 2026-11-09 A5
 COHORT_DAYS = 14          # 最初に来た日から何日後まで追うか
 
 
@@ -440,7 +466,8 @@ def main(argv=None):
             json.dump(obj, f, ensure_ascii=False, indent=1)
             f.write("\n")
     with open(WEEKLY_MD, "w", encoding="utf-8") as f:
-        f.write(to_markdown(weeks, breakdown.get("report_rooms"), breakdown.get("report_slots")))
+        f.write(to_markdown(weeks, breakdown.get("report_rooms"), breakdown.get("report_slots"),
+                            breakdown.get("report_hotspots")))
     t = breakdown["totals"]
     print(f"[INFO] 直近28日 {breakdown['period']['start']}〜{breakdown['period']['end']}: {json.dumps(t, ensure_ascii=False)}"
           f" / 検索 {breakdown['events'].get('search', 0)}")
