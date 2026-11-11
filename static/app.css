@@ -774,5 +774,24 @@ body:not([class*="theme-"]) .season-ribbon.s-normal { display: inline-flex; }
 /* 帯は1行を使い、時計と見た目の切り替えはその下の行に置く（PC 幅で横に並んでいた。2026-11-12 運営） */
 .theme-halloween .season-ribbon.s-halloween, .theme-christmas .season-ribbon.s-christmas,
 body:not([class*="theme-"]) .season-ribbon.s-normal { display: flex; width: fit-content; max-width: 100%; box-sizing: border-box; }
-/* PC 幅：右の結果の列を、時計と見た目の切り替えの行の高さまで上げる（2026-11-12 運営） */
-@media (min-width: 1100px) { .page-cols > .results-area { margin-top: -74px; } }
+/* PC 幅のヘッダー（2026-11-12 運営。左に寄って右が空き、下の2列と釣り合っていなかった）：
+   1段目＝左にロゴ・右端に時計と見た目の切り替え、2段目＝副題、3段目＝帯を横幅いっぱい。その下の2列は同じ高さから始める */
+@media (min-width: 1100px) {
+    header { display: flex; flex-wrap: wrap; align-items: center; column-gap: 10px; margin: 20px 0 28px; }
+    header .logo-link { order: 1; }
+    header .logo-season { order: 2; }
+    header .now-badge { order: 3; margin-left: auto; margin-top: 0; }
+    header .theme-picker { order: 4; margin-top: 0; }
+    header .subtitle { order: 5; flex: 0 0 100%; margin-top: 10px; }
+    header .season-ribbon { order: 6; flex: 0 0 100%; width: auto !important; margin-top: 18px; padding: 11px 18px; font-size: 0.9rem; }
+    header .season-ribbon-sub { margin-left: auto; font-size: 0.82rem; }
+}
+/* PC 幅：右上の飾り（レーダー・月・星）は、時計と見た目の切り替えに重ならないよう、内容の幅の外（画面の右端）へ */
+@media (min-width: 1100px) {
+    .season-deco .n-radar, .season-deco .moon { width: 64px; height: 64px; right: 10px; top: 22px; }
+    .season-deco .x-star { font-size: 44px; right: 14px; top: 22px; }
+}
+@media (min-width: 1500px) {
+    .season-deco .n-radar, .season-deco .moon { width: 92px; height: 92px; right: 6%; top: 48px; }
+    .season-deco .x-star { font-size: 54px; right: 6%; top: 48px; }
+}
