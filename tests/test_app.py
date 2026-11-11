@@ -1012,3 +1012,30 @@ class RetentionImprovementTests(unittest.TestCase):
         self.assertNotIn("location.reload()", js)                       # POST の画面で再送信の確認を出さない
         for name in ("results_view", "room_open", "stale_refresh", "visibilitychange"):
             self.assertIn(name, js)
+
+
+class TrialImprovementTests(unittest.TestCase):
+    """2026-11-11 テスト運用中の改善（B1〜B8）"""
+
+    def setUp(self):
+        self.client = rr.app.test_client()
+
+    def test_rooms_are_ordered_by_floor(self):
+        names = ["S1201", "S706建築スライド室", "S201", "まち製図室1～5", "S101", "1511電気実験室", "152"]
+        self.assertEqual(sorted(names, key=rr.room_order_key),
+                         ["S101", "152", "S201", "S706建築スライド室", "S1201", "1511電気実験室", "まち製図室1～5"])
+
+    def test_slot_chips_tabs_and_notes(self):
+        html = self.client.get("/").get_data(as_text=True)
+        for needle in ('class="slot-chips"', 'class="bldg-tabs"', "時間割をもとにした空きです", "時間割から空き教室をすぐ検索",
+                       'id="form-fold"', 'id="a2hs"', 'id="alt-rooms"', "qr-app.png"):
+            self.assertIn(needle, html)
+        self.assertNotIn("リアルタイム", html)
+        self.assertIn("大学が公式に提供するサービスではありません", html)
+
+    def test_day_and_period_in_url_are_checked(self):
+        html = self.client.get("/?day=木&period=3&building=tower").get_data(as_text=True)
+        self.assertIn("木曜 3限", html)
+        html = self.client.get("/?day=<b>&period=99").get_data(as_text=True)
+        self.assertNotIn("<b>&", html)
+        self.assertEqual(self.client.get("/?day=木&period=x").status_code, 200)

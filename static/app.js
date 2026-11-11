@@ -17,7 +17,16 @@ function updateClock() {
     for (const [p, [s,e]] of Object.entries(PERIODS)) {
         if (cur >= toMin(s) && cur <= toMin(e)) { found = p; break; }
     }
-    document.getElementById('now-period').textContent = found ? found + '限 授業中' : '授業時間外';
+    // 日曜・休み時間・授業の後を言い分ける（2026-11-11 B4。前は日曜でも「○限 授業中」と出ていた）
+    let label;
+    if (jst.getDay() === 0) label = '本日は授業なし';
+    else if (found) label = found + '限 授業中';
+    else {
+        let next = null;
+        for (const [p, [s]] of Object.entries(PERIODS)) { if (cur < toMin(s)) { next = p; break; } }
+        label = next ? (next === '1' ? '授業前' : '休み時間') + ' · 次は' + next + '限' : '本日の授業は終了';
+    }
+    document.getElementById('now-period').textContent = label;
 }
 setInterval(updateClock, 1000);
 updateClock();
@@ -198,6 +207,29 @@ async function submitReport() {
         if (typeof gtag === 'function') {
             gtag('event', 'report_room', reportEventParams());
         }
+        // 同じ校舎の別の空き教室を3つまで出す（2026-11-11 B6）。無ければ今までどおり一覧に戻る
+        const alts = Array.from(document.querySelectorAll('.room-card[data-room]:not(.reported)'))
+            .filter(c => c.dataset.bldg === currentBuilding && c.dataset.room !== currentRoom).slice(0, 3);
+        const box = document.getElementById('alt-rooms');
+        if (box && alts.length) {
+            const list = document.getElementById('alt-list');
+            list.textContent = '';
+            alts.forEach(c => {
+                const a = document.createElement('a');
+                a.href = window.roomWeekUrl(c.dataset.room, RR.year, RR.term);
+                a.textContent = c.dataset.room;
+                const span = c.querySelector('.room-span');
+                if (span) { const s = document.createElement('small'); s.textContent = span.textContent; a.appendChild(s); }
+                a.addEventListener('click', () => { if (typeof gtag === 'function') gtag('event', 'alt_room_click', { building: currentBuilding }); });
+                list.appendChild(a);
+            });
+            document.getElementById('alt-lead').textContent = currentBuilding + 'で、いま空きと出ている教室';
+            ['.btn-report', '#report-note', '#modal-week', '#modal .modal-actions'].forEach(q => {
+                const el = document.querySelector(q); if (el) el.style.display = 'none';
+            });
+            box.hidden = false;
+            return;
+        }
         closeModal();
         showToast('⚠ 報告しました。ありがとうございます！');
         setTimeout(refreshResults, 1000);
@@ -355,5 +387,40 @@ function currentSlot() {
         in_view: first && first.getBoundingClientRect().top < window.innerHeight ? 'yes' : 'no',
         remembered: RR.remembered ? 'yes' : 'no',
         display: standalone ? 'standalone' : 'browser',
+    });
+})();
+
+// ── 目的の質問は、最初の校舎の教室のあとに置く（2026-11-11 B1。開いてすぐ教室が見えるように） ──
+(function() {
+    const bar = document.getElementById('purpose-bar'), first = document.querySelector('.building-section');
+    if (bar && first) first.after(bar);
+})();
+
+// ── 「ホーム画面に追加」の案内（2026-11-11 B2）。2回目に来たときから、閉じるまで出す。ホーム画面から開いているときは出さない ──
+(function() {
+    const box = document.getElementById('a2hs');
+    if (!box || !RR.searched) return;
+    const standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+    let visits = 0, closed = false;
+    try {
+        const today = new Date().toDateString();
+        visits = Number(localStorage.getItem('rr_visits') || 0);
+        if (localStorage.getItem('rr_visit_day') !== today) { visits += 1; localStorage.setItem('rr_visits', visits); localStorage.setItem('rr_visit_day', today); }
+        closed = localStorage.getItem('rr_a2hs') === 'closed';
+    } catch (e) { return; }
+    if (standalone || closed || visits < 2) return;
+    const ua = navigator.userAgent, ios = /iPhone|iPad|iPod/.test(ua), android = /Android/.test(ua);
+    if (!ios && !android) return;                                 // PC には QR の案内を出している
+    const inapp = /Instagram|Line\/|FBAN|FBAV/.test(ua);
+    document.getElementById('a2hs-how').textContent =
+        inapp ? 'まず右上のメニューから「外部ブラウザで開く」。そのあと共有ボタン →「ホーム画面に追加」'
+      : ios ? (/CriOS/.test(ua) ? 'アドレスバー右の共有ボタン →「ホーム画面に追加」' : '画面下の共有ボタン →「ホーム画面に追加」')
+      : '右上の「︙」→「ホーム画面に追加」';
+    box.hidden = false;
+    if (typeof gtag === 'function') gtag('event', 'a2hs_shown', { where: inapp ? 'inapp' : ios ? 'ios' : 'android' });
+    document.getElementById('a2hs-close').addEventListener('click', function() {
+        box.hidden = true;
+        try { localStorage.setItem('rr_a2hs', 'closed'); } catch (e) {}
+        if (typeof gtag === 'function') gtag('event', 'a2hs_dismiss');
     });
 })();

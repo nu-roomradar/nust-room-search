@@ -46,7 +46,7 @@
     <!-- ヘッダー -->
     <header>
         <a href="https://nu-roomradar.github.io/nust-room-search/" class="logo-link"><div class="logo">RoomRadar <span>β</span></div></a>{% if 'halloween' in season_choices %}<span class="logo-season s-halloween" aria-hidden="true">🎃</span>{% endif %}{% if 'christmas' in season_choices %}<span class="logo-season s-christmas" aria-hidden="true">⭐</span>{% endif %}
-        <div class="subtitle">日大理工学部 · 空き教室リアルタイム検索</div>
+        <div class="subtitle">日大理工学部 · 時間割から空き教室をすぐ検索</div>
         {% if 'halloween' in season_choices %}
         <!-- 期間限定の飾り（ハロウィン。app.py の SEASON_THEMES で自動で出し入れ。選んだ見た目のものだけ出る） -->
         <div class="season-ribbon s-halloween"><span aria-hidden="true">🎃</span> Happy Halloween！ <b>Trick or Room?</b> <span class="season-ribbon-sub">開ける前に、ドア越しにチラッと確認を👻</span></div>
@@ -76,6 +76,9 @@
 
         <!-- 左サイドバー（PC）/ 上部（スマホ） -->
         <div class="sidebar">
+            <!-- スマホでは結果を先に見せるため、条件の欄を畳む（2026-11-11 B1）。PC では開いたまま -->
+            <details class="form-fold" id="form-fold" open>
+            <summary>条件を変える<small>年度・曜日・時限・コマ数</small></summary>
             <div class="card">
                 <form method="POST" id="search-form">
                     <div class="form-grid">
@@ -134,6 +137,14 @@
                 <a class="room-search-link" id="room-search-link"
                    href="{{ url_for('room_search', year=selected_year, term=selected_term) }}">🏫 個別の教室を検索 <span class="arrow">→</span></a>
             </div>
+            </details>
+            <script>/* スマホ幅で結果が出ているときは、条件の欄を畳んで始める */
+            (function(){ var f=document.getElementById('form-fold'); if (f && window.matchMedia('(max-width: 1099px)').matches && {{ 'true' if (empty_rooms is not none and not error_message) else 'false' }}) f.removeAttribute('open'); })();</script>
+            <!-- PC で開いた人に、スマホで開くための QR（2026-11-11 B3）。スマホ幅では出さない -->
+            <div class="pc-qr">
+                <img src="{{ url_for('static', filename='qr-app.png') }}" width="96" height="96" alt="RoomRadar をスマホで開く QR コード">
+                <div><b>スマホで開く</b><span>教室を探すのはキャンパスで。カメラで読み取ると、スマホでそのまま開けます。</span></div>
+            </div>
         </div><!-- /sidebar -->
 
         <!-- 右: 結果エリア（PC）/ 下部（スマホ） -->
@@ -156,6 +167,16 @@
                 <span class="result-label">{% if auto_note %}<span class="result-note">{{ auto_note }}</span>次は {% elif auto %}いまから使える · {% endif %}{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }} {{ selected_day }}曜 {{ selected_period }}限{% if selected_span > 1 %}から{{ selected_span }}コマ続けて{% endif %} の空き教室</span>
                 <span class="count-chip" id="count-chip"><em>{{ empty_rooms|length }}</em> 室</span>
             </div>
+            <p class="basis-note">時間割をもとにした空きです。入る前にドア越しに確認を。</p>
+            {% if slot_chips %}
+            <!-- 時限の切り替えと校舎のタブ（2026-11-11 B1・B4） -->
+            <nav class="slot-chips" aria-label="時限">
+                {% for c in slot_chips %}<a href="{{ c.href }}"{% if c.on %} class="on" aria-current="true"{% endif %}><small>{{ c.tag }}</small>{{ c.label }}</a>{% endfor %}
+            </nav>
+            <nav class="bldg-tabs" aria-label="校舎">
+                {% for t in building_tabs %}<a href="{{ t.href }}" class="t-{{ t.code }}{% if t.on %} on{% endif %}"{% if t.on %} aria-current="true"{% endif %}>{{ t.label }}</a>{% endfor %}
+            </nav>
+            {% endif %}
             {% if remembered %}
             <!-- 前に選んだ校舎・コマ数で開いたことの案内（2026-11-09 定着の改善 A3） -->
             <p class="pref-note">前回の条件（{{ {'all': 'すべての校舎', 'tower': 'タワースコラ', 'main': '駿河台校舎', 'funabashi': '船橋校舎'}[selected_building] }}{% if selected_span > 1 %}・{{ selected_span }}コマ続けて{% endif %}）で表示しています · <a href="/?building=all&amp;span=1">すべての校舎で見る</a></p>
@@ -243,6 +264,13 @@
             </div>
             {% endif %}
 
+            <!-- 2回目に来た人に1回だけ出す「ホーム画面に追加」の案内（2026-11-11 B2。出すかどうかは static/app.js） -->
+            <div class="a2hs" id="a2hs" hidden>
+                <button type="button" class="a2hs-close" id="a2hs-close" aria-label="閉じる">×</button>
+                <b>📲 ホーム画面に置くと、次からワンタップ</b>
+                <span id="a2hs-how"></span>
+            </div>
+
             <!-- 結果の下に置く（2026-10-25 運営。結果と目的の調査を上に詰めるため） -->
             <div class="disclaimer below-results">
                 <span class="disclaimer-icon">⚠</span>
@@ -320,6 +348,12 @@
         <a class="modal-week-link" id="modal-week" href="#">この教室の1週間を見る →</a>
 
         <button class="btn-report" onclick="submitReport()">⚠ 実は使われていた</button>
+        <!-- 報告のあと、同じ校舎の別の空き教室を出す（2026-11-11 B6） -->
+        <div class="alt-rooms" id="alt-rooms" hidden>
+            <p><b>報告ありがとうございます。</b><span id="alt-lead">近くの空き教室はこちら</span></p>
+            <div class="alt-list" id="alt-list"></div>
+            <button type="button" class="btn-cancel" onclick="refreshResults()">一覧に戻る</button>
+        </div>
         <div class="report-count-note" id="report-note"></div>
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeModal()">閉じる</button>
