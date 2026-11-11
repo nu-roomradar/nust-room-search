@@ -774,3 +774,5 @@ body:not([class*="theme-"]) .season-ribbon.s-normal { display: inline-flex; }
 /* 帯は1行を使い、時計と見た目の切り替えはその下の行に置く（PC 幅で横に並んでいた。2026-11-12 運営） */
 .theme-halloween .season-ribbon.s-halloween, .theme-christmas .season-ribbon.s-christmas,
 body:not([class*="theme-"]) .season-ribbon.s-normal { display: flex; width: fit-content; max-width: 100%; box-sizing: border-box; }
+/* PC 幅：右の結果の列を、時計と見た目の切り替えの行の高さまで上げる（2026-11-12 運営） */
+@media (min-width: 1100px) { .page-cols > .results-area { margin-top: -74px; } }
