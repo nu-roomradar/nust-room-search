@@ -78,7 +78,7 @@
         <div class="sidebar">
             <!-- スマホでは結果を先に見せるため、条件の欄を畳む（2026-11-11 B1）。PC では開いたまま -->
             <details class="form-fold" id="form-fold" open>
-            <summary>条件を変える</summary>
+            <summary>条件を変える<small>年度・曜日・時限・コマ数</small></summary>
             <div class="card">
                 <form method="POST" id="search-form">
                     <div class="form-grid">
@@ -168,7 +168,6 @@
             {% if slot_chips %}
             <nav class="slot-chips" aria-label="時限">
                 {% for c in slot_chips %}<a href="{{ c.href }}"{% if c.on %} class="on" aria-current="true"{% endif %}><small>{{ c.tag }}</small>{{ c.label }}</a>{% endfor %}
-                <button type="button" class="more" id="more-cond" aria-controls="form-fold"><small>ほか</small>条件</button>
             </nav>
             <nav class="bldg-tabs" aria-label="校舎">
                 {% for t in building_tabs %}<a href="{{ t.href }}" class="t-{{ t.code }}{% if t.on %} on{% endif %}"{% if t.on %} aria-current="true"{% endif %}>{{ t.label }}</a>{% endfor %}
