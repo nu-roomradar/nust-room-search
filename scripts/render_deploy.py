@@ -3,7 +3,8 @@
 
 Render の自動デプロイは切ってあり（2026-10-26 運営決定）、アプリの変更はこの判定を通って
 Deploy Hook で反映される。再デプロイすると「実は使われていた」報告が消えるので、授業のある時間
-（月〜土 9:00〜20:30）には出さず、その日の夜の定期実行（20:40）にまとめて出す。
+（月〜土 9:00〜20:30）には出さず、その日の夜（20:30 以降）の定期実行にまとめて出す。
+定期実行は遅れて届くことがあるので、1日に数回置いてある（時刻は render-deploy.yml）。
 
 判定（上から順に）:
   1. --force なら、時間に関係なく出す（急ぎの直し。報告は消える）
@@ -46,7 +47,7 @@ def decide(changed, now, force=False):
     if changed is not None and not app_changes(changed):
         return False, "前回の反映からアプリに関わる変更はありません"
     if in_class_hours(now):
-        return False, "授業のある時間（月〜土 9:00〜20:30）なので、今夜 20:40 の定期実行で反映します"
+        return False, "授業のある時間（月〜土 9:00〜20:30）なので、今夜（20:30 以降）の定期実行で反映します"
     if changed is None:
         return True, "前回反映したコミットが分からないので反映します"
     return True, "アプリの変更を反映します: " + ", ".join(app_changes(changed)[:10])

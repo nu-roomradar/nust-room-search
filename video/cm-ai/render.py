@@ -13,7 +13,7 @@ class H(http.server.SimpleHTTPRequestHandler):
 srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(H, directory=D)); threading.Thread(target=srv.serve_forever, daemon=True).start()
 url = f"http://127.0.0.1:{srv.server_address[1]}/cm3_built.html"
 with sync_playwright() as p:
-    b = p.chromium.launch(executable_path="/opt/pw-browsers/chromium-1194/chrome-linux/chrome")
+    b = p.chromium.launch(executable_path="/opt/pw-browsers/chromium")
     pg = b.new_page(viewport={"width": 1080, "height": 1920})
     errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
     pg.goto(url, wait_until="load"); pg.evaluate("document.fonts.ready"); pg.wait_for_timeout(1500)

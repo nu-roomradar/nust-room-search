@@ -30,9 +30,11 @@ import qrcode
 from qrcode.constants import ERROR_CORRECT_H
 from playwright.sync_api import sync_playwright
 
+from _browser import find_chrome
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 LP_URL = "https://nu-roomradar.github.io/nust-room-search/"
-CHROME = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
+CHROME = find_chrome()   # この環境に入っているブラウザ。無ければ None（Playwright の既定を使う）
 
 LOGO_PATH = ROOT / "rr_logo.png"
 SHOT_PATH = ROOT / "assets/posters/handoff/app-phone-screenshot.png"

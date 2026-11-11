@@ -25,7 +25,7 @@ Claude Code on the web のセッション内（Bash）で完結する。ポス�
 
 ## 手順
 
-1. **依存を確認する**。必要パッケージは `qrcode` / `pillow` / `playwright` / `python-pptx`（`--print-files` 時）。web セッションでは `.claude/hooks/session-start.sh` が自動インストール済み。QR 確認用の `cv2` は別途 `pip install opencv-python-headless`。ブラウザは preinstall 済みの `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`（スクリプトの `CHROME` 定数）を使うので `playwright install` は不要。
+1. **依存を確認する**。必要パッケージは `qrcode` / `pillow` / `playwright` / `python-pptx`（`--print-files` 時）。web セッションでは `.claude/hooks/session-start.sh` が自動インストール済み。QR 確認用の `cv2` は別途 `pip install opencv-python-headless`。ブラウザは preinstall 済みのもの（`/opt/pw-browsers/chromium`）を `scripts/_browser.py` の `find_chrome()` が探して使うので `playwright install` は不要（フォルダ名の番号は環境が作り直されると変わるので、決め打ちにしない）。
    - 確認コマンド: `python -c "import qrcode, PIL, playwright, pptx"`（エラーが出なければ OK）。
    - 失敗したら（SessionStart hook は `CLAUDE_CODE_REMOTE=true` のときだけ走るため、走っていないことがある）: `pip install qrcode pillow playwright python-pptx` を実行してから再確認する。
 2. **どのバリアントを、どこまで出力するかをユーザーに確認してから**生成する。

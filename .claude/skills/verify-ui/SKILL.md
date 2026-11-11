@@ -7,7 +7,7 @@ argument-hint: "[app|lp|dashboard|all] [変更点の要約]"
 # 画面変更の検証（Playwright スクショ目視）
 
 ## 前提（CLAUDE.md「検証」より）
-- 画面系の変更は Playwright（`/opt/pw-browsers/chromium-1194/chrome-linux/chrome`）で **PC 幅とスマホ幅（390px）の両方**のスクショを撮って目視確認する。片方だけで済ませない。
+- 画面系の変更は Playwright（`/opt/pw-browsers/chromium`）で **PC 幅とスマホ幅（390px）の両方**のスクショを撮って目視確認する。片方だけで済ませない。
 - アプリ起動は `PORT=5055 python app.py`（PORT 未指定だと 10000）。依存は `pip install -r requirements.txt`。debian 製 blinker と衝突して `Cannot uninstall blinker ... installed by debian` で止まる場合は `pip install -r requirements.txt --ignore-installed blinker`。DB（`reservations.db` / `reports.db`）は起動時に自動生成される揮発データで .gitignore 済み。コミットしない。
 - web セッションでは `.claude/hooks/session-start.sh`（`CLAUDE_CODE_REMOTE=true` のときだけ動く）が `requirements.txt` と `requests qrcode pillow python-pptx playwright` を自動インストールする。ただし上記の blinker 衝突で hook が途中で失敗し flask が無いことがあるので、`python -c "import flask, playwright"` で確認してから始める。ブラウザは preinstall 済み（`/opt/pw-browsers`）なので `playwright install` は不要。
 - この環境から github.io / onrender.com 等の公開 URL にはプロキシに阻まれて到達できない。**公開 URL での表示確認（Render / GitHub Pages に反映されたか）は必ずユーザーに依頼する。**「公開 URL で確認した」とは書かない。
@@ -25,7 +25,7 @@ argument-hint: "[app|lp|dashboard|all] [変更点の要約]"
 3. スクショ撮影。PC 幅 **1280x800（dsf=1）** とスマホ幅 **390x844（dsf=3。LP/ダッシュボードは 2 で十分）**、`full_page=True` の全体像を撮る。出力先はスクラッチパッド（システムプロンプトに示されるディレクトリ）で、リポジトリには置かない。雛形:
    ```python
    from playwright.sync_api import sync_playwright
-   CHROME = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
+   CHROME = "/opt/pw-browsers/chromium"   # いま入っているブラウザを指す、番号の付かない名前
    URL, OUT, PAGE = "http://127.0.0.1:5055/", "<scratch>", "app"   # LP は 8088/index.html など
    with sync_playwright() as p:
        b = p.chromium.launch(executable_path=CHROME)
