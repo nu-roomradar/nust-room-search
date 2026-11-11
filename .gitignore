@@ -49,3 +49,7 @@ video/*/sheet*.png
 video/*/music_check.png
 video/*/spec_*.png
 video/*/wave_*.png
+# 3D 広告：アプリの実画面の写真は capture.py で撮り直せる（大きいので入れない）
+video/desk-3d/assets/page*.png
+video/desk-3d/assets/modal*.png
+video/desk-3d/assets/view*.png
