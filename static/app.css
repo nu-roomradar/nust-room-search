@@ -741,3 +741,13 @@ header { margin: 36px 0 38px; }
 .theme-picker { padding: 3px; }
 .theme-picker button { height: 28px; display: inline-flex; align-items: center; justify-content: center; padding-top: 0; padding-bottom: 0; }
 @media (max-width: 767px) { header { margin: 34px 0 34px !important; } }
+
+/* 通常の見た目の手直し（2026-11-12。季節の見た目には当てない）：
+   上の余白を詰める・選んでいるものを教室名の青と別の色（白）にする・背景に薄い色の変化 */
+body:not([class*="theme-"]) { background: linear-gradient(180deg, #111a33 0%, #0c1122 320px, #0a0a0f 760px) no-repeat #0a0a0f; }
+body:not([class*="theme-"]) header { margin: 20px 0 26px !important; }
+body:not([class*="theme-"]) .subtitle { margin-top: 8px; }
+body:not([class*="theme-"]) .now-badge, body:not([class*="theme-"]) .theme-picker { margin-top: 16px; }
+body:not([class*="theme-"]) .slot-chips a.on { border-color: #fff; background: rgba(255,255,255,0.10); }
+body:not([class*="theme-"]) .slot-chips a.on small { color: #fff; }
+body:not([class*="theme-"]) .bldg-tabs a.on { color: #0a0a0f; background: #fff; border-color: #fff; }
