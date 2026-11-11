@@ -144,6 +144,25 @@ class ActionsCheckTests(unittest.TestCase):
         self.assertEqual(res.problems, [])
         self.assertTrue(any("確かめられていません" in n for n in res.notes))
 
+    def test_deploy_failures_at_night_are_not_hidden_by_skipped_runs_in_class_hours(self):
+        """反映の判定は授業中は何もせず成功で終わる。夜の失敗のあとにそれが並んでも、失敗を報告する"""
+        p = ".github/workflows/render-deploy.yml"
+        name = "検索アプリを Render に反映"
+        runs = [run(name, "failure", "2026-09-06T13:40:00Z", "https://gh/night", path=p),   # 日曜 22:40 JST
+                run(name, "failure", "2026-09-06T21:40:00Z", "https://gh/dawn", path=p),    # 月曜 6:40 JST
+                run(name, "success", "2026-09-07T01:40:00Z", path=p),                       # 月曜 10:40 JST（授業中・見送り）
+                run(name, "success", "2026-09-07T03:40:00Z", path=p)]                       # 月曜 12:40 JST（同上）
+        res = hc.Result()
+        hc.check_recent_runs(res, FakeGitHub(runs=runs), now=NOW, known_paths=None)
+        self.assertEqual(len(res.problems), 1)
+        self.assertIn("2 回連続", res.problems[0][0])
+        self.assertIn("https://gh/dawn", res.problems[0][1])
+        # 夜にうまく反映できていれば、問題なし
+        runs.append(run(name, "success", "2026-09-07T11:40:00Z", path=p))                   # 月曜 20:40 JST
+        res = hc.Result()
+        hc.check_recent_runs(res, FakeGitHub(runs=runs), now=NOW, known_paths=None)
+        self.assertEqual(res.problems, [])
+
     def test_groups_failures_by_workflow_and_picks_latest(self):
         gh = FakeGitHub(runs=[
             run("Instagramへ投稿", "failure", "2026-09-01T00:00:00Z", "https://gh/old"),
