@@ -733,8 +733,8 @@ html:has(> body.theme-christmas) { background-color: #081633; }
 .result-label .span-off { color: var(--accent); font-weight: 700; text-decoration: none; }
 .bldg-tabs { margin-bottom: 12px; }
 /* タイトルまわりにゆとり（2026-11-11 運営）：上の余白、ロゴ→副題→時計の間、ヘッダーの下 */
-header { margin: 22px 0 30px; }
-.subtitle { margin-top: 10px; }
-.now-badge { margin-top: 20px; }
-.theme-picker { margin-top: 20px; }
-@media (max-width: 767px) { header { margin: 20px 0 26px !important; } }
+header { margin: 36px 0 38px; }
+.subtitle { margin-top: 14px; }
+.now-badge { margin-top: 26px; }
+.theme-picker { margin-top: 26px; }
+@media (max-width: 767px) { header { margin: 34px 0 34px !important; } }
