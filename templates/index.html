@@ -78,7 +78,7 @@
         <div class="sidebar">
             <!-- スマホでは結果を先に見せるため、条件の欄を畳む（2026-11-11 B1）。PC では開いたまま -->
             <details class="form-fold" id="form-fold" open>
-            <summary>条件を変える<small>年度・曜日・時限・コマ数</small></summary>
+            <summary>条件を変える</summary>
             <div class="card">
                 <form method="POST" id="search-form">
                     <div class="form-grid">
@@ -139,7 +139,7 @@
             </div>
             </details>
             <script>/* スマホ幅で結果が出ているときは、条件の欄を畳んで始める */
-            (function(){ var f=document.getElementById('form-fold'); if (f && window.matchMedia('(max-width: 1099px)').matches && {{ 'true' if (empty_rooms is not none and not error_message) else 'false' }}) f.removeAttribute('open'); })();</script>
+            (function(){ var f=document.getElementById('form-fold'); if (f && window.matchMedia('(max-width: 1099px)').matches && {{ 'true' if (slot_chips and empty_rooms is not none) else 'false' }}) f.removeAttribute('open'); })();</script>
             <!-- PC で開いた人に、スマホで開くための QR（2026-11-11 B3）。スマホ幅では出さない -->
             <div class="pc-qr">
                 <img src="{{ url_for('static', filename='qr-app.png') }}" width="96" height="96" alt="RoomRadar をスマホで開く QR コード">
@@ -163,24 +163,21 @@
                 <span><strong>{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }}</strong>の時間割を表示しています（現在は{{ current_year }}年度 {{ current_term }}）。いま空いている教室を探す場合は、年度と学期を戻してください。</span>
             </div>
             {% endif %}
-            <div class="result-meta" id="result-meta">
-                <span class="result-label">{% if auto_note %}<span class="result-note">{{ auto_note }}</span>次は {% elif auto %}いまから使える · {% endif %}{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }} {{ selected_day }}曜 {{ selected_period }}限{% if selected_span > 1 %}から{{ selected_span }}コマ続けて{% endif %} の空き教室</span>
-                <span class="count-chip" id="count-chip"><em>{{ empty_rooms|length }}</em> 室</span>
-            </div>
-            <p class="basis-note">時間割をもとにした空きです。入る前にドア越しに確認を。</p>
+            {# 2026-11-11 整理：時限の切り替えと校舎のタブを見出しの代わりにし、その下は「○室」と注意の一行だけにする #}
+            {% set chip_on = (slot_chips | selectattr('on') | list | length) > 0 %}
             {% if slot_chips %}
-            <!-- 時限の切り替えと校舎のタブ（2026-11-11 B1・B4） -->
             <nav class="slot-chips" aria-label="時限">
                 {% for c in slot_chips %}<a href="{{ c.href }}"{% if c.on %} class="on" aria-current="true"{% endif %}><small>{{ c.tag }}</small>{{ c.label }}</a>{% endfor %}
+                <button type="button" class="more" id="more-cond" aria-controls="form-fold"><small>ほか</small>条件</button>
             </nav>
             <nav class="bldg-tabs" aria-label="校舎">
                 {% for t in building_tabs %}<a href="{{ t.href }}" class="t-{{ t.code }}{% if t.on %} on{% endif %}"{% if t.on %} aria-current="true"{% endif %}>{{ t.label }}</a>{% endfor %}
             </nav>
             {% endif %}
-            {% if remembered %}
-            <!-- 前に選んだ校舎・コマ数で開いたことの案内（2026-11-09 定着の改善 A3） -->
-            <p class="pref-note">前回の条件（{{ {'all': 'すべての校舎', 'tower': 'タワースコラ', 'main': '駿河台校舎', 'funabashi': '船橋校舎'}[selected_building] }}{% if selected_span > 1 %}・{{ selected_span }}コマ続けて{% endif %}）で表示しています · <a href="/?building=all&amp;span=1">すべての校舎で見る</a></p>
-            {% endif %}
+            <div class="result-meta" id="result-meta">
+                <span class="result-label">{% if auto_note %}<span class="result-note">{{ auto_note }}</span>{% endif %}{% if not chip_on %}<b>{% if not is_current_view %}{% if selected_year %}{{ selected_year }}年度 {% endif %}{{ selected_term }} {% endif %}{{ selected_day }}曜{{ selected_period }}限</b> {% endif %}{% if selected_span > 1 %}<b>{{ selected_span }}コマ続けて空き</b>{% if slot_chips %} <a class="span-off" href="{{ url_for('index', building=selected_building, span=1) }}">解除</a>{% endif %} {% endif %}<span class="basis">時間割上の空きです。入る前にドア越しに確認を</span></span>
+                <span class="count-chip" id="count-chip"><em>{{ empty_rooms|length }}</em> 室</span>
+            </div>
 
             {% if ask_purpose %}
             <!-- 使った目的のワンタップ調査（任意・匿名。1台1日1回まで。答えは全体の集計にだけ使う） -->
