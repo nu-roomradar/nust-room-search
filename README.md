@@ -31,7 +31,7 @@
 │   ├── classes_2025.csv    # 授業の生データ一覧（年度ごと。教員名・単位・対象学年も含む）
 │   ├── classes_2026.csv
 │   ├── instagram_*.json    # Instagram インサイト集計（2026-08 で収集終了・ダッシュボード表示用に凍結）
-│   └── ga4_*.json          # GA4 サイト分析集計（同上）
+│   └── ga4_*               # GA4 の利用状況（2026-10 に週次の記録として再開。ga4-weekly.yml が毎週月曜に更新）
 │
 ├── assets/
 │   ├── instagram/          # Instagram 投稿用画像（弔事ストーリーの雛形）

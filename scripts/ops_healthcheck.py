@@ -38,6 +38,8 @@ from pathlib import Path
 
 import requests
 
+import render_deploy
+
 APP_URL = "https://nust-room-search.onrender.com"
 LP_URL = "https://nu-roomradar.github.io/nust-room-search/"
 REQUIRED_NOTICE = "試験運用中"  # CLAUDE.md ルール1。本番ページに残っているかを見る（2026-10-22 に学生課の文言へ）
@@ -139,6 +141,18 @@ def existing_workflow_paths(root=None):
             if p.is_file() and p.suffix in (".yml", ".yaml")}
 
 
+RENDER_DEPLOY_PATH = ".github/workflows/render-deploy.yml"
+
+
+def _started_in_class_hours(run):
+    stamp = run.get("run_started_at") or run.get("created_at") or ""
+    try:
+        when = datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    except ValueError:
+        return False
+    return render_deploy.in_class_hours(when.astimezone(render_deploy.JST))
+
+
 def check_recent_runs(res, gh, days=RUN_LOOKBACK_DAYS, now=None, known_paths=_UNSET):
     """known_paths: 省略ならリポジトリから読む。None を明示すると絞り込まない"""
     now = now or datetime.now(timezone.utc)
@@ -178,6 +192,10 @@ def check_recent_runs(res, gh, days=RUN_LOOKBACK_DAYS, now=None, known_paths=_UN
     for name, runs in sorted(by_workflow.items()):
         runs.sort(key=lambda r: r.get("created_at", ""), reverse=True)
         done = [r for r in runs if r.get("status") == "completed" and r.get("conclusion")]
+        if any(r.get("path") == RENDER_DEPLOY_PATH for r in runs):
+            # 反映の判定は2時間おきに動き、授業中の実行は Deploy Hook を呼ばずに「成功」で終わる。
+            # それを最新として見ると、夜の反映の失敗が月曜の昼には隠れてしまうので、授業中に始まった実行は材料にしない
+            done = [r for r in done if not _started_in_class_hours(r)]
         if not done:
             continue                                    # まだ実行中のものしかない
         latest = done[0]
