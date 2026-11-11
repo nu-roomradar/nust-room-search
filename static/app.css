@@ -746,7 +746,6 @@ header { margin: 36px 0 38px; }
       季節の見た目を選んでいるとき（body に theme-…）は出ない。色は通常の青のまま ── */
 body:not([class*="theme-"]) .season-deco.s-normal { display: block; }
 body:not([class*="theme-"]) .season-ribbon.s-normal { display: inline-flex; }
-body:not([class*="theme-"]) { background: linear-gradient(180deg, #0f1730 0%, #0b0f1e 340px, #0a0a0f 780px) no-repeat #0a0a0f; }
 .season-ribbon.s-normal { color: #e6ecff; background: rgba(108,143,255,0.10); border-color: rgba(108,143,255,0.38); }
 .season-ribbon.s-normal b { color: #9db5ff; }
 .season-ribbon.s-normal .season-ribbon-sub { color: #9aa3c7; }
