@@ -9,8 +9,13 @@ on:
   push:
     branches: [main]
   schedule:
-    # 毎日 20:40 JST（UTC 11:40）。授業のある時間に main に入った変更をまとめて出す
-    - cron: "40 11 * * *"
+    # 授業のある時間に main に入った変更を、その夜にまとめて出す。
+    # GitHub の定期実行は予定より遅れて届く。このリポジトリでは 2026-10〜11 に毎回 5〜10 時間遅れ、
+    # 20:40 の予定が夜中の 2:00〜朝 6:30 に届いていた。1回だけだと、9:00 を過ぎて届いた日は反映されない。
+    # そこで 2 時間おきに確かめる（日本時間の毎偶数時 40 分。20:40 を含む）。何時間遅れて届いても、
+    # どれかが授業の終わった 20:30 から 2 時間以内に届く。授業中に届いた分は scripts/render_deploy.py が
+    # 見送り、アプリの変更が無ければ何もしないので、回数が多くても害はない（1回 30 秒ほど）。
+    - cron: "40 1,3,5,7,9,11,13,15,17,19,21,23 * * *"
   workflow_dispatch:
     inputs:
       force:
@@ -70,7 +75,9 @@ jobs:
             echo "::error::Secrets の RENDER_DEPLOY_HOOK が未設定なので反映できません（docs/OPERATIONS.md 4.10）"
             exit 1
           fi
-          curl -fsS -X POST --max-time 30 -o /dev/null "$RENDER_DEPLOY_HOOK"
+          # Render の応答が遅くて時間切れになることがある（2026-11-11 に2回続いた）。時間切れ・5xx は2回までやり直す。
+          # 同じ依頼が2回届いても、同じコミットを作り直すだけ（授業のない時間なので報告への影響もない）
+          curl -fsS -X POST --retry 2 --retry-delay 20 --max-time 60 -o /dev/null "$RENDER_DEPLOY_HOOK"
           echo "Render に反映を依頼しました。数分で切り替わります"
 
       - name: 反映したコミットを記録する

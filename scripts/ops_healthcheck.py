@@ -42,6 +42,7 @@ APP_URL = "https://nust-room-search.onrender.com"
 LP_URL = "https://nu-roomradar.github.io/nust-room-search/"
 REQUIRED_NOTICE = "試験運用中"  # CLAUDE.md ルール1。本番ページに残っているかを見る（2026-10-22 に学生課の文言へ）
 RUN_LOOKBACK_DAYS = 14
+RUN_PAGES_MAX = 10      # 実行の一覧を何ページ（×100件）まで見るか。日付で絞った一覧は GitHub 側も 1000 件まで
 ISSUE_TITLE = "【運用ヘルスチェック】異常を検知しました"
 FINGERPRINT_TAG = "healthcheck-fingerprint"
 GITHUB_API = "https://api.github.com"
@@ -144,14 +145,26 @@ def check_recent_runs(res, gh, days=RUN_LOOKBACK_DAYS, now=None, known_paths=_UN
     if known_paths is _UNSET:
         known_paths = existing_workflow_paths()
     since = (now - timedelta(days=days)).strftime("%Y-%m-%d")
-    data = gh.get(f"/repos/{gh.repo}/actions/runs", per_page=100, created=f">={since}")
+    # 1回に取れるのは 100 件まで。push のたびの CI・Pages・反映の判定に、2時間おきの反映の判定（2026-11〜）が
+    # 加わって、14日で 100 件を大きく超える。最初の 100 件だけ見ていると、月1回・週1回しか動かない
+    # ワークフロー（トークンの自動延長など）の実行が一覧から押し出され、失敗していても気づけない。
+    all_runs = []
+    for page in range(1, RUN_PAGES_MAX + 1):
+        data = gh.get(f"/repos/{gh.repo}/actions/runs", per_page=100, page=page, created=f">={since}")
+        batch = data.get("workflow_runs", [])
+        all_runs += batch
+        if len(batch) < 100:
+            break
+    else:
+        res.notes.append(f"Actions の実行が直近{days}日で {RUN_PAGES_MAX * 100} 件を超えています。"
+                         "古い分は確かめられていません")
 
     # ワークフローごとに新しい順へ。判定に使うのは「いちばん新しい完了した実行」だけ。
     # 「直近N日に1回でも失敗したか」で見ると、直した後も N 日間ずっと報告し続けてしまい、
     # Issue が「もう直っているのに赤いまま」になる（2026-09 に実際そうなった）。
     by_workflow = {}
     removed = set()
-    for run in data.get("workflow_runs", []):
+    for run in all_runs:
         path = run.get("path")
         if known_paths is not None and path and path not in known_paths:
             removed.add(run.get("name") or path)      # 撤去済み。直しようがないので報告しない

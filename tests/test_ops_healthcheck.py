@@ -108,6 +108,42 @@ class ActionsCheckTests(unittest.TestCase):
         self.assertEqual(res.problems, [])
         self.assertEqual(gh.calls[0][2]["created"], ">=2026-08-25")
 
+    def test_reads_every_page_so_rare_workflows_are_not_pushed_out(self):
+        """実行が 100 件を超えても、古いページにある「月1回のワークフローの失敗」を見つける"""
+        busy = [run("検索アプリを Render に反映", "success", f"2026-09-07T{h:02d}:{m:02d}:00Z")
+                for h in range(24) for m in range(0, 60, 6)]                     # 新しい順に 240 件
+        busy.sort(key=lambda r: r["created_at"], reverse=True)
+        rare = run("Instagramトークンの自動更新", "failure", "2026-09-01T00:00:00Z", "https://gh/token")
+
+        class PagedGitHub(FakeGitHub):
+            def get(self, path, **params):
+                if path.endswith("/actions/runs"):
+                    self.calls.append(("GET", path, params))
+                    n, size = params.get("page", 1), params["per_page"]
+                    return {"workflow_runs": self.runs[(n - 1) * size:n * size]}
+                return super().get(path, **params)
+
+        gh = PagedGitHub(runs=busy + [rare])
+        res = hc.Result()
+        hc.check_recent_runs(res, gh, now=NOW, known_paths=None)
+        self.assertEqual([c[2]["page"] for c in gh.calls], [1, 2, 3])
+        self.assertEqual(len(res.problems), 1)
+        self.assertIn("Instagramトークンの自動更新", res.problems[0][0])
+        self.assertEqual(res.notes, [])
+
+    def test_says_so_when_there_are_more_runs_than_it_can_read(self):
+        class EndlessGitHub(FakeGitHub):
+            def get(self, path, **params):
+                self.calls.append(("GET", path, params))
+                return {"workflow_runs": [run("CI", "success", "2026-09-07T00:00:00Z")] * params["per_page"]}
+
+        gh = EndlessGitHub()
+        res = hc.Result()
+        hc.check_recent_runs(res, gh, now=NOW, known_paths=None)
+        self.assertEqual(len(gh.calls), hc.RUN_PAGES_MAX)
+        self.assertEqual(res.problems, [])
+        self.assertTrue(any("確かめられていません" in n for n in res.notes))
+
     def test_groups_failures_by_workflow_and_picks_latest(self):
         gh = FakeGitHub(runs=[
             run("Instagramへ投稿", "failure", "2026-09-01T00:00:00Z", "https://gh/old"),

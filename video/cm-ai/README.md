@@ -43,4 +43,4 @@ v2 は `extract_clips.py v2` → `music3.py music3.wav` → `mix3.py cm3_audio.w
 - 場面の長さ: `const SCENES = [...]`（秒）。変えたら `extract_clips.py` の長さと `mix4.py` の `SEG`、`music4.py` の `END` も合わせる
 - 手書きの書き込み: `wobbleEllipse` / `arrow` / `.note`。位置は `rects.json`（アプリの CSS px）から計算している
 - ロゴのレーダーの中心: `LC`（ロゴ画像の同心円を当てはめた値。41.56%, 42.97%）
-- Chromium のパスは `/opt/pw-browsers/chromium-1194/chrome-linux/chrome`（この環境用）
+- Chromium のパスは `/opt/pw-browsers/chromium`（この環境用。いま入っているブラウザを指す、番号の付かない名前）

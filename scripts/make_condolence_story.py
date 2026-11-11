@@ -4,8 +4,10 @@
 import base64, pathlib
 from playwright.sync_api import sync_playwright
 
+from _browser import find_chrome
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-CHROME = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
+CHROME = find_chrome()
 
 logo = base64.b64encode((ROOT / "rr_logo.png").read_bytes()).decode()
 

@@ -59,7 +59,8 @@
     ├── ops-healthcheck.yml     # 毎週月曜 運用ヘルスチェック（異常なら Issue、復旧で自動クローズ）
     ├── ig-token-refresh.yml    # 毎月1日 Instagramトークンを60日延長して Secret を更新
     ├── instagram-post.yml      # 手動トリガーで投稿（feed / story 選択・同時ストーリー可）
-    └── render-plan-reminder.yml # 9/24 に Render プランを戻すリマインド Issue を作成
+    ├── ga4-weekly.yml          # 毎週月曜 GA4 の利用状況を data/ga4_weekly.md に記録
+    └── render-deploy.yml       # 検索アプリを授業のない時間にだけ Render に反映（2時間おきに判定）
 ```
 
 ## 運用メモ

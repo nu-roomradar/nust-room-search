@@ -44,7 +44,7 @@ argument-hint: "[feed|story|condolence|token] 投稿内容や相談の要点"
 
 ## 手順B: 告知ストーリーの確認と投稿
 1. **ストーリーは画像を目視確認してから投稿する。確認前に投稿しない。** github-actions[bot] は `main` にコミットするが、このセッションは `claude/…` 作業ブランチ上で動くため素の `git pull` では取得できないことがある。`main` の該当ファイルを明示的に取り込む: `git fetch origin main && git checkout FETCH_HEAD -- assets/instagram/auto/latest-story.png`、または `curl -sL https://raw.githubusercontent.com/nu-roomradar/nust-room-search/<botのコミットSHA>/assets/instagram/auto/latest-story.png -o assets/instagram/auto/latest-story.png`（bot のコミット SHA は `mcp__github__list_commits`（sha=main）や手順A 6 のログで確認。raw.githubusercontent.com は到達可）。取り込んだ `assets/instagram/auto/latest-story.png` を Read で確認し、ユーザーにも提示して（SendUserFile、または Actions の成果物 `promo-story-preview` / コミットされたファイルを GitHub で開いてもらう）承認を得る。見出しの改行位置・級数（88→54px で2行に収める。収まらなければ最小級数で3行）、埋め込み画像、`プロフィールでチェック` の導線を見る。API 経由のストーリーにはタップ可能なリンクスタンプを付けられないため、画像内文言で誘導する仕様。
-2. 直したい場合はセッション内で再生成 → 再確認 → コミット・push。`scripts/make_story_promo.py` は preinstall 済みの Chrome（`/opt/pw-browsers/chromium-1194/chrome-linux/chrome`）があればそれを使うので、そのまま実行できる（1080x1920 の PNG が出る）:
+2. 直したい場合はセッション内で再生成 → 再確認 → コミット・push。`scripts/make_story_promo.py` は preinstall 済みの Chrome（`/opt/pw-browsers/chromium`。`scripts/_browser.py` が探す）があればそれを使うので、そのまま実行できる（1080x1920 の PNG が出る）:
    ```
    python scripts/make_story_promo.py --feed-image-url <フィード画像の raw URL> --headline <見出し> --out assets/instagram/auto/latest-story.png
    ```
@@ -54,7 +54,7 @@ argument-hint: "[feed|story|condolence|token] 投稿内容や相談の要点"
 ## 手順C: 単体ストーリー投稿（既存画像・弔事など）
 1. 画像（1080x1920）を `assets/instagram/` にコミット・push し、SHA 固定 raw URL を作る。
 2. 画像をユーザーに提示して承認を得てから `post_type=story` で起動する。
-3. **弔事（お見舞い・追悼）のストーリー**は、QR・LP リンク・CTA・ハッシュタグ・絵文字を一切入れない。ブランドカラー（青/ネイビー）も使わず明朝体（Noto Serif JP）で組む。実例は `scripts/make_condolence_story.py`（暖色グレージュ背景、ロゴ＋「RoomRadar 運営」の署名、上下の安全マージン 150px/240px、Playwright `/opt/pw-browsers/chromium-1194/chrome-linux/chrome` で `assets/instagram/kumamoto-condolence-story.png` を出力）。新しい弔事は同スクリプトを雛形に文面だけ差し替え、文面もユーザーに確認してから生成する。
+3. **弔事（お見舞い・追悼）のストーリー**は、QR・LP リンク・CTA・ハッシュタグ・絵文字を一切入れない。ブランドカラー（青/ネイビー）も使わず明朝体（Noto Serif JP）で組む。実例は `scripts/make_condolence_story.py`（暖色グレージュ背景、ロゴ＋「RoomRadar 運営」の署名、上下の安全マージン 150px/240px、Playwright（ブラウザは `scripts/_browser.py` が探す）で `assets/instagram/kumamoto-condolence-story.png` を出力）。新しい弔事は同スクリプトを雛形に文面だけ差し替え、文面もユーザーに確認してから生成する。
 
 ## 手順D: リール投稿（2026-10〜）
 1. 動画は 1080x1920・30fps・H.264（yuv420p、`-movflags +faststart`）・AAC ステレオ 128kbps の mp4 にする。カバーは 1080x1920 の JPEG。どちらも `assets/instagram/` にコミットし、**`main` に push する**。
