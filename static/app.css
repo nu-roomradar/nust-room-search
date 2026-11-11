@@ -771,3 +771,6 @@ body:not([class*="theme-"]) .season-ribbon.s-normal { display: inline-flex; }
 @keyframes radarSweep { to { transform: rotate(360deg); } }
 @media (max-width: 767px) { .season-deco .n-radar { width: 64px; height: 64px; top: 12px; right: 4%; opacity: 0.75; } }
 @media (prefers-reduced-motion: reduce) { .season-deco .n-radar::after { animation: none; } }
+/* 帯は1行を使い、時計と見た目の切り替えはその下の行に置く（PC 幅で横に並んでいた。2026-11-12 運営） */
+.theme-halloween .season-ribbon.s-halloween, .theme-christmas .season-ribbon.s-christmas,
+body:not([class*="theme-"]) .season-ribbon.s-normal { display: flex; width: fit-content; max-width: 100%; box-sizing: border-box; }
