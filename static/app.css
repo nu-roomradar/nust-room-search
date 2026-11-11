@@ -735,6 +735,9 @@ html:has(> body.theme-christmas) { background-color: #081633; }
 /* タイトルまわりにゆとり（2026-11-11 運営）：上の余白、ロゴ→副題→時計の間、ヘッダーの下 */
 header { margin: 36px 0 38px; }
 .subtitle { margin-top: 14px; }
-.now-badge { margin-top: 26px; }
-.theme-picker { margin-top: 26px; }
+/* 時計と見た目の切り替えを、同じ高さ・同じ位置にそろえる（前は上下にずれていた） */
+.now-badge, .theme-picker { margin-top: 26px; vertical-align: middle; height: 36px; box-sizing: border-box; }
+.now-badge { padding: 0 14px; }
+.theme-picker { padding: 3px; }
+.theme-picker button { height: 28px; display: inline-flex; align-items: center; justify-content: center; padding-top: 0; padding-bottom: 0; }
 @media (max-width: 767px) { header { margin: 34px 0 34px !important; } }
