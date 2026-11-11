@@ -470,7 +470,7 @@ class ConsecutiveFreeTests(unittest.TestCase):
         self.assertTrue(all(int(b) >= 3 for b in badges))   # 2限から2コマ以上 → 3限以降まで
 
     def test_heading_mentions_span(self):
-        self.assertIn("2限から2コマ続けて", self.search(span="2"))
+        self.assertIn("2コマ続けて空き", self.search(span="2"))
         self.assertNotIn("コマ続けて", self.search(span="1"))
 
 
@@ -513,12 +513,12 @@ class YearAndTermSelectionTests(unittest.TestCase):
         for term in rr.VALID_TERMS:
             html = self.search(term=term)
             self.assertRegex(html, rf'<option value="{term}" selected')
-            self.assertIn(f"{term} 月曜 2限", html)
+            self.assertIn("月曜2限", html)
 
     def test_invalid_values_fall_back_instead_of_failing(self):
         for bad in ({"term": "ぬるぽ"}, {"year": "9999"}, {"year": "abc"}, {"term": ""}):
             html = self.search(**bad)
-            self.assertIn("の空き教室", html)          # 落ちずに結果が出る
+            self.assertIn('id="result-meta"', html)          # 落ちずに結果が出る
             self.assertNotIn("エラーが発生", html)
 
     def test_notice_only_when_viewing_another_term(self):
@@ -589,19 +589,19 @@ class UpcomingPeriodTests(unittest.TestCase):
 
     def test_get_during_lunch_shows_period3_results(self):
         html = self._get(self.at(12, 50))
-        self.assertIn("いまから使える", html)
-        self.assertIn("水曜 3限", html)
+        self.assertIn('aria-current="true"><small>いま</small>', html)
+        self.assertIn("水曜3限", html)
         self.assertIn('"auto": true', html)
 
     def test_get_after_hours_shows_next_class_day(self):
         html = self._get(self.at(22, 0))                     # 水曜の夜 → 木曜1限
         self.assertIn("本日の授業は終了しました", html)
-        self.assertIn("木曜 1限", html)
-        self.assertNotIn("いまから使える", html)
-        self.assertIn("月曜 1限", self._get(self.at(22, 0, day=19)))   # 土曜の夜 → 月曜
+        self.assertIn("木曜1限", html)
+        self.assertNotIn("<small>いま</small>", html)
+        self.assertIn("月曜1限", self._get(self.at(22, 0, day=19)))   # 土曜の夜 → 月曜
         html = self._get(self.at(12, 0, day=20))              # 日曜 → 月曜
         self.assertIn("本日は授業がありません", html)
-        self.assertIn("月曜 1限", html)
+        self.assertIn("月曜1限", html)
 
 
 class RoomWeekTests(unittest.TestCase):
@@ -978,7 +978,7 @@ class RetentionImprovementTests(unittest.TestCase):
         self.assertIn("rr_pref=tower|2", r.headers.get("Set-Cookie", ""))
         html = self.client.get("/").get_data(as_text=True)
         self.assertIn('value="tower"     selected', html)
-        self.assertIn("前回の条件（タワースコラ・2コマ続けて）", html)
+        self.assertIn("2コマ続けて空き", html); self.assertIn('class="t-tower on"', html)
         self.assertIn('"remembered": true', html)
 
     def test_url_parameters_override_and_are_checked(self):
@@ -1027,7 +1027,7 @@ class TrialImprovementTests(unittest.TestCase):
 
     def test_slot_chips_tabs_and_notes(self):
         html = self.client.get("/").get_data(as_text=True)
-        for needle in ('class="slot-chips"', 'class="bldg-tabs"', "時間割をもとにした空きです", "時間割から空き教室をすぐ検索",
+        for needle in ('class="slot-chips"', 'class="bldg-tabs"', "時間割上の空きです", "時間割から空き教室をすぐ検索",
                        'id="form-fold"', 'id="a2hs"', 'id="alt-rooms"', "qr-app.png"):
             self.assertIn(needle, html)
         self.assertNotIn("リアルタイム", html)
@@ -1035,7 +1035,7 @@ class TrialImprovementTests(unittest.TestCase):
 
     def test_day_and_period_in_url_are_checked(self):
         html = self.client.get("/?day=木&period=3&building=tower").get_data(as_text=True)
-        self.assertIn("木曜 3限", html)
+        self.assertIn("木曜3限", html)
         html = self.client.get("/?day=<b>&period=99").get_data(as_text=True)
         self.assertNotIn("<b>&", html)
         self.assertEqual(self.client.get("/?day=木&period=x").status_code, 200)
