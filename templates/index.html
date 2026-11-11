@@ -41,6 +41,8 @@
   <i class="x-snow"></i><i class="x-snow x-s2"></i><i class="x-wire"></i><i class="x-lights"></i>
   <span class="x-sleigh">🦌🛷</span><span class="x-star">⭐</span><span class="x-tree">🎄</span><span class="x-gift">🎁</span>
 </div>{% endif %}
+<!-- 通常の見た目の飾り（季節の見た目と同じ配置。レーダーの輪）。季節の見た目を選んでいるときは出ない -->
+<div class="season-deco s-normal" aria-hidden="true"><i class="n-radar"></i><i class="n-dots"></i></div>
 <div class="wrap">
 
     <!-- ヘッダー -->
@@ -54,6 +56,8 @@
         <!-- 期間限定の飾り（クリスマス。「Room for you.」＝あなたの教室、あります） -->
         <div class="season-ribbon s-christmas"><span aria-hidden="true">🎄</span> Merry Christmas！ <b>Room for you.</b> <span class="season-ribbon-sub">開ける前に、ドア越しにチラッと確認を🔔</span></div>
         {% endif %}
+        <!-- 通常の見た目の帯（季節の帯と同じ位置）。「当たり前に」は時間割にない授業の注意と組で出す -->
+        <div class="season-ribbon s-normal"><span aria-hidden="true">📡</span> <b>「開けたら、空いてる」</b>を当たり前に。 <span class="season-ribbon-sub">開ける前に、ドア越しにチラッと確認を🚪</span></div>
         <div class="now-badge">
             <span class="dot"></span>
             <span id="clock">--:--</span>
