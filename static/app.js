@@ -424,14 +424,3 @@ function currentSlot() {
         if (typeof gtag === 'function') gtag('event', 'a2hs_dismiss');
     });
 })();
-
-// ── 「ほか 条件」：畳んである検索フォームを開く（スマホ。2026-11-11 整理） ──
-(function() {
-    const btn = document.getElementById('more-cond'), fold = document.getElementById('form-fold');
-    if (!btn || !fold) return;
-    btn.addEventListener('click', function() {
-        fold.open = !fold.open;
-        btn.classList.toggle('on', fold.open);
-        if (fold.open) fold.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-})();
