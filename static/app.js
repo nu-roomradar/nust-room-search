@@ -390,11 +390,8 @@ function currentSlot() {
     });
 })();
 
-// ── 目的の質問は、最初の校舎の教室のあとに置く（2026-11-11 B1。開いてすぐ教室が見えるように） ──
-(function() {
-    const bar = document.getElementById('purpose-bar'), first = document.querySelector('.building-section');
-    if (bar && first) first.after(bar);
-})();
+// 目的の質問（何に使う？）は、件数の行のすぐ下・教室の上に置く（テンプレートの位置のまま）。
+// 2026-11-11 に最初の校舎の教室のあとへ移したが、2026-11-12 に運営の指示で元の位置に戻した。
 
 // ── 「ホーム画面に追加」の案内（2026-11-11 B2）。2回目に来たときから、閉じるまで出す。ホーム画面から開いているときは出さない ──
 (function() {
