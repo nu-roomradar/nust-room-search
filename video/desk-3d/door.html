@@ -11,10 +11,14 @@
   #gl { position: absolute; inset: 0; width: 1080px; height: 1920px; display: block; }
   .cap { position: absolute; left: 80px; width: 920px; text-align: center; color: #fff; opacity: 0; isolation: isolate;
          font-family: 'RRSans', sans-serif; text-shadow: 0 2px 6px rgba(0,0,0,.55), 0 0 28px rgba(0,0,0,.55); }
-  .cap.top { top: 268px; }
-  .cap .mid { font-weight: 900; font-size: 60px; line-height: 1.35; letter-spacing: .01em; }
-  .cap .mid b { color: #5fe6d2; font-weight: 900; }
-  .cap.top::before { content: ''; position: absolute; z-index: -1; left: -80px; top: -268px; width: 1080px; height: 660px; background: linear-gradient(180deg, rgba(4,5,8,.97) 0%, rgba(4,5,8,.95) 60%, rgba(4,5,8,0) 100%); }
+  /* 字幕：すりガラス風の札（下寄り）。小さな見出し＋短い言葉。太い白文字を画面の上にかぶせるのはやめた（2026-11-12 運営「チープすぎる」） */
+  .cap.card { left: 70px; width: 940px; top: 1326px; text-align: left; text-shadow: none; padding: 34px 44px 38px; box-sizing: border-box; border-radius: 30px;
+              background: linear-gradient(135deg, rgba(22,24,28,.72), rgba(12,13,16,.80)); border: 1px solid rgba(255,255,255,.16);
+              -webkit-backdrop-filter: blur(26px) saturate(1.2); backdrop-filter: blur(26px) saturate(1.2); box-shadow: 0 24px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.10); }
+  .cap.card .lb { display: flex; align-items: center; gap: 14px; font-weight: 500; font-size: 27px; letter-spacing: .14em; color: #7fe9d8; }
+  .cap.card .lb::before { content: ''; width: 34px; height: 2px; background: #5fe6d2; border-radius: 2px; }
+  .cap.card .lb em { font-style: normal; font-family: 'Syne', 'RRSans', sans-serif; font-weight: 700; letter-spacing: .04em; font-size: 31px; color: #fff; }
+  .cap.card .mn { margin-top: 14px; font-weight: 700; font-size: 55px; line-height: 1.32; letter-spacing: .035em; color: #fff; }
   #word { top: 1010px; font-family: 'Syne', 'RRSans', sans-serif; font-weight: 800; font-size: 76px; letter-spacing: .01em; }
   #word small { display: block; margin-top: 10px; font-family: 'RRSans', sans-serif; font-weight: 700; font-size: 31px; letter-spacing: .08em; color: rgba(255,255,255,.92); }
   #notice { top: 1250px; left: 110px; width: 860px; text-align: left; font-weight: 500; font-size: 33px; line-height: 1.7;
@@ -27,8 +31,8 @@
 <body>
 <div id="stage" data-composition-id="rr-door-3d" data-width="1080" data-height="1920" data-duration="27">
   <canvas id="gl" width="1080" height="1920"></canvas>
-  <div class="cap top" id="capA"><div class="mid">読み取るだけで、<br>空き教室が一覧で出る</div></div>
-  <div class="cap top" id="capB"><div class="mid">空いてる教室、<b>あった。</b></div></div>
+  <div class="cap card" id="capA"><div class="lb">QR を読み取るだけ</div><div class="mn">いま空いている教室が、<br>ひと目でわかる。</div></div>
+  <div class="cap card" id="capB"><div class="lb"><em>705</em>6限まで空き</div><div class="mn">空きコマの行き先、決まり。</div></div>
   <div class="cap" id="word">RoomRadar<small>空き教室検索</small></div>
   <div class="cap" id="notice"><i>TEST</i>本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</div>
 </div>

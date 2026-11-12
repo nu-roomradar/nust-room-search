@@ -17,7 +17,7 @@ const Q = new URLSearchParams(location.search);
 const T = {
   phoneIn: 3.3, phoneInEnd: 4.3, lock: 5.0, chip: 5.35, tapChip: 6.05, toApp: 6.2,     // 1 ポスター → 2 QR を読み取る
   capAIn: 6.9, capAOut: 9.7, scroll: 8.0,                                              // 3 一覧が出る
-  hi: 10.0, capBIn: 10.1, capBOut: 12.8,                                               //   空いてる教室、あった
+  hi: 10.0, capBIn: 10.1, capBOut: 12.8,                                               //   705 が空いている → 行き先、決まり
   phoneOut: 12.8,
   walk: 13.5, doorClose: 18.55, doorShut: 19.35,                                       // 4 友達と教室へ → ドアが閉まる
   logoIn: 19.8, ring: 20.45, wordIn: 20.3, noticeIn: 20.6,                             // 5 ロゴと必須の表記
@@ -413,6 +413,8 @@ async function build() {
     for (const k of Object.keys(caps)) {
       const [a, b] = caps[k], al = ss(seg(t, a, a + 0.45)) * (1 - ss(seg(t, b - 0.4, b)));
       capEl[k].style.opacity = al.toFixed(4); capEl[k].style.transform = `translateY(${((1 - ss(seg(t, a, a + 0.6))) * 16).toFixed(2)}px)`;
+      const mn = capEl[k].querySelector(".mn");          // 札の中の言葉は、少し遅れて左から現れる
+      if (mn) { const p = eo(seg(t, a + 0.22, a + 0.95)); mn.style.clipPath = `inset(-10% ${((1 - p) * 100).toFixed(2)}% -10% 0)`; mn.style.transform = `translateX(${((1 - p) * -14).toFixed(2)}px)`; }
     }
 
     evalCamera(t);
