@@ -5,7 +5,7 @@
 # 音量は -14 LUFS 前後（上げて、はみ出す山だけ抑える）。映像は 1080x1920・30fps・H.264（yuv420p）、音は AAC ステレオ 128kbps。
 set -euo pipefail
 cd "$(dirname "$0")"
-if [ "${1:-}" = "door" ]; then FR=renders/frames_door; AU=renders/audio2_raw.wav; OUT=renders/cm6-poster-door-v2.mp4; GAIN=6.4
+if [ "${1:-}" = "door" ]; then FR=renders/frames_door; AU=renders/audio2_raw.wav; OUT=renders/cm6-poster-door-v3.mp4; GAIN=6.4
 else FR=renders/frames; AU=renders/audio_raw.wav; OUT=renders/cm5-desk-3d-v2.mp4; GAIN=5.6; fi
 ffmpeg -hide_banner -loglevel error -y -i "$AU" -af "volume=${GAIN}dB,alimiter=limit=0.84:attack=3:release=120:level=false" -ar 48000 "${AU%_raw.wav}.wav"
 ffmpeg -hide_banner -loglevel error -y -framerate 30 -i "$FR/%05d.jpg" -i "${AU%_raw.wav}.wav" \
