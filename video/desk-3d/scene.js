@@ -19,9 +19,10 @@ const T = {
   cap2In: 4.7, cap2Out: 7.9,
   ringToPhone: 8.0, phoneUp: 8.5, phoneUpEnd: 9.7, screenOn: 9.15,   // 3 スマホが立ち上がる
   cap3In: 9.9, cap3Out: 11.7,
-  tapCard: 12.5, modalIn: 12.65, tapBtn: 13.75, thanks: 13.95, modalOut: 14.75, mark1: 15.05, mark2: 15.95,   // 4 報告
-  cap4In: 12.9, cap4Out: 15.0, cap4bIn: 15.25, cap4bOut: 16.7,
-  ringToClock: 16.5, clockRun: 17.2, clockEnd: 18.75, chime: 18.8, vanish: 19.05,   // 5 時限が終わると消える
+  badge: 12.55, cap4In: 12.2, cap4Out: 13.95,                        // 4 ふつうの使い方：何限まで空いているか
+  tapCard: 14.0, modalIn: 14.15, cap4bIn: 14.45, cap4bOut: 17.0,     //   教室を押す → 1週間を見る
+  tapLink: 15.05, toRoom: 15.2, backToList: 16.85,
+  ringToClock: 16.5, clockRun: 17.2, clockEnd: 18.75, chime: 18.8, refresh: 19.05,   // 5 時限が変わっても「いま」
   cap5In: 17.5, cap5Out: 20.2,
   phoneDown: 20.2, sheetUp: 20.5, sheetUpEnd: 21.8, tagIn: 21.5, tagInEnd: 22.3,    // 6 決めの言葉
   sheetDown: 23.7, sheetDownEnd: 24.8,
@@ -116,17 +117,12 @@ function makeTimetable() {
 }
 function makeTagline() {
   const c = paperBase(11), x = c.getContext("2d"), P = TT.PX;
-  drawGrid(x, 0.07);
+  drawGrid(x, 0.06);
   x.textAlign = "center"; x.fillStyle = "#1f2422";
-  x.font = "900 236px RRSans"; x.fillText("空きコマに、", 105 * P, 112 * P);
-  x.font = "900 206px RRSans"; x.fillText("すぐ使える教室を。", 105 * P, 146 * P);
-  // 青緑の下線と、レーダーの輪
-  const g = x.createLinearGradient(20 * P, 0, 190 * P, 0); g.addColorStop(0, "rgba(47,196,178,0)"); g.addColorStop(0.15, "rgba(47,196,178,0.95)"); g.addColorStop(0.85, "rgba(47,196,178,0.95)"); g.addColorStop(1, "rgba(47,196,178,0)");
-  x.fillStyle = g; x.fillRect(20 * P, 156 * P, 170 * P, 1.6 * P);
-  x.strokeStyle = "rgba(47,196,178,0.9)"; x.lineCap = "round";
-  for (let i = 0; i < 4; i++) { x.lineWidth = 16 - i * 2.5; x.globalAlpha = 0.95 - i * 0.2; x.beginPath(); x.arc(105 * P, 214 * P, (7 + i * 7.5) * P, -Math.PI * 0.92, -Math.PI * 0.08); x.stroke(); }
-  x.globalAlpha = 1; x.fillStyle = "rgba(47,196,178,1)"; x.beginPath(); x.arc(105 * P, 214 * P, 2.2 * P, 0, 7); x.fill();
-  x.fillStyle = "#1f2422"; x.font = "800 92px Syne"; x.fillText("RoomRadar", 105 * P, 238 * P);
+  x.font = "900 240px RRSans"; x.fillText("空きコマに、", 105 * P, 128 * P);
+  x.font = "900 208px RRSans"; x.fillText("すぐ使える教室を。", 105 * P, 163 * P);
+  const g = x.createLinearGradient(18 * P, 0, 192 * P, 0); g.addColorStop(0, "rgba(47,196,178,0)"); g.addColorStop(0.12, "rgba(47,196,178,0.95)"); g.addColorStop(0.88, "rgba(47,196,178,0.95)"); g.addColorStop(1, "rgba(47,196,178,0)");
+  x.fillStyle = g; x.fillRect(18 * P, 174 * P, 174 * P, 1.8 * P);
   return c;
 }
 function noiseTex(size, seed, rx, ry) {
@@ -253,9 +249,9 @@ const GradeShader = {
 // ───────── ここから組み立て ─────────
 async function build() {
   await loadFonts();
-  const [imWood, imLogo, page0, page1, page2, modal0, modal1, rects] = await Promise.all([
-    loadImg("assets/wood_src.jpg"), loadImg("assets/logo.png"), loadImg("assets/page0.png"), loadImg("assets/page1.png"), loadImg("assets/page2.png"),
-    loadImg("assets/modal0.png"), loadImg("assets/modal1.png"), fetch("assets/rects.json").then((r) => r.json())]);
+  const [imWood, imLogo, page0, pageN, modal0, room0, rects] = await Promise.all([
+    loadImg("assets/wood_src.jpg"), loadImg("assets/logo.png"), loadImg("assets/page0.png"), loadImg("assets/pageN.png"),
+    loadImg("assets/modal0.png"), loadImg("assets/room0.png"), fetch("assets/rects.json").then((r) => r.json())]);
 
   const canvas = document.getElementById("gl");
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, preserveDrawingBuffer: true, powerPreference: "high-performance" });
@@ -385,15 +381,34 @@ async function build() {
         gl_FragColor = vec4(uColor * I, 1.0); }` }));
   ringMesh.rotation.x = -Math.PI / 2; ringMesh.position.y = 0.0034; scene.add(ringMesh);
 
-  // スマホ（平らに置いてあり、立ち上がる）
-  const SW = 0.0665, SH = SW * 844 / 390, PH = { x: -0.035, z: -0.165, lean: -0.25 };
+  // スマホ（平らに置いてあり、立ち上がる）。平らな金属の枠・角の丸い黒いガラス・細い縁・横のボタン。ロゴなどの印は付けない
+  const PW = 0.0706, PHT = 0.1486, PD = 0.0083, PRAD = 0.0125, BZ = 0.0018;
+  const SW = PW - 2 * BZ, SH = SW * 844 / 390, SCY = PHT / 2, PH = { x: -0.035, z: -0.165, lean: -0.25 };
+  const rrShape = (w, h, r, y0) => { const sh = new THREE.Shape(), x0 = -w / 2;
+    sh.moveTo(x0 + r, y0); sh.lineTo(x0 + w - r, y0); sh.absarc(x0 + w - r, y0 + r, r, -Math.PI / 2, 0, false);
+    sh.lineTo(x0 + w, y0 + h - r); sh.absarc(x0 + w - r, y0 + h - r, r, 0, Math.PI / 2, false);
+    sh.lineTo(x0 + r, y0 + h); sh.absarc(x0 + r, y0 + h - r, r, Math.PI / 2, Math.PI, false);
+    sh.lineTo(x0, y0 + r); sh.absarc(x0 + r, y0 + r, r, Math.PI, Math.PI * 1.5, false); return sh; };
   const phone = new THREE.Group(); phone.position.set(PH.x, 0.0004, PH.z); scene.add(phone);
-  const body = new THREE.Mesh(new RoundedBoxGeometry(0.0715, 0.1472, 0.0080, 5, 0.0038), new THREE.MeshStandardMaterial({ color: 0x1d1e21, metalness: 0.9, roughness: 0.3 }));
-  body.position.set(0, 0.0736, 0.004); body.castShadow = true; body.receiveShadow = true; phone.add(body);
+  const titan = new THREE.MeshStandardMaterial({ color: 0x969088, metalness: 1.0, roughness: 0.34 });
+  const bev = 0.0007, frameG = new THREE.ExtrudeGeometry(rrShape(PW - 2 * bev, PHT - 2 * bev, PRAD - bev, bev), { depth: PD - 2 * bev, bevelEnabled: true, bevelThickness: bev, bevelSize: bev, bevelSegments: 3, curveSegments: 20 });
+  frameG.translate(0, 0, bev);
+  const body = new THREE.Mesh(frameG, titan); body.castShadow = true; body.receiveShadow = true; phone.add(body);
+  const front = new THREE.Mesh(new THREE.ShapeGeometry(rrShape(PW - 0.0015, PHT - 0.0015, PRAD - 0.00075, 0.00075), 20), new THREE.MeshStandardMaterial({ color: 0x040405, roughness: 0.22, metalness: 0 }));
+  front.position.z = PD + 0.00004; phone.add(front);
+  for (const [sx, y, len] of [[1, 0.098, 0.0155], [-1, 0.1215, 0.0058], [-1, 0.1085, 0.0098], [-1, 0.0955, 0.0098]]) {      // 右：電源／左：上のボタンと音量
+    const bt = new THREE.Mesh(new RoundedBoxGeometry(0.0012, len, 0.0030, 2, 0.0005), titan); bt.position.set(sx * (PW / 2 + 0.00025), y, PD / 2); bt.castShadow = true; phone.add(bt);
+  }
   const scrC = mkCanvas(390 * 5, 844 * 5), scrX = scrC.getContext("2d"), scrTex = texFrom(scrC); scrTex.generateMipmaps = true;
-  const scrMat = new THREE.MeshBasicMaterial({ map: scrTex, color: 0xffffff });
-  const screen = new THREE.Mesh(new THREE.PlaneGeometry(SW, SH), scrMat); screen.position.set(0, 0.0736, 0.00812); phone.add(screen);
-  const scrPoint = (cx, cy) => V3((cx / 390 - 0.5) * SW, 0.0736 + (0.5 - cy / 844) * SH, 0.0083);     // 画面上の位置（CSS px）→ スマホの中の位置
+  const scrMat = new THREE.MeshBasicMaterial({ map: scrTex, color: new THREE.Color(1.12, 1.12, 1.12) });
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(SW, SH), scrMat); screen.position.set(0, SCY, PD + 0.00010); phone.add(screen);
+  { // ガラスらしい、うっすらした斜めの映り込み（光の点は出さない）
+    const gc = mkCanvas(256, 512), gx = gc.getContext("2d"), g = gx.createLinearGradient(0, 0, 256, 512);
+    g.addColorStop(0, "rgba(255,255,255,0)"); g.addColorStop(0.30, "rgba(255,255,255,0)"); g.addColorStop(0.44, "rgba(255,240,225,0.028)"); g.addColorStop(0.52, "rgba(255,240,225,0.008)"); g.addColorStop(0.60, "rgba(255,240,225,0.018)"); g.addColorStop(0.72, "rgba(255,255,255,0)"); g.addColorStop(1, "rgba(255,255,255,0)");
+    gx.fillStyle = g; gx.fillRect(0, 0, 256, 512);
+    const sheen = new THREE.Mesh(new THREE.PlaneGeometry(SW, SH), new THREE.MeshBasicMaterial({ map: texFrom(gc), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); sheen.position.set(0, SCY, PD + 0.00016); phone.add(sheen);
+  }
+  const scrPoint = (cx, cy) => V3((cx / 390 - 0.5) * SW, SCY + (0.5 - cy / 844) * SH, PD + 0.0002);     // 画面上の位置（CSS px）→ スマホの中の位置
 
   // 置き時計
   const clock = new THREE.Group(); clock.position.set(0.082, 0, -0.100); clock.rotation.y = -0.22; scene.add(clock);
@@ -438,30 +453,28 @@ async function build() {
       sparks.push({ s, sm, d: V3((r() - 0.5) * 1.0, 0.35 + r() * 1.0, 0.15 + r() * 0.9).multiplyScalar(0.035 + r() * 0.05), o: V3((r() - 0.5) * 0.019, (r() - 0.5) * 0.015, 0), life: 0.7 + r() * 1.0, delay: r() * 0.35, size: 0.0022 + r() * 0.0042, ph: r() * 6.28 }); } }
 
   // ───────── スマホの画面（アプリの実画面の写真を、時刻に合わせて描く） ─────────
-  const S6 = 6, VW = 390, VH = 844, SB = 47, pages = [page0, page1, page2];
+  // 流れ：一覧（水曜3限）→「〜6限」の札 → 教室を押す → その教室の1週間 → 一覧に戻る → 時限が変わると「いま」が水曜4限に
+  const S6 = 6, VW = 390, VH = 844, SB = 47;
   const SCROLL0 = rects.chips[1] - 96, SCROLL1 = rects.chips[1] - 12;          // 開いた直後 → 少しスクロールして教室を見る
-  const cardVY = (sc) => rects.card[1] - sc + SB;
-  const M0 = { top: rects.modal[1], h: rects.modal[3] }, M1 = { top: rects.modal1[1], h: rects.modal1[3] };
-  const BTN = rects.btn;
+  const vy = (pageY, sc) => pageY - sc + SB;                                   // ページの中の位置 → 画面の中の位置
+  const M0 = { top: rects.modal[1], h: rects.modal[3] }, LINK = rects.link;
+  const BADGES = ["span701", "span", "span751", "span752", "span805"].map((k, i) => ({ r: rects[k], t0: T.badge + i * 0.22 }));
+  const ROOMSC = 52;                                                           // 1週間のページを少しスクロールして表を真ん中に
   let lastKey = "";
   function screenState(t) {
     const st = { on: ss(seg(t, T.screenOn, T.screenOn + 0.5)) * (1 - ss(seg(t, T.phoneDown, T.phoneDown + 0.5))) };
     st.scroll = lerp(SCROLL0, SCROLL1, sss(seg(t, T.screenOn + 0.7, T.screenOn + 1.9)));
-    st.pageA = 0; st.pageB = 0; st.mix = 0;
-    if (t >= T.modalOut && t < T.mark2) { st.pageA = 1; }
-    if (t >= T.mark2 - 0.02) { st.pageA = 1; st.pageB = 2; st.mix = ss(seg(t, T.mark2, T.mark2 + 0.3)); }
-    if (t >= T.vanish) { st.pageA = 2; st.pageB = 0; st.mix = ss(seg(t, T.vanish, T.vanish + 0.9)); }
-    st.modalP = eo(seg(t, T.modalIn, T.modalIn + 0.38)) * (1 - ss(seg(t, T.modalOut, T.modalOut + 0.3)));
-    st.thanks = ss(seg(t, T.thanks, T.thanks + 0.22));
-    st.press = seg(t, T.tapBtn, T.tapBtn + 0.1) * (1 - seg(t, T.tapBtn + 0.12, T.tapBtn + 0.3));
+    st.next = ss(seg(t, T.refresh, T.refresh + 0.8));                                           // 時限が変わったあとの一覧へ
+    st.room = eo(seg(t, T.toRoom, T.toRoom + 0.42)) * (1 - eo(seg(t, T.backToList, T.backToList + 0.42)));   // 1週間のページ（横から入る）
+    st.roomScroll = ROOMSC * sss(seg(t, T.toRoom + 0.5, T.toRoom + 1.3));
+    st.modalP = eo(seg(t, T.modalIn, T.modalIn + 0.38)) * (1 - ss(seg(t, T.toRoom, T.toRoom + 0.2)));
+    st.press = seg(t, T.tapLink, T.tapLink + 0.08) * (1 - seg(t, T.tapLink + 0.1, T.tapLink + 0.28));
     st.taps = [];
     const tap = (t0, x, y) => { const p = seg(t, t0, t0 + 0.5); if (p > 0 && p < 1) st.taps.push([x, y, p]); };
-    tap(T.tapCard, rects.card[0] + rects.card[2] / 2, cardVY(SCROLL1) + rects.card[3] / 2);
-    tap(T.tapBtn, BTN[0] + BTN[2] / 2, BTN[1] + BTN[3] / 2);
-    st.pulse = [];
-    const pulse = (t0) => { const p = seg(t, t0, t0 + 0.8); if (p > 0 && p < 1) st.pulse.push(p); };
-    pulse(T.mark1); pulse(T.mark2);
-    st.clock = t >= T.clockEnd ? "15:00" : "14:40";
+    tap(T.tapCard, rects.card[0] + rects.card[2] / 2, vy(rects.card[1], SCROLL1) + rects.card[3] / 2);
+    tap(T.tapLink, LINK[0] + LINK[2] / 2, LINK[1] + LINK[3] / 2);
+    st.badges = BADGES.map((b) => { const p = seg(t, b.t0, b.t0 + 0.9); return p > 0 && p < 1 ? p : 0; });
+    st.clock = t >= T.clockEnd ? "15:10" : "14:40";
     return st;
   }
   function drawScreen(st) {
@@ -470,32 +483,38 @@ async function build() {
     const c = scrX; c.save(); c.setTransform(5, 0, 0, 5, 0, 0);
     c.fillStyle = "#000"; c.fillRect(0, 0, VW, VH);
     if (st.on > 0.001) {
-      rr(c, 0, 0, VW, VH, 47); c.clip();
+      rr(c, 0, 0, VW, VH, 60); c.clip();
       c.fillStyle = "#0a0a0f"; c.fillRect(0, 0, VW, VH);
-      const page = (i, a) => { c.globalAlpha = a; c.drawImage(pages[i], 0, st.scroll * S6, VW * S6, (VH - SB) * S6, 0, SB, VW, VH - SB); c.globalAlpha = 1; };
-      page(st.pageA, 1); if (st.mix > 0) page(st.pageB, st.mix);
-      for (const p of st.pulse) {                                  // 印が付いたときの青緑の縁どり
-        const g = 3 + p * 12; c.strokeStyle = `rgba(95,230,210,${(1 - p) * 0.95})`; c.lineWidth = 3 - p * 1.5;
-        rr(c, rects.card[0] - g, cardVY(st.scroll) - g, rects.card[2] + g * 2, rects.card[3] + g * 2, 14 + g); c.stroke();
-      }
+      const xl = -st.room * VW * 0.28;                                // 一覧は少し左へ下がる
+      const list = (img, a) => { c.globalAlpha = a; c.drawImage(img, 0, st.scroll * S6, VW * S6, (VH - SB) * S6, xl, SB, VW, VH - SB); c.globalAlpha = 1; };
+      list(page0, 1); if (st.next > 0) list(pageN, st.next);
+      st.badges.forEach((p, i) => { if (!p) return;                   // 「〜6限」の札を青緑で囲む
+        const r = BADGES[i].r, g = 2 + p * 5, a = Math.sin(Math.PI * Math.min(1, p * 1.25));
+        c.strokeStyle = `rgba(95,230,210,${a})`; c.lineWidth = 2; rr(c, xl + r[0] - g, vy(r[1], st.scroll) - g, r[2] + g * 2, r[3] + g * 2, 8 + g); c.stroke();
+        c.fillStyle = `rgba(95,230,210,${a * 0.16})`; c.fill(); });
       if (st.modalP > 0.001) {
-        const m = st.thanks > 0.5 ? M1 : M0, img = st.thanks > 0.5 ? modal1 : modal0;
-        c.globalAlpha = Math.min(1, st.modalP * 1.2); c.drawImage(modal0, 0, 0, VW * S6, M1.top * S6, 0, 0, VW, M1.top);
-        c.fillStyle = "rgba(6,6,10,0.86)"; c.fillRect(0, M1.top, VW, VH - M1.top); c.globalAlpha = 1;
-        const yo = (1 - st.modalP) * (m.h + 20);
-        c.drawImage(img, 0, m.top * S6, VW * S6, m.h * S6, 0, m.top + yo, VW, m.h);
-        if (st.thanks > 0 && st.thanks <= 0.5) { c.globalAlpha = st.thanks * 2; c.drawImage(modal1, 0, M1.top * S6, VW * S6, M1.h * S6, 0, M1.top + yo, VW, M1.h); c.globalAlpha = 1; }
-        if (st.press > 0) { c.fillStyle = `rgba(255,255,255,${0.16 * st.press})`; rr(c, BTN[0], BTN[1] + yo, BTN[2], BTN[3], 12); c.fill(); }
+        c.globalAlpha = Math.min(1, st.modalP * 1.2); c.drawImage(modal0, 0, 0, VW * S6, M0.top * S6, 0, 0, VW, M0.top);
+        c.fillStyle = "rgba(6,6,10,0.86)"; c.fillRect(0, M0.top, VW, VH - M0.top); c.globalAlpha = 1;
+        const yo = (1 - st.modalP) * (M0.h + 20);
+        c.drawImage(modal0, 0, M0.top * S6, VW * S6, M0.h * S6, 0, M0.top + yo, VW, M0.h);
+        if (st.press > 0) { c.fillStyle = `rgba(120,160,255,${0.22 * st.press})`; rr(c, LINK[0] - 8, LINK[1] - 7 + yo, LINK[2] + 16, LINK[3] + 14, 8); c.fill(); }
+      }
+      if (st.room > 0.001) {                                         // その教室の1週間（右から入ってくる）
+        const xr = (1 - st.room) * VW;
+        c.fillStyle = `rgba(0,0,0,${0.4 * st.room})`; c.fillRect(0, SB, VW, VH - SB);
+        c.fillStyle = "#0a0a0f"; c.fillRect(xr, SB, VW, VH - SB);
+        const hSrc = Math.min((VH - SB) * S6, room0.height - st.roomScroll * S6);
+        c.drawImage(room0, 0, st.roomScroll * S6, VW * S6, hSrc, xr, SB, VW, hSrc / S6);
       }
       // 上の帯（時刻・電波・電池）と、下の横棒
       c.fillStyle = "#0a0a0f"; c.fillRect(0, 0, VW, SB);
-      c.fillStyle = "#000"; rr(c, VW / 2 - 60, 11, 120, 34, 17); c.fill();
-      c.fillStyle = "rgba(255,255,255,0.95)"; c.font = "700 16px RRSans"; c.textAlign = "left"; c.textBaseline = "middle"; c.fillText(st.clock, 34, 29);
-      for (let i = 0; i < 4; i++) { rr(c, 292 + i * 5.2, 34 - (4 + i * 2.4), 3.4, 4 + i * 2.4, 1); c.fill(); }
-      c.lineWidth = 1.2; c.strokeStyle = "rgba(255,255,255,0.6)"; rr(c, 331, 22.5, 25, 12.5, 3.6); c.stroke(); rr(c, 333, 24.5, 17, 8.5, 2); c.fill(); rr(c, 357.3, 26.6, 1.8, 4.4, 1); c.fill();
-      c.lineCap = "round"; c.strokeStyle = "rgba(255,255,255,0.95)"; c.lineWidth = 1.9;
-      for (let i = 0; i < 3; i++) { c.beginPath(); c.arc(320, 34.5, 2.6 + i * 3.2, -Math.PI * 0.76, -Math.PI * 0.24); c.stroke(); }
-      c.fillStyle = "rgba(255,255,255,0.7)"; rr(c, VW / 2 - 67, VH - 13, 134, 5, 2.5); c.fill();
+      c.fillStyle = "#000"; rr(c, VW / 2 - 62, 11, 124, 36, 18); c.fill();
+      c.fillStyle = "rgba(255,255,255,0.96)"; c.font = "700 17px RRSans"; c.textAlign = "left"; c.textBaseline = "middle"; c.fillText(st.clock, 40, 30);
+      for (let i = 0; i < 4; i++) { rr(c, 286 + i * 5.2, 35 - (4 + i * 2.4), 3.4, 4 + i * 2.4, 1); c.fill(); }
+      c.lineWidth = 1.2; c.strokeStyle = "rgba(255,255,255,0.6)"; rr(c, 326, 23.5, 25, 12.5, 3.6); c.stroke(); rr(c, 328, 25.5, 17, 8.5, 2); c.fill(); rr(c, 352.3, 27.6, 1.8, 4.4, 1); c.fill();
+      c.lineCap = "round"; c.strokeStyle = "rgba(255,255,255,0.96)"; c.lineWidth = 1.9;
+      for (let i = 0; i < 3; i++) { c.beginPath(); c.arc(314, 35.5, 2.6 + i * 3.2, -Math.PI * 0.76, -Math.PI * 0.24); c.stroke(); }
+      c.fillStyle = "rgba(255,255,255,0.75)"; rr(c, VW / 2 - 70, VH - 14, 140, 5, 2.5); c.fill();
       for (const [x, y, p] of st.taps) {                           // 押したところ
         c.fillStyle = `rgba(255,255,255,${(1 - p) * 0.34})`; c.beginPath(); c.arc(x, y, 12 + p * 24, 0, 7); c.fill();
         c.strokeStyle = `rgba(255,255,255,${(1 - p) * 0.7})`; c.lineWidth = 1.6; c.beginPath(); c.arc(x, y, 12 + p * 24, 0, 7); c.stroke();
@@ -509,7 +528,9 @@ async function build() {
   phone.rotation.x = PH.lean; phone.updateMatrixWorld(true);
   const pw = (cx, cy) => phone.localToWorld(scrPoint(cx, cy));
   const nrm = V3(0, 0, 1).applyQuaternion(phone.quaternion);
-  const scrMid = pw(195, 422), modalMid = pw(195, 652), cardMid = pw(rects.card[0] + rects.card[2] / 2 - 24, cardVY(SCROLL1) + rects.card[3] / 2 - 30);
+  const scrMid = pw(195, 422), modalMid = pw(195, 652);
+  const rowsMid = pw(195, vy(rects.card[1], SCROLL1) + 92);                                    // 教室カードの1〜2段目
+  const weekMid = pw(195, vy(rects.week[1] + rects.week[3] / 2, ROOMSC) - 30);                 // 1週間の表
   const sheetMid = V3(0, 0.15, SHEET_Z - 0.03), paperMid = V3(0, 0, 0.06);
   const off = (p, d, dx = 0, dy = 0) => p.clone().addScaledVector(nrm, d).add(V3(dx, dy, 0));
   const KEYS = [   // t, 位置, 見る先, ピントを合わせる点, ぼけの強さ, その時刻までの進み方（io=ゆっくり始めてゆっくり止まる / lin=等速）
@@ -517,15 +538,15 @@ async function build() {
     { t: 3.3, p: V3(0.140, 0.135, 0.365), l: V3(0.0, 0.0, 0.070), f: V3(0.012, 0, 0.075), k: 14, e: "lin" },
     { t: 5.0, p: V3(0.030, 0.520, 0.640), l: V3(0.0, 0.0, 0.052), f: paperMid, k: 15 },
     { t: 7.9, p: V3(-0.020, 0.555, 0.615), l: V3(0.0, 0.0, 0.048), f: paperMid, k: 15, e: "lin" },
-    { t: 9.8, p: V3(0.060, 0.170, 0.500), l: V3(-0.022, 0.066, -0.13), f: scrMid, k: 26 },
-    { t: 11.7, p: V3(0.035, 0.160, 0.410), l: V3(-0.028, 0.070, -0.14), f: scrMid, k: 26, e: "lin" },
-    { t: 12.45, p: off(scrMid, 0.285, 0.010, 0.004), l: scrMid, f: scrMid, k: 26 },
-    { t: 12.75, p: off(scrMid, 0.280, 0.010, 0.004), l: scrMid, f: scrMid, k: 26, e: "lin" },
-    { t: 13.5, p: off(modalMid, 0.215, 0.004, 0.006), l: modalMid, f: modalMid, k: 26 },
-    { t: 14.7, p: off(modalMid, 0.208, 0.004, 0.006), l: modalMid, f: modalMid, k: 26, e: "lin" },
-    { t: 15.5, p: off(cardMid, 0.122, 0.002, 0.002), l: cardMid, f: cardMid, k: 26 },
-    { t: 16.5, p: off(cardMid, 0.112, 0.002, 0.002), l: cardMid, f: cardMid, k: 26, e: "lin" },
-    { t: 17.5, p: V3(0.075, 0.105, 0.430), l: V3(0.030, 0.066, -0.125), f: clockFace, k: 22 },
+    { t: 9.8, p: V3(0.050, 0.150, 0.385), l: V3(-0.026, 0.070, -0.135), f: scrMid, k: 26 },
+    { t: 11.7, p: V3(0.028, 0.142, 0.320), l: V3(-0.030, 0.072, -0.14), f: scrMid, k: 26, e: "lin" },
+    { t: 12.5, p: off(rowsMid, 0.212, 0.006, 0.004), l: rowsMid, f: rowsMid, k: 26 },
+    { t: 13.9, p: off(rowsMid, 0.204, 0.004, 0.004), l: rowsMid, f: rowsMid, k: 26, e: "lin" },
+    { t: 14.75, p: off(modalMid, 0.215, 0.004, 0.006), l: modalMid, f: modalMid, k: 26 },
+    { t: 15.2, p: off(modalMid, 0.212, 0.004, 0.006), l: modalMid, f: modalMid, k: 26, e: "lin" },
+    { t: 16.0, p: off(weekMid, 0.212, 0.003, 0.004), l: weekMid, f: weekMid, k: 26 },
+    { t: 16.7, p: off(weekMid, 0.206, 0.003, 0.004), l: weekMid, f: weekMid, k: 26, e: "lin" },
+    { t: 17.6, p: V3(0.075, 0.105, 0.430), l: V3(0.030, 0.066, -0.125), f: clockFace, k: 22 },
     { t: 18.8, p: V3(0.062, 0.108, 0.405), l: V3(0.026, 0.068, -0.125), f: clockFace, k: 22, e: "lin" },
     { t: 19.5, p: V3(0.048, 0.110, 0.385), l: V3(0.018, 0.070, -0.130), f: scrMid, k: 22 },
     { t: 20.3, p: V3(0.040, 0.112, 0.395), l: V3(0.014, 0.071, -0.130), f: scrMid, k: 22, e: "lin" },
@@ -586,14 +607,14 @@ async function build() {
     phone.updateMatrixWorld(true);
     const sp = phone.localToWorld(scrPoint(195, 420)); phoneLight.position.copy(sp).addScaledVector(V3(0, 0, 1).applyQuaternion(phone.quaternion), 0.05); phoneLight.intensity = st.on * 0.035; phoneLight.visible = !Q.has("lightsoff") || st.on > 0.002;
 
-    // 時計（14:40 → 15:00）
-    const min = lerp(40, 60, sss(seg(t, T.clockRun, T.clockEnd)));
+    // 時計（14:40 → 15:10。4限の始まり）
+    const min = lerp(40, 70, sss(seg(t, T.clockRun, T.clockEnd)));
     minH.rotation.z = -(min / 60) * Math.PI * 2; hourH.rotation.z = -((2 + min / 60) / 12) * Math.PI * 2;
 
     // 光の粒
-    const so = phone.localToWorld(scrPoint(rects.card[0] + rects.card[2] / 2, cardVY(SCROLL1) + rects.card[3] / 2));
+    const so = phone.localToWorld(scrPoint(rects.chips[0] + 58, vy(rects.chips[1], SCROLL1) + 27));
     for (const s of sparks) {
-      const a = (t - T.vanish - s.delay) / s.life; s.s.visible = a > 0 && a < 1; if (!s.s.visible) continue;
+      const a = (t - T.refresh - s.delay) / s.life; s.s.visible = a > 0 && a < 1; if (!s.s.visible) continue;
       const tt = a * s.life; s.s.position.copy(so).add(s.o).addScaledVector(s.d, tt * (1.2 - 0.45 * a)); s.s.position.x += Math.sin(tt * 5 + s.ph) * 0.0022;
       const sc = s.size * (0.6 + 0.9 * Math.sin(Math.PI * Math.min(1, a * 1.6))); s.s.scale.set(sc, sc, 1); s.sm.opacity = Math.sin(Math.PI * a) * 0.95;
     }
