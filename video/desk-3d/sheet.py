@@ -4,7 +4,8 @@ from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__)); times = sys.argv[1]
 arg = lambda k, d: (sys.argv[sys.argv.index(k) + 1] if k in sys.argv else d)
 scale, cols, name, q = arg("--scale", "0.4"), int(arg("--cols", "6")), arg("--name", "sheet"), arg("--query", "")
-subprocess.run([sys.executable, os.path.join(HERE, "render.py"), "--scale", scale, "--times", times, "--out", "renders/pv", "--query", q], check=True)
+page = arg("--page", "index.html")
+subprocess.run([sys.executable, os.path.join(HERE, "render.py"), "--scale", scale, "--times", times, "--out", "renders/pv", "--query", q, "--page", page], check=True)
 ims = [Image.open(os.path.join(HERE, "renders/pv", f"t{float(x):06.2f}".replace(".", "_") + ".jpg")) for x in times.split(",")]
 w, h = ims[0].size; rows = (len(ims) + cols - 1) // cols
 c = Image.new("RGB", (cols * (w + 6), rows * (h + 6)), "#222")

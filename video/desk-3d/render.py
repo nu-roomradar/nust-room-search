@@ -12,12 +12,14 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--scale", type=float, default=1.0); ap.add_argument("--times", default=""); ap.add_argument("--out", default="renders/frames")
 ap.add_argument("--start", type=int, default=0); ap.add_argument("--end", type=int, default=-1); ap.add_argument("--part", default="0/1")
 ap.add_argument("--fps", type=int, default=30); ap.add_argument("--duration", type=float, default=30.0); ap.add_argument("--query", default="")
+ap.add_argument("--page", default="index.html")       # door.html なら「ポスターとドア」の版（--duration 27）
 a = ap.parse_args()
 out = os.path.join(HERE, a.out); os.makedirs(out, exist_ok=True)
 class H(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *x): pass
-srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(H, directory=HERE)); threading.Thread(target=srv.serve_forever, daemon=True).start()
-url = f"http://127.0.0.1:{srv.server_address[1]}/index.html?{a.query}"
+ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))        # リポジトリの根から配る（ポスターの画像など assets/ も読むため）
+srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(H, directory=ROOT)); threading.Thread(target=srv.serve_forever, daemon=True).start()
+url = f"http://127.0.0.1:{srv.server_address[1]}/video/desk-3d/{a.page}?{a.query}"
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path=find_chrome(), args=["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--disable-gpu-vsync"])
     pg = b.new_page(viewport={"width": 1080, "height": 1920}, device_scale_factor=a.scale)
