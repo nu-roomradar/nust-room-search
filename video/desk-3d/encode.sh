@@ -6,7 +6,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 if [ "${1:-}" = "door" ]; then FR=renders/frames_door; AU=renders/audio2_raw.wav; OUT=renders/cm6-poster-door-v4.mp4; GAIN=6.4
-else FR=renders/frames; AU=renders/audio_raw.wav; OUT=renders/cm5-desk-3d-v2.mp4; GAIN=5.6; fi
+else FR=renders/frames; AU=renders/audio_raw.wav; OUT=renders/cm5-desk-3d-v3.mp4; GAIN=5.6; fi
 ffmpeg -hide_banner -loglevel error -y -i "$AU" -af "volume=${GAIN}dB,alimiter=limit=0.84:attack=3:release=120:level=false" -ar 48000 "${AU%_raw.wav}.wav"
 ffmpeg -hide_banner -loglevel error -y -framerate 30 -i "$FR/%05d.jpg" -i "${AU%_raw.wav}.wav" \
   -c:v libx264 -preset slow -crf 21 -pix_fmt yuv420p -colorspace bt709 -color_primaries bt709 -color_trc bt709 -movflags +faststart \

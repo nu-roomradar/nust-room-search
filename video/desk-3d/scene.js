@@ -194,7 +194,7 @@ class DofPass extends Pass {
           if (ds > dc) cs = min(cs, cc * 2.0);                 // 奥のぼけを、手前のピントの合ったものに乗せない
           float m = smoothstep(r - 1.0, r + 1.0, cs);
           vec3 c = texture2D(tColor, uv).rgb;
-          m *= 1.0 + 0.35 * min(dot(c, vec3(0.3, 0.6, 0.1)), 6.0);   // 明るい点を少し強く（玉ぼけ）
+          m *= 1.0 + 0.10 * min(dot(c, vec3(0.3, 0.6, 0.1)), 4.0);   // 明るい点を少しだけ強く（強すぎると、ぼけた所がちらつく）
           acc += c * m; ws += m;
         }
         gl_FragColor = vec4(acc / ws, cc / uMaxR);
@@ -530,7 +530,7 @@ async function build() {
   const nrm = V3(0, 0, 1).applyQuaternion(phone.quaternion);
   const scrMid = pw(195, 422), modalMid = pw(195, 652);
   const rowsMid = pw(195, vy(rects.card[1], SCROLL1) + 92);                                    // 教室カードの1〜2段目
-  const weekMid = pw(195, vy(rects.week[1] + rects.week[3] / 2, ROOMSC) - 30);                 // 1週間の表
+  const weekMid = pw(195, vy(rects.week[1] + rects.week[3] / 2, ROOMSC) - 94);                 // 表の見出し（教室名）が字幕の札の下に来るように                 // 1週間の表
   const sheetMid = V3(0, 0.15, SHEET_Z - 0.03), paperMid = V3(0, 0, 0.06);
   const off = (p, d, dx = 0, dy = 0) => p.clone().addScaledVector(nrm, d).add(V3(dx, dy, 0));
   const KEYS = [   // t, 位置, 見る先, ピントを合わせる点, ぼけの強さ, その時刻までの進み方（io=ゆっくり始めてゆっくり止まる / lin=等速）
@@ -570,7 +570,7 @@ async function build() {
   const dof = new DofPass(rtScene, rw, rh); composer.addPass(dof);
   const bloom = new UnrealBloomPass(new THREE.Vector2(rw, rh), 0.34, 0.7, 1.0); composer.addPass(bloom);
   composer.addPass(new OutputPass());
-  const grade = new ShaderPass(GradeShader); composer.addPass(grade);
+  const grade = new ShaderPass(GradeShader); composer.addPass(grade); grade.uniforms.uGrain.value = 0.018;
 
   const caps = { cap2: [T.cap2In, T.cap2Out], cap3: [T.cap3In, T.cap3Out], cap4: [T.cap4In, T.cap4Out], cap4b: [T.cap4bIn, T.cap4bOut], cap5: [T.cap5In, T.cap5Out], word: [T.wordIn, 99], notice: [T.noticeIn, 99] };
   const capEl = Object.fromEntries(Object.keys(caps).map((k) => [k, document.getElementById(k)]));
@@ -635,13 +635,15 @@ async function build() {
     for (const k of Object.keys(caps)) {
       const [a, b] = caps[k], al = ss(seg(t, a, a + 0.45)) * (1 - ss(seg(t, b - 0.4, b)));
       capEl[k].style.opacity = al.toFixed(4); capEl[k].style.transform = `translateY(${((1 - ss(seg(t, a, a + 0.6))) * 16).toFixed(2)}px)`;
+      const mn = capEl[k].querySelector(".mn");          // 札の中の言葉は、少し遅れて左から現れる
+      if (mn) { const p = eo(seg(t, a + 0.22, a + 0.95)); mn.style.clipPath = `inset(-10% ${((1 - p) * 100).toFixed(2)}% -10% 0)`; mn.style.transform = `translateX(${((1 - p) * -14).toFixed(2)}px)`; }
     }
 
     // カメラとピント
     evalCamera(t);
     camera.position.copy(camState.p); camera.lookAt(camState.l); camera.updateMatrixWorld(true);
     dof.params.focus = camState.p.distanceTo(camState.f); dof.params.k = camState.k * 1.9 * PR; dof.params.maxR = 46 * PR;
-    dof.params.near = camera.near; dof.params.far = camera.far; dof.params.seed = Math.round(t * FPS) % 64;
+    dof.params.near = camera.near; dof.params.far = camera.far; dof.params.seed = 0;        // ぼかしの粒はコマごとに変えない（変えると、ぼけた所がちらつく）
     grade.uniforms.uSeed.value = Math.round(t * FPS);
   }
   renderer.shadowMap.autoUpdate = false; let shadowKey = "";
