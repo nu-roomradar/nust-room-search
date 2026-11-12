@@ -400,7 +400,7 @@ async function build() {
     const bt = new THREE.Mesh(new RoundedBoxGeometry(0.0012, len, 0.0030, 2, 0.0005), titan); bt.position.set(sx * (PW / 2 + 0.00025), y, PD / 2); bt.castShadow = true; phone.add(bt);
   }
   const scrC = mkCanvas(390 * 5, 844 * 5), scrX = scrC.getContext("2d"), scrTex = texFrom(scrC); scrTex.generateMipmaps = true;
-  const scrMat = new THREE.MeshBasicMaterial({ map: scrTex, color: new THREE.Color(1.12, 1.12, 1.12) });
+  const scrMat = new THREE.MeshBasicMaterial({ map: scrTex, color: new THREE.Color(1.12, 1.12, 1.12), alphaTest: 0.5 });   // 四隅は透明（本体の丸い角からはみ出さない）
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(SW, SH), scrMat); screen.position.set(0, SCY, PD + 0.00010); phone.add(screen);
   { // ガラスらしい、うっすらした斜めの映り込み（光の点は出さない）
     const gc = mkCanvas(256, 512), gx = gc.getContext("2d"), g = gx.createLinearGradient(0, 0, 256, 512);
@@ -481,9 +481,9 @@ async function build() {
     const key = JSON.stringify(st, (k, v) => typeof v === "number" ? Math.round(v * 500) / 500 : v);
     if (key === lastKey) return; lastKey = key;
     const c = scrX; c.save(); c.setTransform(5, 0, 0, 5, 0, 0);
+    c.clearRect(0, 0, VW, VH); rr(c, 0, 0, VW, VH, 60); c.clip();          // 画面の形（角の丸い四角）の外は透明のまま
     c.fillStyle = "#000"; c.fillRect(0, 0, VW, VH);
     if (st.on > 0.001) {
-      rr(c, 0, 0, VW, VH, 60); c.clip();
       c.fillStyle = "#0a0a0f"; c.fillRect(0, 0, VW, VH);
       const xl = -st.room * VW * 0.28;                                // 一覧は少し左へ下がる
       const list = (img, a) => { c.globalAlpha = a; c.drawImage(img, 0, st.scroll * S6, VW * S6, (VH - SB) * S6, xl, SB, VW, VH - SB); c.globalAlpha = 1; };

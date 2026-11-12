@@ -1,7 +1,7 @@
 // RoomRadar 3D 広告その2「ポスターとドア」— 夕方の廊下。掲示板の「どこ行く？」ポスター → スマホで QR を読み取る →
 // 空き教室が見つかる → 友達と教室に入る → 閉まったドアにロゴ（縦 1080×1920・27秒）。
 // 時刻 t（秒）だけで全部が決まる。書き出しは render.py --page door.html が window.renderAt(t) を1コマずつ呼ぶ。
-// 人は後ろ姿の簡単な人形（顔は作っていない）。実在の人物・AI 生成の映像は使わない。
+// 人の姿は映さない。夕方の光でできる影だけが壁を通ってドアに入っていく（影を落とす形は描かない）。実在の人物・AI 生成の映像は使わない。
 import * as THREE from "three";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
@@ -48,29 +48,38 @@ function plateTex(text) {
   return texFrom(c);
 }
 
-// 人形（後ろ姿だけ見せる。顔は無い）
+// 影を落とすための人の形（姿は描かない。壁と床に落ちる影だけを見せる）
 function makePerson(o) {
   const g = new THREE.Group(), k = o.h / 1.7, hip = 0.90 * k, sh = 1.42 * k;
-  const mat = (c, r = 0.86) => new THREE.MeshStandardMaterial({ color: c, roughness: r });
+  const mat = () => new THREE.MeshBasicMaterial({ color: 0x000000 });
   const cast = (m) => { m.castShadow = true; return m; };
   const legs = [-1, 1].map((sx) => {
     const p = new THREE.Group(); p.position.set(sx * 0.085 * k, hip, 0);
-    const m = cast(new THREE.Mesh(new THREE.CapsuleGeometry(0.072 * k, 0.72 * k, 6, 12), mat(o.bottom))); m.position.y = -0.43 * k; p.add(m);
-    const shoe = cast(new THREE.Mesh(new RoundedBoxGeometry(0.10 * k, 0.07 * k, 0.25 * k, 2, 0.03 * k), mat(o.shoe || 0x2b2723))); shoe.position.set(0, -0.865 * k, -0.045 * k); p.add(shoe);
+    const m = cast(new THREE.Mesh(new THREE.CapsuleGeometry((o.wide ? 0.085 : 0.07) * k, 0.72 * k, 6, 12), mat())); m.position.y = -0.43 * k; p.add(m);
+    const shoe = cast(new THREE.Mesh(new RoundedBoxGeometry(0.10 * k, 0.07 * k, 0.26 * k, 2, 0.03 * k), mat())); shoe.position.set(0, -0.865 * k, -0.05 * k); p.add(shoe);
     g.add(p); return p; });
-  const torso = cast(new THREE.Mesh(new THREE.CapsuleGeometry(0.168 * k, 0.36 * k, 8, 16), mat(o.top))); torso.scale.z = 0.62; torso.position.y = (hip + sh) / 2 + 0.02 * k; g.add(torso);
+  // 胴（腰は細め・肩は広め）と肩
+  const hips = cast(new THREE.Mesh(new THREE.CapsuleGeometry(0.150 * k, 0.16 * k, 8, 16), mat())); hips.scale.z = 0.66; hips.position.y = hip + 0.08 * k; g.add(hips);
+  const chest = cast(new THREE.Mesh(new THREE.CapsuleGeometry(0.165 * k, 0.20 * k, 8, 16), mat())); chest.scale.z = 0.64; chest.position.y = sh - 0.16 * k; g.add(chest);
+  const shoulders = cast(new THREE.Mesh(new THREE.CapsuleGeometry(0.062 * k, 0.30 * k, 6, 12), mat())); shoulders.rotation.z = Math.PI / 2; shoulders.position.y = sh - 0.02 * k; g.add(shoulders);
+  if (o.skirt) { const sk = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.16 * k, 0.26 * k, 0.48 * k, 20), mat())); sk.scale.z = 0.75; sk.position.y = hip - 0.20 * k; g.add(sk); }
+  if (o.coat) { const ct = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.175 * k, 0.21 * k, 0.42 * k, 20), mat())); ct.scale.z = 0.7; ct.position.y = hip - 0.02 * k; g.add(ct); }
+  // 腕（ひじを少し曲げる。手は丸くしない）
   const arms = [-1, 1].map((sx) => {
-    const p = new THREE.Group(); p.position.set(sx * 0.212 * k, sh - 0.02 * k, 0); p.rotation.z = sx * 0.07;
-    const m = cast(new THREE.Mesh(new THREE.CapsuleGeometry(0.041 * k, 0.50 * k, 6, 10), mat(o.top))); m.position.y = -0.29 * k; p.add(m);
-    const hand = cast(new THREE.Mesh(new THREE.SphereGeometry(0.047 * k, 12, 10), mat(o.skin))); hand.position.y = -0.61 * k; p.add(hand);
-    g.add(p); return p; });
-  const neck = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.05 * k, 0.055 * k, 0.09 * k, 12), mat(o.skin))); neck.position.y = 1.475 * k; g.add(neck);
+    const p = new THREE.Group(); p.position.set(sx * 0.205 * k, sh - 0.03 * k, 0); p.rotation.z = sx * 0.06;
+    const up = cast(new THREE.Mesh(new THREE.CapsuleGeometry(0.043 * k, 0.24 * k, 6, 10), mat())); up.position.y = -0.15 * k; p.add(up);
+    const el = new THREE.Group(); el.position.y = -0.30 * k; el.rotation.x = -(o.bend ?? 0.32); p.add(el);
+    const lo = cast(new THREE.Mesh(new THREE.CapsuleGeometry(0.036 * k, 0.26 * k, 6, 10), mat())); lo.position.y = -0.15 * k; el.add(lo);
+    g.add(p); p.userData.el = el; return p; });
+  const neck = cast(new THREE.Mesh(new THREE.CylinderGeometry(0.052 * k, 0.062 * k, 0.10 * k, 12), mat())); neck.position.y = 1.465 * k; g.add(neck);
   const head = new THREE.Group(); head.position.y = 1.60 * k; g.add(head);
-  head.add(cast(new THREE.Mesh(new THREE.SphereGeometry(0.104 * k, 20, 16), mat(o.skin))));
-  const hair = cast(new THREE.Mesh(new THREE.SphereGeometry(0.113 * k, 20, 16), mat(o.hair, 0.7))); hair.position.set(0, 0.014 * k, 0.016 * k); hair.scale.set(1, o.long ? 1.18 : 1.0, 1); head.add(hair);
-  if (o.long) { const tail = cast(new THREE.Mesh(new THREE.CapsuleGeometry(0.085 * k, 0.12 * k, 6, 12), mat(o.hair, 0.7))); tail.position.set(0, -0.11 * k, 0.045 * k); tail.scale.z = 0.7; head.add(tail); }
-  if (o.bag) { const b = cast(new THREE.Mesh(new RoundedBoxGeometry(0.27 * k, 0.37 * k, 0.13 * k, 3, 0.045 * k), mat(o.bag, 0.75))); b.position.set(0, 1.19 * k, 0.145 * k); g.add(b); }
-  if (o.tote) { const b = cast(new THREE.Mesh(new RoundedBoxGeometry(0.06 * k, 0.30 * k, 0.32 * k, 2, 0.02 * k), mat(o.tote, 0.9))); b.position.set(0.02 * k, -0.52 * k, 0); arms[1].add(b); }
+  const skull = cast(new THREE.Mesh(new THREE.SphereGeometry(0.098 * k, 20, 16), mat())); skull.scale.set(0.92, 1.14, 1.02); head.add(skull);
+  const hair = cast(new THREE.Mesh(new THREE.SphereGeometry(0.106 * k, 20, 16), mat())); hair.position.set(0, 0.022 * k, 0.018 * k); hair.scale.set(0.98, 1.08, 1.05); head.add(hair);
+  if (o.long) { const tail = cast(new THREE.Mesh(new THREE.CapsuleGeometry(0.085 * k, 0.16 * k, 6, 12), mat())); tail.position.set(0, -0.13 * k, 0.05 * k); tail.scale.z = 0.6; head.add(tail); }
+  if (o.pony) { const tail = cast(new THREE.Mesh(new THREE.CapsuleGeometry(0.035 * k, 0.14 * k, 6, 10), mat())); tail.position.set(0, -0.04 * k, 0.13 * k); tail.rotation.x = 0.5; head.add(tail); }
+  if (o.hood) { const hd = cast(new THREE.Mesh(new THREE.SphereGeometry(0.10 * k, 16, 12), mat())); hd.position.set(0, 1.44 * k, 0.10 * k); hd.scale.set(1.25, 0.8, 0.8); g.add(hd); }
+  if (o.bag) { const b = cast(new THREE.Mesh(new RoundedBoxGeometry(0.27 * k, 0.37 * k, 0.14 * k, 3, 0.05 * k), mat())); b.position.set(0, 1.19 * k, 0.15 * k); g.add(b); }
+  if (o.tote) { const b = cast(new THREE.Mesh(new RoundedBoxGeometry(0.06 * k, 0.30 * k, 0.32 * k, 2, 0.02 * k), mat())); b.position.set(0.02 * k, -0.20 * k, 0.02 * k); arms[1].userData.el.add(b); }
   return { g, legs, arms, head, k, o };
 }
 
@@ -99,9 +108,9 @@ async function build() {
   }
 
   // 光：後ろの窓からの夕方の光（壁に斜めに当たる）と、教室の明かり（開いたドアから廊下にこぼれる）
-  const sun = new THREE.SpotLight(0xffc79a, 78, 0, 0.27, 0.5, 2);
-  sun.position.set(3.6, 2.35, 4.6); sun.target.position.set(-0.85, 1.42, 0); scene.add(sun, sun.target);
-  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.near = 1.5; sun.shadow.camera.far = 12; sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.01;
+  const sun = new THREE.SpotLight(0xffc79a, 74, 0, 0.50, 0.45, 2);
+  sun.position.set(3.4, 1.82, 4.9); sun.target.position.set(-0.15, 1.30, 0); scene.add(sun, sun.target);
+  sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024);   // 粗めにして影の縁をやわらかく sun.shadow.camera.near = 1.5; sun.shadow.camera.far = 12; sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.01;
   sun.map = cookieTex();
   const roomLight = new THREE.SpotLight(0xffc98f, 95, 0, 0.62, 0.7, 2);
   roomLight.position.set(DOOR.cx, 2.25, -1.7); roomLight.target.position.set(DOOR.cx, 0, 2.2); scene.add(roomLight, roomLight.target);
@@ -211,20 +220,22 @@ async function build() {
   const front = new THREE.Mesh(new THREE.ShapeGeometry(rrShape(PW - 0.0015, PHT - 0.0015, PRAD - 0.00075), 20), new THREE.MeshStandardMaterial({ color: 0x040405, roughness: 0.22 })); front.position.z = PD / 2 + 0.00004; phone.add(front);
   for (const [sx, y, len] of [[1, 0.0237, 0.0155], [-1, 0.0472, 0.0058], [-1, 0.0342, 0.0098], [-1, 0.0212, 0.0098]]) { const bt = new THREE.Mesh(new RoundedBoxGeometry(0.0012, len, 0.0030, 2, 0.0005), titan); bt.position.set(sx * (PW / 2 + 0.00025), y, 0); phone.add(bt); }
   const scrC = mkCanvas(390 * 5, 844 * 5), scrX = scrC.getContext("2d"), scrTex = texFrom(scrC); scrTex.generateMipmaps = true;
-  const screen = new THREE.Mesh(new THREE.PlaneGeometry(SW, SH), new THREE.MeshBasicMaterial({ map: scrTex, color: new THREE.Color(1.12, 1.12, 1.12) })); screen.position.z = PD / 2 + 0.0001; phone.add(screen);
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(SW, SH), new THREE.MeshBasicMaterial({ map: scrTex, color: new THREE.Color(1.12, 1.12, 1.12), alphaTest: 0.5 })); screen.position.z = PD / 2 + 0.0001; phone.add(screen);   // 四隅は透明（本体の丸い角からはみ出さない）
   const scrPoint = (cx, cy) => V3((cx / 390 - 0.5) * SW, (0.5 - cy / 844) * SH, PD / 2 + 0.0002);
 
-  // 友達（後ろ姿の人形3人）
+  // 友達3人（影だけ）
   const people = [
-    makePerson({ h: 1.74, top: 0x25272b, bottom: 0x1c1e22, hair: 0x100e0c, skin: 0x5a4638, bag: 0x2e3035 }),
-    makePerson({ h: 1.60, top: 0x5c544a, bottom: 0x26231f, hair: 0x15100d, skin: 0x5a4638, long: true, tote: 0x6d655a }),
-    makePerson({ h: 1.68, top: 0x34372f, bottom: 0x1f1f1d, hair: 0x120f0c, skin: 0x5a4638, bag: 0x1d1f21 }),
+    makePerson({ h: 1.75, bag: true, hood: true, wide: true }),
+    makePerson({ h: 1.60, long: true, tote: true, skirt: true, bend: 0.5 }),
+    makePerson({ h: 1.67, pony: true, bag: true, coat: true }),
   ];
-  const WALKS = [   // 出発点（カメラの手前や横）→ ドアの前 → 教室の中。速さ m/s と出発の時刻
-    { from: [-0.30, 4.30], t0: T.walk + 0.15, v: 1.22, ph: 0.0, inX: 0.6 },
-    { from: [1.95, 4.55], t0: T.walk + 0.55, v: 1.20, ph: 2.1, inX: 1.5 },
-    { from: [1.18, 5.55], t0: T.walk + 0.0, v: 1.24, ph: 4.0, inX: 1.0 },
+  const WALKS = [   // 廊下の奥（カメラの後ろ）からドアへ歩く。影は壁の左から右へ流れ、ドアの明かりに入っていく
+    { from: [0.86, 3.60], t0: T.walk - 0.20, v: 0.95, ph: 0.0, inX: 0.6 },
+    { from: [1.22, 3.75], t0: T.walk + 0.30, v: 0.96, ph: 2.1, inX: 1.5 },
+    { from: [1.02, 3.90], t0: T.walk + 0.82, v: 0.97, ph: 4.0, inX: 1.0 },
   ];
+  // 姿は描かない（色も奥行きも書かない）。夕方の光と教室の明かりで、壁と床に影だけが落ちる
+  people.forEach((p) => p.g.traverse((o) => { if (o.isMesh) { o.material.colorWrite = false; o.material.depthWrite = false; o.receiveShadow = false; } }));
   people.forEach((p, i) => { scene.add(p.g); const w = WALKS[i]; w.pts = [V3(w.from[0], 0, w.from[1]), V3(DOOR.cx + (i - 1) * 0.06, 0, 0.55), V3(DOOR.cx, 0, -0.45), V3(w.inX, 0, -2.6)];
     w.len = [0]; for (let k = 1; k < w.pts.length; k++) w.len.push(w.len[k - 1] + w.pts[k].distanceTo(w.pts[k - 1])); });
   function walkPos(w, d) {      // 道のり d の位置と向き
@@ -261,9 +272,9 @@ async function build() {
     const key = JSON.stringify(st, (k, v) => typeof v === "number" ? Math.round(v * 500) / 500 : v);
     if (key === lastKey) return; lastKey = key;
     const c = scrX; c.save(); c.setTransform(5, 0, 0, 5, 0, 0);
+    c.clearRect(0, 0, VW, VH); rr(c, 0, 0, VW, VH, 60); c.clip();          // 画面の形（角の丸い四角）の外は透明のまま
     c.fillStyle = "#000"; c.fillRect(0, 0, VW, VH);
     if (st.on > 0.001) {
-      rr(c, 0, 0, VW, VH, 60); c.clip();
       if (st.app < 1) {                                               // カメラの画面
         c.fillStyle = "#8a6843"; c.fillRect(0, 0, VW, VH);
         const sx = CAM.cx * imPoster.width - camSrcW / 2 + st.dx * 3, sy = CAM.cy * imPoster.height - camSrcH / 2 + st.dy * 3;
@@ -325,8 +336,9 @@ async function build() {
     { t: 8.0, p: off(scrMid, 0.275, 0.004, 0.004), l: scrMid, f: scrMid, k: 24 },
     { t: 9.9, p: off(rowsMid, 0.215, 0.004, 0.004), l: rowsMid, f: rowsMid, k: 24 },
     { t: 12.8, p: off(rowsMid, 0.205, 0.003, 0.004), l: rowsMid, f: rowsMid, k: 24, e: "lin" },
-    { t: 14.6, p: V3(0.70, 1.28, 4.85), l: V3(1.0, 1.08, 0), f: V3(1.0, 1.0, 0.4), k: 15 },
-    { t: 18.6, p: V3(0.78, 1.30, 4.60), l: V3(1.0, 1.10, 0), f: doorC, k: 15, e: "lin" },
+    { t: 14.3, p: V3(-0.30, 1.42, 4.10), l: V3(-0.38, 1.30, 0), f: V3(-0.35, 1.3, 0), k: 9 },
+    { t: 16.5, p: V3(0.42, 1.34, 4.60), l: V3(0.64, 1.14, 0), f: doorC, k: 11 },
+    { t: 18.6, p: V3(0.58, 1.33, 4.50), l: V3(0.80, 1.13, 0), f: doorC, k: 11, e: "lin" },
     { t: 20.9, p: V3(0.93, 1.36, 3.62), l: V3(1.0, 1.21, 0), f: logoC, k: 13 },
     { t: 27.0, p: V3(0.95, 1.37, 3.42), l: V3(1.0, 1.21, 0), f: logoC, k: 13, e: "lin" },
   ];
@@ -378,7 +390,7 @@ async function build() {
       p.g.position.set(pos.x, moving ? 0.014 * p.k * Math.abs(Math.cos(ph)) : 0, pos.z);
       p.g.rotation.y = Math.atan2(-dir.x, -dir.z) + 0.03 * Math.sin(ph * 0.5);
       p.legs[0].rotation.x = 0.44 * sw * amp; p.legs[1].rotation.x = -0.44 * sw * amp;
-      p.arms[0].rotation.x = -0.30 * sw * amp; p.arms[1].rotation.x = (p.o.tote ? 0.08 : 0.30) * sw * amp;
+      p.arms[0].rotation.x = -0.34 * sw * amp; p.arms[1].rotation.x = (p.o.tote ? 0.06 : 0.34) * sw * amp;
       p.head.rotation.y = 0.22 * Math.sin(tt * 1.1 + i * 2.0) * amp;       // 話しながら歩く
       p.g.visible = t > w.t0 - 0.3;
     });
@@ -388,7 +400,7 @@ async function build() {
     doorG.rotation.y = 1.66 * (1 - Math.min(1, close));
     paneMat.color.setRGB(2.6, 1.8, 1.0).multiplyScalar(0.92 + 0.08 * Math.sin(t * 2.1));
     roomLight.intensity = 95;
-    doorLight.intensity = 30 * ss(seg(t, T.doorShut - 0.35, T.doorShut + 0.9));
+    doorLight.intensity = 0;
 
     // ロゴ
     const lg = ss(seg(t, T.logoIn, T.logoIn + 1.0));
