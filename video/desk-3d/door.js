@@ -31,7 +31,7 @@ const QR = { x: POSTER.x + (0.146 - 0.5) * POSTER.w, y: POSTER.y + (0.5 - 0.710)
 function corkTex() {
   const c = mkCanvas(512, 512), x = c.getContext("2d"), r = rnd(21);
   x.fillStyle = "#a47a4d"; x.fillRect(0, 0, 512, 512);
-  for (let i = 0; i < 9000; i++) { const v = r(); x.fillStyle = `rgba(${60 + v * 120},${40 + v * 80},${20 + v * 40},${0.10 + r() * 0.25})`; x.beginPath(); x.arc(r() * 512, r() * 512, 0.6 + r() * 2.4, 0, 7); x.fill(); }
+  for (let i = 0; i < 5200; i++) { const v = r(); x.fillStyle = `rgba(${80 + v * 90},${55 + v * 60},${30 + v * 30},${0.05 + r() * 0.11})`; x.beginPath(); x.arc(r() * 512, r() * 512, 1.6 + r() * 3.6, 0, 7); x.fill(); }
   const t = texFrom(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 2); return t;
 }
 function memoTex(seed, tint) {            // ほかの掲示（読めない灰色の線だけ。実在の掲示物は写さない）
@@ -122,7 +122,7 @@ async function build() {
   const phoneLight = new THREE.PointLight(0x9fd6ee, 0, 0.6, 2); scene.add(phoneLight);
 
   // 壁・床・天井
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0xcfc6b6, roughness: 0.93, bumpMap: noiseTex(256, 8, 14, 5), bumpScale: 0.35 });
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0xcfc6b6, roughness: 0.93, bumpMap: noiseTex(256, 8, 14, 5), bumpScale: 0.16 });
   const box = (w, h, d, mat, x, y, z, cast = false) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); m.receiveShadow = true; m.castShadow = cast; scene.add(m); return m; };
   const WT = 0.14, WH = 2.75;
   box(DOOR.x0 + 6, WH, WT, wallMat, (DOOR.x0 - 6) / 2, WH / 2, -WT / 2, true);
@@ -130,7 +130,7 @@ async function build() {
   box(DOOR.w, WH - DOOR.h, WT, wallMat, DOOR.cx, (WH + DOOR.h) / 2, -WT / 2, true);
   const baseMat = new THREE.MeshStandardMaterial({ color: 0x3a3028, roughness: 0.7 });
   box(DOOR.x0 + 6, 0.09, 0.012, baseMat, (DOOR.x0 - 6) / 2, 0.045, 0.006); box(6 - (DOOR.x0 + DOOR.w), 0.09, 0.012, baseMat, (DOOR.x0 + DOOR.w + 6) / 2, 0.045, 0.006);
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), new THREE.MeshStandardMaterial({ color: 0x7a7064, roughness: 0.38, metalness: 0.0, bumpMap: noiseTex(256, 4, 30, 30), bumpScale: 0.12 }));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), new THREE.MeshStandardMaterial({ color: 0x7a7064, roughness: 0.5, metalness: 0.0, bumpMap: noiseTex(256, 4, 30, 30), bumpScale: 0.035 }));
   floor.rotation.x = -Math.PI / 2; floor.position.set(0, 0, 0); floor.receiveShadow = true; scene.add(floor);
   box(14, 0.05, 14, new THREE.MeshBasicMaterial({ color: 0x110d0a }), 0, WH + 0.025, 0);
   box(0.1, WH, 8, new THREE.MeshBasicMaterial({ color: 0x1a130e }), -6, WH / 2, 3); box(0.1, WH, 8, new THREE.MeshBasicMaterial({ color: 0x1a130e }), 6, WH / 2, 3);
@@ -139,11 +139,15 @@ async function build() {
   box(0.06, DOOR.h + 0.06, WT + 0.03, frameMat, DOOR.x0 - 0.03, (DOOR.h + 0.06) / 2, -WT / 2 + 0.005, true); box(0.06, DOOR.h + 0.06, WT + 0.03, frameMat, DOOR.x0 + DOOR.w + 0.03, (DOOR.h + 0.06) / 2, -WT / 2 + 0.005, true);
   box(DOOR.w + 0.12, 0.06, WT + 0.03, frameMat, DOOR.cx, DOOR.h + 0.03, -WT / 2 + 0.005, true);
 
+  // 戸当たりと敷居（ドアと枠のすき間をふさぐ。ここから強い光が細く漏れると、コマごとにちらつく）
+  box(0.028, DOOR.h, 0.024, frameMat, DOOR.x0 + 0.014, DOOR.h / 2, -0.066, true); box(0.028, DOOR.h, 0.024, frameMat, DOOR.x0 + DOOR.w - 0.014, DOOR.h / 2, -0.066, true);
+  box(DOOR.w, 0.028, 0.024, frameMat, DOOR.cx, DOOR.h - 0.014, -0.066, true); box(DOOR.w, 0.014, 0.07, frameMat, DOOR.cx, 0.007, -0.04, true);
+
   // 教室の中（明るい。ぼけて見える）
   {
     const warm = (r, g, b) => new THREE.MeshBasicMaterial({ color: new THREE.Color(r, g, b) });
-    box(8, WH, 0.1, warm(2.6, 1.75, 1.0), DOOR.cx, WH / 2, -6.5); box(0.1, WH, 6.5, warm(1.9, 1.25, 0.72), DOOR.cx - 3.2, WH / 2, -3.3); box(0.1, WH, 6.5, warm(1.9, 1.25, 0.72), DOOR.cx + 3.2, WH / 2, -3.3);
-    box(8, 0.05, 6.5, warm(1.5, 1.05, 0.7), DOOR.cx, WH - 0.02, -3.3); box(8, 0.02, 6.4, warm(0.9, 0.62, 0.40), DOOR.cx, 0.012, -3.4);
+    box(8, WH, 0.1, warm(1.45, 1.02, 0.63), DOOR.cx, WH / 2, -6.5); box(0.1, WH, 6.5, warm(1.12, 0.78, 0.47), DOOR.cx - 3.2, WH / 2, -3.3); box(0.1, WH, 6.5, warm(1.12, 0.78, 0.47), DOOR.cx + 3.2, WH / 2, -3.3);   // 明るすぎると、枠との境目がコマごとにぎざぎざ動く
+    box(8, 0.05, 6.5, warm(1.1, 0.78, 0.52), DOOR.cx, WH - 0.02, -3.3); box(8, 0.02, 6.4, warm(0.72, 0.50, 0.32), DOOR.cx, 0.012, -3.4);
     box(3.0, 1.05, 0.04, warm(0.26, 0.23, 0.19), DOOR.cx + 0.4, 1.45, -6.42);                       // 黒板
     const dk = warm(0.20, 0.13, 0.08);
     for (let r = 0; r < 3; r++) for (let c = -1; c <= 1; c++) { box(1.0, 0.03, 0.45, dk, DOOR.cx + c * 1.5 + 0.3, 0.72, -2.2 - r * 1.3); box(0.9, 0.68, 0.03, warm(0.14, 0.09, 0.06), DOOR.cx + c * 1.5 + 0.3, 0.36, -2.4 - r * 1.3); }
@@ -154,7 +158,7 @@ async function build() {
   const doorG = new THREE.Group(); doorG.position.set(DOOR.x0, 0, -0.03); scene.add(doorG);
   const leaf = new THREE.Mesh(new THREE.BoxGeometry(DOOR.w - 0.012, DOOR.h - 0.012, 0.042), new THREE.MeshStandardMaterial({ map: woodMap, color: 0xa98463, roughness: 0.55 }));
   leaf.position.set(DOOR.w / 2, DOOR.h / 2, 0); leaf.castShadow = true; leaf.receiveShadow = true; doorG.add(leaf);
-  const paneMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(2.6, 1.8, 1.0) });
+  const paneMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.30, 0.95, 0.60) });
   for (const z of [0.0215, -0.0215]) { const pn = new THREE.Mesh(new THREE.PlaneGeometry(0.11, 0.82), paneMat); pn.position.set(0.70, 1.45, z); if (z < 0) pn.rotation.y = Math.PI; doorG.add(pn);
     const fr = new THREE.Mesh(new THREE.PlaneGeometry(0.135, 0.845), new THREE.MeshStandardMaterial({ color: 0x2c231b, roughness: 0.6 })); fr.position.set(0.70, 1.45, z * 0.995); if (z < 0) fr.rotation.y = Math.PI; doorG.add(fr); }
   const metal = new THREE.MeshStandardMaterial({ color: 0xb9b3a9, metalness: 0.95, roughness: 0.3 });
@@ -356,7 +360,7 @@ async function build() {
   const dof = new DofPass(rtScene, rw, rh); composer.addPass(dof);
   composer.addPass(new UnrealBloomPass(new THREE.Vector2(rw, rh), 0.34, 0.7, 1.0));
   composer.addPass(new OutputPass());
-  const grade = new ShaderPass(GradeShader); composer.addPass(grade);
+  const grade = new ShaderPass(GradeShader); composer.addPass(grade); grade.uniforms.uGrain.value = 0.018;
 
   const caps = { capA: [T.capAIn, T.capAOut], capB: [T.capBIn, T.capBOut], word: [T.wordIn, 99], notice: [T.noticeIn, 99] };
   const capEl = Object.fromEntries(Object.keys(caps).map((k) => [k, document.getElementById(k)]));
@@ -398,8 +402,7 @@ async function build() {
     // ドア（開いている → 閉まる）
     const cl = seg(t, T.doorClose, T.doorShut), close = cl * cl * (3 - 2 * cl) * (0.6 + 0.4 * cl);
     doorG.rotation.y = 1.66 * (1 - Math.min(1, close));
-    paneMat.color.setRGB(2.6, 1.8, 1.0).multiplyScalar(0.92 + 0.08 * Math.sin(t * 2.1));
-    roomLight.intensity = 95;
+    roomLight.intensity = 95 * (1 - ss(seg(t, T.doorShut - 0.12, T.doorShut + 0.1)));      // 閉まったら教室の光は廊下に出ない（すき間の光の線を出さない）
     doorLight.intensity = 0;
 
     // ロゴ
@@ -415,7 +418,7 @@ async function build() {
     evalCamera(t);
     camera.position.copy(camState.p); camera.lookAt(camState.l); camera.updateMatrixWorld(true);
     dof.params.focus = camState.p.distanceTo(camState.f); dof.params.k = camState.k * 1.9 * PR; dof.params.maxR = 46 * PR;
-    dof.params.near = camera.near; dof.params.far = camera.far; dof.params.seed = Math.round(t * FPS) % 64;
+    dof.params.near = camera.near; dof.params.far = camera.far; dof.params.seed = 0;        // ぼかしの粒はコマごとに変えない（変えると、ぼけた所がちらつく）
     grade.uniforms.uSeed.value = Math.round(t * FPS);
   }
   let shadowKey = "";

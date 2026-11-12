@@ -76,7 +76,7 @@ export class DofPass extends Pass {
           if (ds > dc) cs = min(cs, cc * 2.0);                 // 奥のぼけを、手前のピントの合ったものに乗せない
           float m = smoothstep(r - 1.0, r + 1.0, cs);
           vec3 c = texture2D(tColor, uv).rgb;
-          m *= 1.0 + 0.35 * min(dot(c, vec3(0.3, 0.6, 0.1)), 6.0);   // 明るい点を少し強く（玉ぼけ）
+          m *= 1.0 + 0.10 * min(dot(c, vec3(0.3, 0.6, 0.1)), 4.0);   // 明るい点を少しだけ強く（強すぎると、ぼけた所の明るい点がコマごとにちらつく）
           acc += c * m; ws += m;
         }
         gl_FragColor = vec4(acc / ws, cc / uMaxR);
