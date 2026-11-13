@@ -301,7 +301,8 @@ function showToast(msg) {
         } else if (theme === 'newyear') {
             fx.innerHTML = '<span class="fx-pop">🎍</span>' +
                 six.map(function(c) { return '<span class="fx-flake ' + c + '">✨</span>'; }).join('') +
-                '<span class="fx-text">明けましておめでとう！</span>';
+                '<span class="fx-text"></span>';
+            fx.lastChild.textContent = picker.dataset.newyear || '明けましておめでとう！';   // 年内は「よいお年を！」（app.py の newyear_words）
         }
         document.body.appendChild(fx);
         setTimeout(apply, 420);                                   // 円が画面を覆ったところで替える

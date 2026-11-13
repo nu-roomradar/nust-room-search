@@ -955,23 +955,54 @@ class SeasonThemeTests(unittest.TestCase):
         self.assertIn('["halloween", "christmas"]', html)                       # 描画前の反映で選べる見た目
 
     def test_newyear_period_and_choices(self):
-        """お正月：1/1〜1/15、期間中は既定で。切り替えは 通常｜🎍 だけ（秋冬の季節は年明けに出さない。2026-11-13 運営）"""
-        self.assertIsNone(rr.season_theme(self.at(12, 31)))
-        self.assertEqual(rr.season_theme(self.at(1, 1)), "newyear")
-        self.assertEqual(rr.season_theme(self.at(1, 15)), "newyear")
-        self.assertIsNone(rr.season_theme(self.at(1, 16)))
-        self.assertEqual(rr.current_season(self.at(1, 5)), ("newyear", True))
-        self.assertEqual(rr.season_choices(self.at(1, 5)), ["newyear"])
+        """お正月：12/29〜1/15（年をまたぐ）、期間中は既定で。切り替えは 通常｜🎍 だけ（2026-11-13 運営「正月は 12/29 から」）"""
+        for m, d in ((12, 26), (12, 28), (1, 16), (9, 15)):
+            self.assertIsNone(rr.season_theme(self.at(m, d)), (m, d))
+        for m, d in ((12, 29), (12, 31), (1, 1), (1, 15)):
+            self.assertEqual(rr.season_theme(self.at(m, d)), "newyear", (m, d))
+            self.assertEqual(rr.current_season(self.at(m, d)), ("newyear", True), (m, d))
+            self.assertEqual(rr.season_choices(self.at(m, d)), ["newyear"], (m, d))
+        self.assertEqual(rr.season_theme(self.at(12, 25)), "christmas")          # クリスマスは 12/25 までのまま
         self.assertEqual(rr.season_choices(self.at(1, 16)), [])
+        self.assertEqual(rr.season_choices(self.at(12, 27)), [])
         for m, d in ((9, 20), (10, 20), (11, 20), (12, 20)):                  # 秋・冬に 🎍 は出ない
             self.assertNotIn("newyear", rr.season_choices(self.at(m, d)))
+
+    def test_period_across_the_year_end(self):
+        self.assertTrue(rr.in_period((12, 30), (12, 29), (1, 15)))
+        self.assertTrue(rr.in_period((1, 15), (12, 29), (1, 15)))
+        self.assertFalse(rr.in_period((1, 16), (12, 29), (1, 15)))
+        self.assertFalse(rr.in_period((12, 28), (12, 29), (1, 15)))
+        self.assertTrue(rr.in_period((10, 1), (9, 16), (11, 10)))              # ふつうの期間はそのまま
+        self.assertFalse(rr.in_period((11, 11), (9, 16), (11, 10)))
+
+    def test_newyear_words_change_at_midnight_on_new_years_day(self):
+        """年内は「よいお年を！」、年が明けたら「明けましておめでとう！」。干支は 12月のうちから次の年のもの"""
+        dec, jan = self.at(12, 30), self.at(1, 1)
+        self.assertEqual(rr.newyear_words(dec), {"greet": "よいお年を！", "line": "来年も、空きコマはここで。"})
+        self.assertEqual(rr.newyear_words(jan), {"greet": "明けましておめでとう！", "line": "今年も、空きコマはここで。"})
+        self.assertEqual((rr.newyear_year(dec), rr.newyear_year(jan)), (2027, 2026))
+        self.assertEqual(rr.eto_emoji(rr.newyear_year(dec)), "🐑")
+        real = datetime.datetime
+
+        class Dec30(real):
+            @classmethod
+            def now(cls, tz=None):
+                return real(2026, 12, 30, 12, 0, tzinfo=rr.JST)
+        with mock.patch.object(rr.datetime, "datetime", Dec30):
+            html = self.client.get("/").get_data(as_text=True)
+        self.assertIn('class="theme-newyear"', html)
+        self.assertIn("よいお年を！ <b>来年も、空きコマはここで。</b>", html)
+        self.assertNotIn("明けましておめでとう", html)                          # 年内に新年のあいさつは出さない
+        self.assertIn('data-newyear="よいお年を！"', html)                     # 切り替えたときの言葉
+        self.assertIn('<span class="logo-season s-newyear" aria-hidden="true">🐑</span>', html)
 
     def test_eto_follows_the_year(self):
         """お正月仕様のロゴの横は、その年の干支（2026 午・2027 未・2028 申）。年が変われば自動で替わる"""
         self.assertEqual([rr.eto_emoji(y) for y in (2020, 2026, 2027, 2028, 2032)], ["🐭", "🐴", "🐑", "🐵", "🐭"])
         with mock.patch.dict(os.environ, {"SEASON_THEME": "newyear"}):
             html = self.client.get("/").get_data(as_text=True)
-        year = datetime.datetime.now(rr.JST).year
+        year = rr.newyear_year(datetime.datetime.now(rr.JST))                 # 12月のうちは次の年
         self.assertIn('<span class="logo-season s-newyear" aria-hidden="true">%s</span>' % rr.eto_emoji(year), html)
 
     def test_seasons_fall_back_only_inside_their_group(self):
@@ -993,8 +1024,9 @@ class SeasonThemeTests(unittest.TestCase):
         self.assertIn('class="theme-newyear"', html)
         self.assertIn('class="season-deco s-newyear"', html)
         self.assertIn('class="season-ribbon s-newyear"', html)
-        self.assertIn("明けましておめでとう！", html)
-        self.assertIn("今年も、空きコマはここで。", html)
+        words = rr.newyear_words(datetime.datetime.now(rr.JST))               # 年内は「よいお年を！」
+        self.assertIn("%s <b>%s</b>" % (words["greet"], words["line"]), html)
+        self.assertIn('data-newyear="%s"' % words["greet"], html)
         self.assertIn("ドア越しにチラッと確認を", html)
         self.assertIn('data-theme="newyear" aria-checked="true"', html)
         self.assertNotIn('class="season-deco s-christmas"', html)             # ほかの季節の飾りは持たない
@@ -1002,7 +1034,7 @@ class SeasonThemeTests(unittest.TestCase):
             self.assertIn("大学が公式に提供するサービスではありません", page)
         root = Path(__file__).resolve().parents[1] / "static"
         js = (root / "app.js").read_text(encoding="utf-8")
-        self.assertIn("明けましておめでとう！", js)                                # 切り替えの言葉は日本語（2026-11-13 運営）
+        self.assertIn("picker.dataset.newyear", js)                           # 切り替えの言葉は画面から受け取る（日本語。2026-11-13 運営）
         self.assertNotIn("Happy New Year", js)
         css = (root / "app.css").read_text(encoding="utf-8")
         self.assertIn(".theme-newyear .season-ribbon.s-newyear", css)        # 帯が出る（通常の帯と入れ替わる）

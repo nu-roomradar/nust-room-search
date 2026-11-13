@@ -262,10 +262,12 @@ ASSET_VERSION = _asset_version()
 # 利用者は画面のスイッチで着せ替えのオン・オフを選べる。選んだ状態は季節をまたいでまとめて覚える（端末に rr_theme。
 # オンにした人は次の季節も着せ替え、オフにした人は通常のまま。2026-11-06 運営。static/app.js「季節の見た目の切り替え」）。
 # 環境変数 SEASON_THEME で上書きできる（"off" で止める、"halloween" などで期間外でも出す。確認用・緊急停止用）
-SEASON_THEMES = [("newyear", (1, 1), (1, 15)), ("halloween", (9, 16), (11, 10)), ("christmas", (11, 11), (12, 25))]
+# お正月は 12/29〜1/15（2026-11-13 運営「正月は 12/29 からでいい」）。年をまたぐ期間なので、月日の比べ方は in_period を通す。
+# 12/26〜12/28 は通常のまま。年内（12/29〜12/31）は「よいお年を！」、1/1 から「明けましておめでとう！」（newyear_words）
+SEASON_THEMES = [("halloween", (9, 16), (11, 10)), ("christmas", (11, 11), (12, 25)), ("newyear", (12, 29), (1, 15))]
 # いっしょに選べる季節の組。切り替え（通常｜🎃｜🎄）に前の季節を残すのは、同じ組の中だけ
 # （秋〜冬はハロウィーンとクリスマス。お正月は年明けだけで、10月に 🎍 が出たりしない。2026-11-13）
-SEASON_GROUPS = [("newyear",), ("halloween", "christmas")]
+SEASON_GROUPS = [("halloween", "christmas"), ("newyear",)]
 # 見た目を作り終えた季節だけ画面に出す。作り終えていない季節の期間は、直前の季節の見た目をスイッチで選べるようにする
 # （スイッチを消さない。2026-11-06 運営）。クリスマスは「雪の夜のイルミネーション」＋「夜空→もみの森」の色（2026-11-06 運営）
 SEASON_READY = {"halloween", "christmas", "newyear"}
@@ -273,7 +275,7 @@ SEASON_LABELS = {"halloween": "ハロウィーン仕様", "christmas": "クリ�
 SEASON_EMOJI = {"halloween": "🎃", "christmas": "🎄", "newyear": "🎍"}
 # 何も選んでいない人にも着せ替えを出す期間（既定でオン）。季節の期間のうちこれ以外は、スイッチで選んだ人だけ。
 # ハロウィーンは 10/31 まで、クリスマスは 12/1〜12/25（11/11〜11/30 は選んだ人だけ）。2026-11-06 運営
-SEASON_DEFAULT_ON = {"halloween": ((9, 16), (10, 31)), "christmas": ((12, 1), (12, 25)), "newyear": ((1, 1), (1, 15))}
+SEASON_DEFAULT_ON = {"halloween": ((9, 16), (10, 31)), "christmas": ((12, 1), (12, 25)), "newyear": ((12, 29), (1, 15))}
 
 
 # お正月仕様のロゴの横に出す、その年の干支（子丑寅卯辰巳午未申酉戌亥。2020年が子年）。年が変われば自動で替わる
@@ -284,12 +286,29 @@ def eto_emoji(year):
     return ETO_EMOJI[(year - 2020) % 12]
 
 
+def in_period(md, start, end):
+    """月日 (月, 日) が期間に入っているか。年をまたぐ期間（12/29〜1/15）は、始まり以降か終わり以前"""
+    return start <= md <= end if start <= end else (md >= start or md <= end)
+
+
+def newyear_year(now):
+    """お正月仕様が祝う年。12月のうちは次の年（干支も次の年のもの）"""
+    return now.year + 1 if now.month == 12 else now.year
+
+
+def newyear_words(now):
+    """お正月仕様の帯と、切り替えたときの言葉。年内は年末のあいさつ、年が明けたら新年のあいさつ"""
+    if now.month == 12:
+        return {"greet": "よいお年を！", "line": "来年も、空きコマはここで。"}
+    return {"greet": "明けましておめでとう！", "line": "今年も、空きコマはここで。"}
+
+
 def season_theme(now=None):
     forced = os.environ.get("SEASON_THEME", "").strip()
     if forced:
         return None if forced == "off" else forced if forced in {n for n, _, _ in SEASON_THEMES} else None
     md = ((now or datetime.datetime.now(JST)).month, (now or datetime.datetime.now(JST)).day)
-    return next((name for name, start, end in SEASON_THEMES if start <= md <= end), None)
+    return next((name for name, start, end in SEASON_THEMES if in_period(md, start, end)), None)
 
 
 def season_group(season):
@@ -306,7 +325,7 @@ def season_default_on(season, now=None):
     if window is None:
         return True
     now = now or datetime.datetime.now(JST)
-    return window[0] <= (now.month, now.day) <= window[1]
+    return in_period((now.month, now.day), window[0], window[1])
 
 
 def current_season(now=None):
@@ -334,9 +353,8 @@ def season_choices(now=None):
         return []
     if os.environ.get("SEASON_THEME", "").strip():
         return [season]                                  # 確認用に強制したときは、その季節だけ
-    md = (now.month, now.day)
-    group = season_group(season)
-    return [n for n, start, _ in SEASON_THEMES if n in SEASON_READY and n in group and start <= md]
+    names = season_group(season)                         # 同じ組の中で、いまの季節までに始まったもの
+    return [n for n in names[:names.index(season) + 1] if n in SEASON_READY]
 
 
 @app.context_processor
@@ -344,7 +362,8 @@ def inject_season_theme():
     season, on = current_season()
     return {"season": season, "season_label": SEASON_LABELS.get(season, ""), "season_on": bool(season) and on,
             "season_choices": season_choices(), "season_labels": SEASON_LABELS, "season_emoji": SEASON_EMOJI,
-            "eto_emoji": eto_emoji(datetime.datetime.now(JST).year)}
+            "eto_emoji": eto_emoji(newyear_year(datetime.datetime.now(JST))),
+            "newyear_words": newyear_words(datetime.datetime.now(JST))}
 
 
 # ブラウザへの安全設定（2026-10 セキュリティ点検）。画面はインラインの script / onclick を使っているので、
