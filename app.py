@@ -264,15 +264,18 @@ ASSET_VERSION = _asset_version()
 # 利用者は画面のスイッチで着せ替えのオン・オフを選べる。選んだ状態は季節をまたいでまとめて覚える（端末に rr_theme。
 # オンにした人は次の季節も着せ替え、オフにした人は通常のまま。2026-11-06 運営。static/app.js「季節の見た目の切り替え」）。
 # 環境変数 SEASON_THEME で上書きできる（"off" で止める、"halloween" などで期間外でも出す。確認用・緊急停止用）
-SEASON_THEMES = [("halloween", (9, 16), (11, 10)), ("christmas", (11, 11), (12, 25))]
+SEASON_THEMES = [("newyear", (1, 1), (1, 15)), ("halloween", (9, 16), (11, 10)), ("christmas", (11, 11), (12, 25))]
+# いっしょに選べる季節の組。切り替え（通常｜🎃｜🎄）に前の季節を残すのは、同じ組の中だけ
+# （秋〜冬はハロウィーンとクリスマス。お正月は年明けだけで、10月に 🎍 が出たりしない。2026-11-13）
+SEASON_GROUPS = [("newyear",), ("halloween", "christmas")]
 # 見た目を作り終えた季節だけ画面に出す。作り終えていない季節の期間は、直前の季節の見た目をスイッチで選べるようにする
 # （スイッチを消さない。2026-11-06 運営）。クリスマスは「雪の夜のイルミネーション」＋「夜空→もみの森」の色（2026-11-06 運営）
-SEASON_READY = {"halloween", "christmas"}
-SEASON_LABELS = {"halloween": "ハロウィーン仕様", "christmas": "クリスマス仕様"}
-SEASON_EMOJI = {"halloween": "🎃", "christmas": "🎄"}
+SEASON_READY = {"halloween", "christmas", "newyear"}
+SEASON_LABELS = {"halloween": "ハロウィーン仕様", "christmas": "クリスマス仕様", "newyear": "お正月仕様"}
+SEASON_EMOJI = {"halloween": "🎃", "christmas": "🎄", "newyear": "🎍"}
 # 何も選んでいない人にも着せ替えを出す期間（既定でオン）。季節の期間のうちこれ以外は、スイッチで選んだ人だけ。
 # ハロウィーンは 10/31 まで、クリスマスは 12/1〜12/25（11/11〜11/30 は選んだ人だけ）。2026-11-06 運営
-SEASON_DEFAULT_ON = {"halloween": ((9, 16), (10, 31)), "christmas": ((12, 1), (12, 25))}
+SEASON_DEFAULT_ON = {"halloween": ((9, 16), (10, 31)), "christmas": ((12, 1), (12, 25)), "newyear": ((1, 1), (1, 15))}
 
 
 def season_theme(now=None):
@@ -281,6 +284,12 @@ def season_theme(now=None):
         return None if forced == "off" else forced if forced in {n for n, _, _ in SEASON_THEMES} else None
     md = ((now or datetime.datetime.now(JST)).month, (now or datetime.datetime.now(JST)).day)
     return next((name for name, start, end in SEASON_THEMES if start <= md <= end), None)
+
+
+def season_group(season):
+    """その季節と同じ組の季節（年の中での順）"""
+    group = next((g for g in SEASON_GROUPS if season in g), (season,))
+    return [n for n, _, _ in SEASON_THEMES if n in group]
 
 
 def season_default_on(season, now=None):
@@ -302,7 +311,7 @@ def current_season(now=None):
     if season in SEASON_READY:
         return season, season_default_on(season, now)
     if season and not os.environ.get("SEASON_THEME", "").strip():
-        names = [n for n, _, _ in SEASON_THEMES]
+        names = season_group(season)
         for prev in reversed(names[:names.index(season)]):
             if prev in SEASON_READY:
                 return prev, False
@@ -320,7 +329,8 @@ def season_choices(now=None):
     if os.environ.get("SEASON_THEME", "").strip():
         return [season]                                  # 確認用に強制したときは、その季節だけ
     md = (now.month, now.day)
-    return [n for n, start, _ in SEASON_THEMES if n in SEASON_READY and start <= md]
+    group = season_group(season)
+    return [n for n, start, _ in SEASON_THEMES if n in SEASON_READY and n in group and start <= md]
 
 
 @app.context_processor
