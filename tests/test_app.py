@@ -966,6 +966,14 @@ class SeasonThemeTests(unittest.TestCase):
         for m, d in ((9, 20), (10, 20), (11, 20), (12, 20)):                  # 秋・冬に 🎍 は出ない
             self.assertNotIn("newyear", rr.season_choices(self.at(m, d)))
 
+    def test_eto_follows_the_year(self):
+        """お正月仕様のロゴの横は、その年の干支（2026 午・2027 未・2028 申）。年が変われば自動で替わる"""
+        self.assertEqual([rr.eto_emoji(y) for y in (2020, 2026, 2027, 2028, 2032)], ["🐭", "🐴", "🐑", "🐵", "🐭"])
+        with mock.patch.dict(os.environ, {"SEASON_THEME": "newyear"}):
+            html = self.client.get("/").get_data(as_text=True)
+        year = datetime.datetime.now(rr.JST).year
+        self.assertIn('<span class="logo-season s-newyear" aria-hidden="true">%s</span>' % rr.eto_emoji(year), html)
+
     def test_seasons_fall_back_only_inside_their_group(self):
         """「前の季節を選べるように残す」のは同じ組（秋〜冬）の中だけ。お正月まではさかのぼらない"""
         self.assertEqual(rr.season_group("christmas"), ["halloween", "christmas"])
@@ -985,6 +993,7 @@ class SeasonThemeTests(unittest.TestCase):
         self.assertIn('class="theme-newyear"', html)
         self.assertIn('class="season-deco s-newyear"', html)
         self.assertIn('class="season-ribbon s-newyear"', html)
+        self.assertIn("明けましておめでとう！", html)
         self.assertIn("今年も、空きコマはここで。", html)
         self.assertIn("ドア越しにチラッと確認を", html)
         self.assertIn('data-theme="newyear" aria-checked="true"', html)
@@ -992,7 +1001,9 @@ class SeasonThemeTests(unittest.TestCase):
         for page in pages:
             self.assertIn("大学が公式に提供するサービスではありません", page)
         root = Path(__file__).resolve().parents[1] / "static"
-        self.assertIn("Happy New Year!", (root / "app.js").read_text(encoding="utf-8"))
+        js = (root / "app.js").read_text(encoding="utf-8")
+        self.assertIn("明けましておめでとう！", js)                                # 切り替えの言葉は日本語（2026-11-13 運営）
+        self.assertNotIn("Happy New Year", js)
         css = (root / "app.css").read_text(encoding="utf-8")
         self.assertIn(".theme-newyear .season-ribbon.s-newyear", css)        # 帯が出る（通常の帯と入れ替わる）
         self.assertIn(".theme-newyear .icon-normal { display: none; }", css)
