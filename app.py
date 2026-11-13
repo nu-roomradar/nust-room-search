@@ -278,6 +278,14 @@ SEASON_EMOJI = {"halloween": "🎃", "christmas": "🎄", "newyear": "🎍"}
 SEASON_DEFAULT_ON = {"halloween": ((9, 16), (10, 31)), "christmas": ((12, 1), (12, 25)), "newyear": ((1, 1), (1, 15))}
 
 
+# お正月仕様のロゴの横に出す、その年の干支（子丑寅卯辰巳午未申酉戌亥。2020年が子年）。年が変われば自動で替わる
+ETO_EMOJI = ["🐭", "🐮", "🐯", "🐰", "🐲", "🐍", "🐴", "🐑", "🐵", "🐔", "🐶", "🐗"]
+
+
+def eto_emoji(year):
+    return ETO_EMOJI[(year - 2020) % 12]
+
+
 def season_theme(now=None):
     forced = os.environ.get("SEASON_THEME", "").strip()
     if forced:
@@ -337,7 +345,8 @@ def season_choices(now=None):
 def inject_season_theme():
     season, on = current_season()
     return {"season": season, "season_label": SEASON_LABELS.get(season, ""), "season_on": bool(season) and on,
-            "season_choices": season_choices(), "season_labels": SEASON_LABELS, "season_emoji": SEASON_EMOJI}
+            "season_choices": season_choices(), "season_labels": SEASON_LABELS, "season_emoji": SEASON_EMOJI,
+            "eto_emoji": eto_emoji(datetime.datetime.now(JST).year)}
 
 
 # ブラウザへの安全設定（2026-10 セキュリティ点検）。画面はインラインの script / onclick を使っているので、

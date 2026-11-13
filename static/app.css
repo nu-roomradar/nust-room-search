@@ -539,7 +539,7 @@ html:has(> body.theme-halloween) { background-color: #0d0719; }
 .theme-picker button[aria-checked="true"] { background: rgba(255,255,255,0.14); color: #fff; font-weight: 700; }
 .theme-picker button[data-theme="halloween"][aria-checked="true"] { background: #f97316; }
 .theme-picker button[data-theme="christmas"][aria-checked="true"] { background: #dc2626; }
-.theme-picker button[data-theme="newyear"][aria-checked="true"] { background: #c1121f; }
+.theme-picker button[data-theme="newyear"][aria-checked="true"] { background: #f3e9d2; }
 .theme-picker button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 @media (max-width: 767px) {
@@ -797,82 +797,94 @@ body:not([class*="theme-"]) .season-ribbon.s-normal { display: flex; width: fit-
     .season-deco .x-star { font-size: 54px; right: 6%; top: 48px; }
 }
 
-/* ── 期間限定の見た目：お正月（1/1〜1/15。2026-11-13 運営）。初日の出・金の紙吹雪・富士山・凧・門松。
-      色は「夜明け前の藍 → 朝焼けの紅」に金。ほかの季節と同じく、表記・注意書き・校舎の色は変えない ── */
+/* ── 期間限定の見た目：お正月（1/1〜1/15。2026-11-13 運営）。
+      クリスマス（紺の夜空・降る雪・上の電飾・赤いボタン・下の隅の絵文字）と被らないよう、「黒漆に金、紅白」の和の見た目にした。
+      降るものと上の帯は無し。青海波の和柄・初日の出にかかる金の霞・赤富士・凧。帯は紅白（生成りの紙に朱の文字）、検索ボタンは金。
+      ほかの季節と同じく、表記・注意書き・校舎の色は変えない ── */
 .theme-newyear .season-deco.s-newyear { display: block; }
 .theme-newyear .logo-season.s-newyear { display: inline-block; }
 .theme-newyear .icon-season.s-newyear { display: inline; }
 .theme-newyear .icon-normal { display: none; }
 .theme-newyear {
-    --bg: #120f2a; --surface: rgba(28,20,44,0.92); --surface2: #2a1d3a;
-    --border: rgba(233,196,106,0.24); --muted: #cbbcc8; --accent: #e9c46a;
+    --bg: #0f0a09; --surface: rgba(27,19,16,0.94); --surface2: #2a1e19;
+    --border: rgba(214,170,72,0.28); --muted: #cdbfae; --accent: #e2b24a;
     background:
-        radial-gradient(900px 520px at 50% 112%, rgba(255,122,60,0.24), transparent 70%),
-        radial-gradient(640px 480px at 100% 0%, rgba(233,196,106,0.10), transparent 70%),
-        linear-gradient(180deg, #0c1030 0%, #161338 36%, #2d1430 70%, #4c1728 100%);   /* 上は夜明け前の藍、下は朝焼けの紅 */
-    background-color: #0c1030;
+        radial-gradient(560px 420px at 100% 0%, rgba(226,67,42,0.20), transparent 70%),
+        radial-gradient(720px 480px at 0% 100%, rgba(214,170,72,0.07), transparent 70%),
+        linear-gradient(180deg, #130c0b 0%, #0f0a09 55%, #170c0a 100%);   /* 黒漆。右上だけ初日の出の朱がにじむ */
+    background-color: #0f0a09;
     background-attachment: fixed;
 }
-html:has(> body.theme-newyear) { background-color: #0c1030; }
-.theme-newyear .card { box-shadow: 0 0 0 1px rgba(233,196,106,0.12), 0 18px 40px rgba(0,0,0,0.45); }
-.theme-newyear .logo { background: linear-gradient(135deg, #fff 0%, #f6e3a1 55%, #e9c46a 100%); -webkit-background-clip: text; background-clip: text; }
-.theme-newyear .logo span { -webkit-text-fill-color: #f6e3a1; color: #f6e3a1; }
-.theme-newyear .logo-season { animation: xmasTwinkle 3s ease-in-out infinite; filter: drop-shadow(0 0 8px rgba(255,150,80,0.7)); }
+html:has(> body.theme-newyear) { background-color: #0f0a09; }
+.theme-newyear .card { box-shadow: 0 0 0 1px rgba(214,170,72,0.14), 0 18px 40px rgba(0,0,0,0.5); }
+.theme-newyear .logo { background: linear-gradient(135deg, #fff 0%, #fff 55%, #f7dcc6 100%); -webkit-background-clip: text; background-clip: text; }
+.theme-newyear .logo span { -webkit-text-fill-color: #ff6f4f; color: #ff6f4f; }
+.theme-newyear .logo-season { animation: xmasTwinkle 3.4s ease-in-out infinite; filter: drop-shadow(0 0 8px rgba(240,88,58,0.6)); }
 .theme-newyear .btn-search {
-    background: linear-gradient(90deg, #a4161a, #c1121f 45%, #e5383b); color: #fff;
-    box-shadow: 0 0 0 1px rgba(233,196,106,0.5), 0 8px 26px rgba(193,18,31,0.45);
+    background: linear-gradient(90deg, #c9982f, #e6bd58 45%, #f3d98a); color: #2a1206;
+    box-shadow: 0 0 0 1px rgba(255,236,170,0.5), 0 8px 26px rgba(214,170,72,0.32);
 }
 .theme-newyear .btn-search .btn-text::before { content: '🎍 '; }
-.theme-newyear select:focus { border-color: #e9c46a; }
-.theme-newyear .room-search-link { border-color: rgba(233,196,106,0.45); background: rgba(233,196,106,0.07); }
-.theme-newyear .now-badge .dot { background: #e9c46a; }
-.theme-newyear .room-card { box-shadow: inset 0 -3px 0 rgba(233,196,106,0.22); }
+.theme-newyear .btn-search .spinner { border-color: rgba(42,18,6,0.35); border-top-color: #2a1206; }
+.theme-newyear select:focus { border-color: #e2b24a; }
+.theme-newyear .room-search-link { border-color: rgba(214,170,72,0.45); background: rgba(214,170,72,0.06); }
+.theme-newyear .now-badge .dot { background: #f0583a; }
+.theme-newyear .room-card { box-shadow: inset 0 -3px 0 rgba(226,67,42,0.30); }
+/* 教室カードは下地を不透明にする（後ろの和柄・赤富士が透けて番号が読みにくくならないように。校舎の色はそのまま上に重ねる） */
+.theme-newyear .room-card.tower     { background: linear-gradient(var(--tower-bg), var(--tower-bg)), #17100e; }
+.theme-newyear .room-card.surugadai { background: linear-gradient(var(--surugadai-bg), var(--surugadai-bg)), #17100e; }
+.theme-newyear .room-card.funabashi { background: linear-gradient(var(--funabashi-bg), var(--funabashi-bg)), #17100e; }
 .theme-newyear .bldg-tabs a.on { color: #2a1206; }
-.theme-newyear .season-ribbon { color: #fff3d6; background: rgba(193,18,31,0.18); border-color: rgba(233,196,106,0.55); }
-.theme-newyear .season-ribbon b { color: #f2cf73; }
-.theme-newyear .season-ribbon-sub { color: #f3d9cb; }
-/* 背景の飾り：紅白の幕・初日の出・金の紙吹雪・富士山・凧・門松 */
-.season-deco .ny-maku {
-    position: absolute; left: 0; right: 0; top: 0; height: 9px; opacity: 0.9;
-    background: repeating-linear-gradient(90deg, #c1121f 0 30px, #f6efe6 30px 60px);
-    box-shadow: 0 1px 0 #e9c46a, 0 6px 18px rgba(0,0,0,0.35);
+/* 帯は紅白：生成りの紙に朱の文字、内側に朱の細い線（年賀状・のし紙の見立て） */
+.theme-newyear .season-ribbon {
+    color: #4a1a12; background: linear-gradient(180deg, #fbf5e6, #f3e9d2); border-color: #d6aa48;
+    box-shadow: inset 0 0 0 3px #fbf5e6, inset 0 0 0 4px rgba(200,50,30,0.5), 0 8px 22px rgba(0,0,0,0.4);
+}
+.theme-newyear .season-ribbon b { color: #c8321e; }
+.theme-newyear .season-ribbon-sub { color: #6a4a3c; }
+/* 背景の飾り：青海波・初日の出と金の霞・赤富士・凧 */
+.season-deco .ny-nami {
+    position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40' fill='none' stroke='%23d6aa48' stroke-opacity='0.28' stroke-width='1.2'%3E%3Cpath d='M5.2 20.3A40 40 0 0 1 74.8 20.3M15.3 23.0A30 30 0 0 1 64.7 23.0M24.0 28.0A20 20 0 0 1 56.0 28.0M31.3 35.1A10 10 0 0 1 48.7 35.1M-34.8 0.3A40 40 0 0 1 34.8 0.3M-24.7 3.0A30 30 0 0 1 24.7 3.0M-16.0 8.0A20 20 0 0 1 16.0 8.0M-8.7 15.1A10 10 0 0 1 8.7 15.1M45.2 0.3A40 40 0 0 1 114.8 0.3M55.3 3.0A30 30 0 0 1 104.7 3.0M64.0 8.0A20 20 0 0 1 96.0 8.0M71.3 15.1A10 10 0 0 1 88.7 15.1M-34.8 40.3A40 40 0 0 1 34.8 40.3M-24.7 43.0A30 30 0 0 1 24.7 43.0M-16.0 48.0A20 20 0 0 1 16.0 48.0M-8.7 55.1A10 10 0 0 1 8.7 55.1M45.2 40.3A40 40 0 0 1 114.8 40.3M55.3 43.0A30 30 0 0 1 104.7 43.0M64.0 48.0A20 20 0 0 1 96.0 48.0M71.3 55.1A10 10 0 0 1 88.7 55.1'/%3E%3C/svg%3E") 0 100% / 72px 36px;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.22) 38%, #000 100%);
+            mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.22) 38%, #000 100%);
 }
 .season-deco .ny-sun {
     position: absolute; right: 7%; top: 64px; width: 92px; height: 92px; border-radius: 50%;
-    background: radial-gradient(circle at 50% 56%, #ffc27a, #f4683f 55%, #c1121f);
-    box-shadow: 0 0 70px 22px rgba(255,122,60,0.30); opacity: 0.92;
+    background: radial-gradient(circle at 50% 42%, #f4654a, #de3d24 68%, #c8321e);
+    box-shadow: 0 0 60px 14px rgba(226,67,42,0.26); opacity: 0.95;
 }
-.season-deco .ny-gold {
-    position: absolute; inset: -180px 0 0 0; opacity: 0.6; animation: xmasSnow 24s linear infinite;
-    background-image: radial-gradient(2px 2px at 24px 34px, #f2cf73 50%, transparent 51%), radial-gradient(1.5px 1.5px at 96px 84px, #fff3d6 50%, transparent 51%),
-                      radial-gradient(2.5px 2.5px at 150px 22px, #e9c46a 50%, transparent 51%), radial-gradient(1.5px 1.5px at 62px 142px, #f2cf73 50%, transparent 51%);
-    background-size: 180px 180px;
+/* 初日の出にかかる霞（金の細長い雲） */
+.season-deco .ny-sun::before, .season-deco .ny-sun::after {
+    content: ''; position: absolute; height: 10%; border-radius: 999px;
+    background: linear-gradient(90deg, #c9982f, #f3d98a 50%, #c9982f); box-shadow: 0 1px 6px rgba(0,0,0,0.25);
 }
-.season-deco .ny-g2 { background-size: 270px 270px; opacity: 0.35; animation-duration: 36s; }
+.season-deco .ny-sun::before { left: -62%; width: 150%; bottom: 24%; }
+.season-deco .ny-sun::after  { left: 22%; width: 120%; bottom: 7%; }
+.season-deco .ny-kasumi, .season-deco .ny-kasumi::before, .season-deco .ny-kasumi::after {
+    position: absolute; height: 9px; border-radius: 999px; background: linear-gradient(90deg, #c9982f, #f3d98a 50%, #c9982f);
+}
+.season-deco .ny-kasumi { display: none; left: -34px; top: 62%; width: 150px; opacity: 0.4; }
+.season-deco .ny-kasumi::before { content: ''; left: 56px; top: 17px; width: 104px; }
+.season-deco .ny-kasumi::after  { content: ''; left: 14px; top: -17px; width: 72px; }
 .season-deco .ny-fuji {
-    position: absolute; left: 50%; bottom: 0; width: min(520px, 120vw); height: 128px; transform: translateX(-50%); opacity: 0.34;
+    position: absolute; left: 50%; bottom: 0; width: min(520px, 120vw); height: 128px; transform: translateX(-50%); opacity: 0.30;
     clip-path: polygon(0 100%, 37% 16%, 43% 25%, 50% 13%, 57% 25%, 63% 16%, 100% 100%);
-    background: linear-gradient(180deg, #e9d8cf 0%, #d9c4c0 20%, #2c2a5c 25%, #19183c 100%);   /* 教室カードの後ろに来るので、雪は白くしすぎない */
+    background: linear-gradient(180deg, #f1e4d6 0%, #e4cdbb 19%, #b5341f 25%, #6e1c12 100%);   /* 赤富士。教室カードの後ろに来るので薄く */
 }
-.season-deco .ny-kite, .season-deco .ny-pine { position: absolute; line-height: 1; }
-.season-deco .ny-kite { left: calc(50% - 600px); top: 148px; font-size: 34px; opacity: 0.8; animation: nyKite 7s ease-in-out infinite; }
-.season-deco .ny-pine { left: 3%; bottom: 12px; font-size: 52px; opacity: 0.62; filter: drop-shadow(0 0 12px rgba(233,196,106,0.35)); }
-.season-deco .ny-p2 { left: auto; right: 4%; font-size: 38px; opacity: 0.5; }
+.season-deco .ny-kite { position: absolute; line-height: 1; left: calc(50% - 600px); top: 148px; font-size: 34px; opacity: 0.85; animation: nyKite 7s ease-in-out infinite; }
 @keyframes nyKite { 0%,100% { transform: translate(0, 0) rotate(-8deg); } 50% { transform: translate(14px, -18px) rotate(6deg); } }
-/* 右上の初日の出は、月・レーダーの輪と同じ決まり（PC は中身の外の隅、スマホは小さく薄く） */
+/* 右上の初日の出は、月・レーダーの輪と同じ決まり（PC は中身の外の隅、スマホは小さく） */
 @media (min-width: 1100px) { .season-deco .ny-sun { width: 56px; height: 56px; right: 8px; top: 15px; } }             /* 切り替えのボタンに重ねない */
 @media (min-width: 1240px) { .season-deco .ny-sun { width: 72px; height: 72px; right: 22px; top: 26px; } }
+@media (min-width: 1300px) { .season-deco .ny-kasumi { display: block; } }
 @media (min-width: 1500px) { .season-deco .ny-sun { width: 92px; height: 92px; right: 6%; top: 52px; } }
-@media (max-width: 1299px) { .season-deco .ny-kite { display: none; } }          /* 凧は中身の左に余白がある幅だけ */
+@media (max-width: 1299px) { .season-deco .ny-kite { display: none; } }          /* 凧と左の霞は、中身の左に余白がある幅だけ */
 @media (max-width: 767px) {
-    /* スマホは中身が横幅いっぱいなので、飾りは小さく・薄く。門松は右下だけ */
-    .season-deco .ny-maku { height: 6px; }
-    .season-deco .ny-sun { width: 50px; height: 50px; top: 20px; right: 5%; opacity: 0.7; box-shadow: 0 0 40px 12px rgba(255,122,60,0.24); }
-    .season-deco .ny-fuji { height: 84px; opacity: 0.26; }
-    .season-deco .ny-pine { display: none; }
-    .season-deco .ny-p2 { display: block; font-size: 32px; right: 4%; bottom: 14px; opacity: 0.5; }
+    /* スマホは中身が横幅いっぱいなので、飾りは小さく・薄く */
+    .season-deco .ny-sun { width: 50px; height: 50px; top: 20px; right: 5%; opacity: 0.85; box-shadow: 0 0 36px 8px rgba(226,67,42,0.22); }
+    .season-deco .ny-fuji { height: 84px; opacity: 0.22; }
 }
-@media (prefers-reduced-motion: reduce) { .season-deco .ny-gold, .season-deco .ny-kite, .theme-newyear .logo-season { animation: none; } }
-.season-fx.fx-newyear { background: radial-gradient(circle at var(--fx-x) var(--fx-y), #7a1c24 0%, #33142e 45%, #0c1030 100%); }
-.season-fx.fx-newyear .fx-pop { filter: drop-shadow(0 0 30px rgba(242,207,115,0.75)); }
-.season-fx.fx-newyear .fx-text { color: #f6e3a1; }
+@media (prefers-reduced-motion: reduce) { .season-deco .ny-kite, .theme-newyear .logo-season { animation: none; } }
+.season-fx.fx-newyear { background: radial-gradient(circle at var(--fx-x) var(--fx-y), #ee5a3e 0%, #d23a22 45%, #a3271a 100%); }
+.season-fx.fx-newyear .fx-pop { filter: drop-shadow(0 0 30px rgba(255,236,170,0.8)); }
+.season-fx.fx-newyear .fx-text { color: #fff8e8; }

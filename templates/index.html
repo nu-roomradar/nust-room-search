@@ -42,8 +42,8 @@
   <span class="x-sleigh">🦌🛷</span><span class="x-star">⭐</span><span class="x-tree">🎄</span><span class="x-gift">🎁</span>
 </div>{% endif %}
 {% if 'newyear' in season_choices %}<div class="season-deco s-newyear" aria-hidden="true">
-  <i class="ny-gold"></i><i class="ny-gold ny-g2"></i><i class="ny-maku"></i><i class="ny-sun"></i><i class="ny-fuji"></i>
-  <span class="ny-kite">🪁</span><span class="ny-pine">🎍</span><span class="ny-pine ny-p2">🎍</span>
+  <i class="ny-nami"></i><i class="ny-fuji"></i><i class="ny-sun"></i><i class="ny-kasumi"></i>
+  <span class="ny-kite">🪁</span>
 </div>{% endif %}
 <!-- 通常の見た目の飾り（季節の見た目と同じ配置。レーダーの輪）。季節の見た目を選んでいるときは出ない -->
 <div class="season-deco s-normal" aria-hidden="true"><i class="n-radar"></i><i class="n-dots"></i></div>
@@ -51,7 +51,7 @@
 
     <!-- ヘッダー -->
     <header>
-        <a href="https://nu-roomradar.github.io/nust-room-search/" class="logo-link"><div class="logo">RoomRadar <span>β</span></div></a>{% if 'halloween' in season_choices %}<span class="logo-season s-halloween" aria-hidden="true">🎃</span>{% endif %}{% if 'christmas' in season_choices %}<span class="logo-season s-christmas" aria-hidden="true">⭐</span>{% endif %}{% if 'newyear' in season_choices %}<span class="logo-season s-newyear" aria-hidden="true">🌅</span>{% endif %}
+        <a href="https://nu-roomradar.github.io/nust-room-search/" class="logo-link"><div class="logo">RoomRadar <span>β</span></div></a>{% if 'halloween' in season_choices %}<span class="logo-season s-halloween" aria-hidden="true">🎃</span>{% endif %}{% if 'christmas' in season_choices %}<span class="logo-season s-christmas" aria-hidden="true">⭐</span>{% endif %}{% if 'newyear' in season_choices %}<span class="logo-season s-newyear" aria-hidden="true">{{ eto_emoji }}</span>{% endif %}
         <div class="subtitle">日大理工学部 · 時間割から空き教室をすぐ検索</div>
         {% if 'halloween' in season_choices %}
         <!-- 期間限定の飾り（ハロウィン。app.py の SEASON_THEMES で自動で出し入れ。選んだ見た目のものだけ出る） -->
@@ -62,7 +62,7 @@
         {% endif %}
         {% if 'newyear' in season_choices %}
         <!-- 期間限定の飾り（お正月。1/1〜1/15） -->
-        <div class="season-ribbon s-newyear"><span aria-hidden="true">🎍</span> あけましておめでとう！ <b>今年も、空きコマはここで。</b> <span class="season-ribbon-sub">開ける前に、ドア越しにチラッと確認を🌅</span></div>
+        <div class="season-ribbon s-newyear"><span aria-hidden="true">🎍</span> 明けましておめでとう！ <b>今年も、空きコマはここで。</b> <span class="season-ribbon-sub">開ける前に、ドア越しにチラッと確認を🌅</span></div>
         {% endif %}
         <!-- 通常の見た目の帯（季節の帯と同じ位置）。「当たり前に」は時間割にない授業の注意と組で出す -->
         <div class="season-ribbon s-normal"><span aria-hidden="true">📡</span> <b>「開けたら、空いてる」</b>を当たり前に。 <span class="season-ribbon-sub">開ける前に、ドア越しにチラッと確認を🚪</span></div>
