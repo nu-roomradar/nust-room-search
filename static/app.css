@@ -839,7 +839,13 @@ html:has(> body.theme-newyear) { background-color: #0f0a09; }
 }
 .theme-newyear .season-ribbon b { color: #c8321e; }
 .theme-newyear .season-ribbon-sub { color: #6a4a3c; }
-/* 背景の飾り：青海波・初日の出と金の霞・富士山・凧 */
+/* 背景の飾り：青海波・初日の出と金の霞・富士山・凧。上半分には金の切箔（小さな四角の箔）をまばらに、左上に薄い霞 */
+.season-deco .ny-haku {
+    position: absolute; inset: 0; opacity: 0.5;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Crect x='22' y='30' width='4' height='4' fill='%23e2b24a' fill-opacity='0.9' transform='rotate(20 24.0 32.0)'/%3E%3Crect x='88' y='14' width='2.5' height='2.5' fill='%23f3d98a' fill-opacity='0.7' transform='rotate(45 89.25 15.25)'/%3E%3Crect x='150' y='52' width='5' height='5' fill='%23e2b24a' fill-opacity='0.8' transform='rotate(10 152.5 54.5)'/%3E%3Crect x='214' y='24' width='3' height='3' fill='%23f3d98a' fill-opacity='0.6' transform='rotate(60 215.5 25.5)'/%3E%3Crect x='58' y='96' width='3' height='3' fill='%23e2b24a' fill-opacity='0.7' transform='rotate(35 59.5 97.5)'/%3E%3Crect x='126' y='124' width='2' height='2' fill='%23f3d98a' fill-opacity='0.6' transform='rotate(15 127.0 125.0)'/%3E%3Crect x='192' y='104' width='4.5' height='4.5' fill='%23e2b24a' fill-opacity='0.85' transform='rotate(50 194.25 106.25)'/%3E%3Crect x='30' y='172' width='2.5' height='2.5' fill='%23f3d98a' fill-opacity='0.6' transform='rotate(70 31.25 173.25)'/%3E%3Crect x='102' y='198' width='3.5' height='3.5' fill='%23e2b24a' fill-opacity='0.75' transform='rotate(25 103.75 199.75)'/%3E%3Crect x='168' y='180' width='2' height='2' fill='%23f3d98a' fill-opacity='0.6' transform='rotate(40 169.0 181.0)'/%3E%3Crect x='230' y='214' width='3' height='3' fill='%23e2b24a' fill-opacity='0.7' transform='rotate(5 231.5 215.5)'/%3E%3Crect x='70' y='238' width='2' height='2' fill='%23f3d98a' fill-opacity='0.5' transform='rotate(55 71.0 239.0)'/%3E%3C/svg%3E") 0 0 / 260px 260px, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='370' height='370' viewBox='0 0 370 370'%3E%3Crect x='40' y='60' width='6' height='6' fill='%23f3d98a' fill-opacity='0.7' transform='rotate(30 43.0 63.0)'/%3E%3Crect x='182' y='38' width='3' height='3' fill='%23e2b24a' fill-opacity='0.6' transform='rotate(10 183.5 39.5)'/%3E%3Crect x='302' y='112' width='5' height='5' fill='%23f3d98a' fill-opacity='0.75' transform='rotate(55 304.5 114.5)'/%3E%3Crect x='120' y='204' width='4' height='4' fill='%23e2b24a' fill-opacity='0.6' transform='rotate(20 122.0 206.0)'/%3E%3Crect x='252' y='272' width='7' height='7' fill='%23f3d98a' fill-opacity='0.6' transform='rotate(40 255.5 275.5)'/%3E%3Crect x='60' y='322' width='3' height='3' fill='%23e2b24a' fill-opacity='0.5' transform='rotate(65 61.5 323.5)'/%3E%3Crect x='332' y='334' width='4' height='4' fill='%23f3d98a' fill-opacity='0.6' transform='rotate(15 334.0 336.0)'/%3E%3C/svg%3E") 46px 28px / 370px 370px;
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,0.55) 30%, transparent 60%);
+            mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,0.55) 30%, transparent 60%);   /* 上ほど見え、画面の半分より下は出さない（下は青海波） */
+}
 .season-deco .ny-nami {
     position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40' viewBox='0 0 80 40' fill='none' stroke='%23d6aa48' stroke-opacity='0.12' stroke-width='1.2'%3E%3Cpath d='M5.2 20.3A40 40 0 0 1 74.8 20.3M15.3 23.0A30 30 0 0 1 64.7 23.0M24.0 28.0A20 20 0 0 1 56.0 28.0M31.3 35.1A10 10 0 0 1 48.7 35.1M-34.8 0.3A40 40 0 0 1 34.8 0.3M-24.7 3.0A30 30 0 0 1 24.7 3.0M-16.0 8.0A20 20 0 0 1 16.0 8.0M-8.7 15.1A10 10 0 0 1 8.7 15.1M45.2 0.3A40 40 0 0 1 114.8 0.3M55.3 3.0A30 30 0 0 1 104.7 3.0M64.0 8.0A20 20 0 0 1 96.0 8.0M71.3 15.1A10 10 0 0 1 88.7 15.1M-34.8 40.3A40 40 0 0 1 34.8 40.3M-24.7 43.0A30 30 0 0 1 24.7 43.0M-16.0 48.0A20 20 0 0 1 16.0 48.0M-8.7 55.1A10 10 0 0 1 8.7 55.1M45.2 40.3A40 40 0 0 1 114.8 40.3M55.3 43.0A30 30 0 0 1 104.7 43.0M64.0 48.0A20 20 0 0 1 96.0 48.0M71.3 55.1A10 10 0 0 1 88.7 55.1'/%3E%3C/svg%3E") 0 100% / 72px 36px;
     -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.22) 38%, #000 100%);
@@ -863,6 +869,7 @@ html:has(> body.theme-newyear) { background-color: #0f0a09; }
 .season-deco .ny-kasumi { display: none; left: -34px; top: 62%; width: 150px; opacity: 0.4; }
 .season-deco .ny-kasumi::before { content: ''; left: 56px; top: 17px; width: 104px; }
 .season-deco .ny-kasumi::after  { content: ''; left: 14px; top: -17px; width: 72px; }
+.season-deco .ny-kasumi.ny-k2 { display: block; left: -40px; top: 26px; width: 132px; opacity: 0.26; }       /* 左上の霞（どの幅でも。ロゴより上） */
 /* 下の富士山（なだらかに反った裾・平らな頂・ぎざぎざの雪。藍に白い雪）。教室カードの後ろに透けて見える */
 .season-deco .ny-fuji {
     position: absolute; left: 50%; bottom: -12px; width: min(480px, 92vw); aspect-ratio: 288 / 94; transform: translateX(-50%); opacity: 0.5;
@@ -880,8 +887,16 @@ html:has(> body.theme-newyear) { background-color: #0f0a09; }
     /* スマホは中身が横幅いっぱいなので、飾りは小さく・薄く */
     .season-deco .ny-sun { width: 50px; height: 50px; top: 20px; right: 5%; opacity: 0.85; box-shadow: 0 0 36px 8px rgba(226,67,42,0.22); }
     .season-deco .ny-fuji { width: min(300px, 80vw); opacity: 0.42; }
+    .season-deco .ny-kasumi.ny-k2 { top: 24px; left: -52px; opacity: 0.22; }
 }
 @media (prefers-reduced-motion: reduce) { .season-deco .ny-kite, .theme-newyear .logo-season { animation: none; } }
 .season-fx.fx-newyear { background: radial-gradient(circle at var(--fx-x) var(--fx-y), #ee5a3e 0%, #d23a22 45%, #a3271a 100%); }
 .season-fx.fx-newyear .fx-pop { filter: drop-shadow(0 0 30px rgba(255,236,170,0.8)); }
 .season-fx.fx-newyear .fx-text { color: #fff8e8; }
+
+/* スマホ：季節の絵文字（🎃・⭐・干支）をロゴと同じ行に収める。幅 430px の端末では横に並び、390px などでは次の行に落ちていたので、
+   狭い端末ではロゴと絵文字を少しだけ小さくして、どの端末でも横に並ぶようにそろえた（2026-11-13 運営「実機のこの見え方の方が好き」） */
+@media (max-width: 767px) {
+    body[class*="theme-"] .logo { font-size: min(2rem, calc((100vw - 34px) / 11.6)); }
+    body[class*="theme-"] .logo-season { font-size: min(1.7rem, calc((100vw - 34px) / 14.5)); margin-left: 4px; }
+}

@@ -1007,6 +1007,9 @@ class SeasonThemeTests(unittest.TestCase):
         css = (root / "app.css").read_text(encoding="utf-8")
         self.assertIn(".theme-newyear .season-ribbon.s-newyear", css)        # 帯が出る（通常の帯と入れ替わる）
         self.assertIn(".theme-newyear .icon-normal { display: none; }", css)
+        # スマホの狭い幅でも、季節の絵文字はロゴと同じ行（次の行に落とさない。2026-11-13 運営）
+        self.assertIn('body[class*="theme-"] .logo { font-size: min(2rem, calc((100vw - 34px) / 11.6)); }', css)
+        self.assertIn('class="ny-haku"', html)                                # 上半分の金の切箔
 
     def test_switch_script_saves_the_choice(self):
         js = (Path(__file__).resolve().parents[1] / "static" / "app.js").read_text(encoding="utf-8")
