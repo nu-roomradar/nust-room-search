@@ -61,8 +61,8 @@
         <div class="season-ribbon s-christmas"><span aria-hidden="true">🎄</span> Merry Christmas！ <b>Room for you.</b> <span class="season-ribbon-sub">開ける前に、ドア越しにチラッと確認を🔔</span></div>
         {% endif %}
         {% if 'newyear' in season_choices %}
-        <!-- 期間限定の飾り（お正月。1/1〜1/15） -->
-        <div class="season-ribbon s-newyear"><span aria-hidden="true">🎍</span> 明けましておめでとう！ <b>今年も、空きコマはここで。</b> <span class="season-ribbon-sub">開ける前に、ドア越しにチラッと確認を🌅</span></div>
+        {# 期間限定の飾り（お正月。12/29〜1/15。年内は「よいお年を！」、年が明けたら「明けましておめでとう！」。app.py の newyear_words） #}
+        <div class="season-ribbon s-newyear"><span aria-hidden="true">🎍</span> {{ newyear_words.greet }} <b>{{ newyear_words.line }}</b> <span class="season-ribbon-sub">開ける前に、ドア越しにチラッと確認を🌅</span></div>
         {% endif %}
         <!-- 通常の見た目の帯（季節の帯と同じ位置）。「当たり前に」は時間割にない授業の注意と組で出す -->
         <div class="season-ribbon s-normal"><span aria-hidden="true">📡</span> <b>「開けたら、空いてる」</b>を当たり前に。 <span class="season-ribbon-sub">開ける前に、ドア越しにチラッと確認を🚪</span></div>
@@ -74,7 +74,7 @@
         </div>
         {% if season_choices %}
         <!-- 見た目の切り替え（通常・ハロウィーン・クリスマス。始まった季節だけ選べる。選んだものはこの端末に保存。2026-11-07 運営） -->
-        <div class="theme-picker" id="theme-picker" role="radiogroup" aria-label="見た目" data-current="{{ season }}">
+        <div class="theme-picker" id="theme-picker" role="radiogroup" aria-label="見た目" data-current="{{ season }}" data-newyear="{{ newyear_words.greet }}">
             <button type="button" role="radio" data-theme="off" aria-checked="{{ 'false' if season_on else 'true' }}">通常</button>
             {%- for t in season_choices %}
             <button type="button" role="radio" data-theme="{{ t }}" aria-checked="{{ 'true' if (season_on and t == season) else 'false' }}" aria-label="{{ season_labels[t] }}" title="{{ season_labels[t] }}">{{ season_emoji[t] }}</button>
