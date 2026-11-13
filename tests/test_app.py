@@ -954,6 +954,49 @@ class SeasonThemeTests(unittest.TestCase):
         self.assertIn('class="season-deco s-christmas"', html)
         self.assertIn('["halloween", "christmas"]', html)                       # 描画前の反映で選べる見た目
 
+    def test_newyear_period_and_choices(self):
+        """お正月：1/1〜1/15、期間中は既定で。切り替えは 通常｜🎍 だけ（秋冬の季節は年明けに出さない。2026-11-13 運営）"""
+        self.assertIsNone(rr.season_theme(self.at(12, 31)))
+        self.assertEqual(rr.season_theme(self.at(1, 1)), "newyear")
+        self.assertEqual(rr.season_theme(self.at(1, 15)), "newyear")
+        self.assertIsNone(rr.season_theme(self.at(1, 16)))
+        self.assertEqual(rr.current_season(self.at(1, 5)), ("newyear", True))
+        self.assertEqual(rr.season_choices(self.at(1, 5)), ["newyear"])
+        self.assertEqual(rr.season_choices(self.at(1, 16)), [])
+        for m, d in ((9, 20), (10, 20), (11, 20), (12, 20)):                  # 秋・冬に 🎍 は出ない
+            self.assertNotIn("newyear", rr.season_choices(self.at(m, d)))
+
+    def test_seasons_fall_back_only_inside_their_group(self):
+        """「前の季節を選べるように残す」のは同じ組（秋〜冬）の中だけ。お正月まではさかのぼらない"""
+        self.assertEqual(rr.season_group("christmas"), ["halloween", "christmas"])
+        self.assertEqual(rr.season_group("newyear"), ["newyear"])
+        with mock.patch.object(rr, "SEASON_READY", {"newyear"}):
+            self.assertEqual(rr.current_season(self.at(10, 20)), (None, False))
+            self.assertEqual(rr.season_choices(self.at(10, 20)), [])
+        with mock.patch.object(rr, "SEASON_READY", {"newyear", "halloween"}):
+            self.assertEqual(rr.current_season(self.at(11, 20)), ("halloween", False))
+            self.assertEqual(rr.season_choices(self.at(11, 20)), ["halloween"])
+
+    def test_newyear_look(self):
+        """お正月の画面：帯・飾り・切り替えがあり、必須の表記とドア越しの確認はそのまま"""
+        with mock.patch.dict(os.environ, {"SEASON_THEME": "newyear"}):
+            pages = [self.client.get(u).get_data(as_text=True) for u in ("/", "/room")]
+        html = pages[0]
+        self.assertIn('class="theme-newyear"', html)
+        self.assertIn('class="season-deco s-newyear"', html)
+        self.assertIn('class="season-ribbon s-newyear"', html)
+        self.assertIn("今年も、空きコマはここで。", html)
+        self.assertIn("ドア越しにチラッと確認を", html)
+        self.assertIn('data-theme="newyear" aria-checked="true"', html)
+        self.assertNotIn('class="season-deco s-christmas"', html)             # ほかの季節の飾りは持たない
+        for page in pages:
+            self.assertIn("大学が公式に提供するサービスではありません", page)
+        root = Path(__file__).resolve().parents[1] / "static"
+        self.assertIn("Happy New Year!", (root / "app.js").read_text(encoding="utf-8"))
+        css = (root / "app.css").read_text(encoding="utf-8")
+        self.assertIn(".theme-newyear .season-ribbon.s-newyear", css)        # 帯が出る（通常の帯と入れ替わる）
+        self.assertIn(".theme-newyear .icon-normal { display: none; }", css)
+
     def test_switch_script_saves_the_choice(self):
         js = (Path(__file__).resolve().parents[1] / "static" / "app.js").read_text(encoding="utf-8")
         self.assertIn("localStorage.setItem('rr_theme', pref)", js)        # 季節をまたいでまとめて覚える
