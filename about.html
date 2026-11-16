@@ -110,7 +110,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
     <dl class="ab-meta">
       <div><dt><span class="ja">運営</span><span class="en">Run by</span><span class="zh">运营</span></dt><dd><span class="ja"><span class="ab-nb">学生6人の</span><span class="ab-nb">チーム</span></span><span class="en">A team of six students</span><span class="zh">6名学生组成的团队</span></dd></div>
       <div><dt><span class="ja">対象</span><span class="en">Where</span><span class="zh">范围</span></dt><dd><span class="ja"><span class="ab-nb">駿河台キャンパスの</span><span class="ab-nb">2校舎</span></span><span class="en">Two buildings, Surugadai campus</span><span class="zh"><span class="ab-nb">骏河台校区的</span><span class="ab-nb">2栋教学楼</span></span></dd></div>
-      <div><dt><span class="ja">テスト運用</span><span class="en">Trial</span><span class="zh">试运营</span></dt><dd><span class="ab-mono ab-nb">2026.10.13–12.19</span><span class="ja">（予定）</span><span class="en"> (planned)</span><span class="zh">（预计）</span></dd></div>
+      <div><dt><span class="ja">テスト運用</span><span class="en">Trial</span><span class="zh">试运营</span></dt><dd><span class="ab-mono ab-nb">2026.10.13–12.19</span><span class="ja"><span class="ab-nb">（予定）</span></span><span class="en"> <span class="ab-nb">(planned)</span></span><span class="zh"><span class="ab-nb">（预计）</span></span></dd></div>
       <div><dt><span class="ja">利用</span><span class="en">Cost</span><span class="zh">费用</span></dt><dd><span class="ja">無料・登録不要</span><span class="en">Free, no sign-up</span><span class="zh">免费・无需注册</span></dd></div>
     </dl>
   </div>
@@ -147,7 +147,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
     <h2 class="ab-h2" id="why-h"><span class="ja"><span class="ab-nb">空いている教室は、</span><span class="ab-nb">あるはずなのに。</span></span><span class="en">There must be an empty room somewhere.</span><span class="zh"><span class="ab-nb">明明应该有</span><span class="ab-nb">空教室的。</span></span></h2>
     <div class="ab-prose">
       <p class="ab-lead"><span class="ja">空きコマに、課題を進めたい。友だちと打合せをしたい。少し休みたい。そう思って教室を探しはじめると、思ったより時間がかかります。</span><span class="en">A free period. You want to get some work done, meet up with friends, or just take a break. Then you start looking for a room, and it takes longer than you expected.</span><span class="zh">没课的时候，想写写作业，想和朋友讨论一下，或者只是想歇一会儿。可一旦开始找教室，花的时间往往比想象的多。</span></p>
-      <p class="reveal"><span class="ja">タワー・スコラを、上から下まで歩き回る。「空き」だと思ってドアを開けたら、授業中だった。RoomRadar が解決したいのは、こういう困りごとです。</span><span class="en">Walking Tower Schola from top to bottom. Opening a door you thought was free, and finding a class in session. These are the problems RoomRadar is trying to solve.</span><span class="zh">把 Tower Schola 从上到下跑一遍。以为是空教室，推开门却发现正在上课。RoomRadar 想解决的，就是这些麻烦。</span></p>
+      <p class="reveal"><span class="ja">タワー・スコラを、上から下まで歩き回る。「空き」だと思ってドアを開けたら、授業中だった。RoomRadar が解決したいのは、こういう困りごとです。公開されている時間割表から授業のない教室を拾えば、歩き回る前に見当がつきます。</span><span class="en">Walking Tower Schola from top to bottom. Opening a door you thought was free, and finding a class in session. These are the problems RoomRadar is trying to solve. Pick out the rooms with no class from the published timetables, and you have a good idea before you start walking.</span><span class="zh">把 Tower Schola 从上到下跑一遍。以为是空教室，推开门却发现正在上课。RoomRadar 想解决的，就是这些麻烦。只要从公开的课程表里找出没有课的教室，出发之前心里就有数了。</span></p>
     </div>
 
     <figure class="ab-stats reveal">
@@ -157,18 +157,14 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
       </div>
       <div class="ab-stat">
         <p class="ab-stat-num"><span class="ab-num">15–20</span><span class="ab-unit"><span class="ja">分</span><span class="en">min</span><span class="zh">分钟</span></span></p>
-        <p class="ab-stat-label"><span class="ja">教室探しだけでかかる時間（平均）<sup>※</sup></span><span class="en">Average time spent just finding a room<sup>*</sup></span><span class="zh">光是找教室平均花费的时间<sup>*</sup></span></p>
+        <p class="ab-stat-label"><span class="ja"><span class="ab-nb">教室探しだけで</span><span class="ab-nb">かかる時間</span><span class="ab-nb">（平均）<sup>※</sup></span></span><span class="en">Average time spent just finding a room<sup>*</sup></span><span class="zh"><span class="ab-nb">光是找教室</span><span class="ab-nb">平均花费的时间<sup>*</sup></span></span></p>
       </div>
       <figcaption><span class="ja">※ どちらも、RoomRadar 運営学生による非公式の学内アンケートより。</span><span class="en">* Both from an unofficial on-campus survey run by the RoomRadar student team.</span><span class="zh">* 均来自RoomRadar运营学生进行的非官方校内问卷。</span></figcaption>
     </figure>
 
-    <div class="ab-prose">
-      <p class="reveal"><span class="ja">時間割表は、教務ページで公開されています。そこから「授業が入っていない教室」を拾い出せば、歩き回る前に見当がつきます。RoomRadar は、その一覧を、開いた瞬間に出します。</span><span class="en">The class timetables are already published on the academic affairs page. Pick out the rooms with no class scheduled, and you have a good idea before you start walking. RoomRadar shows that list the moment you open it.</span><span class="zh">课程表在教务页面上是公开的。只要从中找出“没有排课的教室”，出发之前心里就有数了。RoomRadar 一打开，就把这份名单列出来。</span></p>
-    </div>
-
     <figure class="ab-quote reveal">
       <blockquote>
-        <p><span class="ja"><span class="ab-nb"><em class="ab-mark">「開けたら、</em></span><span class="ab-nb"><em class="ab-mark">空いてる」</em>を</span><span class="ab-nb">当たり前に。</span></span><span class="en">Make <em class="ab-mark">“open the door, and it's free”</em> the norm.</span><span class="zh">让<em class="ab-mark">“推开门，就是空的”</em><span class="ab-nb">成为理所当然。</span></span></p>
+        <p><span class="ja"><span class="ab-nb"><em class="ab-mark">「開けたら、</em></span><span class="ab-nb"><em class="ab-mark">空いてる」</em>を</span><span class="ab-nb">当たり前に。</span></span><span class="en">Make <em class="ab-mark">“open the door, and it's free”</em> the norm.</span><span class="zh">让<em class="ab-mark">“推开门，<span class="ab-nb">就是空的”</span></em><span class="ab-nb">成为理所当然。</span></span></p>
       </blockquote>
       <figcaption><span class="ja">検索画面に掲げている言葉です。すぐ横に、「開ける前に、ドア越しにチラッと確認を」と添えています。目指している姿で、いまはまだ「かならず」とは言えないからです。</span><span class="en">This is the line on the search screen. Right next to it we add: “Before you open, take a quick look through the door.” It is where we want to get to. We can't promise it yet.</span><span class="zh">这是搜索页面上写的一句话。旁边还加了一句：“开门之前，先隔着门看一眼。”这是我们想达到的样子，现在还不能说“一定”。</span></figcaption>
     </figure>
@@ -181,14 +177,14 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
     <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">02</span><span class="ab-ch-name"><span class="ja">どう動くか</span><span class="en">How it works</span><span class="zh">如何运作</span></span></p>
     <h2 class="ab-h2" id="how-h"><span class="ja"><span class="ab-nb">時間割から、</span><span class="ab-nb">授業のないコマを</span><span class="ab-nb">拾います。</span></span><span class="en">It picks out the periods with no class.</span><span class="zh"><span class="ab-nb">从课程表里，</span><span class="ab-nb">找出没有课的时段。</span></span></h2>
     <div class="ab-prose">
-      <p class="ab-lead reveal"><span class="ja">しくみは単純です。はじめの3つは RoomRadar がします。あとの2つは、使う人にお願いしていることです。</span><span class="en">The idea is simple. RoomRadar does the first three steps. The last two are what we ask of you.</span><span class="zh">原理很简单。前三步由 RoomRadar 完成，后两步是拜托使用者做的事。</span></p>
+      <p class="ab-lead reveal"><span class="ja">はじめの3つは RoomRadar が、あとの2つは使う人がします。</span><span class="en">RoomRadar does the first three steps; the last two are up to you.</span><span class="zh">前三步由 RoomRadar 完成，<span class="ab-nb">后两步靠使用者。</span></span></p>
     </div>
 
     <figure class="ab-pipe reveal">
       <div class="ab-pipe-group is-app">
         <h3 class="ab-pipe-head">
           <span class="ab-pipe-who"><span class="ja">RoomRadar がすること</span><span class="en">What RoomRadar does</span><span class="zh">RoomRadar 做的事</span></span>
-          <span class="ab-pipe-tag"><span class="ja">時間割で分かるところ</span><span class="en">Known from the timetable</span><span class="zh">课程表能告诉我们的</span></span>
+          <span class="ab-pipe-tag"><span class="ja">時間割で分かる</span><span class="en">Known from the timetable</span><span class="zh">课程表能告诉我们的</span></span>
         </h3>
         <ol class="ab-pipe-steps">
           <li class="ab-pipe-step">
@@ -201,7 +197,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
               <path class="b n" d="M53.8 20a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0-3.4 0M68.6 20a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0-3.4 0M83.4 20a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0-3.4 0M98.2 20a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0-3.4 0M113 20a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0-3.4 0"/>
             </svg></span>
             <h4 class="ab-pipe-t"><span class="ab-pipe-no" aria-hidden="true">1</span><span class="ja">時間割表を読む</span><span class="en">Read the timetables</span><span class="zh">读取课程表</span></h4>
-            <p><span class="ja">教務ページで公開されている、理工学部と大学院などの時間割表（2025・2026年度）を読みます。</span><span class="en">We read the timetables published on the academic affairs page for the College of Science and Technology, the graduate school and others (AY2025 and AY2026).</span><span class="zh">读取教务页面公开的理工学部、研究生院等的课程表（2025・2026学年）。</span></p>
+            <p><span class="ja">教務ページで公開されている、理工学部と大学院などの時間割表（2025・2026年度）を<span class="ab-nb">読みます。</span></span><span class="en">We read the timetables published on the academic affairs page for the College of Science and Technology, the graduate school and others (AY2025 and AY2026).</span><span class="zh">读取教务页面公开的理工学部、研究生院等的课程表<span class="ab-nb">（2025・2026学年）。</span></span></p>
           </li>
           <li class="ab-pipe-step">
             <span class="ab-pipe-art" aria-hidden="true"><svg viewBox="0 0 160 110" focusable="false">
@@ -214,7 +210,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
               <text class="tx" x="80" y="88.5" text-anchor="middle">2025</text>
             </svg></span>
             <h4 class="ab-pipe-t"><span class="ab-pipe-no" aria-hidden="true">2</span><span class="ja">データにまとめる</span><span class="en">Build one database</span><span class="zh">整理成数据</span></h4>
-            <p><span class="ja">教室名の全角・半角をそろえ、まとめて書かれた教室は1教室ずつに分けます。運営が確認できた教室変更も、ここで反映します。</span><span class="en">Room names in mixed character widths are unified, and rooms listed together are split into single rooms. Room changes our team has confirmed are applied here too.</span><span class="zh">统一教室名称的全角、半角写法，把合写在一起的教室拆成一间一间。运营方已确认的教室变更也在这里反映。</span></p>
+            <p><span class="ja">教室名の全角・半角をそろえ、まとめて書かれた教室を1つずつに分けます。運営が確認できた教室変更も反映します。</span><span class="en">Room names in mixed character widths are unified, and rooms listed together are split into single rooms. Room changes our team has confirmed are applied here too.</span><span class="zh">统一教室名称的全角、半角写法，把合写在一起的教室拆成一间一间。运营方已确认的教室变更<span class="ab-nb">也在这里反映。</span></span></p>
           </li>
           <li class="ab-pipe-step">
             <span class="ab-pipe-art" aria-hidden="true"><svg viewBox="0 0 160 110" focusable="false">
@@ -230,7 +226,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
               <path class="hd" d="M95.5 83.5L112 100"/>
             </svg></span>
             <h4 class="ab-pipe-t"><span class="ab-pipe-no" aria-hidden="true">3</span><span class="ja">「空き」を出す</span><span class="en">Show the free rooms</span><span class="zh">列出空闲教室</span></h4>
-            <p><span class="ja">選んだ年度・学期・曜日・時限に、授業が1つも入っていない教室を「空き」と出します。開いた瞬間は、いまの時限（休み時間なら次の時限）です。</span><span class="en">Rooms with no class at all in the year, term, day and period you choose are shown as “free”. When you open the app, it shows the current period (or the next one during a break).</span><span class="zh">在所选学年、学期、星期和时段里一节课都没有的教室，显示为“空闲”。打开时显示当前时段（课间则显示下一时段）。</span></p>
+            <p><span class="ja">選んだ曜日・時限に授業が1つも無い教室が「空き」。開いた瞬間は、いまの時限（休み時間なら次）を<span class="ab-nb">出します。</span></span><span class="en">Rooms with no class in the day and period you choose are “free”. On opening, it shows the current period (or the next, during a break).</span><span class="zh">所选星期、时段里一节课都没有的教室就是“空闲”。打开时显示当前时段<span class="ab-nb">（课间则显示下一节）。</span></span></p>
           </li>
         </ol>
       </div>
@@ -238,7 +234,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
       <div class="ab-pipe-group is-you">
         <h3 class="ab-pipe-head">
           <span class="ab-pipe-who"><span class="ja">使う人がすること</span><span class="en">What you do</span><span class="zh">使用者做的事</span></span>
-          <span class="ab-pipe-tag"><span class="ja">行ってみて分かるところ</span><span class="en">Known only at the door</span><span class="zh">到了门口才知道的</span></span>
+          <span class="ab-pipe-tag"><span class="ja">行って分かる</span><span class="en">Known only at the door</span><span class="zh">到了门口才知道的</span></span>
         </h3>
         <ol class="ab-pipe-steps" start="4">
           <li class="ab-pipe-step">
@@ -253,7 +249,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
               <path class="bl dash" d="M53 39.5l21-2.5"/>
             </svg></span>
             <h4 class="ab-pipe-t"><span class="ab-pipe-no" aria-hidden="true">4</span><span class="ja">ドア越しに確かめる</span><span class="en">Check through the door</span><span class="zh">隔着门确认</span></h4>
-            <p><span class="ja">時間割にない使われ方は、RoomRadar には見えません。入る前に、ドア越しに中を確かめてください。</span><span class="en">RoomRadar can't see any use that isn't on the timetable. Before you go in, look through the door.</span><span class="zh">课程表上没有的使用情况，RoomRadar 看不到。进门前，请先隔着门看一眼。</span></p>
+            <p><span class="ja">時間割にない使われ方は、RoomRadar には見えません。入る前に、<span class="ab-nb">ドア越しに</span><span class="ab-nb">中を見てください。</span></span><span class="en">RoomRadar can't see use that isn't on the timetable. Look through the door before you go in.</span><span class="zh">课程表上没有的使用情况，RoomRadar 看不到。进门前请先隔着门看一眼。</span></p>
           </li>
           <li class="ab-pipe-step">
             <span class="ab-pipe-art" aria-hidden="true"><svg viewBox="0 0 160 110" focusable="false">
@@ -266,7 +262,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
               <path class="w" d="M103 104c0-11 26-11 26 0"/>
             </svg></span>
             <h4 class="ab-pipe-t"><span class="ab-pipe-no" aria-hidden="true">5</span><span class="ja">使われていたら報告</span><span class="en">Report it if it's in use</span><span class="zh">有人在用就报告</span></h4>
-            <p><span class="ja">「⚠ 実は使われていた」を押すと、次に探す人に伝わります。報告は、その時限が終わると消えます。</span><span class="en">Press <span class="ab-ui" lang="ja">「⚠ 実は使われていた」</span> (actually in use) to let the next person know. Reports disappear when the period ends.</span><span class="zh">按下<span class="ab-ui" lang="ja">“⚠ 実は使われていた”</span>（其实有人在用），下一个找教室的人就能看到。报告在该时段结束后消失。</span></p>
+            <p><span class="ja">「⚠ 実は使われていた」を押すと、次に探す人に伝わります。押したあとは、同じ校舎の別の空き教室を<span class="ab-nb">3つまで案内します。</span></span><span class="en">Press <span class="ab-ui" lang="ja">「⚠ 実は使われていた」</span> (actually in use) to let the next person know. The app then suggests up to three other free rooms in the same building.</span><span class="zh">按下<span class="ab-ui" lang="ja">“⚠ 実は使われていた”</span>（其实有人在用），下一个找教室的人就能看到。之后会推荐同一栋楼里<span class="ab-nb">最多3间其他空教室。</span></span></p>
           </li>
         </ol>
       </div>
@@ -275,13 +271,12 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
     <div class="ab-also reveal">
       <p class="ab-also-h"><span class="ja">ほかにできること</span><span class="en">Also in the app</span><span class="zh">其他功能</span></p>
       <ul class="ab-chips">
-        <li><span class="ja">年度（2025・2026）と学期の切り替え</span><span class="en">Switch year (2025 / 2026) and term</span><span class="zh">切换学年（2025・2026）和学期</span></li>
-        <li><span class="ja">2コマ以上続けて空いている教室に絞る</span><span class="en">Only rooms free for 2+ periods in a row</span><span class="zh">只看连续2节以上空闲的教室</span></li>
-        <li><span class="ja">教室名・番号で探す（例: S303）</span><span class="en">Search by room name or number (e.g. S303)</span><span class="zh">按教室名称或编号查找（例：S303）</span></li>
-        <li><span class="ja">「いま・次・明日」の切り替え</span><span class="en">Switch between now, next and tomorrow</span><span class="zh">“现在・下一节・明天”切换</span></li>
-        <li><span class="ja">前に選んだ校舎を覚える</span><span class="en">Remembers your last building</span><span class="zh">记住上次选择的教学楼</span></li>
-        <li><span class="ja">ホーム画面に追加できる</span><span class="en">Add to your home screen</span><span class="zh">可添加到主屏幕</span></li>
-        <li><span class="ja">季節の見た目（通常の見た目にも戻せる）</span><span class="en">Seasonal looks (switchable back to normal)</span><span class="zh">季节外观（可切换回普通外观）</span></li>
+        <li><span class="ja">年度・学期の切り替え</span><span class="en">Year and term</span><span class="zh">学年・学期切换</span></li>
+        <li><span class="ja">教室名・番号で探す</span><span class="en">Search by room</span><span class="zh">按教室查找</span></li>
+        <li><span class="ja">いま・次・明日</span><span class="en">Now / next / tomorrow</span><span class="zh">现在・下一节・明天</span></li>
+        <li><span class="ja">前の校舎を覚える</span><span class="en">Remembers your building</span><span class="zh">记住上次的教学楼</span></li>
+        <li><span class="ja">ホーム画面に追加</span><span class="en">Add to home screen</span><span class="zh">添加到主屏幕</span></li>
+        <li><span class="ja">季節の見た目（戻せる）</span><span class="en">Seasonal looks (optional)</span><span class="zh">季节外观（可关闭）</span></li>
       </ul>
       <p class="ab-more-p"><a class="ab-more" href="index.html#features"><span class="ja">できることの一覧を見る（紹介ページ）</span><span class="en">See everything it does (home page)</span><span class="zh">查看全部功能（首页）</span><span class="ab-more-a" aria-hidden="true">→</span></a></p>
     </div>
@@ -294,19 +289,18 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
     <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">03</span><span class="ab-ch-name"><span class="ja">どこまで信じてよいか</span><span class="en">How far to trust it</span><span class="zh">可信的范围</span></span></p>
     <h2 class="ab-h2" id="trust-h"><span class="ja"><span class="ab-nb">「空き」は、</span><span class="ab-nb">時間割の上の</span><span class="ab-nb">話です。</span></span><span class="en">“Free” means free on the timetable.</span><span class="zh"><span class="ab-nb">“空闲”只是</span><span class="ab-nb">课程表上的空闲。</span></span></h2>
     <div class="ab-prose">
-      <p class="ab-lead reveal"><span class="ja">いちばん大事なことを書きます。「空き」は、時間割に授業が入っていないという意味です。使ってよいという許可ではありません。いま教室に人がいるかどうかも、RoomRadar には分かりません。</span><span class="en">This is the most important part. “Free” means no class is scheduled there. It is not permission to use the room. RoomRadar also has no way of knowing whether anyone is in the room right now.</span><span class="zh">这是最重要的一点。“空闲”的意思是课程表上没有排课，并不是使用许可。此刻教室里有没有人，RoomRadar 也无从知道。</span></p>
+      <p class="ab-lead reveal"><span class="ja">いちばん大事なことです。「空き」は、時間割に授業が入っていないという意味で、使ってよいという許可ではありません。</span><span class="en">This is the most important part. “Free” means no class is scheduled there. It is not permission to use the room.</span><span class="zh">这是最重要的一点。“空闲”的意思是课程表上没有排课，并不是<span class="ab-nb">使用许可。</span></span></p>
     </div>
 
     <div class="ab-know reveal">
       <div class="ab-know-col is-yes">
-        <h3 class="ab-know-h"><span class="ab-know-ico" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span><span class="ja">RoomRadar に分かること</span><span class="en">What RoomRadar knows</span><span class="zh">RoomRadar 知道的</span></span></h3>
+        <h3 class="ab-know-h"><span class="ab-know-ico" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span><span class="ja">RoomRadar に<span class="ab-nb">分かること</span></span><span class="en">What RoomRadar knows</span><span class="zh">RoomRadar 知道的</span></span></h3>
         <p class="ab-know-sub"><span class="ja">ドアの手前 ― 時間割と報告から</span><span class="en">This side of the door: the timetable and reports</span><span class="zh">门的这一侧：来自课程表和报告</span></p>
         <ul>
-          <li><span class="ja">その曜日・時限に、時間割で授業が入っているかどうか</span><span class="en">Whether the timetable has a class there for that day and period</span><span class="zh">课程表上那个星期、那个时段有没有排课</span></li>
+          <li><span class="ja">その曜日・時限に、時間割で授業が入っているかどうか</span><span class="en">Whether the timetable has a class there for that day and period</span><span class="zh">课程表上那个星期、那个时段<span class="ab-nb">有没有排课</span></span></li>
           <li><span class="ja">何限まで続けて空いているか</span><span class="en">How many periods in a row a room stays free</span><span class="zh">能连续空到第几节</span></li>
-          <li><span class="ja">隔週の授業が入っているかどうか</span><span class="en">Whether a class meets on alternate weeks</span><span class="zh">有没有隔周上的课</span></li>
           <li><span class="ja">運営が確認できた教室変更</span><span class="en">Room changes our team has confirmed</span><span class="zh">运营方已确认的教室变更</span></li>
-          <li><span class="ja">その時限に「実は使われていた」の報告があったか</span><span class="en">Whether anyone reported the room as in use this period</span><span class="zh">该时段有没有人报告“其实有人在用”</span></li>
+          <li><span class="ja">その時限に「実は使われていた」の報告があったか</span><span class="en">Whether anyone reported the room as in use this period</span><span class="zh">该时段有没有人报告<span class="ab-nb">“其实有人在用”</span></span></li>
         </ul>
       </div>
       <div class="ab-door" aria-hidden="true">
@@ -318,14 +312,13 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
         </svg>
       </div>
       <div class="ab-know-col is-no">
-        <h3 class="ab-know-h"><span class="ab-know-ico" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 7l10 10M17 7L7 17"/></svg></span><span><span class="ja">RoomRadar に分からないこと</span><span class="en">What it can't know</span><span class="zh">RoomRadar 不知道的</span></span></h3>
+        <h3 class="ab-know-h"><span class="ab-know-ico" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 7l10 10M17 7L7 17"/></svg></span><span><span class="ja">RoomRadar に<span class="ab-nb">分からないこと</span></span><span class="en">What it can't know</span><span class="zh">RoomRadar 不知道的</span></span></h3>
         <p class="ab-know-sub"><span class="ja">ドアの向こう ― 行ってみないと分からない</span><span class="en">Behind the door: you only know once you're there</span><span class="zh">门的另一侧：到了才知道</span></p>
         <ul>
           <li><span class="ja">いま、教室に人がいるかどうか</span><span class="en">Whether anyone is in the room right now</span><span class="zh">此刻教室里有没有人</span></li>
           <li><span class="ja">休講・補講</span><span class="en">Cancelled and make-up classes</span><span class="zh">停课、补课</span></li>
-          <li><span class="ja">運営が確認できていない急な教室変更</span><span class="en">Sudden room changes our team hasn't confirmed</span><span class="zh">运营方尚未确认的临时教室变更</span></li>
+          <li><span class="ja">運営が確認できていない<span class="ab-nb">急な教室変更</span></span><span class="en">Sudden room changes our team hasn't confirmed</span><span class="zh">运营方尚未确认的临时教室变更</span></li>
           <li><span class="ja">試験・時間割にない授業</span><span class="en">Exams and classes not on the timetable</span><span class="zh">考试、课程表上没有的课</span></li>
-          <li><span class="ja">隔週の授業が、今週あるかどうか</span><span class="en">Whether an alternate-week class meets this week</span><span class="zh">隔周的课这一周上不上</span></li>
         </ul>
       </div>
     </div>
@@ -338,11 +331,11 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
 
     <h3 class="ab-h3" id="report-h"><span class="ja"><span class="ab-nb">使われていたら、</span><span class="ab-nb">次の人に知らせる</span></span><span class="en">If it's in use, let the next person know</span><span class="zh"><span class="ab-nb">有人在用时，</span><span class="ab-nb">告诉下一个人</span></span></h3>
     <div class="ab-prose">
-      <p class="reveal"><span class="ja">「空き」と出た教室が使われていたら、教室カードをタップして「⚠ 実は使われていた」を押してください。報告が時間割の上にどう重なるか、架空の教室の1日で見てみます。</span><span class="en">If a room shown as free is in use, tap its card and press <span class="ab-ui" lang="ja">「⚠ 実は使われていた」</span> (actually in use). Here is how reports sit on top of the timetable, using one made-up room's day.</span><span class="zh">如果显示“空闲”的教室有人在用，请点开教室卡片，按下<span class="ab-ui" lang="ja">“⚠ 実は使われていた”</span>（其实有人在用）。下面用一间虚构教室的一天，看看报告如何叠加在课程表上。</span></p>
+      <p class="reveal"><span class="ja">使われていたら、教室カードの「⚠ 実は使われていた」で知らせてください。報告が時間割にどう重なるか、架空の教室の1日で見てみます。</span><span class="en">If a room is in use, tap its card and press <span class="ab-ui" lang="ja">「⚠ 実は使われていた」</span> (actually in use). Here is how reports sit on top of the timetable, in one made-up room's day.</span><span class="zh">如果显示“空闲”的教室有人在用，请点开教室卡片，按下<span class="ab-ui" lang="ja">“⚠ 実は使われていた”</span>（其实有人在用）。下面用一间虚构教室的一天，看看报告如何叠加在课程表上。</span></p>
     </div>
 
     <figure class="ab-day reveal" aria-labelledby="day-cap">
-      <figcaption class="ab-day-cap" id="day-cap"><b><span class="ja">ある教室の1日</span><span class="en">One room, one day</span><span class="zh">一间教室的一天</span></b><span class="ab-day-fic"><span class="ja">架空の例です（実在の教室・授業ではありません）。右の札は表示のイメージです（実際の画面とは色や形が違います）。</span><span class="en">A made-up example (not a real room or class). The cards on the right show roughly how the app displays it (the real screen differs in colour and shape).</span><span class="zh">虚构的例子（并非真实的教室或课程）。右侧卡片是显示效果的示意（与实际画面的颜色和形状不同）。</span></span></figcaption>
+      <figcaption class="ab-day-cap" id="day-cap"><b><span class="ja">ある教室の1日</span><span class="en">One room, one day</span><span class="zh">一间教室的一天</span></b><span class="ab-day-fic"><span class="ja">架空の教室の例です。右の札は表示のイメージです（実際の画面とは色や形が違います）。</span><span class="en">A made-up room. The cards on the right are only an impression of the display (the real screen differs in colour and shape).</span><span class="zh">虚构教室的例子。右侧卡片只是显示效果的示意（与实际画面的颜色和形状不同）。</span></span></figcaption>
       <div class="ab-daybar" aria-hidden="true">
         <div class="ab-bar">
           <span class="ab-seg s-class"><b>1</b></span><span></span>
@@ -353,79 +346,63 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
           <span class="ab-seg s-free"><b>6</b></span>
         </div>
         <div class="ab-ticks"><span>9:00</span><span>12:30</span><span>13:20</span><span>20:30</span></div>
-        <ul class="ab-key">
-          <li><span class="ab-sw s-class"></span><span class="ja">授業あり</span><span class="en">Class</span><span class="zh">有课</span></li>
-          <li><span class="ab-sw s-free"></span><span class="ja">授業なし</span><span class="en">No class</span><span class="zh">没课</span></li>
-          <li><span class="ab-sw s-rep1"><i>⚠</i></span><span class="ja">報告1人</span><span class="en">1 report</span><span class="zh">报告1人</span></li>
-          <li><span class="ab-sw s-busy"><i>⚠⚠</i></span><span class="ja">報告2人以上</span><span class="en">2+ reports</span><span class="zh">报告2人以上</span></li>
-          <li><span class="ab-sw s-alt"></span><span class="ja">隔週の授業</span><span class="en">Alternate weeks</span><span class="zh">隔周的课</span></li>
-        </ul>
       </div>
       <ol class="ab-slots">
         <li class="ab-slot">
           <p class="ab-slot-when"><b><span class="ja">1限</span><span class="en">P1</span><span class="zh">第1节</span></b><span class="ab-mono">9:00–10:40</span></p>
           <span class="ab-mock is-none" aria-hidden="true" lang="ja">一覧に出ない</span>
-          <p class="ab-slot-text"><span class="ab-tag2 t-class"><span class="ja">授業あり</span><span class="en">Class</span><span class="zh">有课</span></span><span class="ja">時間割に授業があります。空きの一覧には出ません。</span><span class="en">A class is on the timetable. The room is not in the free list.</span><span class="zh">课程表上有课，不会出现在空闲名单中。</span></p>
+          <span class="ab-tag2 t-class"><span class="ja">授業あり</span><span class="en">Class</span><span class="zh">有课</span></span>
+          <p class="ab-slot-text"><span class="ja">空きの一覧には出ません。</span><span class="en">Not in the free list.</span><span class="zh">不会出现在空闲名单中。</span></p>
         </li>
         <li class="ab-slot">
           <p class="ab-slot-when"><b><span class="ja">2限</span><span class="en">P2</span><span class="zh">第2节</span></b><span class="ab-mono">10:50–12:30</span></p>
           <span class="ab-mock" aria-hidden="true" lang="ja"><b>教室A</b><small>空き</small></span>
-          <p class="ab-slot-text"><span class="ab-tag2 t-free"><span class="ja">授業なし</span><span class="en">No class</span><span class="zh">没课</span></span><span class="ja">授業が1つもありません。「空き」として一覧に出ます。</span><span class="en">No class at all. The room appears in the free list.</span><span class="zh">一节课都没有，作为“空闲”出现在名单中。</span></p>
+          <span class="ab-tag2 t-free"><span class="ja">授業なし</span><span class="en">No class</span><span class="zh">没课</span></span>
+          <p class="ab-slot-text"><span class="ja">「空き」として一覧に出ます。</span><span class="en">Shown in the free list.</span><span class="zh">作为“空闲”出现在名单中。</span></p>
         </li>
         <li class="ab-slot">
           <p class="ab-slot-when"><b><span class="ja">3限</span><span class="en">P3</span><span class="zh">第3节</span></b><span class="ab-mono">13:20–15:00</span></p>
           <span class="ab-mock is-rep" aria-hidden="true" lang="ja"><b>教室A</b><small>⚠1件報告</small></span>
-          <p class="ab-slot-text"><span class="ab-tag2 t-rep"><span class="ja">報告1人</span><span class="en">1 report</span><span class="zh">报告1人</span></span><span class="ja">1人から報告がありました。一覧には残ったまま、「⚠1件報告」と出ます。</span><span class="en">One person reported it. It stays in the list, marked <span class="ab-ui" lang="ja">「⚠1件報告」</span> (1 report).</span><span class="zh">有1人报告。仍留在名单中，显示<span class="ab-ui" lang="ja">“⚠1件報告”</span>（1条报告）。</span></p>
+          <span class="ab-tag2 t-rep"><span class="ja">報告1人</span><span class="en">1 report</span><span class="zh">报告1人</span></span>
+          <p class="ab-slot-text"><span class="ja">一覧に残ったまま、<span class="ab-nb">「⚠1件報告」と出ます。</span></span><span class="en">Stays in the list, marked <span class="ab-ui" lang="ja">「⚠1件報告」</span> (1 report).</span><span class="zh">仍留在名单中，显示<span class="ab-ui" lang="ja">“⚠1件報告”</span><span class="ab-nb">（1条报告）。</span></span></p>
         </li>
         <li class="ab-slot">
           <p class="ab-slot-when"><b><span class="ja">4限</span><span class="en">P4</span><span class="zh">第4节</span></b><span class="ab-mono">15:10–16:50</span></p>
           <span class="ab-mock is-busy" aria-hidden="true" lang="ja"><em>使用中の可能性</em><b>教室A</b></span>
-          <p class="ab-slot-text"><span class="ab-tag2 t-busy"><span class="ja">報告2人</span><span class="en">2 reports</span><span class="zh">报告2人</span></span><span class="ja">2人以上から報告があると、グレーになり「使用中の可能性」と出ます。4限が終わると、報告は自動で消えます。</span><span class="en">With reports from two or more people, the room turns grey and shows <span class="ab-ui" lang="ja">「使用中の可能性」</span> (may be in use). The reports are deleted automatically when period 4 ends.</span><span class="zh">有2人以上报告时，教室变灰并显示<span class="ab-ui" lang="ja">“使用中の可能性”</span>（可能在使用中）。第4节结束后，报告自动删除。</span></p>
+          <span class="ab-tag2 t-busy"><span class="ja">報告2人</span><span class="en">2 reports</span><span class="zh">报告2人</span></span>
+          <p class="ab-slot-text"><span class="ja">2人以上でグレーの「使用中の可能性」に。4限が終わると、<span class="ab-nb">報告は自動で消えます。</span></span><span class="en">Two or more reports turn it grey: <span class="ab-ui" lang="ja">「使用中の可能性」</span> (may be in use). The reports go when period 4 ends.</span><span class="zh">2人以上报告后变灰，显示<span class="ab-ui" lang="ja">“使用中の可能性”</span>（可能在使用中）。第4节结束后，<span class="ab-nb">报告自动删除。</span></span></p>
         </li>
         <li class="ab-slot">
           <p class="ab-slot-when"><b><span class="ja">5限</span><span class="en">P5</span><span class="zh">第5节</span></b><span class="ab-mono">17:00–18:40</span></p>
           <span class="ab-mock is-alt" aria-hidden="true" lang="ja"><small>週によっては空き<br>（隔週の授業）</small></span>
-          <p class="ab-slot-text"><span class="ab-tag2 t-alt"><span class="ja">隔週の授業</span><span class="en">Alternate weeks</span><span class="zh">隔周的课</span></span><span class="ja">どちらの週に授業があるかは時間割から分からないので、空きの一覧とは分けて出します。授業がある週は使えません。</span><span class="en">The timetable doesn't say which weeks the class meets, so the room is listed separately from the free list. It can't be used in the weeks with class.</span><span class="zh">课程表看不出哪一周上课，所以与空闲名单分开显示。有课的那一周不能使用。</span></p>
+          <span class="ab-tag2 t-alt"><span class="ja">隔週の授業</span><span class="en">Alternate weeks</span><span class="zh">隔周的课</span></span>
+          <p class="ab-slot-text"><span class="ja">どちらの週か時間割から分からないので、<span class="ab-nb">空きとは分けて出します。</span><span class="ab-nb">授業がある週は使えません。</span></span><span class="en">The timetable doesn't say which weeks, so it is listed apart from the free rooms. It can't be used in class weeks.</span><span class="zh">课程表看不出是哪一周，所以与空闲教室分开显示。有课的那一周不能使用。</span></p>
         </li>
         <li class="ab-slot">
           <p class="ab-slot-when"><b><span class="ja">6限</span><span class="en">P6</span><span class="zh">第6节</span></b><span class="ab-mono">18:50–20:30</span></p>
           <span class="ab-mock" aria-hidden="true" lang="ja"><b>教室A</b><small>空き</small></span>
-          <p class="ab-slot-text"><span class="ab-tag2 t-free"><span class="ja">授業なし</span><span class="en">No class</span><span class="zh">没课</span></span><span class="ja">報告は時限ごとに数えるので、4限の報告は残っていません。「空き」として出ます。</span><span class="en">Reports are counted per period, so the period-4 reports are gone. The room shows as free.</span><span class="zh">报告按时段计算，第4节的报告已经不在了，显示为“空闲”。</span></p>
+          <span class="ab-tag2 t-free"><span class="ja">授業なし</span><span class="en">No class</span><span class="zh">没课</span></span>
+          <p class="ab-slot-text"><span class="ja">報告は時限ごとなので、<span class="ab-nb">4限の報告は残っていません。</span></span><span class="en">Reports are per period, so the period-4 reports are gone.</span><span class="zh">报告按时段计算，第4节的报告<span class="ab-nb">已经不在了。</span></span></p>
         </li>
       </ol>
     </figure>
 
     <div class="ab-report">
-      <figure class="ab-try reveal" id="tryDemo">
-        <figcaption class="ab-try-cap"><b><span class="ja">さわって試す見本</span><span class="en">Try it: a sample</span><span class="zh">动手试试：示例</span></b><small><span class="ja">このページの中だけで動きます。実際には送られません。</span><span class="en">It only runs on this page. Nothing is sent.</span><span class="zh">只在本页中运行，不会真的发送。</span></small></figcaption>
-        <div class="ab-try-screen" aria-hidden="true" lang="ja">
-          <span class="ab-mock ab-try-card"><em>使用中の可能性</em><b>教室A</b><small class="ab-try-sub">空き</small></span>
-          <span class="ab-try-btn">⚠ 実は使われていた</span>
-        </div>
-        <p class="ab-try-say" id="trySay" aria-live="polite"><span class="ja">報告はまだありません。「空き」として一覧に出ています。</span><span class="en">No reports yet. The room is in the free list.</span><span class="zh">还没有报告，显示在空闲名单中。</span></p>
-        <div class="ab-try-ctrl" role="group" aria-label="見本の操作" data-label-en="Sample controls" data-label-zh="示例操作">
-          <button type="button" class="ab-try-b" data-act="you" aria-pressed="false"><span class="ja">自分が報告する</span><span class="en">I report it</span><span class="zh">我来报告</span></button>
-          <button type="button" class="ab-try-b" data-act="other"><span class="ja">ほかの人が報告する</span><span class="en">Someone else reports</span><span class="zh">别人报告</span></button>
-          <button type="button" class="ab-try-b is-quiet" data-act="end"><span class="ja">時限が終わる</span><span class="en">The period ends</span><span class="zh">时段结束</span></button>
-        </div>
-      </figure>
-
       <div class="ab-rules reveal">
         <p class="ab-rules-h"><span class="ja">報告の決まり</span><span class="en">How reports work</span><span class="zh">报告的规则</span></p>
         <dl>
-          <div><dt><span class="ja">2人から</span><span class="en">Two people</span><span class="zh">2人起</span></dt><dd><span class="ja">2人以上の報告で「使用中の可能性」になります。1人のときは「⚠1件報告」です。</span><span class="en">Reports from two or more people mark a room <span class="ab-ui" lang="ja">「使用中の可能性」</span>. With one, it shows <span class="ab-ui" lang="ja">「⚠1件報告」</span>.</span><span class="zh">2人以上报告时显示<span class="ab-ui" lang="ja">“使用中の可能性”</span>。只有1人时显示<span class="ab-ui" lang="ja">“⚠1件報告”</span>。</span></dd></div>
+          <div><dt><span class="ja">2人から</span><span class="en">Two people</span><span class="zh">2人起</span></dt><dd><span class="ja">「使用中の可能性」になるのは、2人以上が報告したときだけです。</span><span class="en">A room becomes <span class="ab-ui" lang="ja">「使用中の可能性」</span> only when two or more people report it.</span><span class="zh">只有2人以上报告时，才会显示<span class="ab-ui" lang="ja">“使用中の可能性”</span>。</span></dd></div>
           <div><dt><span class="ja">1人分</span><span class="en">One each</span><span class="zh">只算1人</span></dt><dd><span class="ja">同じ人が何度押しても、1人分です。</span><span class="en">Pressing again and again still counts as one person.</span><span class="zh">同一个人按多少次，都只算1人。</span></dd></div>
           <div><dt><span class="ja">3教室まで</span><span class="en">Up to 3</span><span class="zh">最多3间</span></dt><dd><span class="ja">1人が同じ曜日・時限に報告できるのは、3教室までです。</span><span class="en">One person can report up to three rooms for the same day and period.</span><span class="zh">同一星期、同一时段，1人最多可以报告3间教室。</span></dd></div>
-          <div><dt><span class="ja">時限の終わり</span><span class="en">Period end</span><span class="zh">时段结束</span></dt><dd><span class="ja">報告は、その時限が終わると自動で消えます。アプリの更新などで途中に消えることもあるので、そのときは気づいた人がもう一度報告してください。</span><span class="en">Reports are deleted automatically when the period ends. They can also vanish mid-period, for example when the app is updated. If so, whoever notices can simply report again.</span><span class="zh">报告在该时段结束后自动删除。应用更新等情况下也可能中途消失，这时请发现的人再报告一次。</span></dd></div>
-          <div><dt><span class="ja">取り消し</span><span class="en">Undo</span><span class="zh">取消</span></dt><dd><span class="ja">報告した端末で同じ教室を開き、「✓ 報告済み（タップで取り消し）」から。取り消し用のコードは、その端末の中にだけあります。「使用中の可能性」になった教室は開けないので、時限の終わりに消えるのを待ちます。</span><span class="en">Open the same room on the device you reported from and tap <span class="ab-ui" lang="ja">「✓ 報告済み（タップで取り消し）」</span>. The undo code is kept only on that device. A room marked <span class="ab-ui" lang="ja">「使用中の可能性」</span> can't be opened, so those reports expire at the end of the period.</span><span class="zh">在报告时用的设备上打开同一间教室，点<span class="ab-ui" lang="ja">“✓ 報告済み（タップで取り消し）”</span>即可取消。取消用的代码只保存在那台设备里。已显示<span class="ab-ui" lang="ja">“使用中の可能性”</span>的教室无法打开，只能等时段结束后自动删除。</span></dd></div>
-          <div><dt><span class="ja">報告のあと</span><span class="en">After</span><span class="zh">报告之后</span></dt><dd><span class="ja">同じ校舎でいま空きと出ている別の教室を、3つまで案内します。</span><span class="en">The app suggests up to three other rooms in the same building that are shown as free.</span><span class="zh">会推荐同一栋楼里目前显示空闲的其他教室，最多3间。</span></dd></div>
+          <div><dt><span class="ja">時限の終わり</span><span class="en">Period end</span><span class="zh">时段结束</span></dt><dd><span class="ja">時限が終わると自動で消えます。アプリの更新などで途中に消えたときは、気づいた人がもう一度報告してください。</span><span class="en">Deleted automatically when the period ends. If they vanish mid-period (for example, when the app is updated), whoever notices can report again.</span><span class="zh">时段结束后自动删除。如因应用更新等中途消失，请发现的人再报告一次。</span></dd></div>
+          <div><dt><span class="ja">取り消し</span><span class="en">Undo</span><span class="zh">取消</span></dt><dd><span class="ja">報告した端末で同じ教室を開き、「✓ 報告済み（タップで取り消し）」から（取り消し用のコードは、その端末の中だけ）。「使用中の可能性」になった教室は開けないので、時限の終わりを待ちます。</span><span class="en">Open the same room on the device you reported from and tap <span class="ab-ui" lang="ja">「✓ 報告済み（タップで取り消し）」</span>. The undo code is kept only on that device. A room marked <span class="ab-ui" lang="ja">「使用中の可能性」</span> can't be opened, so those reports expire at the end of the period.</span><span class="zh">在报告时用的设备上打开同一间教室，点<span class="ab-ui" lang="ja">“✓ 報告済み（タップで取り消し）”</span>即可取消。取消用的代码只保存在那台设备里。已显示<span class="ab-ui" lang="ja">“使用中の可能性”</span>的教室无法打开，只能等时段结束后自动删除。</span></dd></div>
         </dl>
       </div>
     </div>
 
     <div class="ab-manners reveal">
       <h3 class="ab-manners-h"><span class="ja"><span class="ab-nb">空き教室は、</span><span class="ab-nb">みんなで使う場所です</span></span><span class="en">Empty classrooms are shared spaces</span><span class="zh"><span class="ab-nb">空教室是</span><span class="ab-nb">大家共用的地方</span></span></h3>
-      <p class="ab-manners-lead"><span class="ja">使う目的は人それぞれです。お互いの目的を尊重して、周りに配慮して使いましょう。授業が優先です。</span><span class="en">Everyone uses them differently. Respect each other and be considerate. Classes come first.</span><span class="zh">使用目的因人而异。请互相尊重，照顾周围的人。课程优先。</span></p>
+      <p class="ab-manners-lead"><span class="ja">使う目的は人それぞれです。お互いの目的を尊重して、周りに配慮して使いましょう。<span class="ab-nb">授業が優先です。</span></span><span class="en">Everyone uses them differently. Respect each other and be considerate. Classes come first.</span><span class="zh">使用目的因人而异。请互相尊重，照顾周围的人。<span class="ab-nb">课程优先。</span></span></p>
       <ul class="ab-manners-chips">
         <li><span class="ja">個人学習</span><span class="en">Solo study</span><span class="zh">个人学习</span></li>
         <li><span class="ja">グループワーク</span><span class="en">Group work</span><span class="zh">小组作业</span></li>
@@ -443,7 +420,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
     <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">04</span><span class="ab-ch-name"><span class="ja">情報の扱い</span><span class="en">Your data</span><span class="zh">信息处理</span></span></p>
     <h2 class="ab-h2" id="privacy-h"><span class="ja"><span class="ab-nb">検索アプリは、</span><span class="ab-nb">名前も学籍番号も</span><span class="ab-nb">聞きません。</span></span><span class="en">The app never asks for your name or student ID.</span><span class="zh"><span class="ab-nb">搜索应用</span><span class="ab-nb">不会询问</span><span class="ab-nb">你的姓名和学号。</span></span></h2>
     <div class="ab-prose">
-      <p class="ab-lead reveal"><span class="ja">会員登録もログインもありません。入力するのは、検索の条件と教室名だけです。そのうえで残るものと、消えるときを表にしました。</span><span class="en">There is no sign-up and no login. All you ever enter is your search and a room name. Here is what is kept, where, and when it goes.</span><span class="zh">不需要注册，也不需要登录。输入的只有搜索条件和教室名称。会留下什么、何时删除，整理成了下表。</span></p>
+      <p class="ab-lead reveal"><span class="ja">会員登録もログインもありません。<span class="ab-nb">残るものと、</span><span class="ab-nb">消えるときを</span><span class="ab-nb">表にしました。</span></span><span class="en">No sign-up, no login. Here is what is kept, where, and when it goes.</span><span class="zh">不需要注册和登录。会留下什么、何时删除，<span class="ab-nb">见下表。</span></span></p>
     </div>
 
     <div class="ab-tablebox reveal">
@@ -459,34 +436,34 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
         </thead>
         <tbody role="rowgroup">
           <tr role="row">
-            <th scope="row" role="rowheader"><span class="ja">「実は使われていた」の報告</span><span class="en">“In use” reports</span><span class="zh">“其实有人在用”的报告</span></th>
+            <th scope="row" role="rowheader"><span class="ja"><span class="ab-nb">「実は使われていた」</span><span class="ab-nb">の報告</span></span><span class="en">“In use” reports</span><span class="zh"><span class="ab-nb">“其实有人在用”</span><span class="ab-nb">的报告</span></span></th>
             <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></span><span class="ab-td"><span class="ja">教室・曜日・時限、取り消し用のコード、報告した人を見分ける識別子（IPアドレスをハッシュ化したもの）</span><span class="en">Room, day and period; an undo code; an identifier that tells reporters apart (a hash of the IP address)</span><span class="zh">教室、星期、时段；取消用的代码；区分报告者的标识（IP地址的哈希值）</span></span></td>
             <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">どこに</span><span class="en">Where</span><span class="zh">位置</span></span><span class="ab-td"><span class="ab-where is-server"><span class="ja">アプリのサーバー</span><span class="en">The app's server</span><span class="zh">应用的服务器</span></span></span></td>
             <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">いつ消えるか</span><span class="en">Deleted</span><span class="zh">何时删除</span></span><span class="ab-td"><strong><span class="ja">その時限が終わると、自動で</span><span class="en">Automatically, when the period ends</span><span class="zh">该时段结束后自动删除</span></strong></span></td>
           </tr>
           <tr role="row">
-            <th scope="row" role="rowheader"><span class="ja">前に選んだ条件</span><span class="en">Your last settings</span><span class="zh">上次选择的条件</span></th>
-            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></span><span class="ab-td"><span class="ja">選んだ校舎と「続けて使う」コマ数（自分で選んだときだけ。年度と学期は残しません）</span><span class="en">The building and the “periods in a row” setting (only when you choose them; year and term are not kept)</span><span class="zh">所选的教学楼和“连续使用”的节数（仅在你自己选择时；不保存学年和学期）</span></span></td>
+            <th scope="row" role="rowheader"><span class="ja"><span class="ab-nb">前に選んだ</span><span class="ab-nb">条件</span></span><span class="en">Your last settings</span><span class="zh">上次选择的条件</span></th>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></span><span class="ab-td"><span class="ja">選んだ校舎と「続けて使う」コマ数（自分で選んだときだけ）</span><span class="en">The building and “periods in a row” (only when you choose them)</span><span class="zh">所选教学楼和“连续使用”的节数（仅在你自己选择时）</span></span></td>
             <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">どこに</span><span class="en">Where</span><span class="zh">位置</span></span><span class="ab-td"><span class="ab-where is-device"><span class="ja">この端末の Cookie</span><span class="en">A cookie on this device</span><span class="zh">本设备的 Cookie</span></span></span></td>
             <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">いつ消えるか</span><span class="en">Deleted</span><span class="zh">何时删除</span></span><span class="ab-td"><strong><span class="ja">保存から半年</span><span class="en">Six months after saving</span><span class="zh">保存后半年</span></strong></span></td>
           </tr>
           <tr role="row">
-            <th scope="row" role="rowheader"><span class="ja">端末の中の覚え書き</span><span class="en">Notes in your browser</span><span class="zh">浏览器里的记录</span></th>
-            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></span><span class="ab-td"><span class="ja">選んだ見た目、最近見た教室、報告の取り消し用コードなど（くわしくは表の下）</span><span class="en">Your chosen look, recently viewed rooms, report undo codes and so on (details below the table)</span><span class="zh">所选外观、最近查看的教室、报告的取消代码等（详见表下）</span></span></td>
+            <th scope="row" role="rowheader"><span class="ja"><span class="ab-nb">端末の中の</span><span class="ab-nb">覚え書き</span></span><span class="en">Notes in your browser</span><span class="zh">浏览器里的记录</span></th>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></span><span class="ab-td"><span class="ja">選んだ見た目、最近見た教室、取り消し用のコードなど</span><span class="en">Your chosen look, recent rooms, undo codes and so on</span><span class="zh">所选外观、最近查看的教室、取消代码等</span></span></td>
             <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">どこに</span><span class="en">Where</span><span class="zh">位置</span></span><span class="ab-td"><span class="ab-where is-device"><span class="ja">この端末のブラウザ</span><span class="en">The browser on this device</span><span class="zh">本设备的浏览器</span></span></span></td>
             <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">いつ消えるか</span><span class="en">Deleted</span><span class="zh">何时删除</span></span><span class="ab-td"><strong><span class="ja">サイトのデータを消すまで</span><span class="en">When you clear site data</span><span class="zh">直到清除网站数据</span></strong></span></td>
           </tr>
           <tr role="row">
             <th scope="row" role="rowheader"><span class="ja">操作の記録</span><span class="en">Usage records</span><span class="zh">操作记录</span></th>
-            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></span><span class="ab-td"><span class="ja">検索した曜日・時限・校舎、開いた教室、報告の回数など。名前などを送る処理はありません</span><span class="en">Day, period and building searched, rooms opened, number of reports and so on. Nothing in our code sends your name or similar details</span><span class="zh">搜索的星期、时段、教学楼，打开的教室，报告次数等。代码中不会发送姓名等个人信息</span></span></td>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></span><span class="ab-td"><span class="ja">検索した条件、開いた教室、報告の回数など。名前などを送る処理はありません</span><span class="en">What you searched, rooms opened, number of reports and so on. Nothing in our code sends your name or similar details</span><span class="zh">搜索条件、打开的教室、报告次数等。代码中不会发送姓名等个人信息</span></span></td>
             <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">どこに</span><span class="en">Where</span><span class="zh">位置</span></span><span class="ab-td"><span class="ab-where is-ext"><span class="ja">Google アナリティクス</span><span class="en">Google Analytics</span><span class="zh">Google Analytics</span></span></span></td>
             <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">いつ消えるか</span><span class="en">Deleted</span><span class="zh">何时删除</span></span><span class="ab-td"><strong><span class="ja">Google の設定と決まりによります</span><span class="en">Per Google's settings and policies</span><span class="zh">按 Google 的设置和规定</span></strong></span></td>
           </tr>
           <tr role="row">
-            <th scope="row" role="rowheader"><span class="ja">意見箱に書いた内容</span><span class="en">Feedback you send</span><span class="zh">意见箱的内容</span></th>
+            <th scope="row" role="rowheader"><span class="ja"><span class="ab-nb">意見箱に</span><span class="ab-nb">書いた内容</span></span><span class="en">Feedback you send</span><span class="zh">意见箱的内容</span></th>
             <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></span><span class="ab-td"><span class="ja">運営メンバーが改善のために読みます。種類、ご意見・ご要望、連絡先（任意）</span><span class="en">The team reads it to improve the service. Category, your message, a contact (optional)</span><span class="zh">运营成员会阅读并用于改进。类型、意见内容、联系方式（可选）</span></span></td>
             <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">どこに</span><span class="en">Where</span><span class="zh">位置</span></span><span class="ab-td"><span class="ab-where is-ext"><span class="ja">Google フォーム</span><span class="en">Google Forms</span><span class="zh">Google 表单</span></span></span></td>
-            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">いつ消えるか</span><span class="en">Deleted</span><span class="zh">何时删除</span></span><span class="ab-td"><strong><span class="ja">自動で消すしくみはありません。連絡先は書かなくても送れます</span><span class="en">There is no automatic deletion. You can send it without a contact</span><span class="zh">没有自动删除的机制。不填联系方式也能发送</span></strong></span></td>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">いつ消えるか</span><span class="en">Deleted</span><span class="zh">何时删除</span></span><span class="ab-td"><strong><span class="ja">自動では消えません（連絡先は書かなくても送れます）</span><span class="en">Not deleted automatically (you can leave the contact blank)</span><span class="zh">不会自动删除（可以不填联系方式）</span></strong></span></td>
           </tr>
         </tbody>
       </table>
@@ -523,7 +500,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
   ════════════════════════════════════════════ -->
   <section class="ab-ch" id="trial" aria-labelledby="trial-h">
     <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">05</span><span class="ab-ch-name"><span class="ja">テスト運用と校舎</span><span class="en">The trial &amp; buildings</span><span class="zh">试运营与教学楼</span></span></p>
-    <h2 class="ab-h2" id="trial-h"><span class="ja"><span class="ab-nb">いまは、</span><span class="ab-nb">駿河台キャンパスの</span><span class="ab-nb">2つの校舎で</span><span class="ab-nb">試しています。</span></span><span class="en">For now, we're trying it out in two buildings on the Surugadai campus.</span><span class="zh"><span class="ab-nb">目前在骏河台校区的</span><span class="ab-nb">2栋教学楼</span><span class="ab-nb">试运营。</span></span></h2>
+    <h2 class="ab-h2" id="trial-h"><span class="ja"><span class="ab-nb">いまは、</span><span class="ab-nb">駿河台の２つの校舎で</span><span class="ab-nb">試しています。</span></span><span class="en">For now, we're trying it in two buildings at Surugadai.</span><span class="zh"><span class="ab-nb">目前在骏河台校区的</span><span class="ab-nb">两栋教学楼</span><span class="ab-nb">试运营。</span></span></h2>
 
     <dl class="ab-trial reveal">
       <div><dt><span class="ja">期間</span><span class="en">Period</span><span class="zh">期间</span></dt>
@@ -544,13 +521,12 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
     <h3 class="ab-h3" id="campus-h"><span class="ja">対象の校舎</span><span class="en">The two buildings</span><span class="zh">对象教学楼</span></h3>
     <p class="ab-vh"><span class="ja">タワー・スコラ 38室、駿河台校舎 26室、合わせて64室。2026年度の検索の対象の教室数です。</span><span class="en">Tower Schola 38 rooms and Surugadai 26 rooms, 64 in total: the rooms searchable for AY2026.</span><span class="zh">Tower Schola 38间，骏河台校舍26间，共64间，为2026学年可搜索的教室数。</span></p>
     <div class="ab-eq reveal" aria-hidden="true">
-      <p class="ab-eq-term"><span class="ab-num">38</span><span class="ab-eq-l"><span class="ab-eq-n">1</span><span class="ja">タワー・スコラ</span><span class="en">Tower Schola</span><span class="zh">Tower Schola</span></span></p>
+      <p class="ab-eq-term"><span class="ab-num">38</span><span class="ab-eq-l"><span class="ab-eq-n">1</span><span class="ja"><span class="ab-nb">タワー・</span><span class="ab-nb">スコラ</span></span><span class="en">Tower Schola</span><span class="zh">Tower Schola</span></span></p>
       <span class="ab-eq-op">+</span>
-      <p class="ab-eq-term"><span class="ab-num">26</span><span class="ab-eq-l"><span class="ab-eq-n">2</span><span class="ja">駿河台校舎</span><span class="en">Surugadai</span><span class="zh">骏河台校舍</span></span></p>
+      <p class="ab-eq-term"><span class="ab-num">26</span><span class="ab-eq-l"><span class="ab-eq-n">2</span><span class="ja"><span class="ab-nb">駿河台</span><span class="ab-nb">校舎</span></span><span class="en">Surugadai</span><span class="zh">骏河台校舍</span></span></p>
       <span class="ab-eq-op">=</span>
-      <p class="ab-eq-term is-sum"><span class="ab-num">64</span><span class="ab-eq-l"><span class="ja">室</span><span class="en">rooms</span><span class="zh">间</span></span></p>
+      <p class="ab-eq-term is-sum"><span class="ab-num">64</span><span class="ab-eq-l"><span class="ja">室<span class="ab-nb">（2026年度）</span></span><span class="en">rooms <span class="ab-nb">(AY2026)</span></span><span class="zh">间<span class="ab-nb">（2026学年）</span></span></span></p>
     </div>
-    <p class="ab-eq-cap" aria-hidden="true"><span class="ja">2026年度の検索の対象の教室数です。</span><span class="en">Rooms searchable for AY2026.</span><span class="zh">2026学年可搜索的教室数。</span></p>
 
     <figure class="ab-campus reveal" id="campus">
       <div class="ab-picks" id="campusPicks" role="group" aria-labelledby="campus-h">
@@ -759,19 +735,24 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
     <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">06</span><span class="ab-ch-name"><span class="ja">これまでの歩み</span><span class="en">The story so far</span><span class="zh">一路走来</span></span></p>
     <h2 class="ab-h2" id="history-h"><span class="ja"><span class="ab-nb">少しずつ、</span><span class="ab-nb">直してきました。</span></span><span class="en">Small fixes, one after another.</span><span class="zh"><span class="ab-nb">一点一点，</span><span class="ab-nb">改到现在。</span></span></h2>
 
-    <ol class="ab-tl reveal">
-      <li><time datetime="2026-05-21">2026.05.21</time><p><span class="ja">Instagram で、RoomRadar の紹介を始めました</span><span class="en">Started introducing RoomRadar on Instagram</span><span class="zh">开始在 Instagram 介绍 RoomRadar</span></p></li>
+    <details class="ab-tl-more">
+      <summary><span class="ab-more-d-row"><span class="ja">それより前（2026年5月〜9月）</span><span class="en">Earlier (May–September 2026)</span><span class="zh">更早（2026年5月〜9月）</span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+      <ol class="ab-tl">
+      <li><time datetime="2026-05-21">2026.05.21</time><p><span class="ja">Instagram で紹介を始めました</span><span class="en">Started posting on Instagram</span><span class="zh">开始在 Instagram 介绍</span></p></li>
       <li><time datetime="2026-06-10">2026.06.10</time><p><span class="ja">ロゴを新しくしました</span><span class="en">A new logo</span><span class="zh">更换了新标志</span></p></li>
-      <li><time datetime="2026-06-14">2026.06.14</time><p><span class="ja">紹介ページに意見箱を作りました</span><span class="en">Added a feedback box to the home page</span><span class="zh">在首页设置了意见箱</span></p></li>
-      <li><time datetime="2026-08-05">2026.08.05</time><p><span class="ja">紹介ページのアドレスが、今のものに</span><span class="en">The home page moved to its current address</span><span class="zh">首页更换为现在的网址</span></p></li>
-      <li><time datetime="2026-09">2026.09</time><p><span class="ja">時間割データを、もとの時間割表から作り直せるように</span><span class="en">Timetable data can now be rebuilt from the source timetables</span><span class="zh">课程表数据可以从原始课程表重新生成</span></p></li>
-      <li><time datetime="2026-10">2026.10</time><p><span class="ja">運営が確認できた教室変更を、反映するように</span><span class="en">Began applying room changes our team has confirmed</span><span class="zh">开始反映运营方已确认的教室变更</span></p></li>
-      <li class="is-key"><time datetime="2026-10-13">2026.10.13</time><p><span class="ja">駿河台キャンパスで、テスト運用を始めました</span><span class="en">The trial began on the Surugadai campus</span><span class="zh">在骏河台校区开始试运营</span></p></li>
-      <li><time datetime="2026-10-25">2026.10.25</time><p><span class="ja">検索画面に、任意・匿名の質問「何に使う？」</span><span class="en">Added an optional, anonymous question, <span class="ab-ui" lang="ja">「何に使う？」</span></span><span class="zh">搜索页面加入自愿、匿名的提问<span class="ab-ui" lang="ja">“何に使う？”</span></span></p></li>
-      <li><time datetime="2026-10-30">2026.10.30</time><p><span class="ja">季節の見た目と、通常に戻すスイッチ</span><span class="en">Seasonal looks, with a switch back to normal</span><span class="zh">季节外观，以及切换回普通外观的开关</span></p></li>
-      <li><time datetime="2026-11-07">2026.11.07</time><p><span class="ja">くわしい説明を、このページに分けました</span><span class="en">Moved the details to this page</span><span class="zh">把详细说明移到了本页面</span></p></li>
-      <li><time datetime="2026-11-09">2026.11.09</time><p><span class="ja">前に選んだ校舎を覚える・ホーム画面のアイコン</span><span class="en">Remembers your last building; home-screen icon</span><span class="zh">记住上次的教学楼；主屏幕图标</span></p></li>
-      <li class="to-plan"><time datetime="2026-11-11">2026.11.11</time><p><span class="ja">検索画面を整理（時限の切り替え・校舎のタブ・階の順）</span><span class="en">Reworked the search screen (periods, building tabs, floor order)</span><span class="zh">整理搜索页面（时段切换、教学楼标签、按楼层排序）</span></p></li>
+      <li><time datetime="2026-06-14">2026.06.14</time><p><span class="ja">紹介ページに意見箱</span><span class="en">Added a feedback box to the home page</span><span class="zh">在首页设置了意见箱</span></p></li>
+      <li><time datetime="2026-08-05">2026.08.05</time><p><span class="ja">紹介ページのアドレスを変更</span><span class="en">Home page address changed</span><span class="zh">首页更换为现在的网址</span></p></li>
+      <li><time datetime="2026-09">2026.09</time><p><span class="ja"><span class="ab-nb">時間割データを</span><span class="ab-nb">原本から作り直せるように</span></span><span class="en">Timetable data rebuilt from the sources</span><span class="zh">课程表数据可从原始表重建</span></p></li>
+      </ol>
+    </details>
+    <ol class="ab-tl reveal">
+      <li><time datetime="2026-10">2026.10</time><p><span class="ja">確認できた教室変更を反映</span><span class="en">Confirmed room changes applied</span><span class="zh">反映已确认的教室变更</span></p></li>
+      <li class="is-key"><time datetime="2026-10-13">2026.10.13</time><p><span class="ja">駿河台でテスト運用を開始</span><span class="en">Trial began at Surugadai</span><span class="zh">在骏河台校区开始试运营</span></p></li>
+      <li><time datetime="2026-10-25">2026.10.25</time><p><span class="ja">任意・匿名の質問「何に使う？」</span><span class="en">Optional question <span class="ab-ui" lang="ja">「何に使う？」</span></span><span class="zh">自愿匿名提问<span class="ab-ui" lang="ja">“何に使う？”</span></span></p></li>
+      <li><time datetime="2026-10-30">2026.10.30</time><p><span class="ja">季節の見た目と、戻すスイッチ</span><span class="en">Seasonal looks, with a switch back</span><span class="zh">季节外观和切换开关</span></p></li>
+      <li><time datetime="2026-11-07">2026.11.07</time><p><span class="ja">くわしい説明をこのページへ</span><span class="en">Moved the details to this page</span><span class="zh">把详细说明移到了本页面</span></p></li>
+      <li><time datetime="2026-11-09">2026.11.09</time><p><span class="ja"><span class="ab-nb">校舎を覚える・</span><span class="ab-nb">ホーム画面のアイコン</span></span><span class="en">Remembers your building; app icon</span><span class="zh">记住上次的教学楼；主屏幕图标</span></p></li>
+      <li class="to-plan"><time datetime="2026-11-11">2026.11.11</time><p><span class="ja"><span class="ab-nb">検索画面を整理</span><span class="ab-nb">（時限・校舎のタブ）</span></span><span class="en">Search screen reworked</span><span class="zh">整理搜索页面（时段、教学楼标签）</span></p></li>
       <li class="is-plan"><time datetime="2026-12-19">2026.12.19</time><p><span class="ja">テスト運用の終了予定日</span><span class="en">Planned end of the trial</span><span class="zh">试运营预计结束日</span></p></li>
     </ol>
   </section>
@@ -782,10 +763,6 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
   <section class="ab-ch" id="members" aria-labelledby="members-h">
     <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">07</span><span class="ab-ch-name"><span class="ja">開発メンバー</span><span class="en">The team</span><span class="zh">开发成员</span></span></p>
     <h2 class="ab-h2" id="members-h"><span class="ja"><span class="ab-nb">学生が作った、</span><span class="ab-nb">学生のための</span><span class="ab-nb">サービスです。</span></span><span class="en">Built by students, for students.</span><span class="zh"><span class="ab-nb">由学生开发，</span><span class="ab-nb">为学生服务。</span></span></h2>
-    <div class="ab-prose">
-      <p class="ab-lead reveal"><span class="ja">理工学部の学生が中心になって、開発・運営しています。</span><span class="en">It is developed and run mainly by students of the College of Science and Technology.</span><span class="zh">主要由理工学部的学生开发和运营。</span></p>
-    </div>
-
     <ul class="ab-team reveal" lang="ja">
       <li class="ab-member">
         <div class="member-avatar" aria-hidden="true">二</div>
@@ -829,11 +806,11 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
     <div class="ab-colophon reveal">
       <h3 class="ab-colophon-h"><span class="ja">つくり</span><span class="en">How it's built</span><span class="zh">技术构成</span></h3>
       <dl>
-        <div><dt><span class="ja">検索アプリ</span><span class="en">The app</span><span class="zh">搜索应用</span></dt><dd><span class="ja">Python（Flask）。画面は、素の HTML・CSS・JavaScript です。</span><span class="en">Python (Flask). The screens are plain HTML, CSS and JavaScript.</span><span class="zh">Python（Flask）。页面是原生的 HTML、CSS 和 JavaScript。</span></dd></div>
-        <div><dt><span class="ja">時間割データ</span><span class="en">Timetable data</span><span class="zh">课程表数据</span></dt><dd><span class="ja">SQLite のデータベース1つ。もとの時間割表から、Python のスクリプトで組み立てます。</span><span class="en">A single SQLite database, built from the source timetables by a Python script.</span><span class="zh">一个 SQLite 数据库，由 Python 脚本从原始课程表生成。</span></dd></div>
-        <div><dt><span class="ja">動かしている場所</span><span class="en">Hosting</span><span class="zh">运行位置</span></dt><dd><span class="ja">検索アプリは Render、紹介ページとこのページは GitHub Pages。</span><span class="en">The app runs on Render; the home page and this page are on GitHub Pages.</span><span class="zh">搜索应用在 Render，首页和本页面在 GitHub Pages。</span></dd></div>
-        <div><dt><span class="ja">校舎の模型</span><span class="en">Building model</span><span class="zh">教学楼模型</span></dt><dd><span class="ja">three.js で描いています。画面に近づいてから読み込みます。</span><span class="en">Drawn with three.js, loaded only when you scroll near it.</span><span class="zh">用 three.js 绘制，滚动到附近时才加载。</span></dd></div>
-        <div><dt><span class="ja">点検</span><span class="en">Checks</span><span class="zh">检查</span></dt><dd><span class="ja">変更のたびに自動のテストを動かし、週に1回、ページが開くかと必須の表記が出ているかを自動で点検しています。</span><span class="en">Automated tests run on every change, and once a week an automated check confirms the pages open and the required notice is shown.</span><span class="zh">每次修改都会运行自动测试；每周一次，自动检查页面能否打开、必要的声明是否显示。</span></dd></div>
+        <div><dt><span class="ja">検索アプリ</span><span class="en">The app</span><span class="zh">搜索应用</span></dt><dd><span class="ja">Python（Flask）と素の HTML・CSS・JS</span><span class="en">Python (Flask) with plain HTML, CSS and JS</span><span class="zh">Python（Flask）和原生 HTML、CSS、JS</span></dd></div>
+        <div><dt><span class="ja">時間割データ</span><span class="en">Timetable data</span><span class="zh">课程表数据</span></dt><dd><span class="ja">SQLite（時間割表から Python で作成）</span><span class="en">SQLite, built from the timetables in Python</span><span class="zh">SQLite（用 Python 从课程表生成）</span></dd></div>
+        <div><dt><span class="ja">動かしている場所</span><span class="en">Hosting</span><span class="zh">运行位置</span></dt><dd><span class="ja">Render と GitHub Pages</span><span class="en">Render and GitHub Pages</span><span class="zh">Render 和 GitHub Pages</span></dd></div>
+        <div><dt><span class="ja">校舎の模型</span><span class="en">Building model</span><span class="zh">教学楼模型</span></dt><dd><span class="ja">three.js（近づいてから読み込み）</span><span class="en">three.js (loaded when you scroll near)</span><span class="zh">three.js（滚动到附近时加载）</span></dd></div>
+        <div><dt><span class="ja">点検</span><span class="en">Checks</span><span class="zh">检查</span></dt><dd><span class="ja">変更ごとの自動テストと、週1回の自動点検</span><span class="en">Tests on every change and a weekly automated check</span><span class="zh">每次修改的自动测试和每周自动检查</span></dd></div>
       </dl>
     </div>
   </section>
@@ -849,39 +826,39 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
 
     <div class="ab-faq">
       <details class="ab-q" open>
-        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">RoomRadar は大学の公式サービスですか？</span><span class="en">Is RoomRadar an official university service?</span><span class="zh">RoomRadar 是大学的官方服务吗？</span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">RoomRadar は<span class="ab-nb">大学の公式</span><span class="ab-nb">サービスですか？</span></span><span class="en">Is RoomRadar an official university service?</span><span class="zh">RoomRadar 是<span class="ab-nb">大学的</span><span class="ab-nb">官方服务吗？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
         <div class="ab-a"><p><span class="ja">いいえ。本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</span><span class="en">No. This service is developed and run by students as part of Nihon University's student project program and is currently in trial operation. It is not an official service provided by the university.</span><span class="zh">不是。本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。</span></p></div>
       </details>
       <details class="ab-q">
-        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">「空き」と出た教室は、自由に使ってよいのですか？</span><span class="en">Can I freely use a room shown as “free”?</span><span class="zh">显示“空闲”的教室可以随便用吗？</span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">「空き」と出た教室は、<span class="ab-nb">自由に使って</span><span class="ab-nb">よいのですか？</span></span><span class="en">Can I freely use a room shown as “free”?</span><span class="zh">显示“空闲”的教室<span class="ab-nb">可以随便用吗？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
         <div class="ab-a"><p><span class="ja">「空き」は、時間割の上で授業が入っていないという意味です。使ってよいという許可ではありません。授業が優先です。入る前に、ドア越しに確認してください。</span><span class="en">“Free” means no class is scheduled on the timetable. It is not permission to use the room. Classes come first. Please check through the door before you go in.</span><span class="zh">“空闲”只表示课程表上没有排课，并不是使用许可。课程优先。进门前请先隔着门确认。</span></p></div>
       </details>
       <details class="ab-q">
-        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">「空き」と出たのに、使われていました。なぜですか？</span><span class="en">It said “free”, but the room was in use. Why?</span><span class="zh">显示“空闲”，却有人在用。为什么？</span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">「空き」と出たのに、<span class="ab-nb">使われていました。</span><span class="ab-nb">なぜですか？</span></span><span class="en">It said “free”, but the room was in use. Why?</span><span class="zh">显示“空闲”，<span class="ab-nb">却有人在用。</span><span class="ab-nb">为什么？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
         <div class="ab-a"><p><span class="ja">補講・試験・時間割にない授業・運営が確認できていない急な教室変更は、時間割に載っていないので「空き」のまま出ます（休講は反対に、「授業あり」のまま出ます）。使われていたら、教室をタップして「実は使われていた」で、次の人に知らせてください。</span><span class="en">Make-up classes, exams, classes not on the timetable and sudden room changes our team hasn't confirmed aren't on the timetable, so the room still shows as free. (A cancelled class works the other way: the room stays “class scheduled”.) If a room is in use, tap it and use <span class="ab-ui" lang="ja">「実は使われていた」</span> to let the next person know.</span><span class="zh">补课、考试、课程表上没有的课，以及运营方尚未确认的临时教室变更，因为不在课程表上，教室会仍显示为空闲（停课则相反，仍显示为有课）。发现有人在用时，请点开教室，用<span class="ab-ui" lang="ja">“実は使われていた”</span>告诉下一个人。</span></p></div>
       </details>
       <details class="ab-q">
-        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">まちがえて報告しました。取り消せますか？</span><span class="en">I reported a room by mistake. Can I undo it?</span><span class="zh">报告错了，可以取消吗？</span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja"><span class="ab-nb">まちがえて</span><span class="ab-nb">報告しました。</span><span class="ab-nb">取り消せますか？</span></span><span class="en">I reported a room by mistake. Can I undo it?</span><span class="zh">报告错了，<span class="ab-nb">可以取消吗？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
         <div class="ab-a"><p><span class="ja">報告した端末で同じ教室をもう一度開くと、「報告済み（タップで取り消し）」から取り消せます。「使用中の可能性」と表示された教室は開けないので、その場合は時限が終わると自動で消えます。</span><span class="en">Open the same room again on the device you reported from, and undo it from <span class="ab-ui" lang="ja">「報告済み（タップで取り消し）」</span>. A room marked <span class="ab-ui" lang="ja">「使用中の可能性」</span> can't be opened, so in that case the report is deleted automatically when the period ends.</span><span class="zh">在报告时用的设备上再次打开同一间教室，点<span class="ab-ui" lang="ja">“報告済み（タップで取り消し）”</span>即可取消。已显示<span class="ab-ui" lang="ja">“使用中の可能性”</span>的教室无法打开，这种情况下报告会在时段结束后自动删除。</span></p></div>
       </details>
       <details class="ab-q">
-        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">前の年度や、別の学期も見られますか？</span><span class="en">Can I look at another year or term?</span><span class="zh">可以查看其他学年或学期吗？</span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">前の年度や、<span class="ab-nb">別の学期も</span><span class="ab-nb">見られますか？</span></span><span class="en">Can I look at another year or term?</span><span class="zh">可以查看<span class="ab-nb">其他学年或学期吗？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
         <div class="ab-a"><p><span class="ja">見られます。2025・2026年度の前期・後期を切り替えられます。何も選ばなければ、いまの年度・いまの学期です（4月1日〜9月20日が前期、それ以外が後期）。曜日・時限・校舎・続けて使うコマ数も選べます。</span><span class="en">Yes. You can switch between the first and second terms of AY2025 and AY2026. If you choose nothing, it uses the current year and term (April 1 to September 20 is the first term; the rest of the year is the second). You can also pick the day, period, building and how many periods in a row.</span><span class="zh">可以。可以切换2025・2026学年的前期和后期。不做选择时，显示当前学年、当前学期（4月1日〜9月20日为前期，其余为后期）。星期、时段、教学楼和连续使用的节数也可以选择。</span></p></div>
       </details>
       <details class="ab-q">
-        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">登録やログインは必要ですか？ お金はかかりますか？</span><span class="en">Do I need to sign up or log in? Does it cost anything?</span><span class="zh">需要注册或登录吗？要收费吗？</span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja"><span class="ab-nb">登録やログインは</span><span class="ab-nb">必要ですか？</span> <span class="ab-nb">お金は</span><span class="ab-nb">かかりますか？</span></span><span class="en">Do I need to sign up or <span class="ab-nb">log in?</span> Does it cost anything?</span><span class="zh"><span class="ab-nb">需要注册或登录吗？</span><span class="ab-nb">要收费吗？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
         <div class="ab-a"><p><span class="ja">どちらも要りません。無料で、ブラウザで開くだけで使えます。アプリのインストールも要りません。</span><span class="en">Neither. It is free and opens in your browser. There is no app to install.</span><span class="zh">都不需要。免费，用浏览器打开就能用，也不用安装应用。</span></p></div>
       </details>
       <details class="ab-q">
-        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">検索画面に出る「何に使う？」は何ですか？</span><span class="en">What is the <span class="ab-ui" lang="ja">「何に使う？」</span> question on the search screen?</span><span class="zh">搜索页面上出现的<span class="ab-ui" lang="ja">“何に使う？”</span>是什么？</span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">検索画面に出る<span class="ab-nb">「何に使う？」は</span><span class="ab-nb">何ですか？</span></span><span class="en">What is the <span class="ab-ui" lang="ja">「何に使う？」</span> question on the search screen?</span><span class="zh">搜索页面上出现的<span class="ab-nb"><span class="ab-ui" lang="ja">“何に使う？”</span>是什么？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
         <div class="ab-a"><p><span class="ja">空きコマの使い方を知るための、任意・匿名の質問です。1台につき1日1回までで、答えずに閉じられます。送るのは答えと曜日・時限・校舎だけで、教室名は送りません。全体の集計にだけ使います。</span><span class="en">An optional, anonymous question to learn how free periods are used. It appears at most once a day per device, and you can close it without answering. Only your answer and the day, period and building are sent, not the room name. It is used only for overall totals.</span><span class="zh">这是为了解空闲时段用途而设的自愿、匿名提问。每台设备每天最多出现一次，不回答也可以关掉。发送的只有答案和星期、时段、教学楼，不包含教室名称，仅用于整体统计。</span></p></div>
       </details>
       <details class="ab-q">
-        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">英語や中国語でも使えますか？</span><span class="en">Is it available in English or Chinese?</span><span class="zh">有英文或中文版吗？</span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">英語や中国語でも<span class="ab-nb">使えますか？</span></span><span class="en">Is it available in English or Chinese?</span><span class="zh">有英文或中文版吗？</span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
         <div class="ab-a"><p><span class="ja">紹介ページとこのページは、日本語・英語・中国語で読めます。検索アプリの画面は、日本語だけです。</span><span class="en">The home page and this page are available in Japanese, English and Chinese. The search app itself is in Japanese only.</span><span class="zh">首页和本页面提供日语、英语和中文。搜索应用的界面只有日语。</span></p></div>
       </details>
       <details class="ab-q">
-        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">スマホのホーム画面に置けますか？</span><span class="en">Can I add it to my phone's home screen?</span><span class="zh">可以添加到手机主屏幕吗？</span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">スマホのホーム画面に<span class="ab-nb">置けますか？</span></span><span class="en">Can I add it to my phone's home screen?</span><span class="zh">可以添加到<span class="ab-nb">手机主屏幕吗？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
         <div class="ab-a"><p><span class="ja">置けます。ブラウザの「ホーム画面に追加」を使うと、アイコンから開けます。2回目に来たときから、スマホでは追加のしかたを案内します（×で閉じると出なくなります）。</span><span class="en">Yes. Use your browser's “Add to Home Screen” and it opens from an icon. From your second visit, the app shows phone users how to add it (close it with × and it stops appearing).</span><span class="zh">可以。使用浏览器的“添加到主屏幕”，就能从图标打开。从第二次访问起，手机上会提示添加方法（点 × 关闭后就不再出现）。</span></p></div>
       </details>
     </div>
@@ -894,7 +871,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
     <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">09</span><span class="ab-ch-name"><span class="ja">意見を送る</span><span class="en">Feedback</span><span class="zh">提意见</span></span></p>
     <h2 class="ab-h2" id="voice-h"><span class="ja"><span class="ab-nb">まちがいを見つけたら、</span><span class="ab-nb">教えてください。</span></span><span class="en">Found a mistake? Tell us.</span><span class="zh"><span class="ab-nb">发现错误，</span><span class="ab-nb">请告诉我们。</span></span></h2>
     <div class="ab-prose">
-      <p class="ab-lead reveal"><span class="ja">教室データの誤り、使いにくいところ、ほしい機能。気づいたことは、紹介ページの意見箱から送れます。種類は、機能要望・バグ報告・教室データの誤り・その他から選べます。連絡先の入力は任意です。</span><span class="en">Wrong room data, something hard to use, a feature you'd like. Send it through the feedback box on the home page. Choose from feature request, bug report, wrong room data, or other. Leaving a contact is optional.</span><span class="zh">教室数据有误、哪里不好用、想要的功能——都可以通过首页的意见箱发给我们。类型可选：功能需求、错误报告、教室数据有误、其他。联系方式可以不填。</span></p>
+      <p class="ab-lead reveal"><span class="ja">教室データの誤り、使いにくいところ、ほしい機能。気づいたことは、紹介ページの意見箱から送れます<span class="ab-nb">（連絡先の入力は任意です）。</span></span><span class="en">Wrong room data, something hard to use, a feature you'd like: send it through the feedback box on the home page (a contact is optional).</span><span class="zh">教室数据有误、哪里不好用、想要的功能，都可以通过首页的意见箱发给我们<span class="ab-nb">（联系方式可以不填）。</span></span></p>
     </div>
     <div class="ab-links reveal">
       <a class="ab-linkcard" href="index.html#feedback">
@@ -918,7 +895,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
 <div class="ab-end">
   <div class="ab-wrap">
     <p class="ab-end-t"><span class="ja"><span class="ab-nb">読んでくれて、</span><span class="ab-nb">ありがとうございます。</span></span><span class="en">Thanks for reading.</span><span class="zh"><span class="ab-nb">感谢你</span><span class="ab-nb">读到这里。</span></span></p>
-    <p class="ab-end-s"><span class="ja">使うときは、ドア越しの確認だけ、忘れずに。</span><span class="en">One last thing: check through the door before you go in.</span><span class="zh">使用时，别忘了先隔着门确认一下。</span></p>
+    <p class="ab-end-s"><span class="ja">使うときは、<span class="ab-nb">ドア越しの確認だけ、</span><span class="ab-nb">忘れずに。</span></span><span class="en">One last thing: check through the door before you go in.</span><span class="zh">使用时，别忘了先隔着门确认一下。</span></p>
     <div class="ab-end-actions">
       <a href="https://nust-room-search.onrender.com" class="cta-btn"><span class="ja">RoomRadarを開く</span><span class="en">Open RoomRadar</span><span class="zh">打开RoomRadar</span><span aria-hidden="true">→</span></a>
       <a class="ab-back" href="index.html"><span aria-hidden="true">←</span><span class="ja">紹介ページへ戻る</span><span class="en">Back to the home page</span><span class="zh">返回首页</span></a>
@@ -1084,7 +1061,7 @@ if ('IntersectionObserver' in window) {
   window.addEventListener('scroll', onScroll, { passive: true });
 })();
 </script>
-<!-- 目次の現在地・読み上げ名の言語・テスト運用の期間の目印・報告の見本（無くても読める） -->
+<!-- 目次の現在地・読み上げ名の言語・テスト運用の期間の目印（無くても読める） -->
 <script src="assets/lp/about.js?v=20261116" defer></script>
 </body>
 </html>

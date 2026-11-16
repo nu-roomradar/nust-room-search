@@ -19,7 +19,7 @@
   --ab-mono:  'DM Mono', 'Noto Sans JP', monospace;
   --ab-head:  'Syne', 'Noto Sans JP', sans-serif;   /* 見出し：紹介ページの大見出しと同じ並び */
   --ab-w:     1040px;                  /* 紹介ページの .sec-inner と同じ幅・同じ左端 */
-  --ab-gap:   72px;                    /* 章と章のあいだ（1つの値にそろえる） */
+  --ab-gap:   56px;                    /* 章と章のあいだ・結びの上下（どの幅でもこの1つの値にそろえる） */
   --ab-r:     16px;
   --ab-r-lg:  20px;
 }
@@ -27,7 +27,6 @@
 /* ════════════════════════════════════════════
    土台：フォーカス・スキップリンク・小さな道具
 ════════════════════════════════════════════ */
-html { scroll-padding-top: 64px; }
 :where(a, button, summary, [tabindex]):focus-visible { outline: 3px solid var(--ab-blue); outline-offset: 3px; }
 main:focus { outline: none; }
 /* 言語ボタン: 親の overflow:hidden で輪郭が切れていたので、見えるようにする */
@@ -48,6 +47,7 @@ main:focus { outline: none; }
 .ab-ui { display: inline-block; max-width: 100%; }
 /* 段落の最後の行に1〜2字だけ残らないように（対応ブラウザのみ） */
 .ab p, .ab li, .ab dd, .ab figcaption { text-wrap: pretty; }
+.ab :is(.ab-notice, .ab-q-t, .ab-tl p, .ab-stat-label, .ab-end-s, .ab-table th, .ab-eq-l, .ab-mock, .ab-day-fic, .ab-linkcard-t) { text-wrap: balance; }
 .ab-mono { font-family: var(--ab-mono); font-weight: 500; letter-spacing: 0; }
 .ab-vh { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
 
@@ -60,8 +60,10 @@ main:focus { outline: none; }
 
 /* 見出しの共通：書体・詰め・最後の行に1〜2字だけ残さない */
 .ab-display, .ab-h2, .ab-h3, .ab-end-t, .ab-quote blockquote p, .ab-callout-t, .ab-manners-h {
-  font-family: var(--ab-head); font-feature-settings: "palt"; word-break: auto-phrase; text-wrap: balance;
+  font-family: var(--ab-head); font-feature-settings: "palt"; word-break: auto-phrase; text-wrap: balance; overflow-wrap: break-word;
 }
+/* 文字を大きくしたときも、長い英単語で横にはみ出さない */
+.ab { overflow-wrap: break-word; }
 
 /* ════════════════════════════════════════════
    表紙
@@ -85,17 +87,17 @@ main:focus { outline: none; }
   font-family: 'Noto Sans JP', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1.4; color: var(--ab-blue);
 }
 .ab-kicker-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
-.ab-display { display: block; font-weight: 800; font-size: clamp(2.2rem, 7vw, 4.5rem); line-height: 1.2; letter-spacing: -0.01em; }
+.ab-display { display: block; font-weight: 800; font-size: clamp(2.2rem, 7vw, 4.2rem); line-height: 1.2; letter-spacing: -0.01em; }
 .ab-acc { color: var(--accent); }
 
-.ab-deck { margin: 26px 0 0; max-width: 35em; font-size: 1.02rem; font-weight: 500; line-height: 2; letter-spacing: 0.01em; color: var(--ab-text); }
+.ab-deck { margin: 24px 0 0; max-width: 35em; font-size: 1rem; font-weight: 500; line-height: 1.9; letter-spacing: 0.01em; color: var(--ab-text); }
 .ab-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 26px; }
 /* lp.css の「下から出てくる」動きは表紙全体でまとめて扱う（動きを減らす設定で消えたままにならないように） */
 .ab-hero .hero-cta { opacity: 1; animation: none; }
 
 /* 必須の表記（試験運用中・大学公式ではない）。ボタンの下に置く（浮かせない） */
 .ab-notice {
-  max-width: 40em; margin: 22px 0 0; padding: 14px 16px; border-radius: 14px;
+  width: fit-content; max-width: min(40em, 100%); margin: 22px 0 0; padding: 14px 16px; border-radius: 14px;
   border: 1px solid var(--border); background: rgba(255, 255, 255, 0.66);
   -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
   font-size: 0.84rem; font-weight: 500; line-height: 1.85; color: var(--ab-sub);
@@ -179,13 +181,13 @@ html.ab-anim .ab-hero .ab-wrap > :nth-child(n+4) { animation-delay: 0.18s; }
 }
 .ab-ch-no { display: inline-flex; align-items: center; gap: 12px; font-family: var(--ab-mono); font-weight: 500; letter-spacing: 0.06em; color: var(--ab-blue); }
 .ab-ch-no::after { content: ''; width: 28px; height: 1px; background: currentColor; opacity: 0.55; }
-.ab-h2 { margin: 22px 0 20px; color: var(--ink); font-weight: 800; font-size: clamp(1.5rem, 4.4vw, 2.4rem); line-height: 1.38; letter-spacing: 0; }
+.ab-h2 { margin: 20px 0 18px; color: var(--ink); font-weight: 800; font-size: clamp(1.5rem, 4.2vw, 2.2rem); line-height: 1.38; letter-spacing: 0; }
 .ab-h3 { margin: 48px 0 12px; font-size: 1.18rem; font-weight: 800; line-height: 1.55; color: var(--ink); }
 
 .ab-prose { max-width: 40em; }
-.ab-prose p { margin: 0 0 1.3em; font-size: 1rem; line-height: 1.95; letter-spacing: 0.01em; color: var(--ab-text); }
+.ab-prose p { margin: 0 0 1.2em; font-size: 0.98rem; line-height: 1.9; letter-spacing: 0.01em; color: var(--ab-text); }
 .ab-prose > p:last-child { margin-bottom: 0; }
-.ab-prose .ab-lead { font-size: 1.04rem; font-weight: 500; color: var(--ink); }
+.ab-prose .ab-lead { font-size: 1.02rem; font-weight: 500; color: var(--ink); }
 .ab-more {
   display: inline-flex; align-items: center; gap: 8px; padding: 2px 0; color: var(--ink);
   font-size: 0.92rem; font-weight: 700; text-decoration: none; border-bottom: 1.5px solid var(--ink);
@@ -198,19 +200,20 @@ html.ab-anim .ab-hero .ab-wrap > :nth-child(n+4) { animation-delay: 0.18s; }
 ════════════════════════════════════════════ */
 /* 大きな数字は紹介ページの統計と同じ Noto Sans JP の太字＋等幅の数字（DM Mono の大きな 0 は斜線が出るので使わない） */
 .ab-num { font-family: 'Noto Sans JP', sans-serif; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.035em; line-height: 1; color: var(--ink); }
-.ab-stats { display: grid; margin: 30px 0; border-top: 1px solid var(--ab-rule); }
-.ab-stat { padding: 20px 0 18px; }
-.ab-stat + .ab-stat { border-top: 1px solid var(--ab-rule); }
-.ab-stat-num { display: flex; align-items: baseline; gap: 4px; margin: 0; }
-.ab-stat-num .ab-num { font-size: clamp(3rem, 14vw, 4.8rem); }
-.ab-unit { font-size: 1.3rem; font-weight: 800; color: var(--ab-blue); }
+.ab-stats { display: grid; grid-template-columns: 1fr 1fr; margin: 28px 0; border-top: 1px solid var(--ab-rule); }
+.ab-stat { min-width: 0; padding: 18px 8px 16px 0; }
+.ab-stat + .ab-stat { border-left: 1px solid var(--ab-rule); padding-left: clamp(12px, 4vw, 32px); }
+.ab-stats figcaption { grid-column: 1 / -1; }
+.ab-stat-num { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; margin: 0; }
+.ab-stat-num .ab-num { font-size: clamp(2.1rem, 10.5vw, 4.4rem); }
+.ab-unit { font-size: clamp(1rem, 4vw, 1.3rem); font-weight: 800; color: var(--ab-blue); }
 .ab-stat-label { margin: 10px 0 0; font-size: 0.88rem; font-weight: 700; line-height: 1.6; color: var(--ink); }
 .ab-stat-label sup { font-size: 0.7em; font-weight: 500; color: var(--ab-sub); margin-left: 1px; }
 .ab-stats figcaption { padding: 12px 0; border-top: 1px solid var(--ab-rule); border-bottom: 1px solid var(--ab-rule); font-size: 0.8rem; line-height: 1.7; color: var(--ab-sub); }
 
-.ab-quote { margin: 44px 0 0; }
+.ab-quote { margin: 36px 0 0; }
 .ab-quote blockquote { margin: 0; padding: 2px 0 2px 20px; border-left: 3px solid var(--accent); }
-.ab-quote blockquote p { margin: 0; color: var(--ink); font-weight: 800; font-size: clamp(1.55rem, 5.6vw, 2.8rem); line-height: 1.42; letter-spacing: 0; }
+.ab-quote blockquote p { margin: 0; color: var(--ink); font-weight: 800; font-size: clamp(1.55rem, 5.4vw, 2.5rem); line-height: 1.42; letter-spacing: 0; }
 .ab-mark { font-style: normal; background: linear-gradient(transparent 64%, rgba(37, 99, 235, 0.2) 64%, rgba(37, 99, 235, 0.2) 94%, transparent 94%); }
 .ab-quote figcaption { margin: 16px 0 0; padding-left: 23px; max-width: 39em; font-size: 0.86rem; line-height: 1.95; color: var(--ab-sub); }
 
@@ -235,7 +238,7 @@ html.ab-anim .ab-hero .ab-wrap > :nth-child(n+4) { animation-delay: 0.18s; }
 .ab-pipe-art { grid-area: art; display: block; }
 .ab-pipe-t { grid-area: t; display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1rem; font-weight: 800; line-height: 1.45; color: var(--ink); }
 .ab-pipe-no { flex: none; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: #fff; font-family: var(--ab-mono); font-size: 0.74rem; font-weight: 500; line-height: 1; }
-.ab-pipe-step p { grid-area: p; margin: 0; font-size: 0.88rem; line-height: 1.8; color: var(--ab-text); }
+.ab-pipe-step p { grid-area: p; margin: 0; font-size: 0.86rem; line-height: 1.75; color: var(--ab-text); }
 /* 手順をつなぐ小さな矢じり */
 .ab-pipe-step + .ab-pipe-step::before {
   content: ''; position: absolute; left: 24px; top: -10px; width: 8px; height: 8px; margin-top: -4px;
@@ -278,7 +281,7 @@ html.ab-anim .ab-hero .ab-wrap > :nth-child(n+4) { animation-delay: 0.18s; }
 .ab-know-sub { margin: 0 0 10px; font-size: 0.76rem; font-weight: 700; line-height: 1.7; color: var(--ab-sub); }
 .is-yes .ab-know-sub { color: var(--ab-blue); }
 .ab-know-col ul { list-style: none; margin: 0; padding: 0; }
-.ab-know-col li { position: relative; padding: 10px 0 10px 26px; border-top: 1px solid var(--ab-rule); font-size: 0.92rem; line-height: 1.7; color: var(--ab-text); }
+.ab-know-col li { position: relative; padding: 8px 0 8px 26px; border-top: 1px solid var(--ab-rule); font-size: 0.92rem; line-height: 1.7; color: var(--ab-text); }
 .ab-know-col li::before { content: ''; position: absolute; left: 1px; top: 1em; width: 15px; height: 15px; background: center / contain no-repeat; }
 .is-yes li::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d4ed8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E"); }
 .is-no li::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231a1814' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E"); }
@@ -322,16 +325,16 @@ html.ab-anim .ab-hero .ab-wrap > :nth-child(n+4) { animation-delay: 0.18s; }
 .ab-key li { display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; color: var(--ab-text); }
 .ab-sw { display: inline-grid; place-items: center; width: 22px; height: 14px; border-radius: 4px; flex: none; }
 /* 時限ごとの行 */
-.ab-slots { list-style: none; margin: 14px 0 0; padding: 0; }
+.ab-slots { list-style: none; margin: 12px 0 0; padding: 0; }
 .ab-slot {
-  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "when mock" "text text";
-  gap: 6px 12px; align-items: center; padding: 14px 0; border-top: 1px solid var(--ab-rule);
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "when tag mock" "text text mock";
+  gap: 4px 10px; align-items: center; padding: 12px 0; border-top: 1px solid var(--ab-rule);
 }
-.ab-slot-when { grid-area: when; display: flex; align-items: baseline; gap: 8px; margin: 0; }
+.ab-slot-when { grid-area: when; display: flex; align-items: baseline; gap: 8px; margin: 0; align-self: end; }
 .ab-slot-when b { font-size: 1rem; font-weight: 800; line-height: 1.3; color: var(--ink); }
 .ab-slot-when .ab-mono { font-size: 0.72rem; color: var(--ab-sub); }
-.ab-slot-text { grid-area: text; margin: 0; font-size: 0.88rem; line-height: 1.8; color: var(--ab-text); }
-.ab-tag2 { display: inline-block; margin: 0 8px 0 0; padding: 0 9px; border-radius: 99px; border: 1px solid; font-size: 0.72rem; font-weight: 700; line-height: 1.65; vertical-align: 0.08em; }
+.ab-slot-text { grid-area: text; align-self: start; margin: 0; font-size: 0.86rem; line-height: 1.75; color: var(--ab-text); }
+.ab-tag2 { grid-area: tag; justify-self: start; align-self: end; margin: 0 0 2px; padding: 0 9px; border-radius: 99px; border: 1px solid; font-size: 0.72rem; font-weight: 700; line-height: 1.65; white-space: nowrap; }
 .t-class { background: #3a362f; border-color: #3a362f; color: #fff; }
 .t-free  { background: #fff; border-color: rgba(37, 99, 235, 0.45); color: var(--ab-blue); }
 .t-rep   { background: #fff; border-color: rgba(154, 52, 18, 0.45); color: var(--ab-warn); }
@@ -340,7 +343,7 @@ html.ab-anim .ab-hero .ab-wrap > :nth-child(n+4) { animation-delay: 0.18s; }
 /* 検索アプリの教室カードの見本（表示のイメージ。明るい札で描く） */
 .ab-mock {
   grid-area: mock; position: relative; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-  min-width: 112px; min-height: 52px; padding: 7px 12px; border-radius: 12px; text-align: center;
+  min-width: 96px; min-height: 46px; padding: 5px 10px; border-radius: 12px; text-align: center;
   background: #fff; border: 1px solid rgba(26, 24, 20, 0.16); box-shadow: 0 6px 16px -12px rgba(26, 24, 20, 0.5);
   font-family: 'Noto Sans JP', sans-serif; color: var(--ink);
 }
@@ -354,40 +357,12 @@ html.ab-anim .ab-hero .ab-wrap > :nth-child(n+4) { animation-delay: 0.18s; }
 .ab-mock.is-alt { background: repeating-linear-gradient(135deg, rgba(26, 24, 20, 0.07) 0 1.5px, #fff 1.5px 6px); }
 .ab-mock.is-alt small { color: var(--ink); font-weight: 500; }
 
-/* ── さわって試す見本・報告の決まり ── */
-.ab-report { display: grid; gap: 14px; margin: 14px 0 0; }
-.ab-try { margin: 0; padding: 16px; border-radius: var(--ab-r-lg); background: #fff; border: 1px solid var(--border); }
-.ab-try-cap { display: grid; gap: 2px; margin: 0 0 12px; }
-.ab-try-cap b { font-size: 0.96rem; font-weight: 800; color: var(--ink); }
-.ab-try-cap small { font-size: 0.76rem; line-height: 1.6; color: var(--ab-sub); }
-.ab-try-screen { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; min-height: 96px; padding: 14px 12px; border-radius: 14px; background: var(--bg); border: 1px solid var(--border); }
-.ab-try-card { min-width: 120px; }
-.ab-try-card em { display: none; }
-.ab-try.is-busy .ab-try-card { padding-top: 22px; background: #e7e4dc; box-shadow: none; }
-.ab-try.is-busy .ab-try-card b { color: var(--ab-sub); }
-.ab-try.is-busy .ab-try-card em { display: block; }
-.ab-try.is-busy .ab-try-sub { display: none; }
-.ab-try.has-rep .ab-try-sub { color: var(--ab-warn); }
-.ab-try-btn { padding: 7px 12px; border-radius: 10px; background: #fff; border: 1px solid rgba(154, 52, 18, 0.4); font-size: 0.76rem; font-weight: 700; color: var(--ab-warn); }
-.ab-try.is-mine .ab-try-btn { border-color: rgba(21, 128, 61, 0.45); color: var(--ab-ok); }
-.ab-try.is-busy .ab-try-btn { visibility: hidden; }
-.ab-try-say { min-height: 3.6em; margin: 12px 2px 10px; font-size: 0.86rem; line-height: 1.75; color: var(--ab-text); }
-.ab-try-ctrl { display: flex; flex-wrap: wrap; gap: 8px; }
-.ab-try:not(.is-live) .ab-try-ctrl { display: none; }   /* about.js が動いたときだけ押せるボタンを出す */
-.ab-try-b {
-  min-height: 40px; padding: 0 14px; border-radius: 99px; border: 1.5px solid var(--ink); background: #fff; color: var(--ink);
-  font: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer; transition: background 0.2s, color 0.2s;
-}
-.ab-try-b:hover:not(:disabled) { background: rgba(26, 24, 20, 0.06); }
-.ab-try-b[aria-pressed="true"] { background: var(--ink); color: #fff; }
-.ab-try-b.is-quiet { border-color: var(--ab-line2); }
-.ab-try-b:disabled { opacity: 0.45; cursor: default; }
-
-.ab-rules { padding: 16px 18px 6px; border-radius: var(--ab-r-lg); background: #fff; border: 1px solid var(--border); }
+/* ── 報告の決まり（1枚の札） ── */
+.ab-rules { margin: 14px 0 0; padding: 16px 18px 6px; border-radius: var(--ab-r-lg); background: #fff; border: 1px solid var(--border); }
 .ab-rules dl { margin: 0; }
-.ab-rules dl > div { display: grid; grid-template-columns: 6.2em minmax(0, 1fr); gap: 2px 12px; padding: 11px 0; border-top: 1px solid var(--ab-rule); }
-.ab-rules dt { font-size: 0.82rem; font-weight: 800; line-height: 1.75; color: var(--ink); }
-.ab-rules dd { margin: 0; font-size: 0.86rem; line-height: 1.75; color: var(--ab-text); }
+.ab-rules dl > div, .ab-colophon dl > div { padding: 10px 0; border-top: 1px solid var(--ab-rule); }
+.ab-rules dt, .ab-colophon dt { display: inline; margin-right: 0.6em; font-size: 0.84rem; font-weight: 800; line-height: 1.75; color: var(--ink); }
+.ab-rules dd, .ab-colophon dd { display: inline; margin: 0; font-size: 0.86rem; line-height: 1.75; color: var(--ab-text); }
 
 /* みんなで使う場所（紹介ページの緑の札と同じ色づかい。緑の文字は #15803d で対比を保つ） */
 .ab-manners {
@@ -407,8 +382,8 @@ html.ab-anim .ab-hero .ab-wrap > :nth-child(n+4) { animation-delay: 0.18s; }
 .ab-tablebox { margin: 26px 0 0; }
 .ab-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; background: #fff; border: 1px solid var(--border); border-radius: var(--ab-r-lg); overflow: hidden; }
 .ab-table thead th { padding: 11px 16px; background: #fbfaf7; border-bottom: 1px solid var(--ab-rule); text-align: left; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.05em; color: var(--ab-sub); }
-.ab-table thead th:nth-child(1) { width: 20%; }
-.ab-table thead th:nth-child(2) { width: 38%; }
+.ab-table thead th:nth-child(1) { width: 22%; }
+.ab-table thead th:nth-child(2) { width: 36%; }
 .ab-table thead th:nth-child(3) { width: 20%; }
 .ab-table tbody th, .ab-table td { padding: 16px; vertical-align: top; text-align: left; border-bottom: 1px solid var(--ab-rule); font-size: 0.86rem; line-height: 1.75; }
 .ab-table tbody tr:last-child > * { border-bottom: 0; }
@@ -443,8 +418,9 @@ html.ab-anim .ab-hero .ab-wrap > :nth-child(n+4) { animation-delay: 0.18s; }
 /* ════════════════════════════════════════════
    05：テスト運用（1枚の札の中の定義リスト）・校舎
 ════════════════════════════════════════════ */
-.ab-trial { margin: 4px 0 0; padding: 4px 18px; background: #fff; border: 1px solid var(--border); border-radius: var(--ab-r-lg); }
-.ab-trial > div { display: grid; gap: 4px; padding: 14px 0; }
+.ab-trial { margin: 4px 0 0; padding: 4px 16px; background: #fff; border: 1px solid var(--border); border-radius: var(--ab-r-lg); }
+.ab-trial > div { display: grid; grid-template-columns: 3.4em minmax(0, 1fr); gap: 4px 10px; padding: 13px 0; }
+.ab-trial dt { padding-top: 0.22em; }
 .ab-trial > div + div { border-top: 1px solid var(--ab-rule); }
 .ab-trial dt { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; color: var(--ab-sub); }
 .ab-trial dd { margin: 0; font-size: 0.94rem; font-weight: 500; line-height: 1.85; color: var(--ink); }
@@ -461,14 +437,13 @@ html.ab-anim .ab-hero .ab-wrap > :nth-child(n+4) { animation-delay: 0.18s; }
 .ab-span-ends { display: flex; justify-content: space-between; margin-top: 7px; font-family: var(--ab-mono); font-size: 0.74rem; color: var(--ab-sub); }
 
 /* 室数：38 + 26 = 64 を1行に収める（狭い幅では数字を縮める） */
-.ab-eq { display: flex; flex-wrap: nowrap; align-items: flex-start; gap: 0 clamp(8px, 2.6vw, 18px); margin: 4px 0 0; }
+.ab-eq { display: flex; flex-wrap: nowrap; align-items: flex-start; gap: 0 clamp(8px, 2.6vw, 18px); margin: 4px 0 18px; }
 .ab-eq-term { display: flex; flex-direction: column; gap: 6px; margin: 0; min-width: 0; }
 .ab-eq .ab-num { font-size: clamp(2.2rem, 10vw, 4rem); }
 .ab-eq-term.is-sum .ab-num { color: var(--accent); }
-.ab-eq-l { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 700; line-height: 1.4; color: var(--ab-sub); }
-.ab-eq-n { flex: none; display: inline-grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: var(--ink); color: #fff; font-family: var(--ab-mono); font-size: 0.64rem; font-weight: 500; }
+.ab-eq-l { display: flex; align-items: flex-start; gap: 5px; font-size: 0.78rem; font-weight: 700; line-height: 1.4; color: var(--ab-sub); }
+.ab-eq-n { flex: none; margin-top: 1px; display: inline-grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: var(--ink); color: #fff; font-family: var(--ab-mono); font-size: 0.64rem; font-weight: 500; }
 .ab-eq-op { padding-top: 0.35em; font-family: var(--ab-mono); font-size: clamp(1.3rem, 5vw, 2rem); line-height: 1; color: var(--ab-sub); }
-.ab-eq-cap { margin: 10px 0 18px; font-size: 0.8rem; line-height: 1.7; color: var(--ab-sub); }
 
 .ab-campus { margin: 0; }
 .ab-picks { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
@@ -483,7 +458,7 @@ html:not(.js) .ab-picks { display: none; }   /* JS が無いと動かないの�
 .ab-pick[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
 .ab-pick[aria-pressed="true"] .n { background: #fff; color: var(--ink); }
 
-.ab-stage { position: relative; height: clamp(280px, 80vw, 470px); overflow: hidden; background: #F0EEE6; border: 1px solid var(--border); border-radius: var(--ab-r); }
+.ab-stage { position: relative; height: clamp(270px, 76vw, 420px); overflow: hidden; background: #F0EEE6; border: 1px solid var(--border); border-radius: var(--ab-r); }
 .ab-stage rr-campus { position: absolute; inset: 0; height: 100%; }
 .ab-stage rr-campus[hidden] { display: none; }
 .ab-stage-still { position: absolute; inset: 0; display: grid; place-items: center; padding: 6px; transition: opacity 0.45s ease, visibility 0s linear 0.45s; }
@@ -498,7 +473,7 @@ html:not(.js) .ab-picks { display: none; }   /* JS が無いと動かないの�
 .ab-stage-status > span { display: none; padding: 4px 11px; border-radius: 99px; background: rgba(255, 255, 255, 0.86); border: 1px solid var(--border); font-size: 0.74rem; font-weight: 500; line-height: 1.5; color: var(--ab-sub); }
 .ab-stage[data-state="loading"] .s-loading, .ab-stage[data-state="ready"] .s-ready, .ab-stage[data-state="failed"] .s-failed { display: inline-block; }
 .ab-stage-load {
-  position: absolute; z-index: 3; left: 50%; bottom: 14px; transform: translateX(-50%); max-width: calc(100% - 24px);
+  position: absolute; z-index: 3; left: 12px; right: 12px; bottom: 14px; width: fit-content; max-width: calc(100% - 24px); margin: 0 auto;
   min-height: 42px; padding: 0 16px; border-radius: 99px; border: none; background: var(--ink); color: #fff;
   font: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer;
 }
@@ -509,45 +484,50 @@ html:not(.js) .ab-picks { display: none; }   /* JS が無いと動かないの�
    06：年表（1行ずつ）
 ════════════════════════════════════════════ */
 .ab-tl { list-style: none; margin: 6px 0 0; padding: 0; }
-.ab-tl li { position: relative; display: grid; grid-template-columns: 6.6em minmax(0, 1fr); gap: 10px; align-items: baseline; padding: 0 0 12px 22px; }
+.ab-tl li { position: relative; display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 8px; align-items: baseline; padding: 0 0 9px 22px; }
 .ab-tl li::before { content: ''; position: absolute; left: 4px; top: 13px; bottom: -3px; border-left: 1px solid var(--ab-line2); }
 .ab-tl li:last-child { padding-bottom: 0; }
 .ab-tl li:last-child::before { display: none; }
 .ab-tl li.to-plan::before { border-left-style: dashed; }
 .ab-tl li::after { content: ''; position: absolute; left: 0; top: 6px; width: 9px; height: 9px; border-radius: 50%; box-sizing: border-box; background: var(--bg); border: 1.5px solid rgba(26, 24, 20, 0.6); }
-.ab-tl time { font-family: var(--ab-mono); font-size: 0.76rem; letter-spacing: 0.02em; line-height: 1.7; color: var(--ab-sub); white-space: nowrap; }
-.ab-tl p { margin: 0; font-size: 0.9rem; line-height: 1.7; color: var(--ab-text); }
+.ab-tl time { font-family: var(--ab-mono); font-size: 0.74rem; letter-spacing: 0.02em; line-height: 1.7; color: var(--ab-sub); white-space: nowrap; }
+.ab-tl p { margin: 0; font-size: 0.88rem; line-height: 1.7; color: var(--ab-text); }
 .ab-tl .is-key::after { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.16); }
 .ab-tl .is-key time { color: var(--ab-blue); }
 .ab-tl .is-key p { font-weight: 700; color: var(--ink); }
 .ab-tl .is-plan::after { border-style: dashed; }
+.ab-tl-more { margin: 6px 0 14px; border-top: 1px solid var(--ab-rule); border-bottom: 1px solid var(--ab-rule); }
+.ab-tl-more summary { display: block; list-style: none; cursor: pointer; }
+.ab-tl-more summary::-webkit-details-marker { display: none; }
+.ab-tl-more .ab-more-d-row { padding: 11px 0; font-size: 0.86rem; }
+.ab-tl-more[open] .ab-q-i::after { transform: rotate(0deg); }
+.ab-tl-more summary:hover .ab-q-i { border-color: var(--ink); }
+.ab-tl-more .ab-tl { margin: 4px 0 14px; }
 
 /* ════════════════════════════════════════════
    07：開発メンバー（名簿）・つくり
 ════════════════════════════════════════════ */
 .ab-team { list-style: none; display: grid; margin: 22px 0 0; padding: 0; border-top: 1px solid var(--ink); }
+.ab-team { grid-template-columns: 1fr 1fr; column-gap: 16px; }
 .ab-member {
-  display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; grid-template-areas: "av name role" "av dept role";
-  column-gap: 14px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--ab-rule);
+  display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-areas: "av name" "av role" "dept dept";
+  column-gap: 10px; row-gap: 2px; align-items: center; padding: 14px 0 12px; border-bottom: 1px solid var(--ab-rule); min-width: 0;
 }
 /* 頭文字の丸は紹介ページの .member-avatar と同じ青→橙の1種類のグラデーション（lp.css のまま。大きさだけ変える） */
-.ab-team .member-avatar { grid-area: av; width: 48px; height: 48px; margin: 0; font-size: 1.12rem; transition: none; }
-.ab-team .member-name { grid-area: name; align-self: end; margin: 0; font-family: 'Noto Sans JP', sans-serif; font-size: 1.04rem; font-weight: 800; letter-spacing: 0.02em; line-height: 1.5; color: var(--ink); }
-.ab-team .member-dept { grid-area: dept; align-self: start; font-size: 0.8rem; line-height: 1.55; color: var(--ab-sub); }
+.ab-team .member-avatar { grid-area: av; width: 40px; height: 40px; margin: 0; font-size: 1rem; transition: none; }
+.ab-team .member-name { grid-area: name; align-self: end; margin: 0; font-family: 'Noto Sans JP', sans-serif; font-size: 0.98rem; font-weight: 800; letter-spacing: 0.02em; line-height: 1.5; color: var(--ink); }
+.ab-team .member-dept { grid-area: dept; align-self: start; margin-top: 6px; font-size: 0.78rem; line-height: 1.55; color: var(--ab-sub); }
 .ab-team .member-role {
-  grid-area: role; align-self: center; margin: 0; padding: 4px 11px;
+  grid-area: role; align-self: start; justify-self: start; margin: 0; padding: 1px 9px;
   background: #fff; border: 1px solid rgba(37, 99, 235, 0.3); color: var(--ab-blue); font-size: 0.76rem; white-space: nowrap;
 }
 /* 英語・中国語のときだけ、名簿が日本語のままであることを添える */
 .ab-team-note { display: none; margin: 12px 0 0; font-size: 0.8rem; line-height: 1.7; color: var(--ab-sub); }
 body.lang-en .ab-team-note, body.lang-zh .ab-team-note { display: block; }
 
-.ab-colophon { margin: 32px 0 0; padding: 18px 18px 6px; background: #fff; border: 1px solid var(--border); border-radius: var(--ab-r-lg); }
+.ab-colophon { margin: 28px 0 0; padding: 18px 18px 6px; background: #fff; border: 1px solid var(--border); border-radius: var(--ab-r-lg); }
 .ab-colophon-h { margin: 0 0 10px; font-size: 1.04rem; font-weight: 800; line-height: 1.5; color: var(--ink); }
 .ab-colophon dl { margin: 0; }
-.ab-colophon dl > div { display: grid; gap: 2px; padding: 11px 0; border-top: 1px solid var(--ab-rule); }
-.ab-colophon dt { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.03em; line-height: 1.75; color: var(--ab-sub); }
-.ab-colophon dd { margin: 0; font-size: 0.88rem; line-height: 1.8; color: var(--ab-text); }
 
 /* ════════════════════════════════════════════
    08：よくある質問（details。JS なしで開閉できる）
@@ -556,7 +536,7 @@ body.lang-en .ab-team-note, body.lang-zh .ab-team-note { display: block; }
 .ab-q { border-bottom: 1px solid var(--ab-rule); }
 .ab-q summary { display: block; list-style: none; cursor: pointer; }
 .ab-q summary::-webkit-details-marker { display: none; }
-.ab-q-row { display: grid; grid-template-columns: auto minmax(0, 1fr) 24px; column-gap: 12px; align-items: start; padding: 16px 0; font-size: 0.98rem; font-weight: 700; line-height: 1.65; color: var(--ink); }
+.ab-q-row { display: grid; grid-template-columns: auto minmax(0, 1fr) 24px; column-gap: 12px; align-items: start; padding: 14px 0; font-size: 0.94rem; font-weight: 700; line-height: 1.65; color: var(--ink); }
 .ab-q-t { text-wrap: pretty; }
 .ab-q-m { font-family: var(--ab-mono); font-weight: 500; color: var(--ab-blue); }
 .ab-q-i { position: relative; width: 24px; height: 24px; margin-top: 1px; border-radius: 50%; border: 1px solid var(--ab-rule); background: rgba(255, 255, 255, 0.6); }
@@ -591,6 +571,8 @@ body.lang-en .ab-team-note, body.lang-zh .ab-team-note { display: block; }
 /* フッターのリンク：lp.css の opacity:0.85 では対比が 3.8:1 なので、4.5:1 以上にする */
 .about-page ~ footer .foot-links a { opacity: 1; color: var(--ink); }
 .about-page ~ footer .foot-links a:hover { opacity: 1; }
+/* 文字を大きくしても、フッターの長い語句で横にはみ出さない */
+.about-page ~ footer > * { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
 
 /* ════════════════════════════════════════════
    スクロールで出す動き：控えめに。JS が動いて ab-anim が付いたときだけ隠す（止まっても読める）
@@ -611,28 +593,27 @@ body.lang-en .ab-prose p, body.lang-en .ab-deck { line-height: 1.78; letter-spac
 body.lang-en :is(.ab-pipe-step p, .ab-a p, .ab-tl p, .ab-colophon dd, .ab-notice, .ab-slot-text, .ab-rules dd, .ab-table td, .ab-more-dl dd, .ab-know-col li, .ab-trial dd) { line-height: 1.7; }
 body.lang-en .ab-kicker, body.lang-en .ab-ch-label { letter-spacing: 0.04em; }
 body.lang-en .ab-meta dt { text-transform: uppercase; }
-body.lang-en .ab-rules dl > div { grid-template-columns: 6.6em minmax(0, 1fr); }
 body.lang-zh .ab-prose p, body.lang-zh .ab-deck { line-height: 1.95; }
 
 /* ════════════════════════════════════════════
    広い画面
 ════════════════════════════════════════════ */
 @media (min-width: 600px) {
-  .ab-stats { grid-template-columns: 1fr 1fr; }
-  .ab-stat + .ab-stat { border-top: none; border-left: 1px solid var(--ab-rule); padding-left: 32px; }
-  .ab-stats figcaption { grid-column: 1 / -1; }
   .ab-trial { padding: 6px 26px; }
   .ab-trial > div { grid-template-columns: 6.5em minmax(0, 1fr); gap: 20px; padding: 16px 0; }
   .ab-trial dt { padding-top: 0.25em; }
   .ab-colophon { padding: 22px 26px 8px; }
-  .ab-colophon dl > div { grid-template-columns: 9.5em minmax(0, 1fr); gap: 20px; }
+  .ab-colophon dl > div, .ab-rules dl > div { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 16px; }
+  .ab-colophon dt, .ab-rules dt, .ab-colophon dd, .ab-rules dd { display: block; margin: 0; }
   .ab-day { padding: 22px 22px 8px; }
   .ab-bar { height: 56px; }
-  .ab-try, .ab-rules { padding-left: 22px; padding-right: 22px; }
+  .ab-rules { padding-left: 22px; padding-right: 22px; }
   /* 時限ごとの行：時限｜説明｜見本 */
-  .ab-slot { grid-template-columns: 6.4em minmax(0, 1fr) 132px; grid-template-areas: "when text mock"; gap: 6px 18px; padding: 16px 0; }
-  .ab-slot-when { flex-direction: column; gap: 2px; align-self: start; }
-  .ab-mock { justify-self: end; min-width: 124px; }
+  .ab-slot { grid-template-columns: 6.4em auto minmax(0, 1fr) 132px; grid-template-areas: "when tag text mock"; gap: 6px 14px; padding: 10px 0; }
+  .ab-tag2 { align-self: center; margin: 0; }
+  .ab-slot-when { flex-direction: column; gap: 0; align-self: center; }
+  .ab-slot-text { align-self: center; }
+  .ab-mock { justify-self: end; min-width: 124px; min-height: 44px; }
   .ab-more-dl > div { display: grid; grid-template-columns: 11em minmax(0, 1fr); gap: 16px; }
   .ab-more-dl dd { margin: 0; }
 }
@@ -642,7 +623,7 @@ body.lang-zh .ab-prose p, body.lang-zh .ab-deck { line-height: 1.95; }
   .is-you .ab-pipe-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ab-pipe-group { padding: 16px 16px 16px; }
   .ab-pipe-step { grid-template-columns: minmax(0, 1fr); grid-template-areas: "art" "t" "p"; align-items: start; align-content: start; gap: 8px; padding: 14px 16px 16px; }
-  .ab-pipe-art { width: 104px; }
+  .ab-pipe-art { width: 76px; }
   .ab-pipe-step + .ab-pipe-step::before { left: -11px; top: 50%; margin: -4px 0 0; transform: rotate(-45deg); }
   /* 分かること｜ドア｜分からないこと */
   .ab-know { grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr); }
@@ -650,39 +631,53 @@ body.lang-zh .ab-prose p, body.lang-zh .ab-deck { line-height: 1.95; }
   .ab-door::before { left: 50%; right: auto; top: 0; bottom: 0; border-top: 0; border-left: 1.5px dashed var(--ab-line2); }
   .ab-door svg { width: 42px; padding: 6px 3px; }
   .ab-links { grid-template-columns: 1fr 1fr; gap: 16px; }
-  .ab-team { grid-template-columns: 1fr 1fr; column-gap: 40px; }
 }
 @media (min-width: 768px) {
-  :root { --ab-gap: 104px; }
   .ab-wrap, .ab-body-in { max-width: calc(var(--ab-w) + 80px); padding-left: 40px; padding-right: 40px; }
   .ab-toc { margin: 0 -40px; padding: 0 28px 0 30px; }
-  .ab-hero { padding: 124px 0 52px; }
+  .ab-hero { padding: 100px 0 32px; }
   .ab-ring { left: calc(100% - 180px); top: 230px; }
-  .ab-kicker { margin-bottom: 26px; }
-  .ab-deck { font-size: 1.08rem; }
-  .ab-hero-actions { margin-top: 30px; }
-  .ab-meta { grid-template-columns: repeat(4, 1fr); margin-top: 44px; }
+  .ab-kicker { margin-bottom: 22px; }
+  .ab-deck { font-size: 1.06rem; margin-top: 20px; }
+  .ab-hero-actions { margin-top: 26px; }
+  .ab-meta { grid-template-columns: repeat(4, 1fr); margin-top: 30px; }
   .ab-meta > div { padding: 16px 16px 0 0; border-bottom: none; }
   .ab-meta > div + div { padding-left: 18px; border-left: 1px solid var(--ab-rule); }
   .ab-meta dd { font-size: 0.9rem; }
-  .ab-chapters { padding-top: 56px; }
-  .ab-h2 { margin: 26px 0 24px; }
-  .ab-h3 { margin-top: 56px; }
-  .ab-prose p { font-size: 1.04rem; }
-  .ab-prose .ab-lead { font-size: 1.08rem; }
+  .ab-chapters { padding-top: 48px; }
+  .ab-h2 { margin: 20px 0 18px; }
+  .ab-h3 { margin-top: 40px; }
+  .ab-prose p { font-size: 1rem; }
+  .ab-prose .ab-lead { font-size: 1.04rem; }
   .ab-callout { padding: 26px 30px; gap: 22px; }
   .ab-callout-ico { width: 50px; height: 50px; }
-  .ab-manners { padding: 30px 34px 26px; }
+  .ab-manners { padding: 26px 30px 24px; }
   .ab-stage { border-radius: var(--ab-r-lg); }
-  .ab-report { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 16px; align-items: start; }
-  .ab-table tbody th, .ab-table td { padding: 18px; }
 }
 @media (min-width: 900px) {
-  .ab-hero-actions { margin-top: 34px; }
+  .ab-deck { max-width: 44em; }
+  /* 使う人の2つの手順は、絵を左に置いて低く */
+  .is-you .ab-pipe-step { grid-template-columns: 76px minmax(0, 1fr); grid-template-areas: "art t" "art p"; column-gap: 16px; align-items: start; }
+  .is-you .ab-pipe-art { width: 76px; padding-top: 2px; }
+  .ab-table tbody th, .ab-table td { padding: 14px 16px; }
+  /* みんなで使う場所：左に見出しと文、右にチップと場所 */
+  .ab-manners { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "h h" "lead chips" "lead note"; column-gap: 32px; align-items: start; }
+  .ab-manners-h { grid-area: h; }
+  .ab-manners-lead { grid-area: lead; }
+  .ab-manners-chips { grid-area: chips; margin: 2px 0 10px; }
+  .ab-manners-note { grid-area: note; padding-top: 10px; }
+  .ab-also { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+  .ab-also-h { flex: 1 0 100%; margin-bottom: 2px; }
+  .ab-more-p { margin: 0 0 0 auto; }
+  .ab-trial > div:first-child { align-items: center; }
+  .ab-trial > div:first-child dt { padding-top: 0; }
+  .ab-trial > div:first-child dd { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 32px; }
+  .ab-trial .ab-span { flex: 1 1 260px; margin-top: 18px; }
 }
 /* PC：目次を左の柱に。よくある質問は左に見出し・右に一覧 */
 @media (min-width: 1100px) {
-  .ab-body-in { display: grid; grid-template-columns: 200px minmax(0, 1fr); column-gap: 72px; align-items: start; }
+  .ab-body-in { display: grid; grid-template-columns: 184px minmax(0, 1fr); column-gap: 56px; align-items: start; }
+  .ab-team { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 28px; }
   .ab-toc {
     top: 28px; display: block; height: auto; margin: 56px 0 0; padding: 0;
     background: none; -webkit-backdrop-filter: none; backdrop-filter: none; border: none;
@@ -699,26 +694,57 @@ body.lang-zh .ab-prose p, body.lang-zh .ab-deck { line-height: 1.95; }
   .ab-toc .sticky-cta { margin: 20px 0 0; min-height: 40px; padding: 0 16px; font-size: 0.82rem; }
   .ab-toc-open .ab-d { position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; }
   .ab-ch { scroll-margin-top: 28px; }
-  html { scroll-padding-top: 24px; }
-  .ab-ch-faq { display: grid; grid-template-columns: 11.5em minmax(0, 1fr); column-gap: 40px; align-items: start; }
+  .ab-ch-faq { display: grid; grid-template-columns: 13em minmax(0, 1fr); column-gap: 36px; align-items: start; }
+  .ab-ch-faq .ab-h2 { font-size: 1.85rem; }
+  body.lang-en .ab-ch-faq .ab-h2 { font-size: 1.5rem; }
   .ab-ch-faq .ab-faq { margin-top: 0; border-top-color: var(--ink); }
   .ab-ch-faq .ab-h2 { margin-bottom: 0; }
+  .ab-stage { height: 330px; }
+  .ab-q-row { padding: 11px 0; }
+  .ab-bar { height: 50px; }
+  .ab-rules dl > div, .ab-colophon dl > div { padding: 8px 0; }
+  .ab-member { padding: 12px 0 10px; }
 }
 
 /* スマホ：紹介ページの「下に張り付く開くボタン」の分の余白は、このページでは要らない */
 @media (max-width: 767px) {
   .about-page ~ footer { padding-bottom: 40px; }
+}
+@media (max-width: 899px) {
   /* 表は、項目ごとの札に組みかえる（表としての意味は HTML の role で保つ） */
   .ab-table, .ab-table tbody, .ab-table tbody tr, .ab-table tbody th, .ab-table td { display: block; width: auto; }
   .ab-table { background: none; border: 0; border-radius: 0; overflow: visible; }
   .ab-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); }
   .ab-table tbody tr { margin: 0 0 10px; padding: 14px 16px 12px; background: #fff; border: 1px solid var(--border); border-radius: var(--ab-r); }
   .ab-table tbody tr:last-child { margin-bottom: 0; }
-  .ab-table tbody th { padding: 0 0 8px; border-bottom: 1px solid var(--ab-rule); font-size: 0.96rem; }
+  .ab-table tbody th { padding: 0 0 8px; border-bottom: 1px solid var(--ab-rule); font-size: 0.94rem; }
   .ab-table tbody tr:last-child > th { border-bottom: 1px solid var(--ab-rule); }
-  .ab-table td { display: grid; grid-template-columns: 5.2em minmax(0, 1fr); gap: 10px; padding: 8px 0 0; border: 0; }
-  .ab-th { display: block; font-size: 0.72rem; font-weight: 700; line-height: 1.75rem; color: var(--ab-sub); }
-  body.lang-en .ab-table td { grid-template-columns: 4.6em minmax(0, 1fr); }
+  .ab-table tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 14px; }
+  .ab-table tbody th, .ab-table td:nth-of-type(1) { grid-column: 1 / -1; }
+  .ab-table td { padding: 8px 0 0; border: 0; }
+  .ab-table td:nth-of-type(1) .ab-th { display: none; }
+  .ab-th { display: block; font-size: 0.7rem; font-weight: 700; line-height: 1.6; color: var(--ab-sub); }
+}
+@media (min-width: 600px) and (max-width: 899px) {
+  .ab-table tbody { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ab-table tbody tr, .ab-table tbody tr:last-child { margin: 0; }
+}
+@media (max-width: 480px) {
+  .ab-picks { gap: 6px; }
+  .ab-pick { gap: 6px; padding: 0 12px; font-size: 0.82rem; }
+}
+@media (max-width: 374px) {
+  .ab-slot { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "when mock" "tag mock" "text text"; }
+  .ab-eq { flex-direction: column; gap: 6px; }
+  .ab-eq-term { flex-direction: row; align-items: center; gap: 10px; }
+  .ab-eq-op { display: none; }
+  .ab-eq .ab-num { font-size: 2rem; min-width: 1.6em; }
+}
+@media (min-width: 375px) {
+  .ab-eq-l { white-space: nowrap; }
+}
+@media (max-width: 420px) {
+  .ab-eq-l { font-size: 0.7rem; }
 }
 @media (max-width: 360px) {
   .ab-meta > div { padding-right: 6px; }
@@ -726,10 +752,9 @@ body.lang-zh .ab-prose p, body.lang-zh .ab-deck { line-height: 1.95; }
   .ab-meta dd { font-size: 0.78rem; }
   .ab-pipe-group { padding: 12px 10px 10px; }
   .ab-pipe-step { padding: 12px; grid-template-columns: 44px minmax(0, 1fr); }
-  .ab-day, .ab-try { padding-left: 14px; padding-right: 14px; }
+  .ab-day { padding-left: 14px; padding-right: 14px; }
   .ab-rules { padding-left: 14px; padding-right: 14px; }
-  .ab-rules dl > div, body.lang-en .ab-rules dl > div { grid-template-columns: 1fr; }
-  .ab-pick { gap: 6px; padding: 0 12px; font-size: 0.8rem; }
+  .ab-pick { gap: 6px; padding: 0 11px; font-size: 0.78rem; }
   .ab-a { padding-right: 8px; }
   .ab-tl li { grid-template-columns: 1fr; gap: 0; }
 }
@@ -741,7 +766,7 @@ body.lang-zh .ab-prose p, body.lang-zh .ab-deck { line-height: 1.95; }
   html { scroll-behavior: auto; }
   html.ab-anim .reveal { opacity: 1; transform: none; transition: none; }
   html.ab-anim .ab-hero .ab-wrap > * { animation: none; }
-  .ab-stage-still, .ab-bldg, .ab-q-i::before, .ab-q-i::after, .ab-more-a, .ab-skip, .ab-try-b, .ab-pick, .ab-linkcard, .ab-linkcard-a, .ab-toc-list a, .ab-toc .sticky-cta { transition: none; }
+  .ab-stage-still, .ab-bldg, .ab-q-i::before, .ab-q-i::after, .ab-more-a, .ab-skip, .ab-pick, .ab-linkcard, .ab-linkcard-a, .ab-toc-list a, .ab-toc .sticky-cta { transition: none; }
   .hero-cta, .hero-cta .arrow, .cta-btn { transition: none; animation: none; }
 }
 
@@ -749,7 +774,7 @@ body.lang-zh .ab-prose p, body.lang-zh .ab-deck { line-height: 1.95; }
    印刷：ナビ・目次・操作の部品を隠し、全部見せる
 ════════════════════════════════════════════ */
 @media print {
-  body::before, .section-nav, .ab-toc, .ab-skip, .ab-hero-bg, .ab-glows, .ab-picks, .ab-stage-status, .ab-stage-load, .ab-try-ctrl, .ab-hero-actions, .ab-end-actions { display: none; }
+  body::before, .section-nav, .ab-toc, .ab-skip, .ab-hero-bg, .ab-glows, .ab-picks, .ab-stage-status, .ab-stage-load, .ab-hero-actions, .ab-end-actions { display: none; }
   html.ab-anim .reveal, .reveal { opacity: 1; transform: none; }
   .ab-hero { padding: 24px 0; }
   .ab-callout { background: #fff; color: var(--ink); border: 2px solid var(--ink); }
