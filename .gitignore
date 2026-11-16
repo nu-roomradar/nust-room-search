@@ -54,3 +54,6 @@ video/desk-3d/assets/page*.png
 video/desk-3d/assets/modal*.png
 video/desk-3d/assets/view*.png
 video/desk-3d/assets/room*.png
+
+# ワークフローの試作用の一時的な作業ツリー（Claude Code が作って消す。コミットしない）
+.claude/worktrees/
