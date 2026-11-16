@@ -1,0 +1,853 @@
+/* RoomRadar「このサービスについて」（about.html）だけの見た目。2026-11-16
+   共有の lp.css の後ろで読む。lp.css は変えず、色・書体・紙の地・方眼・にじみは紹介ページと同じ世界観のまま、
+   「読み物」の組みにする（大きな見出し・細い罫・白い札は要所だけ）。
+   クラスは ab- で始める（lp.css の .about / #team / .campus / .sec には背景や余白の指定が付くので使わない）。
+   色は lp.css の変数（--ink --muted --accent --accent2 --bg --card --border）を土台に、足りない分だけ --ab-* で決める。 */
+
+/* ════════════════════════════════════════════
+   変数
+════════════════════════════════════════════ */
+:root {
+  --ab-text:  #2b2823;                 /* 本文。生成りの地で 13:1 */
+  --ab-sub:   #5c574c;                 /* 補助の文字。生成りの地で 6.4:1、白で 7:1 */
+  --ab-blue:  #1d4ed8;                 /* 小さな青い文字用（--accent は地の上で 4.66 とぎりぎりなので濃いほう） */
+  --ab-warn:  #9a3412;                 /* ⚠ の印だけに使う。橙 --accent2 は文字に使えない（対比不足） */
+  --ab-ok:    #15803d;                 /* 緑の文字（白で 5.0:1） */
+  --ab-rule:  rgba(26, 24, 20, 0.16);  /* 細い罫 */
+  --ab-line2: rgba(26, 24, 20, 0.3);   /* 点線・図の線 */
+  --ab-ink-2:  #33302a;                /* 墨のボタンを押す前の濃さ */
+  --ab-class:  #3a362f;                /* 1日の例：授業あり（墨） */
+  --ab-busy:   #d9d5cb;                /* 1日の例：使用中の可能性（灰） */
+  --ab-busy-2: #e7e4dc;                /* 使用中の可能性の見本の札 */
+  --ab-busy-3: #ece9e2;                /* 使用中の可能性の小札 */
+  --ab-busy-ink: #4a463e;              /* 使用中の可能性の帯の地（白い文字で 9:1） */
+  --ab-paper:  #fbfaf7;                /* 表の見出しの地 */
+  --ab-blue-tint: #dbe6fd;             /* 線画の青い面 */
+  --ab-warn-tint: #fde6d3;             /* 線画の ⚠ の面 */
+  --ab-stage:  #F0EEE6;                /* 3D の台の地（rr-campus の day の地と同じ） */
+  --ab-blue-a: color-mix(in srgb, var(--accent) 30%, transparent);   /* 青の細い縁 */
+  --ab-blue-b: color-mix(in srgb, var(--accent) 16%, transparent);   /* 青のごく淡い線 */
+  --ab-warn-a: color-mix(in srgb, var(--ab-warn) 50%, transparent);  /* ⚠ の縁 */
+  --ab-ok-a:   color-mix(in srgb, var(--suruga) 30%, transparent);   /* 緑の縁 */
+  --ab-ink-a:  color-mix(in srgb, var(--ink) 22%, transparent);      /* 墨の淡い縁 */
+  --ab-mono:  'DM Mono', 'Noto Sans JP', monospace;
+  --ab-head:  'Syne', 'Noto Sans JP', sans-serif;   /* 見出し：紹介ページの大見出しと同じ並び */
+  --ab-w:     1040px;                  /* 紹介ページの .sec-inner と同じ幅・同じ左端 */
+  --ab-gap:   56px;                    /* 章と章のあいだ・結びの上下（どの幅でもこの1つの値にそろえる） */
+  --ab-r:     16px;
+  --ab-r-lg:  20px;
+}
+
+/* ════════════════════════════════════════════
+   土台：フォーカス・スキップリンク・小さな道具
+════════════════════════════════════════════ */
+:where(a, button, summary, [tabindex]):focus-visible { outline: 3px solid var(--ab-blue); outline-offset: 3px; }
+main:focus { outline: none; }
+/* 言語ボタン: 親の overflow:hidden で輪郭が切れていたので、見えるようにする（共有のナビの直しなので、次に lp.css を触るときに lp.css へ移す） */
+.lang-toggle { overflow: visible; }
+.lang-btn { border-radius: 99px; }
+.lang-btn:focus-visible { outline-offset: 2px; }
+
+.ab-skip {
+  position: absolute; left: 12px; top: -64px; z-index: 200;
+  padding: 10px 16px; border-radius: 10px; background: var(--ink); color: #fff;
+  font-size: 0.88rem; font-weight: 700; text-decoration: none; transition: top 0.15s ease;
+}
+.ab-skip:focus { top: 8px; }
+
+/* 言葉のまとまりの途中で折らない（Safari・Firefox は auto-phrase が無い）。狭い幅や文字の拡大でははみ出さず、中で折れる */
+.ab-nb { display: inline-block; max-width: 100%; }
+/* 英語・中国語の文の中のアプリの日本語（読み上げは日本語、途中で折らない） */
+.ab-ui { display: inline-block; max-width: 100%; }
+/* 段落の最後の行に1〜2字だけ残らないように（対応ブラウザのみ） */
+.ab p, .ab li, .ab dd, .ab td, .ab figcaption, .ab summary, .ab-q-t > span, .ab-when, .ab-where { text-wrap: pretty; }
+/* 狭い札の中の短い文は、日本語を語のまとまりで折る（最後の行に「ます。」だけ残らないように） */
+.ab :is(.ab-deck, .ab-slot-text, .ab-rules dd, .ab-manners-lead) { word-break: auto-phrase; }
+.ab :is(.ab-q-t, .ab-tl p, .ab-stat-label, .ab-end-s, .ab-table th, .ab-eq-l, .ab-mock, .ab-day-fic, .ab-linkcard-t) { text-wrap: balance; }
+.ab-mono { font-family: var(--ab-mono); font-weight: 500; letter-spacing: 0; }
+.ab-vh { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+/* 上のナビの分は表紙の中で空ける（にじみをナビの下まで通す） */
+.about-page.ab { padding-top: 0; }
+.ab-wrap { position: relative; z-index: 1; max-width: calc(var(--ab-w) + 40px); margin: 0 auto; padding: 0 20px; }
+
+/* やわらかい色のにじみ（紹介ページのヒーローと同じ大きさ・ぼかし・濃さ） */
+.ab-glow { position: absolute; width: 520px; height: 520px; border-radius: 50%; filter: blur(80px); opacity: 0.13; pointer-events: none; }
+
+/* 見出しの共通：書体・詰め・最後の行に1〜2字だけ残さない */
+.ab-display, .ab-h2, .ab-h3, .ab-end-t, .ab-quote blockquote p, .ab-callout-t, .ab-manners-h {
+  font-family: var(--ab-head); font-feature-settings: "palt"; word-break: auto-phrase; text-wrap: balance; overflow-wrap: break-word;
+}
+/* 文字を大きくしたときも、長い英単語で横にはみ出さない */
+.ab { overflow-wrap: break-word; }
+
+/* ════════════════════════════════════════════
+   表紙
+════════════════════════════════════════════ */
+/* 横だけ切る（にじみを表紙の下の端で切らず、本文へ自然に溶かす）。clip が無い古いブラウザでは hidden のまま */
+.ab-hero { position: relative; overflow: hidden; overflow-x: clip; overflow-y: visible; padding: 92px 0 36px; }
+.ab-hero-bg { position: absolute; inset: 0; pointer-events: none; }
+.ab-glow-a { background: var(--accent);  top: -240px; right: -220px; opacity: 0.15; }
+.ab-glow-b { background: var(--accent2); bottom: -260px; left: -240px; width: 420px; height: 420px; }
+/* レーダーの輪（動かさない） */
+.ab-ring { position: absolute; left: calc(100% - 64px); top: 150px; border: 1px solid var(--ab-blue-b); border-radius: 50%; transform: translate(-50%, -50%); }
+.ab-ring-1 { width: 220px; height: 220px; }
+.ab-ring-2 { width: 420px; height: 420px; border-color: color-mix(in srgb, var(--accent) 11%, transparent); }
+.ab-ring-3 { width: 640px; height: 640px; border-color: color-mix(in srgb, var(--accent) 7%, transparent); }
+
+.ab-h1 { margin: 0; font-weight: 800; color: var(--ink); }
+.ab-kicker {
+  display: flex; align-items: center; gap: 9px; width: fit-content; max-width: 100%; margin: 0 0 22px;
+  padding: 7px 14px 7px 12px; border-radius: 99px;
+  background: color-mix(in srgb, var(--card) 72%, transparent); border: 1px solid var(--ab-blue-a);
+  font-family: 'Noto Sans JP', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; line-height: 1.4; color: var(--ab-blue);
+}
+.ab-kicker-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+.ab-display { display: block; font-weight: 800; font-size: clamp(2.2rem, 7vw, 4.2rem); line-height: 1.2; letter-spacing: -0.01em; }
+.ab-acc { color: var(--accent); }
+
+.ab-deck { margin: 24px 0 0; max-width: 35em; font-size: 1rem; font-weight: 500; line-height: 1.9; letter-spacing: 0.01em; color: var(--ab-text); }
+.ab-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 26px; }
+/* lp.css の「下から出てくる」動きは表紙全体でまとめて扱う（動きを減らす設定で消えたままにならないように） */
+.ab-hero .hero-cta { opacity: 1; animation: none; }
+
+/* 必須の表記（試験運用中・大学公式ではない）。ボタンの下に置く（浮かせない） */
+.ab-notice {
+  max-width: min(44em, 100%); margin: 22px 0 0; padding: 14px 16px; border-radius: 14px;
+  word-break: auto-phrase;   /* 日本語は語のまとまりで折る（行末に「せん。」だけ残らない。タグは入れない） */
+  border: 1px solid var(--border); background: color-mix(in srgb, var(--card) 66%, transparent);
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  font-size: 0.84rem; font-weight: 500; line-height: 1.85; color: var(--ab-sub);
+}
+.ab-tag {
+  display: inline-block; margin-right: 8px; padding: 2px 7px; border-radius: 5px; vertical-align: 0.12em;
+  font-family: 'Syne', 'Noto Sans JP', sans-serif; font-weight: 700; font-size: 0.66rem; letter-spacing: 0.1em; line-height: 1.5;
+  background: color-mix(in srgb, var(--ink) 5%, transparent); border: 1px solid var(--border); color: var(--ab-sub);
+}
+
+/* 基本の情報（記事の頭にある小さな表） */
+.ab-meta { display: grid; grid-template-columns: 1fr 1fr; margin: 32px 0 0; border-top: 1px solid var(--ink); }
+.ab-meta > div { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--ab-rule); min-width: 0; }
+.ab-meta > div:nth-child(even) { padding-left: 14px; border-left: 1px solid var(--ab-rule); }
+.ab-meta dt { margin-bottom: 4px; font-family: var(--ab-mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em; color: var(--ab-sub); }
+.ab-meta dd { margin: 0; font-size: 0.86rem; font-weight: 700; line-height: 1.55; color: var(--ink); }
+
+/* 表紙が出るときの小さな動き（JS が動き、動きを減らす設定でもないときだけ。言語の切り替えではやり直さない） */
+@keyframes abRise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+html.ab-anim .ab-hero .ab-wrap > * { animation: abRise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+html.ab-anim .ab-hero .ab-wrap > :nth-child(2) { animation-delay: 0.06s; }
+html.ab-anim .ab-hero .ab-wrap > :nth-child(3) { animation-delay: 0.12s; }
+html.ab-anim .ab-hero .ab-wrap > :nth-child(n+4) { animation-delay: 0.18s; }
+
+/* ════════════════════════════════════════════
+   本文の骨組み：目次（スマホは上に張り付く横並び／PC は左の柱）＋章
+════════════════════════════════════════════ */
+.ab-body { position: relative; }
+.ab-glows { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.ab-glow-c { background: var(--accent);  top: 4%;  right: -300px; }
+.ab-glow-d { background: var(--accent2); top: 27%; left: -320px; }
+.ab-glow-e { background: var(--accent);  top: 54%; right: -320px; }
+.ab-glow-f { background: var(--accent2); top: 80%; left: -320px; }
+.ab-body-in { position: relative; z-index: 1; max-width: calc(var(--ab-w) + 40px); margin: 0 auto; padding: 0 20px; }
+
+.ab-toc {
+  position: sticky; top: 0; z-index: 90;
+  display: flex; align-items: center; gap: 6px; height: 50px; margin: 0 -20px; padding: 0 12px 0 10px;
+  background: color-mix(in srgb, var(--bg) 96%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(16px); backdrop-filter: saturate(180%) blur(16px);
+  border-top: 1px solid var(--ab-rule); border-bottom: 1px solid var(--ab-rule);
+}
+.ab-toc-h { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ab-toc-list {
+  position: relative; flex: 1 1 auto; min-width: 0; display: flex; list-style: none; margin: 0; padding: 0 26px 0 0;
+  overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; -ms-overflow-style: none;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 30px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 30px), transparent);
+}
+.ab-toc-list::-webkit-scrollbar { display: none; }
+.ab-toc-list li { flex: none; }
+.ab-toc-list a {
+  position: relative; display: flex; align-items: center; gap: 6px; height: 50px; padding: 0 10px;
+  font-size: 0.8rem; font-weight: 700; white-space: nowrap; text-decoration: none; color: var(--ab-sub);
+  transition: color 0.2s;
+}
+.ab-toc-list a:hover { color: var(--ink); }
+.ab-toc-list a:focus-visible { outline-offset: -4px; }
+.ab-toc-no { font-family: var(--ab-mono); font-weight: 500; font-size: 0.7rem; letter-spacing: 0.02em; }
+.ab-toc-list a[aria-current] { color: var(--ink); }
+.ab-toc-list a[aria-current] .ab-toc-no { color: var(--ab-blue); }
+.ab-toc-list a[aria-current]::after { content: ''; position: absolute; left: 10px; right: 10px; bottom: 0; height: 2px; background: var(--ink); }
+/* 目次の横の「開く」（計測の place は data-place="sticky"。lp.css のクラスは使わない） */
+.ab-toc-open {
+  position: relative; flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 34px; padding: 0 13px; border-radius: 99px;
+  background: var(--ink); color: #fff; font-size: 0.78rem; font-weight: 700; text-decoration: none; transition: background 0.2s;
+}
+.ab-toc-open::before { content: ''; position: absolute; inset: -8px -4px; }   /* 押せる範囲を広げる */
+.ab-toc-open:hover { background: var(--ab-ink-2); }
+.ab-toc-open .ab-d { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.ab-chapters { min-width: 0; padding: 44px 0 0; }
+.ab-ch { margin: 0; padding: 0; scroll-margin-top: 66px; }       /* lp.css の section{padding:100px 24px} を打ち消す */
+.ab-ch + .ab-ch { margin-top: var(--ab-gap); }
+.ab-ch-label {
+  display: flex; align-items: center; gap: 12px; margin: 0; padding-top: 14px; border-top: 1px solid var(--ink);
+  font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; line-height: 1.5; color: var(--ink);
+}
+.ab-ch-no { display: inline-flex; align-items: center; gap: 12px; font-family: var(--ab-mono); font-weight: 500; letter-spacing: 0.06em; color: var(--ab-blue); }
+.ab-ch-no::after { content: ''; width: 28px; height: 1px; background: currentColor; opacity: 0.55; }
+.ab-h2 { margin: 20px 0 18px; color: var(--ink); font-weight: 800; font-size: clamp(1.5rem, 4.2vw, 2.2rem); line-height: 1.38; letter-spacing: 0; }
+.ab-h3 { margin: 40px 0 12px; font-size: 1.18rem; font-weight: 800; line-height: 1.55; color: var(--ink); }
+
+.ab-prose { max-width: 40em; }
+.ab-prose p { margin: 0 0 1.2em; font-size: 0.98rem; line-height: 1.9; letter-spacing: 0.01em; color: var(--ab-text); }
+.ab-prose > p:last-child { margin-bottom: 0; }
+.ab-prose .ab-lead { font-size: 1.02rem; font-weight: 500; color: var(--ink); }
+.ab-more {
+  display: inline-flex; align-items: center; gap: 8px; padding: 2px 0; color: var(--ink);
+  font-size: 0.92rem; font-weight: 700; text-decoration: none; border-bottom: 1.5px solid var(--ink);
+}
+.ab-more-a { transition: transform 0.2s ease; }
+.ab-more:hover .ab-more-a { transform: translateX(4px); }
+
+/* ════════════════════════════════════════════
+   01：数字の見せ場・引用
+════════════════════════════════════════════ */
+/* 大きな数字は紹介ページの統計と同じ Noto Sans JP の太字＋等幅の数字（DM Mono の大きな 0 は斜線が出るので使わない） */
+.ab-num { font-family: 'Noto Sans JP', sans-serif; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.035em; line-height: 1; color: var(--ink); }
+.ab-stats { display: grid; grid-template-columns: 1fr 1fr; margin: 28px 0; border-top: 1px solid var(--ab-rule); }
+.ab-stat { min-width: 0; padding: 18px 8px 16px 0; }
+.ab-stat + .ab-stat { border-left: 1px solid var(--ab-rule); padding-left: clamp(12px, 4vw, 32px); }
+.ab-stat-num { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; margin: 0; }
+.ab-stat-num .ab-num { font-size: clamp(2.1rem, 10.5vw, 4.4rem); }
+.ab-unit { font-size: clamp(1rem, 4vw, 1.3rem); font-weight: 800; color: var(--ab-blue); }
+.ab-stat-label { margin: 10px 0 0; font-size: 0.88rem; font-weight: 700; line-height: 1.6; color: var(--ink); }
+.ab-stat-label sup { font-size: 0.7em; font-weight: 500; color: var(--ab-sub); margin-left: 1px; }
+.ab-stats figcaption { grid-column: 1 / -1; padding: 12px 0; border-top: 1px solid var(--ab-rule); border-bottom: 1px solid var(--ab-rule); font-size: 0.8rem; line-height: 1.7; color: var(--ab-sub); }
+
+.ab-quote { margin: 36px 0 0; }
+.ab-quote blockquote { margin: 0; padding: 2px 0 2px 20px; border-left: 3px solid var(--accent); }
+.ab-quote blockquote p { margin: 0; color: var(--ink); font-weight: 800; font-size: clamp(1.55rem, 5.4vw, 2.5rem); line-height: 1.42; letter-spacing: 0; }
+.ab-mark { font-style: normal; background: linear-gradient(transparent 64%, color-mix(in srgb, var(--accent) 20%, transparent) 64% 94%, transparent 94%); }
+.ab-quote figcaption { margin: 16px 0 0; padding-left: 23px; max-width: 39em; font-size: 0.86rem; line-height: 1.95; color: var(--ab-sub); }
+
+/* ════════════════════════════════════════════
+   02：流れの図（RoomRadar がすること／使う人がすること）
+════════════════════════════════════════════ */
+.ab-pipe { display: grid; gap: 14px; margin: 26px 0 0; }
+.ab-pipe-group { position: relative; padding: 14px 12px 12px; border-radius: var(--ab-r-lg); }
+.ab-pipe-group.is-app { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 8%, transparent), color-mix(in srgb, var(--accent) 3%, transparent)); border: 1px solid var(--ab-blue-a); }
+/* 使う人の側は「ドアの向こう」と同じ点線の札（警告の色は使わない） */
+.ab-pipe-group.is-you { background: color-mix(in srgb, var(--card) 45%, transparent); border: 1.5px dashed var(--ab-line2); }
+.ab-pipe-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0 0 10px; padding: 0 4px; font-size: inherit; }
+.ab-pipe-who { font-size: 0.98rem; font-weight: 800; color: var(--ink); }
+.ab-pipe-tag { padding: 2px 10px; border-radius: 99px; background: var(--card); border: 1px solid var(--ab-rule); font-size: 0.72rem; font-weight: 700; line-height: 1.6; color: var(--ab-sub); }
+.is-app .ab-pipe-tag { color: var(--ab-blue); border-color: var(--ab-blue-a); }
+.ab-pipe-steps { list-style: none; display: grid; gap: 10px; margin: 0; padding: 0; }
+/* スマホ：絵を小さく横に置き、本文は札の幅いっぱいに使う（320px でも本文の列が細くならない） */
+.ab-pipe-step {
+  position: relative; display: grid; grid-template-columns: 52px minmax(0, 1fr); grid-template-areas: "art t" "p p";
+  gap: 6px 12px; align-items: center; padding: 12px 14px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+}
+.ab-pipe-art { grid-area: art; display: block; }
+.ab-pipe-t { grid-area: t; text-wrap: balance; display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1rem; font-weight: 800; line-height: 1.45; color: var(--ink); }
+.ab-pipe-no { flex: none; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: #fff; font-family: var(--ab-mono); font-size: 0.74rem; font-weight: 500; line-height: 1; }
+.ab-pipe-step p { grid-area: p; margin: 0; font-size: 0.84rem; line-height: 1.75; color: var(--ab-text); }
+/* 手順をつなぐ小さな矢じり */
+.ab-pipe-step + .ab-pipe-step::before {
+  content: ''; position: absolute; left: 24px; top: -10px; width: 8px; height: 8px; margin-top: -4px;
+  border: solid var(--ab-line2); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg);
+}
+/* 線画（B 案の絵。色は lp.css の変数にそろえる） */
+.ab-pipe-art svg, .ab-door svg { display: block; width: 100%; height: auto; fill: none; stroke: var(--ink); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.ab-pipe-art .w, .ab-door .w { fill: var(--card); }
+.ab-pipe-art .t, .ab-door .t { fill: var(--ab-blue-tint); }
+.ab-pipe-art .n { stroke: none; }
+.ab-pipe-art .m { stroke: var(--ab-line2); stroke-width: 1.2; }
+.ab-pipe-art .b { fill: var(--accent); }
+.ab-pipe-art .bl { stroke: var(--accent); stroke-width: 2.6; }
+.ab-pipe-art .o { fill: var(--ab-warn-tint); stroke: var(--ab-warn); }
+.ab-pipe-art .od { stroke: var(--ab-warn); stroke-width: 2.6; }
+.ab-pipe-art .hd, .ab-door .hd { stroke-width: 3.2; }
+.ab-pipe-art .dash { stroke-dasharray: 3 4; }
+.ab-pipe-art .lens { fill: color-mix(in srgb, var(--card) 60%, transparent); stroke-width: 2.6; }
+.ab-pipe-art .tx { fill: var(--muted); stroke: none; font-family: var(--ab-mono); font-size: 10px; letter-spacing: 0.08em; }
+
+/* ほかにできること（小さなピルの列） */
+.ab-also { margin: 30px 0 0; }
+.ab-also-h, .ab-never-h, .ab-rules-h { margin: 0 0 12px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; color: var(--ab-sub); }
+.ab-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; }
+.ab-chips li { padding: 6px 13px; border-radius: 99px; background: var(--card); border: 1px solid var(--border); font-size: 0.8rem; font-weight: 700; line-height: 1.5; color: var(--ink); }
+.ab-more-p { margin: 20px 0 0; }
+
+/* ════════════════════════════════════════════
+   03：分かること／分からないこと（ドアを境に）・ドア越しの確認
+════════════════════════════════════════════ */
+.ab-know { display: grid; margin: 28px 0 0; }
+.ab-know-col { padding: 20px 18px 8px; border-radius: var(--ab-r-lg); }
+.ab-know-col.is-yes { background: var(--card); border: 1px solid var(--border); border-top: 3px solid var(--accent); }
+.ab-know-col.is-no { background: color-mix(in srgb, var(--card) 50%, transparent); border: 1.5px dashed var(--ab-line2); }
+.ab-know-h { display: flex; align-items: center; gap: 10px; margin: 0 0 2px; font-size: 1.04rem; font-weight: 800; line-height: 1.5; color: var(--ink); }
+.ab-know-ico { flex: none; display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; }
+.ab-know-ico svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; }
+.is-yes .ab-know-ico { background: var(--accent); color: #fff; }
+.is-no .ab-know-ico { background: var(--card); color: var(--ink); border: 2px solid var(--ink); }
+.ab-know-sub { margin: 0 0 10px; font-size: 0.76rem; font-weight: 700; line-height: 1.7; color: var(--ab-sub); }
+.is-yes .ab-know-sub { color: var(--ab-blue); }
+.ab-know-col ul { list-style: none; margin: 0; padding: 0; }
+.ab-know-col li { position: relative; padding: 8px 0 8px 26px; border-top: 1px solid var(--ab-rule); font-size: 0.92rem; line-height: 1.7; color: var(--ab-text); }
+.ab-know-col li::before { content: ''; position: absolute; left: 1px; top: 1em; width: 15px; height: 15px; background: center / contain no-repeat; }
+.is-yes li::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d4ed8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E"); }
+.is-no li::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231a1814' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7l10 10M17 7L7 17'/%3E%3C/svg%3E"); }
+/* ドア：スマホでは横の点線の上、PC では縦の点線の上 */
+.ab-door { position: relative; display: grid; place-items: center; height: 64px; }
+.ab-door::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 1.5px dashed var(--ab-line2); }
+.ab-door svg { position: relative; width: 36px; padding: 3px 5px; background: var(--bg); border-radius: 8px; }
+.ab-know-note { max-width: 40em; margin: 14px 0 0; font-size: 0.86rem; line-height: 1.85; color: var(--ab-sub); }
+
+.ab-callout { display: flex; align-items: center; gap: 16px; margin: 18px 0 0; padding: 20px; border-radius: var(--ab-r-lg); background: linear-gradient(180deg, color-mix(in srgb, var(--ink) 92%, #fff), var(--ink)); color: #fff; }
+.ab-callout-ico { flex: none; width: 40px; height: 40px; opacity: 0.92; }
+.ab-callout-t { font-size: clamp(1.18rem, 4.6vw, 1.8rem); font-weight: 800; line-height: 1.42; }
+.ab-callout-t small { display: block; margin-top: 6px; font-family: 'Noto Sans JP', sans-serif; font-size: 0.86rem; font-weight: 500; letter-spacing: 0.02em; color: rgba(255, 255, 255, 0.82); font-feature-settings: normal; }
+
+/* ── ある教室の1日（架空の例。CSS だけで描く） ── */
+.ab-day { margin: 22px 0 0; padding: 18px 16px 6px; background: var(--card); border: 1px solid var(--border); border-radius: var(--ab-r-lg); }
+.ab-day-cap { display: grid; gap: 4px; margin: 0 0 14px; }
+.ab-day-cap b { font-size: 1rem; font-weight: 800; color: var(--ink); }
+.ab-day-fic { font-size: 0.78rem; line-height: 1.7; color: var(--ab-sub); }
+/* 時間に比例した帯（1コマ100分・休み10分・昼休み50分） */
+.ab-bar, .ab-ticks { display: grid; grid-template-columns: 100fr 10fr 100fr 50fr 100fr 10fr 100fr 10fr 100fr 10fr 100fr; }
+.ab-bar { height: 50px; }
+.ab-seg { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: 9px; font-family: var(--ab-mono); color: var(--ink); }
+.ab-seg b { font-size: 0.92rem; font-weight: 500; line-height: 1; }
+.ab-seg i { font-style: normal; font-size: 0.6rem; line-height: 1; letter-spacing: -0.05em; color: var(--ab-warn); }
+.ab-lunch { position: relative; }
+.ab-lunch::after { content: ''; position: absolute; left: 50%; top: 9px; bottom: 9px; border-left: 1.5px dotted var(--ab-line2); }
+.s-class { background: var(--ab-class); color: #fff; }
+.s-free  { background: var(--card); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 50%, transparent); }
+.s-rep1  { background: var(--card); box-shadow: inset 0 0 0 1.5px var(--ab-warn-a); }
+.s-busy  { background: var(--ab-busy); }
+/* 隔週：細く淡い斜線（授業ありより薄く） */
+.s-alt   { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--ink) 20%, transparent) 0 1.5px, transparent 1.5px 6px), var(--card); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 26%, transparent); }
+.ab-seg.s-alt b { padding: 1px 4px; border-radius: 5px; background: var(--card); }
+.ab-ticks { margin-top: 6px; font-family: var(--ab-mono); font-size: 0.66rem; color: var(--ab-sub); }
+.ab-ticks span:nth-child(1) { grid-column: 1; justify-self: start; }
+.ab-ticks span:nth-child(2) { grid-column: 3; justify-self: end; }
+.ab-ticks span:nth-child(3) { grid-column: 5; justify-self: start; }
+.ab-ticks span:nth-child(4) { grid-column: 11; justify-self: end; }
+/* 時限ごとの行。.ab-day の幅が文字に比べて狭いとき（文字の拡大）は縦に積む（下の @container） */
+.ab-day { container-type: inline-size; }
+.ab-slots { list-style: none; margin: 12px 0 0; padding: 0; }
+.ab-slot {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "when tag mock" "text text mock";
+  gap: 4px 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--ab-rule);
+}
+.ab-slot-when { grid-area: when; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; min-width: 0; margin: 0; align-self: end; }
+.ab-slot-when b { font-size: 1rem; font-weight: 800; line-height: 1.3; color: var(--ink); }
+.ab-slot-when .ab-mono { font-size: 0.72rem; color: var(--ab-sub); }
+.ab-slot-text { grid-area: text; align-self: start; margin: 0; font-size: 0.86rem; line-height: 1.75; color: var(--ab-text); }
+.ab-tag2 { grid-area: tag; justify-self: start; align-self: end; margin: 0 0 2px; padding: 0 9px; border-radius: 99px; border: 1px solid; font-size: 0.72rem; font-weight: 700; line-height: 1.65; white-space: nowrap; }
+.t-class { background: var(--ab-class); border-color: var(--ab-class); color: #fff; }
+.t-free  { background: var(--card); border-color: color-mix(in srgb, var(--accent) 45%, transparent); color: var(--ab-blue); }
+.t-rep   { background: var(--card); border-color: var(--ab-warn-a); color: var(--ab-warn); }
+.t-busy  { background: var(--ab-busy-3); border-color: var(--ab-ink-a); color: var(--ab-text); }
+.t-alt   { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--ink) 10%, transparent) 0 1.5px, var(--card) 1.5px 6px); border-color: var(--ab-line2); color: var(--ink); }
+/* 検索アプリの教室カードの見本（表示のイメージ。明るい札で描く） */
+.ab-mock {
+  grid-area: mock; position: relative; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  min-width: 96px; min-height: 46px; padding: 5px 10px; border-radius: 12px; text-align: center;
+  background: var(--card); border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent); box-shadow: 0 6px 16px -12px color-mix(in srgb, var(--ink) 50%, transparent);
+  font-family: 'Noto Sans JP', sans-serif; color: var(--ink);
+}
+.ab-mock b { font-size: 0.98rem; font-weight: 800; line-height: 1.25; letter-spacing: 0.02em; }
+.ab-mock small { margin-top: 2px; font-size: 0.68rem; font-weight: 700; line-height: 1.45; color: var(--ab-blue); }
+.ab-mock.is-rep small { color: var(--ab-warn); }
+.ab-mock.is-busy { padding-top: 22px; background: var(--ab-busy-2); box-shadow: none; }
+.ab-mock.is-busy b { color: var(--ab-sub); }
+.ab-mock em { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); padding: 0 6px; border-radius: 4px; white-space: nowrap; font-style: normal; font-size: 0.6rem; font-weight: 700; line-height: 1.6; background: var(--ab-busy-ink); color: #fff; }
+.ab-mock.is-none { background: transparent; border: 1.5px dashed var(--ab-line2); box-shadow: none; font-size: 0.74rem; font-weight: 700; color: var(--ab-sub); }
+.ab-mock.is-alt { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--ink) 7%, transparent) 0 1.5px, var(--card) 1.5px 6px); }
+.ab-mock.is-alt small { color: var(--ink); font-weight: 500; }
+
+/* ── 報告の決まり（1枚の札） ── */
+.ab-rules { margin: 14px 0 0; padding: 16px 18px 6px; border-radius: var(--ab-r-lg); background: var(--card); border: 1px solid var(--border); }
+.ab-rules dl { margin: 0; }
+.ab-rules dl > div, .ab-colophon dl > div { padding: 10px 0; border-top: 1px solid var(--ab-rule); }
+.ab-rules dt, .ab-colophon dt { display: inline; margin-right: 0.6em; font-size: 0.84rem; font-weight: 800; line-height: 1.75; color: var(--ink); }
+.ab-rules dd, .ab-colophon dd { display: inline; margin: 0; font-size: 0.86rem; line-height: 1.75; color: var(--ab-text); }
+/* 報告の決まりは文が長いので、狭い幅では見出し語を上に置く（05 の札と同じ組み） */
+.ab-rules dt { display: block; margin: 0 0 2px; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; color: var(--ab-sub); }
+.ab-rules dd { display: block; }
+
+/* みんなで使う場所（紹介ページの緑の札と同じ色づかい。緑の文字は #15803d で対比を保つ） */
+.ab-manners {
+  margin: 44px 0 0; padding: 22px 20px 20px; border-radius: var(--ab-r-lg);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--suruga) 7%, transparent), color-mix(in srgb, var(--suruga) 2.5%, transparent)), color-mix(in srgb, var(--card) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--suruga) 24%, transparent);
+}
+.ab-manners-h { margin: 0 0 10px; font-size: 1.18rem; font-weight: 800; line-height: 1.55; color: var(--ink); }
+.ab-manners-lead { margin: 0; max-width: 38em; font-size: 0.95rem; line-height: 1.9; color: var(--ab-text); }
+.ab-manners-chips { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; padding: 0; }
+.ab-manners-chips li { padding: 5px 12px; border-radius: 99px; background: var(--card); border: 1px solid color-mix(in srgb, var(--suruga) 38%, transparent); font-size: 0.8rem; font-weight: 700; line-height: 1.5; color: var(--ab-ok); }
+.ab-manners-note { margin: 0; padding-top: 12px; border-top: 1px solid color-mix(in srgb, var(--suruga) 20%, transparent); font-size: 0.9rem; font-weight: 500; line-height: 1.85; color: var(--ink); }
+
+/* ════════════════════════════════════════════
+   04：情報の扱い（何を・どこに・いつ消えるかの表）
+════════════════════════════════════════════ */
+.ab-tablebox { margin: 26px 0 0; }
+.ab-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; background: var(--card); border: 1px solid var(--border); border-radius: var(--ab-r-lg); overflow: hidden; }
+.ab-table thead th { padding: 11px 16px; background: var(--ab-paper); border-bottom: 1px solid var(--ab-rule); text-align: left; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.05em; color: var(--ab-sub); }
+.ab-table thead th:nth-child(1) { width: 21%; }
+.ab-table thead th:nth-child(2) { width: 31%; }
+.ab-table thead th:nth-child(3) { width: 24%; }
+.ab-table thead th:nth-child(4) { width: 24%; }
+.ab-table tbody th, .ab-table td { padding: 16px; vertical-align: top; text-align: left; border-bottom: 1px solid var(--ab-rule); font-size: 0.86rem; line-height: 1.75; }
+.ab-table tbody tr:last-child > * { border-bottom: 0; }
+.ab-table tbody th { font-weight: 800; color: var(--ink); }
+.ab-table td { color: var(--ab-text); }
+.ab-when { font-weight: 500; color: var(--ink); }
+.ab-th { display: none; }
+/* 置き場所は形でも区別する（■ サーバー ● この端末 ◇ 外のサービス） */
+.ab-where { display: inline-flex; align-items: baseline; gap: 8px; min-width: 0; font-weight: 500; color: var(--ink); }
+.ab-where > span { min-width: 0; }
+.ab-where::before { content: ''; flex: none; width: 9px; height: 9px; transform: translateY(-1px); }
+.ab-where.is-server::before { background: var(--ink); border-radius: 2px; }
+.ab-where.is-device::before { background: var(--accent); border-radius: 50%; }
+.ab-where.is-ext::before { box-sizing: border-box; background: var(--card); border: 2px solid var(--ink); transform: translateY(-1px) rotate(45deg); width: 8px; height: 8px; }
+.ab-legend2 { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 10px 0 0; font-size: 0.76rem; }
+.ab-legend2 .ab-where { font-weight: 500; color: var(--ab-sub); }
+
+.ab-never { margin: 26px 0 0; }
+.ab-chip-k { font-weight: 800; }
+/* 見出しの中の数字は Noto Sans JP で（Syne の 2 は字形が崩れて見える） */
+.ab-jnum { font-family: 'Noto Sans JP', sans-serif; }
+.ab-chips.is-never li { position: relative; padding-left: 30px; background: color-mix(in srgb, var(--card) 70%, transparent); }
+.ab-chips.is-never li::before { content: ''; position: absolute; left: 11px; top: 50%; width: 11px; height: 0; border-top: 2px solid var(--ink); transform: translateY(-50%); }
+.ab-never-note { max-width: 40em; margin: 14px 0 0; font-size: 0.86rem; line-height: 1.85; color: var(--ab-sub); }
+
+/* くわしく（たたむ） */
+.ab-more-d { margin: 22px 0 0; border-top: 1px solid var(--ab-rule); border-bottom: 1px solid var(--ab-rule); }
+.ab-more-d summary { display: block; list-style: none; cursor: pointer; }
+.ab-more-d summary::-webkit-details-marker { display: none; }
+.ab-more-d-row { display: grid; grid-template-columns: minmax(0, 1fr) 24px; gap: 12px; align-items: center; padding: 14px 0; font-size: 0.92rem; font-weight: 700; line-height: 1.6; color: var(--ink); }
+.ab-more-dl { margin: 0; padding: 0 0 8px; }
+.ab-more-dl > div { padding: 10px 0; border-top: 1px dashed var(--ab-rule); }
+.ab-more-dl dt { font-size: 0.82rem; font-weight: 800; line-height: 1.7; color: var(--ink); }
+.ab-more-dl dd { margin: 2px 0 0; max-width: 42em; font-size: 0.86rem; line-height: 1.85; color: var(--ab-text); }
+
+/* ════════════════════════════════════════════
+   05：テスト運用（1枚の札の中の定義リスト）・校舎
+════════════════════════════════════════════ */
+.ab-trial { margin: 4px 0 0; padding: 4px 16px; background: var(--card); border: 1px solid var(--border); border-radius: var(--ab-r-lg); }
+.ab-trial > div { display: grid; grid-template-columns: 3.4em minmax(0, 1fr); gap: 4px 10px; padding: 13px 0; }
+.ab-trial > div + div { border-top: 1px solid var(--ab-rule); }
+.ab-trial dt { padding-top: 0.22em; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; color: var(--ab-sub); }
+.ab-trial dd { margin: 0; font-size: 0.94rem; font-weight: 500; line-height: 1.85; color: var(--ink); }
+/* 期間のうち、今日がどのあたりか（about.js が期間中だけ出す。飾り） */
+.ab-span { display: block; max-width: 420px; margin-top: 30px; padding-bottom: 2px; }
+.ab-span[hidden] { display: none; }
+.ab-span-track { position: relative; display: block; height: 6px; border-radius: 99px; background: color-mix(in srgb, var(--ink) 12%, transparent); }
+.ab-span-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 99px; background: var(--accent); }
+.ab-span-now { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--card); border: 3px solid var(--accent); box-sizing: border-box; }
+.ab-span-now[hidden] { display: none; }
+.ab-span-now-l { position: absolute; left: 50%; bottom: 15px; transform: translateX(-50%); font-size: 0.7rem; font-weight: 700; line-height: 1.4; white-space: nowrap; color: var(--ab-blue); }
+.ab-span-now.is-l .ab-span-now-l { left: -4px; transform: none; }
+.ab-span-now.is-r .ab-span-now-l { left: auto; right: -4px; transform: none; }
+.ab-span-ends { display: flex; justify-content: space-between; margin-top: 7px; font-family: var(--ab-mono); font-size: 0.74rem; color: var(--ab-sub); }
+
+/* 室数：38 + 26 = 64 を1行に収める（狭い幅では数字を縮める） */
+.ab-eq { display: flex; flex-wrap: nowrap; align-items: flex-start; gap: 0 clamp(8px, 2.6vw, 18px); margin: 4px 0 18px; }
+.ab-eq-term { display: flex; flex-direction: column; gap: 6px; margin: 0; min-width: 0; }
+.ab-eq .ab-num { font-size: clamp(2.2rem, 10vw, 4rem); }
+.ab-eq-term.is-sum .ab-num { color: var(--accent); }
+.ab-eq-l { display: flex; align-items: flex-start; gap: 5px; font-size: 0.78rem; font-weight: 700; line-height: 1.4; color: var(--ab-sub); }
+.ab-eq-n { flex: none; margin-top: 1px; display: inline-grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: var(--ink); color: #fff; font-family: var(--ab-mono); font-size: 0.64rem; font-weight: 500; }
+.ab-eq-op { padding-top: 0.35em; font-family: var(--ab-mono); font-size: clamp(1.3rem, 5vw, 2rem); line-height: 1; color: var(--ab-sub); }
+
+.ab-campus { margin: 0; }
+.ab-picks { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+html:not(.js) .ab-picks, html:not(.js) .lang-toggle { display: none; }   /* JS が無いと動かないので出さない（言語は日本語で読める） */
+.ab-pick {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 99px;
+  border: 1.5px solid var(--ab-line2); background: var(--card); color: var(--ink);
+  font: inherit; font-size: 0.86rem; font-weight: 700; cursor: pointer; transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.ab-pick .n { flex: none; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: #fff; font-family: var(--ab-mono); font-size: 0.76rem; font-weight: 500; }
+.ab-pick:hover { border-color: var(--ink); }
+.ab-pick[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.ab-pick[aria-pressed="true"] .n { background: var(--card); color: var(--ink); }
+
+.ab-stage { position: relative; height: clamp(270px, 76vw, 420px); overflow: hidden; background: var(--ab-stage); border: 1px solid var(--border); border-radius: var(--ab-r); }
+.ab-stage rr-campus { position: absolute; inset: 0; height: 100%; }
+.ab-stage rr-campus[hidden] { display: none; }
+.ab-stage-still { position: absolute; inset: 0; display: grid; place-items: center; padding: 6px; transition: opacity 0.45s ease, visibility 0s linear 0.45s; }
+.ab-campus-svg { display: block; width: 100%; height: 100%; }
+.ab-stage.is-live .ab-stage-still { opacity: 0; visibility: hidden; }
+/* 静止の図でも、選んだ校舎を強調する（ほかの校舎を薄く・番号の丸を青く） */
+.ab-bldg { transition: opacity 0.25s ease; }
+.ab-stage[data-show="tower"] .ab-bldg[data-b="ichi"], .ab-stage[data-show="ichi"] .ab-bldg[data-b="tower"] { opacity: 0.22; }
+.ab-stage[data-show="tower"] .ab-bldg[data-b="tower"] .ab-bldg-badge, .ab-stage[data-show="ichi"] .ab-bldg[data-b="ichi"] .ab-bldg-badge { fill: var(--accent); }
+/* 状態の文字（読み込み中／回せます／図で表示） */
+.ab-stage-status { position: absolute; z-index: 2; left: 12px; bottom: 12px; max-width: calc(100% - 24px); margin: 0; pointer-events: none; }
+.ab-stage-status > span { display: inline-block; padding: 4px 11px; border-radius: 99px; background: color-mix(in srgb, var(--card) 86%, transparent); border: 1px solid var(--border); font-size: 0.74rem; font-weight: 500; line-height: 1.5; color: var(--ab-sub); }
+.ab-stage-status > span[hidden] { display: none; }
+.ab-stage:focus { outline: none; }
+.ab-stage:focus-visible { outline: 3px solid var(--ab-blue); outline-offset: 3px; }
+.ab-stage-load {
+  position: absolute; z-index: 3; left: 12px; right: 12px; bottom: 14px; width: fit-content; max-width: calc(100% - 24px); margin: 0 auto;
+  min-height: 42px; padding: 0 16px; border-radius: 99px; border: none; background: var(--ink); color: #fff;
+  font: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+}
+.ab-stage-load[hidden] { display: none; }
+.ab-campus-note { margin: 10px 0 0; font-size: 0.8rem; line-height: 1.85; color: var(--ab-sub); }
+
+/* ════════════════════════════════════════════
+   06：年表（1行ずつ）
+════════════════════════════════════════════ */
+.ab-tl { list-style: none; margin: 6px 0 0; padding: 0; }
+.ab-tl li { position: relative; display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 8px; align-items: baseline; padding: 0 0 9px 22px; }
+.ab-tl li::before { content: ''; position: absolute; left: 4px; top: 13px; bottom: -3px; border-left: 1px solid var(--ab-line2); }
+.ab-tl li:last-child { padding-bottom: 0; }
+.ab-tl li:last-child::before { display: none; }
+.ab-tl li.to-plan::before { border-left-style: dashed; }
+.ab-tl li::after { content: ''; position: absolute; left: 0; top: 6px; width: 9px; height: 9px; border-radius: 50%; box-sizing: border-box; background: var(--bg); border: 1.5px solid color-mix(in srgb, var(--ink) 60%, transparent); }
+.ab-tl time { font-family: var(--ab-mono); font-size: 0.74rem; letter-spacing: 0.02em; line-height: 1.7; color: var(--ab-sub); white-space: nowrap; }
+.ab-tl p { margin: 0; font-size: 0.88rem; line-height: 1.7; color: var(--ab-text); }
+.ab-tl .is-key::after { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 4px var(--ab-blue-b); }
+.ab-tl .is-key time { color: var(--ab-blue); }
+.ab-tl .is-key p { font-weight: 700; color: var(--ink); }
+.ab-tl .is-plan::after { border-style: dashed; }
+.ab-tl-more { margin: 6px 0 14px; border-top: 1px solid var(--ab-rule); border-bottom: 1px solid var(--ab-rule); }
+.ab-tl-more summary { display: block; list-style: none; cursor: pointer; }
+.ab-tl-more summary::-webkit-details-marker { display: none; }
+.ab-tl-more .ab-more-d-row { padding: 11px 0; font-size: 0.86rem; }
+.ab-tl-more[open] .ab-q-i::after { transform: rotate(0deg); }
+.ab-tl-more summary:hover .ab-q-i { border-color: var(--ink); }
+.ab-tl-more .ab-tl { margin: 4px 0 14px; }
+
+/* ════════════════════════════════════════════
+   07：開発メンバー（名簿）・つくり
+════════════════════════════════════════════ */
+.ab-team { list-style: none; display: grid; grid-template-columns: 1fr 1fr; column-gap: 16px; margin: 22px 0 0; padding: 0; border-top: 1px solid var(--ink); }
+.ab-member {
+  display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-areas: "av name" "av role" "dept dept";
+  column-gap: 10px; row-gap: 2px; align-items: center; padding: 14px 0 12px; border-bottom: 1px solid var(--ab-rule); min-width: 0;
+}
+/* 頭文字の丸は紹介ページの .member-avatar と同じ青→橙の1種類のグラデーション（lp.css のまま。大きさだけ変える） */
+.ab-team .member-avatar { grid-area: av; width: 40px; height: 40px; margin: 0; font-size: 1rem; transition: none; }
+.ab-team .member-name { grid-area: name; align-self: end; margin: 0;   /* 姓と名の途中では折らない（about.html で姓・名を .ab-nb に） */ font-family: 'Noto Sans JP', sans-serif; font-size: 0.98rem; font-weight: 800; letter-spacing: 0.02em; line-height: 1.5; color: var(--ink); }
+.ab-team .member-dept { grid-area: dept; align-self: start; margin-top: 6px; font-size: 0.78rem; line-height: 1.55; color: var(--ab-sub); }
+.ab-team .member-role {
+  grid-area: role; align-self: start; justify-self: start; margin: 0; padding: 1px 9px;
+  background: var(--card); border: 1px solid var(--ab-blue-a); color: var(--ab-blue); font-size: 0.76rem; white-space: nowrap;
+}
+/* 英語・中国語のときだけ、名簿が日本語のままであることを添える */
+.ab-team-note { display: none; margin: 12px 0 0; font-size: 0.8rem; line-height: 1.7; color: var(--ab-sub); }
+body.lang-en .ab-team-note, body.lang-zh .ab-team-note { display: block; }
+
+.ab-colophon { margin: 28px 0 0; padding: 18px 18px 6px; background: var(--card); border: 1px solid var(--border); border-radius: var(--ab-r-lg); }
+.ab-colophon-h { margin: 0 0 10px; font-size: 1.04rem; font-weight: 800; line-height: 1.5; color: var(--ink); }
+.ab-colophon dl { margin: 0; }
+
+/* ════════════════════════════════════════════
+   08：よくある質問（details。JS なしで開閉できる）
+════════════════════════════════════════════ */
+.ab-faq { margin: 4px 0 0; border-top: 1px solid var(--ab-rule); }
+.ab-q { border-bottom: 1px solid var(--ab-rule); }
+.ab-q summary { display: block; list-style: none; cursor: pointer; }
+.ab-q summary::-webkit-details-marker { display: none; }
+.ab-q-row { display: grid; grid-template-columns: auto minmax(0, 1fr) 24px; column-gap: 12px; align-items: start; padding: 14px 0; font-size: 0.94rem; font-weight: 700; line-height: 1.65; color: var(--ink); }
+.ab-q-m { font-family: var(--ab-mono); font-weight: 500; color: var(--ab-blue); }
+.ab-q-i { position: relative; width: 24px; height: 24px; margin-top: 1px; border-radius: 50%; border: 1px solid var(--ab-rule); background: color-mix(in srgb, var(--card) 60%, transparent); }
+.ab-q-i::before, .ab-q-i::after { content: ''; position: absolute; left: 50%; top: 50%; width: 10px; height: 1.5px; margin: -0.75px 0 0 -5px; background: var(--ink); transition: transform 0.25s ease; }
+.ab-q-i::after { transform: rotate(90deg); }
+.ab-q[open] .ab-q-i::after, .ab-more-d[open] .ab-q-i::after { transform: rotate(0deg); }
+.ab-q summary:hover .ab-q-i, .ab-more-d summary:hover .ab-q-i { border-color: var(--ink); }
+.ab-a { padding: 0 36px 20px 26px; }
+.ab-a p { margin: 0; max-width: 40em; font-size: 0.92rem; line-height: 1.95; color: var(--ab-text); }
+
+/* ════════════════════════════════════════════
+   09：意見を送る・結び
+════════════════════════════════════════════ */
+.ab-links { display: grid; gap: 12px; margin: 24px 0 0; }
+.ab-linkcard {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "k a" "t a"; gap: 4px 14px; align-items: center;
+  padding: 16px 16px 16px 20px; border-radius: var(--ab-r); background: var(--card); border: 1px solid var(--border);
+  color: var(--ink); text-decoration: none; transition: border-color 0.2s;
+}
+.ab-linkcard:hover { border-color: var(--ink); }
+.ab-linkcard-k { grid-area: k; font-size: 1.04rem; font-weight: 800; line-height: 1.5; }
+.ab-linkcard-t { grid-area: t; font-size: 0.82rem; line-height: 1.7; color: var(--ab-sub); }
+.ab-linkcard-a { grid-area: a; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border); font-size: 1rem; transition: background 0.2s, color 0.2s; }
+.ab-linkcard:hover .ab-linkcard-a { background: var(--ink); color: #fff; }
+
+.ab-end { position: relative; overflow-x: clip; padding: var(--ab-gap) 0 calc(var(--ab-gap) + 8px); text-align: center; }
+.ab-end .ab-wrap { position: relative; z-index: 1; }
+/* 紹介ページの最後の案内と同じ、中央の淡い橙の光 */
+.ab-glow-end { left: 50%; top: 50%; width: min(560px, 110vw); height: 380px; margin: -190px 0 0 0; transform: translateX(-50%); background: var(--accent2); }
+.ab-end-t { margin: 0; font-size: clamp(1.6rem, 5.4vw, 2.6rem); font-weight: 800; line-height: 1.4; color: var(--ink); }
+.ab-end-s { max-width: 32em; margin: 12px auto 0; font-size: 0.96rem; line-height: 1.9; color: var(--ab-sub); }
+.ab-end-actions { display: flex; flex-direction: column; align-items: center; gap: 18px; margin-top: 28px; }
+.ab-back { display: inline-flex; align-items: center; gap: 8px; padding: 6px 2px; color: var(--ink); font-size: 0.9rem; font-weight: 700; text-decoration: none; border-bottom: 1.5px solid var(--ink); }
+
+/* フッターのリンク：lp.css の opacity:0.85 では対比が 3.8:1 なので、4.5:1 以上にする */
+.about-page ~ footer .foot-links a { opacity: 1; color: var(--ink); }
+.about-page ~ footer .foot-links a:hover { opacity: 1; }
+/* 文字を大きくしても、フッターの長い語句で横にはみ出さない */
+.about-page ~ footer > * { min-width: 0; overflow-wrap: anywhere; }
+.about-page ~ footer .foot-note { max-width: min(760px, 100%); }
+.about-page ~ footer { position: relative; z-index: 1; }   /* 結びの光がフッターの文字の上にかからないように */
+
+/* ════════════════════════════════════════════
+   スクロールで出す動き：控えめに。JS が動いて ab-anim が付いたときだけ隠す（止まっても読める）
+════════════════════════════════════════════ */
+.reveal { opacity: 1; transform: none; transition: none; }
+html.ab-anim .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
+html.ab-anim .reveal.visible { opacity: 1; transform: none; }
+
+/* ════════════════════════════════════════════
+   英語・中国語の組み（中国語の書体は lp.css と同じまま。ページを行き来しても字形が変わらないように）
+════════════════════════════════════════════ */
+body.lang-en .ab-display { font-size: clamp(1.55rem, 5.2vw + 0.5rem, 3.6rem); line-height: 1.12; letter-spacing: -0.03em; }
+body.lang-en .ab-h2 { font-size: clamp(1.35rem, 3.8vw, 1.9rem); line-height: 1.22; letter-spacing: -0.02em; }
+body.lang-en .ab-quote blockquote p, body.lang-en .ab-end-t { font-size: clamp(1.4rem, 4.6vw, 2.1rem); line-height: 1.25; letter-spacing: -0.02em; }
+body.lang-en .ab-callout-t { font-size: clamp(1.1rem, 4vw, 1.6rem); line-height: 1.3; letter-spacing: -0.01em; }
+body.lang-en .ab-h3, body.lang-en .ab-manners-h { font-size: 1.1rem; line-height: 1.4; letter-spacing: -0.01em; }
+body.lang-en .ab-prose p, body.lang-en .ab-deck { line-height: 1.72; letter-spacing: 0; }
+body.lang-en :is(.ab-slot-text, .ab-rules dd, .ab-know-col li, .ab-pipe-step p, .ab-table td) { line-height: 1.6; }
+body.lang-en :is(.ab-pipe-step p, .ab-a p, .ab-tl p, .ab-colophon dd, .ab-notice, .ab-table td, .ab-more-dl dd, .ab-know-col li, .ab-trial dd) { line-height: 1.7; }
+body.lang-en .ab-kicker, body.lang-en .ab-ch-label { letter-spacing: 0.04em; }
+body.lang-en .ab-meta dt { text-transform: uppercase; }
+body.lang-en :is(.ab-h2, .ab-h3, .ab-callout-t, .ab-manners-h) { font-family: 'Noto Sans JP', sans-serif; font-weight: 800; letter-spacing: -0.01em; }
+/* 英語の文の中のアプリの日本語：かぎ括弧を半分の幅で組み、前後に穴が空かないように */
+body.lang-en .ab-ui { font-feature-settings: "halt"; }
+body.lang-zh .ab-prose p, body.lang-zh .ab-deck { line-height: 1.95; }
+body.lang-zh :is(.ab-notice, .ab-req) { letter-spacing: 0.05em; }   /* 狭い幅で最後の行に「服务。」だけ残らないように */
+
+/* ════════════════════════════════════════════
+   広い画面
+════════════════════════════════════════════ */
+@media (min-width: 600px) {
+  .ab-trial { padding: 6px 26px; }
+  .ab-trial > div { grid-template-columns: 6.5em minmax(0, 1fr); gap: 20px; padding: 16px 0; }
+  .ab-trial dt { padding-top: 0.25em; }
+  .ab-colophon { padding: 22px 26px 8px; }
+  .ab-colophon dl > div, .ab-rules dl > div { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 16px; }
+  .ab-colophon dt, .ab-rules dt, .ab-colophon dd, .ab-rules dd { display: block; margin: 0; }
+  .ab-rules dt { font-size: 0.84rem; font-weight: 800; letter-spacing: 0; color: var(--ink); }
+  .ab-day { padding: 22px 22px 8px; }
+  .ab-bar { height: 56px; }
+  .ab-rules { padding-left: 22px; padding-right: 22px; }
+  /* 時限ごとの行：時限｜説明｜見本 */
+  .ab-slot { grid-template-columns: 6.4em auto minmax(0, 1fr) 132px; grid-template-areas: "when tag text mock"; gap: 6px 14px; padding: 10px 0; }
+  .ab-tag2 { align-self: center; margin: 0; }
+  .ab-slot-when { flex-direction: column; gap: 0; align-self: center; }
+  .ab-slot-text { align-self: center; }
+  .ab-mock { justify-self: end; min-width: 124px; min-height: 44px; }
+  .ab-more-dl > div { display: grid; grid-template-columns: 11em minmax(0, 1fr); gap: 16px; }
+  .ab-more-dl dd { margin: 0; }
+}
+@media (min-width: 700px) {
+  /* 流れの図：手順を横に並べ、絵を上に */
+  .ab-pipe-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .is-you .ab-pipe-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ab-pipe-group { padding: 16px 16px 16px; }
+  .ab-pipe-step { grid-template-columns: minmax(0, 1fr); grid-template-areas: "art" "t" "p"; align-items: start; align-content: start; gap: 8px; padding: 14px 16px 16px; }
+  .ab-pipe-art { width: 76px; }
+  .ab-pipe-step + .ab-pipe-step::before { left: -11px; top: 50%; margin: -4px 0 0; transform: rotate(-45deg); }
+  /* 分かること｜ドア｜分からないこと */
+  .ab-know { grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr); }
+  .ab-door { height: auto; }
+  .ab-door::before { left: 50%; right: auto; top: 0; bottom: 0; border-top: 0; border-left: 1.5px dashed var(--ab-line2); }
+  .ab-door svg { width: 42px; padding: 6px 3px; }
+  .ab-links { grid-template-columns: 1fr 1fr; gap: 16px; }
+}
+@media (min-width: 768px) {
+  .ab-wrap, .ab-body-in { max-width: calc(var(--ab-w) + 80px); padding-left: 40px; padding-right: 40px; }
+  .ab-toc { margin: 0 -40px; padding: 0 28px 0 30px; }
+  .ab-hero { padding: 100px 0 32px; }
+  .ab-ring { left: calc(100% - 180px); top: 230px; }
+  .ab-kicker { margin-bottom: 22px; }
+  .ab-deck { font-size: 1.06rem; margin-top: 20px; }
+  .ab-hero-actions { margin-top: 26px; }
+  .ab-meta { margin-top: 30px; }
+  .ab-meta dd { font-size: 0.9rem; }
+  .ab-chapters { padding-top: 48px; }
+  .ab-h2 { margin: 20px 0 18px; }
+  .ab-h3 { margin-top: 40px; }
+  .ab-prose p { font-size: 1rem; }
+  .ab-prose .ab-lead { font-size: 1.04rem; }
+  .ab-callout { padding: 26px 30px; gap: 22px; }
+  .ab-callout-ico { width: 50px; height: 50px; }
+  .ab-manners { padding: 26px 30px 24px; }
+  .ab-stage { border-radius: var(--ab-r-lg); }
+}
+@media (min-width: 900px) {
+  .ab-deck { max-width: 44em; }
+  .ab-meta { grid-template-columns: repeat(4, 1fr); }
+  .ab-meta > div { padding: 16px 16px 0 0; border-bottom: none; }
+  .ab-meta > div + div { padding-left: 18px; border-left: 1px solid var(--ab-rule); }
+  /* 使う人の2つの手順は、絵を左に置いて低く */
+  .is-you .ab-pipe-step { grid-template-columns: 76px minmax(0, 1fr); grid-template-areas: "art t" "art p"; column-gap: 16px; align-items: start; }
+  .is-you .ab-pipe-art { width: 76px; padding-top: 2px; }
+  .ab-table tbody th, .ab-table td { padding: 12px 16px; }
+  .ab-slot { padding: 8px 0; }
+  .ab-manners { margin-top: 36px; }
+  /* みんなで使う場所：左に見出しと文、右にチップと場所 */
+  .ab-manners { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "h h" "lead chips" "lead note"; column-gap: 32px; align-items: start; }
+  .ab-manners-h { grid-area: h; }
+  .ab-manners-lead { grid-area: lead; }
+  .ab-manners-chips { grid-area: chips; margin: 2px 0 10px; }
+  .ab-manners-note { grid-area: note; padding-top: 10px; }
+  .ab-also { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+  .ab-also-h { flex: 1 0 100%; margin-bottom: 2px; }
+  .ab-more-p { margin: 0 0 0 auto; }
+  .ab-trial > div:first-child { align-items: center; }
+  .ab-trial > div:first-child dt { padding-top: 0; }
+  .ab-trial > div:first-child dd { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 32px; }
+  .ab-trial .ab-span { flex: 1 1 260px; margin-top: 18px; }
+}
+/* PC：目次を左の柱に。よくある質問は左に見出し・右に一覧 */
+@media (min-width: 1100px) {
+  .ab-body-in { display: grid; grid-template-columns: 184px minmax(0, 1fr); column-gap: 56px; align-items: start; }
+  .ab-team { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 28px; }
+  .ab-toc {
+    top: 28px; display: block; height: auto; margin: 56px 0 0; padding: 0;
+    background: none; -webkit-backdrop-filter: none; backdrop-filter: none; border: none;
+  }
+  .ab-toc-h {
+    position: static; width: auto; height: auto; margin: 0 0 6px; padding: 14px 0 10px; overflow: visible; clip: auto;
+    border-top: 1px solid var(--ink); font-family: var(--ab-mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.14em; color: var(--ab-sub);
+  }
+  .ab-toc-list { display: block; padding: 0; overflow: visible; -webkit-mask-image: none; mask-image: none; }
+  .ab-toc-list a { height: auto; padding: 7px 0 7px 14px; gap: 10px; align-items: baseline; border-left: 2px solid transparent; font-size: 0.84rem; font-weight: 500; line-height: 1.5; white-space: normal; }
+  .ab-toc-list a[aria-current] { border-left-color: var(--accent); font-weight: 700; }
+  .ab-toc-list a[aria-current]::after { display: none; }
+  .ab-toc-list a:focus-visible { outline-offset: 2px; }
+  .ab-toc-open { margin: 20px 0 0; min-height: 40px; padding: 0 16px; font-size: 0.82rem; }
+  .ab-toc-open .ab-d { position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; }
+  .ab-ch { scroll-margin-top: 28px; }
+  .ab-ch-faq { display: grid; grid-template-columns: 17em minmax(0, 1fr); column-gap: 36px; align-items: start; }
+  .ab-ch-faq .ab-faq { margin-top: 0; border-top-color: var(--ink); }
+  .ab-ch-faq .ab-h2 { margin-bottom: 0; }
+  .ab-stage { height: 330px; }
+  .ab-q-row { padding: 11px 0; }
+  .ab-bar { height: 50px; }
+  .ab-rules dl > div, .ab-colophon dl > div { padding: 8px 0; }
+  .ab-member { padding: 12px 0 10px; }
+  .ab-end { padding-top: calc(var(--ab-gap) + 40px); }
+}
+/* 上に張り付く目次（高さ 50px）の下にフォーカスが隠れないように */
+@media (max-width: 1099px) {
+  html { scroll-padding-top: 60px; }
+  .ab-ch { scroll-margin-top: 6px; }   /* 目次から飛んだ着地は今までどおり上から 66px（60 + 6） */
+}
+
+/* スマホ：紹介ページの「下に張り付く開くボタン」の分の余白は、このページでは要らない */
+@media (max-width: 767px) {
+  .about-page ~ footer { padding-bottom: 40px; }
+}
+@media (min-width: 700px) and (max-width: 899px) {
+  /* 表の1列目に「「実は使われていた」」（10字）が1行で入るように、列の幅と余白を配り直す */
+  .ab-table thead th, .ab-table tbody th, .ab-table td { padding-left: 12px; padding-right: 12px; }
+  .ab-table thead th:nth-child(1) { width: 24%; }
+  .ab-table thead th:nth-child(2) { width: 30%; }
+  .ab-table thead th:nth-child(3) { width: 22%; }
+}
+@media (max-width: 699px) {
+  /* 表は、項目ごとの札に組みかえる（表としての意味は HTML の role で保つ） */
+  .ab-table, .ab-table tbody, .ab-table tbody tr, .ab-table tbody th, .ab-table td { display: block; width: auto; }
+  .ab-table { background: none; border: 0; border-radius: 0; overflow: visible; }
+  .ab-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); }
+  .ab-table tbody tr { margin: 0 0 10px; padding: 12px 16px 10px; background: var(--card); border: 1px solid var(--border); border-radius: var(--ab-r); }
+  .ab-table tbody tr:last-child { margin-bottom: 0; }
+  .ab-table tbody th { padding: 0 0 8px; border-bottom: 1px solid var(--ab-rule); font-size: 0.94rem; }
+  .ab-table tbody tr:last-child > th { border-bottom: 1px solid var(--ab-rule); }
+  .ab-table tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 14px; }
+  .ab-table tbody th, .ab-table td:nth-of-type(1) { grid-column: 1 / -1; }
+  .ab-table td { padding: 8px 0 0; border: 0; }
+  .ab-table td:nth-of-type(1) .ab-th { display: none; }
+  .ab-th { display: block; font-size: 0.7rem; font-weight: 700; line-height: 1.6; color: var(--ab-sub); }
+}
+@media (max-width: 599px) {
+  /* 05 テスト運用の札：dt を dd の上に積み、必須表記の行を札の幅いっぱいに使う */
+  .ab-trial > div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .ab-trial dt { padding-top: 0; }
+  /* 縦を詰める */
+  .ab-know-col li { padding: 6px 0 6px 26px; }
+  .ab-know-col li::before { top: 0.85em; }
+  .ab-pipe-steps { gap: 8px; }
+}
+@media (max-width: 379px) {
+  /* 約17字/行の幅では、字送りだと最後の行に「せん。」「さい。」だけ残るので、語のまとまりで折る（390px 以上は字送りのほうがそろう） */
+  .ab-trial dd, .ab-a p { word-break: auto-phrase; }
+}
+@media (max-width: 480px) {
+  .ab-picks { gap: 6px; }
+  .ab-pick { gap: 6px; padding: 0 12px; font-size: 0.82rem; }
+}
+@media (max-width: 374px) {
+  .ab-slot { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "when mock" "tag mock" "text text"; }
+  .ab-eq { flex-direction: column; gap: 6px; }
+  .ab-eq-term { flex-direction: row; align-items: center; gap: 10px; }
+  .ab-eq-op { display: none; }
+  .ab-eq .ab-num { font-size: 2rem; min-width: 1.6em; }
+}
+@media (min-width: 375px) {
+  .ab-eq-l { white-space: nowrap; }
+}
+@container (max-width: 14em) {   /* 本文の文字の14字分より狭い＝文字を大きくしたとき（ふつうの大きさなら 320px でも約16字分ある） */
+  .ab-slot { grid-template-columns: minmax(0, 1fr); grid-template-areas: "when" "tag" "text" "mock"; }
+  .ab-mock { justify-self: start; }
+  .ab-mock em { position: static; transform: none; white-space: normal; margin-bottom: 2px; }
+  .ab-mock.is-busy { padding-top: 5px; }
+  .ab-ticks span:nth-child(2), .ab-ticks span:nth-child(3) { display: none; }
+}
+@media (max-width: 420px) {
+  .ab-eq-l { font-size: 0.7rem; }
+}
+@media (max-width: 360px) {
+  .ab-meta > div { padding-right: 6px; }
+  .ab-meta > div:nth-child(even) { padding-left: 10px; }
+  .ab-meta dd { font-size: 0.78rem; }
+  .ab-pipe-group { padding: 12px 10px 10px; }
+  .ab-pipe-step { padding: 12px; grid-template-columns: 44px minmax(0, 1fr); }
+  .ab-day { padding-left: 14px; padding-right: 14px; }
+  .ab-rules { padding-left: 14px; padding-right: 14px; }
+  .ab-pick { gap: 6px; padding: 0 11px; font-size: 0.78rem; }
+  .ab-a { padding-right: 8px; }
+  .ab-tl li { grid-template-columns: 1fr; gap: 0; }
+}
+@media (max-width: 359px) {
+  .ab-team { column-gap: 10px; }
+  .ab-member { grid-template-columns: 30px minmax(0, 1fr); column-gap: 8px; }
+  .ab-team .member-avatar { width: 30px; height: 30px; font-size: 0.82rem; }
+  .ab-team .member-name { font-size: 0.9rem; letter-spacing: 0; }
+  body.lang-zh .ab-notice { letter-spacing: 0.08em; }   /* 最後の行に「服务。」だけ残らないように */
+}
+
+/* ════════════════════════════════════════════
+   動きを減らす設定：動かさずに全部見せる（lp.css は .reveal となめらかスクロールを止めていない）
+════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  html.ab-anim .reveal { opacity: 1; transform: none; transition: none; }
+  html.ab-anim .ab-hero .ab-wrap > * { animation: none; }
+  .ab-stage-still, .ab-bldg, .ab-q-i::before, .ab-q-i::after, .ab-more-a, .ab-skip, .ab-pick, .ab-linkcard, .ab-linkcard-a, .ab-toc-list a, .ab-toc-open { transition: none; }
+  .hero-cta, .hero-cta .arrow, .cta-btn { transition: none; animation: none; }
+}
+
+/* ════════════════════════════════════════════
+   印刷：ナビ・目次・操作の部品を隠し、全部見せる
+════════════════════════════════════════════ */
+@media print {
+  body::before, .section-nav, .ab-toc, .ab-skip, .ab-hero-bg, .ab-glows, .ab-picks, .ab-stage-status, .ab-stage-load, .ab-hero-actions, .ab-end-actions { display: none; }
+  html.ab-anim .reveal, .reveal { opacity: 1; transform: none; }
+  .ab-hero { padding: 24px 0; }
+  .ab-callout { background: var(--card); color: var(--ink); border: 2px solid var(--ink); }
+  .ab-callout-t small { color: var(--ab-sub); }
+  .ab-ch { break-inside: auto; }
+  .ab-day, .ab-trial, .ab-rules, .ab-table { break-inside: avoid; }
+  .ab-day, .ab-day * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .ab-glow-end { display: none; }
+}

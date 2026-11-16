@@ -12,18 +12,18 @@
   gtag('config', 'G-L1T1CDZ05N');
 </script>
 <title>このサービスについて — RoomRadar</title>
-<meta name="description" content="日大理工の空き教室を、開いた瞬間に一覧表示。時間割をもとに、いま使える教室・2コマ続けて使える教室・教室ごとの1週間がわかります。本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。">
+<meta name="description" content="RoomRadar（日大理工の空き教室検索）について。なぜ作ったか、どう動くか、どこまで信じてよいか、情報の扱い、開発メンバーをまとめました。本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。">
 <link rel="canonical" href="https://nu-roomradar.github.io/nust-room-search/about.html">
 <meta name="theme-color" content="#f5f3ee">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/lp/favicon-32.png">
 <link rel="apple-touch-icon" href="assets/lp/icon-180.png">
 <!-- LINE・Instagram などで共有したときのプレビュー。試験運用中で大学公式ではないことを必ず入れる -->
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:site_name" content="RoomRadar">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:url" content="https://nu-roomradar.github.io/nust-room-search/">
-<meta property="og:title" content="RoomRadar — 日大理工の空き教室が、開いた瞬間わかる（学生開発・試験運用中）">
-<meta property="og:description" content="時間割をもとに、いま使える教室を一覧表示。本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。">
+<meta property="og:url" content="https://nu-roomradar.github.io/nust-room-search/about.html">
+<meta property="og:title" content="このサービスについて — RoomRadar（学生開発・試験運用中）">
+<meta property="og:description" content="なぜ作ったか、どう動くか、どこまで信じてよいか。本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。">
 <meta property="og:image" content="https://nu-roomradar.github.io/nust-room-search/assets/lp/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -31,23 +31,37 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- 日本語は Noto Sans JP（Google Fonts で最も使われている日本語フォント。検索アプリ本体とも同じ）。
-     文字のまとまりごとに分割して配信されるので、ページで使う文字の分だけ読み込まれる -->
+<!-- 日本語は Noto Sans JP（検索アプリ本体とも同じ）。文字のまとまりごとに分割して配信されるので、使う文字の分だけ読み込まれる -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<noscript><style>
-  /* JS が動かなくても中身が見えるように（スクロールで出すアニメーションを止める） */
-  .reveal { opacity: 1 !important; transform: none !important; }
-  .step-num { transform: none !important; }
-</style></noscript>
 <link rel="stylesheet" href="assets/lp/lp.css?v=20261107">
+<!-- このページだけの見た目（読み物の組み）。共有の lp.css は変えず、後ろで上書きする -->
+<link rel="stylesheet" href="assets/lp/about.css?v=20261116">
+<script>
+// js: JS が動く（JS が無いと動かない部品はこれが無いとき隠す）。
+// ab-anim: スクロールで出す動きの準備。動きを減らす設定でもないときだけ隠し、
+// 3秒たっても末尾のスクリプトが準備できていなければ、隠すのをやめて全部見せる（途中で止まっても読めるように）
+(function (d) {
+  d.classList.add('js');
+  if (!('IntersectionObserver' in window)) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  d.classList.add('ab-anim');
+  setTimeout(function () { if (!window.abRevealReady) d.classList.remove('ab-anim'); }, 3000);
+})(document.documentElement);
+</script>
 </head>
 <body>
+<script>
+// 前に選んだ言語を、描く前に反映する（英語・中国語の人に一瞬日本語が見えないように。ボタンの状態は末尾の setLang がそろえる）
+try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rrLang === 'zh') { document.body.classList.add('lang-' + rrLang); document.documentElement.lang = rrLang === 'zh' ? 'zh-Hans' : 'en'; } } catch (e) {}
+</script>
+
+<a class="ab-skip" href="#main"><span class="ja">本文へ移動</span><span class="en">Skip to content</span><span class="zh">跳到正文</span></a>
 
 <header class="section-nav" id="siteNav">
-  <a class="nav-logo" href="index.html" aria-label="RoomRadar トップへ">
+  <a class="nav-logo" href="index.html" aria-label="RoomRadar トップへ" data-label-en="RoomRadar home" data-label-zh="RoomRadar 首页">
     <img src="assets/lp/logo-nav.png" alt="RoomRadar" width="130" height="76">
   </a>
-  <nav class="nav-links" id="navLinks">
+  <nav class="nav-links" id="navLinks" aria-label="サイトの案内" data-label-en="Site" data-label-zh="网站导航">
     <a href="index.html#features"><span class="ja">機能</span><span class="en">Features</span><span class="zh">功能</span></a>
     <a href="index.html#howto"><span class="ja">使い方</span><span class="en">How&nbsp;to</span><span class="zh">使用方法</span></a>
     <a href="index.html#manners"><span class="ja">みんなで使う</span><span class="en">Shared&nbsp;space</span><span class="zh">共享空间</span></a>
@@ -64,155 +78,830 @@
   </div>
 </header>
 
-<main class="about-page">
-<section class="sec sec-about-hero">
-  <div class="sec-inner">
-    <p class="sec-eyebrow">About</p>
-    <h1 class="sec-title about-h1"><span class="ja">このサービスについて</span><span class="en">About this service</span><span class="zh">关于本服务</span></h1>
-    <div class="hero-note about-note">
-      <span class="hero-note-tag">TEST</span>
-      <span class="ja">本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</span><span class="en">This service is developed and run by students as part of Nihon University's student project program and is currently in trial operation. It is not an official service provided by the university.</span><span class="zh">本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。</span>
-    </div>
-    <a class="a-link" href="https://nust-room-search.onrender.com"><span class="ja">RoomRadarを開く</span><span class="en">Open RoomRadar</span><span class="zh">打开RoomRadar</span> <span aria-hidden="true">→</span></a>
-  </div>
-</section>
+<main class="about-page ab" id="main" tabindex="-1">
 
-<section class="about" id="about" aria-label="運営・データ・情報の扱い">
-  <div class="section-inner">
-    <div class="about-grid">
-      <div class="about-card reveal">
-        <h3><span class="ja">運営</span><span class="en">Who runs it</span><span class="zh">运营</span></h3>
-        <p>
-          <span class="ja">本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。理工学部の学生が中心になって開発・運営しています。</span>
-          <span class="en">This service is developed and run by students as part of Nihon University's student project program and is currently in trial operation. It is not an official service provided by the university. It is developed and run mainly by students of the College of Science and Technology.</span>
-          <span class="zh">本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。主要由理工学部的学生开发和运营。</span>
-        </p>
-      </div>
-      <div class="about-card reveal">
-        <h3><span class="ja">データ</span><span class="en">Data</span><span class="zh">数据</span></h3>
-        <p>
-          <span class="ja">教務ページで公開されている時間割表（2025・2026年度）をもとに、授業が入っていない教室を表示しています。「空き」は時間割上の空きで、使ってよいという許可ではありません。休講・補講・教室変更・試験・時間割にない授業は反映されないので、入る前にドア越しに確認してください。</span>
-          <span class="en">Based on the published class timetables (AY2025–2026), it lists rooms with no scheduled class. “Free” means free on the timetable, not permission to use the room. Cancellations, make-up classes, room changes, exams and unscheduled use are not reflected — please check at the door.</span>
-          <span class="zh">根据公开的课程表（2025・2026学年）显示没有排课的教室。“空闲”仅指课表上空闲，并非使用许可。停课、补课、教室变更、考试及课表外使用不会反映，请在门口确认后再进入。</span>
-        </p>
-      </div>
-      <div class="about-card reveal">
-        <h3><span class="ja">情報の扱い</span><span class="en">Your data</span><span class="zh">信息处理</span></h3>
-        <p>
-          <span class="ja">「使われていた」の報告は、その時限が終わると自動で消えます。意見箱の内容は、改善のために運営メンバーが確認します。検索アプリでは、次に開いたときに同じ校舎で表示するため、選んだ校舎とコマ数をこの端末（Cookie）にだけ保存します。このページと検索アプリでは、利用状況を知るために Google アナリティクス（Cookie）を使っています。</span>
-          <span class="en">Reports are deleted automatically when the period ends. Feedback is read by the team to improve the service. The app remembers your chosen building and number of periods on this device only (a cookie) so it opens the same way next time. This page and the app use Google Analytics (cookies) to understand usage.</span>
-          <span class="zh">举报会在该时段结束后自动删除。意见箱的内容由运营成员查看并用于改进。搜索应用会把您选择的教学楼和节数仅保存在本设备（Cookie）中，以便下次以相同条件打开。本页面和搜索应用使用Google Analytics（Cookie）了解使用情况。</span>
-        </p>
-      </div>
-    </div>
+<!-- ════════════════════════════════════════════
+     表紙：題（h1）・リード・開くボタン・必須の表記・基本の情報
+════════════════════════════════════════════ -->
+<header class="ab-hero">
+  <div class="ab-hero-bg" aria-hidden="true">
+    <span class="ab-glow ab-glow-a"></span><span class="ab-glow ab-glow-b"></span>
+    <span class="ab-ring ab-ring-1"></span><span class="ab-ring ab-ring-2"></span><span class="ab-ring ab-ring-3"></span>
   </div>
-</section>
-
-<section class="sec sec-white" id="trial">
-  <div class="sec-inner">
-    <p class="sec-eyebrow reveal">Trial</p>
-    <h2 class="sec-title reveal"><span class="ja">テスト運用について</span><span class="en">About the trial</span><span class="zh">关于试运营</span></h2>
-    <dl class="t-list reveal">
-      <div><dt><span class="ja">期間</span><span class="en">Period</span><span class="zh">期间</span></dt><dd><span class="ja">2026年10月13日〜12月19日（予定）</span><span class="en">Oct 13 – Dec 19, 2026 (planned)</span><span class="zh">2026年10月13日〜12月19日（预计）</span></dd></div>
-      <div><dt><span class="ja">対象</span><span class="en">Where</span><span class="zh">范围</span></dt><dd><span class="ja">駿河台キャンパス（タワー・スコラ／駿河台校舎1号館）</span><span class="en">Surugadai campus (Tower Schola / Surugadai Building 1)</span><span class="zh">骏河台校区（Tower Schola／骏河台校舍1号馆）</span></dd></div>
-      <div><dt><span class="ja">お願い</span><span class="en">Please</span><span class="zh">请注意</span></dt><dd><span class="ja">テスト運用中のため、検索結果が実際の使用状況と違うことがあります。入る前にドア越しに確認してください。</span><span class="en">Results may differ from actual use during the trial. Please check at the door before entering.</span><span class="zh">试运营期间，搜索结果可能与实际使用情况不同。进门前请先确认。</span></dd></div>
+  <div class="ab-wrap">
+    <h1 class="ab-h1">
+      <span class="ab-kicker"><span class="ab-kicker-dot" aria-hidden="true"></span><span class="ja">このサービスについて</span><span class="en">About this service</span><span class="zh">关于本服务</span></span>
+      <span class="ab-display"><span class="ja"><span class="ab-nb">教室を探して</span><span class="ab-nb">歩く時間を、</span><span class="ab-nb ab-acc">なくしたい。</span></span><span class="en">No more walking the halls <span class="ab-acc">to find&nbsp;an empty&nbsp;room.</span></span><span class="zh"><span class="ab-nb">把找教室的时间，</span><span class="ab-nb ab-acc">省下来。</span></span></span>
+    </h1>
+    <p class="ab-deck">
+      <span class="ja">RoomRadar は、日本大学理工学部の空き教室を、時間割から探せるサービスです。学生が作り、学生が運営しています。なぜ作ったのか。どう動いているのか。どこまで信じてよいのか。順に<span class="ab-nb">書きます。</span></span>
+      <span class="en">RoomRadar finds empty classrooms at Nihon University's College of Science and Technology, using the class timetables. It is built and run by students. Here is why we made it, how it works, and how far you can trust it.</span>
+      <span class="zh">RoomRadar 是一项根据课程表查找日本大学理工学部空教室的服务，由学生开发、学生运营。为什么要做，怎么运作，可以在多大程度上相信它——下面<span class="ab-nb">依次说明。</span></span>
+    </p>
+    <div class="ab-hero-actions">
+      <a class="hero-cta" href="https://nust-room-search.onrender.com"><span class="ja">RoomRadarを開く</span><span class="en">Open RoomRadar</span><span class="zh">打开RoomRadar</span><span class="arrow" aria-hidden="true">→</span></a>
+    </div>
+    <p class="ab-notice"><span class="ab-tag">TEST</span><span class="ja">本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</span><span class="en">This service is developed and run by students as part of Nihon University's student project program and is currently in trial operation. It is not an official service provided by the university.</span><span class="zh">本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。</span></p>
+    <dl class="ab-meta">
+      <div><dt><span class="ja">運営</span><span class="en">Run by</span><span class="zh">运营</span></dt><dd><span class="ja"><span class="ab-nb">学生6人の</span><span class="ab-nb">チーム</span></span><span class="en">A team of six students</span><span class="zh">6名学生组成的团队</span></dd></div>
+      <div><dt><span class="ja">対象</span><span class="en">Where</span><span class="zh">范围</span></dt><dd><span class="ja"><span class="ab-nb">駿河台キャンパスの</span><span class="ab-nb">2校舎</span></span><span class="en">Two buildings, Surugadai campus</span><span class="zh"><span class="ab-nb">骏河台校区的</span><span class="ab-nb">2栋教学楼</span></span></dd></div>
+      <div><dt><span class="ja">テスト運用</span><span class="en">Trial</span><span class="zh">试运营</span></dt><dd><span class="ab-mono ab-nb">2026.10.13–12.19</span><span class="ja"><span class="ab-nb">（予定）</span></span><span class="en"> <span class="ab-nb">(planned)</span></span><span class="zh"><span class="ab-nb">（预计）</span></span></dd></div>
+      <div><dt><span class="ja">利用</span><span class="en">Cost</span><span class="zh">费用</span></dt><dd><span class="ja">無料・登録不要</span><span class="en">Free, no sign-up</span><span class="zh">免费・无需注册</span></dd></div>
     </dl>
   </div>
-</section>
+</header>
 
-<section id="team">
-  <div class="section-inner">
-    <div class="section-eyebrow reveal">
-      <span class="ja">開発メンバー</span>
-      <span class="en">The Team</span>
-      <span class="zh">开发成员</span>
+<div class="ab-body">
+  <div class="ab-glows" aria-hidden="true"><span class="ab-glow ab-glow-c"></span><span class="ab-glow ab-glow-d"></span><span class="ab-glow ab-glow-e"></span><span class="ab-glow ab-glow-f"></span></div>
+  <div class="ab-body-in">
+
+  <!-- 目次：スマホでは上に張り付く横並び、PC では左の柱 -->
+  <nav class="ab-toc" id="toc" aria-labelledby="toc-h">
+    <p class="ab-toc-h" id="toc-h"><span class="ja">目次</span><span class="en">Contents</span><span class="zh">目录</span></p>
+    <ol class="ab-toc-list" id="tocList">
+      <li><a href="#why"><span class="ab-toc-no" aria-hidden="true">01</span><span class="ab-toc-t"><span class="ja">なぜ作ったか</span><span class="en">Why we built it</span><span class="zh">为什么要做</span></span></a></li>
+      <li><a href="#how"><span class="ab-toc-no" aria-hidden="true">02</span><span class="ab-toc-t"><span class="ja">どう動くか</span><span class="en">How it works</span><span class="zh">如何运作</span></span></a></li>
+      <li><a href="#trust"><span class="ab-toc-no" aria-hidden="true">03</span><span class="ab-toc-t"><span class="ja">どこまで信じてよいか</span><span class="en">How far to trust it</span><span class="zh">可信的范围</span></span></a></li>
+      <li><a href="#privacy"><span class="ab-toc-no" aria-hidden="true">04</span><span class="ab-toc-t"><span class="ja">情報の扱い</span><span class="en">Your data</span><span class="zh">信息处理</span></span></a></li>
+      <li><a href="#trial"><span class="ab-toc-no" aria-hidden="true">05</span><span class="ab-toc-t"><span class="ja">テスト運用と校舎</span><span class="en">The trial &amp; buildings</span><span class="zh">试运营与教学楼</span></span></a></li>
+      <li><a href="#history"><span class="ab-toc-no" aria-hidden="true">06</span><span class="ab-toc-t"><span class="ja">これまでの歩み</span><span class="en">The story so far</span><span class="zh">一路走来</span></span></a></li>
+      <li><a href="#members"><span class="ab-toc-no" aria-hidden="true">07</span><span class="ab-toc-t"><span class="ja">開発メンバー</span><span class="en">The team</span><span class="zh">开发成员</span></span></a></li>
+      <li><a href="#faq"><span class="ab-toc-no" aria-hidden="true">08</span><span class="ab-toc-t"><span class="ja">よくある質問</span><span class="en">FAQ</span><span class="zh">常见问题</span></span></a></li>
+      <li><a href="#voice"><span class="ab-toc-no" aria-hidden="true">09</span><span class="ab-toc-t"><span class="ja">意見を送る</span><span class="en">Feedback</span><span class="zh">提意见</span></span></a></li>
+    </ol>
+    <a class="ab-toc-open" data-place="sticky" href="https://nust-room-search.onrender.com"><span class="ja"><span class="ab-d">RoomRadarを</span>開く</span><span class="en">Open<span class="ab-d"> RoomRadar</span></span><span class="zh">打开<span class="ab-d">RoomRadar</span></span><span aria-hidden="true">→</span></a>
+  </nav>
+
+  <div class="ab-chapters">
+
+  <!-- ════════════════════════════════════════════
+       01 なぜ作ったか
+  ════════════════════════════════════════════ -->
+  <section class="ab-ch" id="why" aria-labelledby="why-h">
+    <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">01</span><span class="ab-ch-name"><span class="ja">なぜ作ったか</span><span class="en">Why we built it</span><span class="zh">为什么要做</span></span></p>
+    <h2 class="ab-h2" id="why-h"><span class="ja"><span class="ab-nb">空いている教室は、</span><span class="ab-nb">あるはずなのに。</span></span><span class="en">There must be an empty room somewhere.</span><span class="zh"><span class="ab-nb">明明应该有</span><span class="ab-nb">空教室的。</span></span></h2>
+    <div class="ab-prose">
+      <p class="ab-lead"><span class="ja">空きコマに、課題を進めたい。友だちと打合せをしたい。少し休みたい。そう思って教室を探しはじめると、思ったより時間が<span class="ab-nb">かかります。</span></span><span class="en">A free period. You want to get some work done, meet up with friends, or just take a break. Then you start looking for a room, and it takes longer than you expected.</span><span class="zh">没课的时候，想写写作业，想和朋友讨论一下，或者只是想歇一会儿。可一旦开始找教室，花的时间往往比<span class="ab-nb">想象的多。</span></span></p>
+      <p class="reveal"><span class="ja">タワー・スコラを、上から下まで歩き回る。「空き」だと思ってドアを開けたら、授業中だった。RoomRadar が解決したいのは、こういう困りごとです。公開されている時間割表から授業のない教室を拾えば、歩き回る前に見当が<span class="ab-nb">つきます。</span></span><span class="en">Walking Tower Schola from top to bottom. Opening a door you thought was free, and finding a class. That is what RoomRadar is for: pick out the rooms with no class from the published timetables, and you know where to look before you start walking.</span><span class="zh">把 Tower Schola 从上到下跑一遍。以为是空教室，推开门却发现正在上课。RoomRadar 想解决的，就是这些麻烦。只要从公开的课程表里找出没有课的教室，出发之前心里就<span class="ab-nb">有数了。</span></span></p>
     </div>
-    <h2 class="section-title reveal">
-      <span class="ja">学生が作った、学生のための<br>サービスです。</span>
-      <span class="en">Built by students,<br>for students.</span>
-      <span class="zh">由学生开发，<br>为学生服务。</span>
-    </h2>
-    <div class="members-grid">
-      <div class="member-card reveal reveal-delay-1">
-        <div class="member-avatar">二</div>
-        <div class="member-name">二川 航大</div>
+
+    <figure class="ab-stats reveal">
+      <div class="ab-stat">
+        <p class="ab-stat-num"><span class="ab-num">88.9</span><span class="ab-unit">%</span></p>
+        <p class="ab-stat-label"><span class="ja">教室探しに不満<sup>※</sup></span><span class="en">Unhappy with room hunting<sup>*</sup></span><span class="zh">对找教室不满<sup>*</sup></span></p>
+      </div>
+      <div class="ab-stat">
+        <p class="ab-stat-num"><span class="ab-num">15–20</span><span class="ab-unit"><span class="ja">分</span><span class="en">min</span><span class="zh">分钟</span></span></p>
+        <p class="ab-stat-label"><span class="ja"><span class="ab-nb">教室探しだけで</span><span class="ab-nb">かかる時間</span><span class="ab-nb">（平均）<sup>※</sup></span></span><span class="en">Average time spent just finding a room<sup>*</sup></span><span class="zh"><span class="ab-nb">光是找教室</span><span class="ab-nb">平均花费的时间<sup>*</sup></span></span></p>
+      </div>
+      <figcaption><span class="ja">※ どちらも、RoomRadar 運営学生による非公式の学内アンケートより。</span><span class="en">* Both from an unofficial on-campus survey run by the RoomRadar student team.</span><span class="zh">* 均来自RoomRadar运营学生进行的非官方<span class="ab-nb">校内问卷。</span></span></figcaption>
+    </figure>
+
+    <figure class="ab-quote reveal">
+      <blockquote>
+        <p><span class="ja"><span class="ab-nb"><em class="ab-mark">「開けたら、</em></span><span class="ab-nb"><em class="ab-mark">空いてる」</em>を</span><span class="ab-nb">当たり前に。</span></span><span class="en">Make <em class="ab-mark">“open the door, and it's free”</em> the norm.</span><span class="zh">让<em class="ab-mark">“推开门，<span class="ab-nb">就是空的”</span></em><span class="ab-nb">成为理所当然。</span></span></p>
+      </blockquote>
+      <figcaption><span class="ja">検索画面に掲げている言葉です。これは目指している姿で、いまはまだ「かならず」とは言えません。だから、すぐ横に「開ける前に、ドア越しにチラッと確認を」と<span class="ab-nb">添えています。</span></span><span class="en">It's the line on our search screen. It's where we want to get to; we can't promise it yet. So right next to it we add: “Before you open, take a quick look through the door.”</span><span class="zh">这是搜索页面上写的一句话。这是我们想达到的样子，现在还不能说“一定”。所以旁边还加了一句：“开门之前，先隔着门<span class="ab-nb">看一眼。”</span></span></figcaption>
+    </figure>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       02 どう動くか（RoomRadar がすること → 使う人がすること）
+  ════════════════════════════════════════════ -->
+  <section class="ab-ch" id="how" aria-labelledby="how-h">
+    <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">02</span><span class="ab-ch-name"><span class="ja">どう動くか</span><span class="en">How it works</span><span class="zh">如何运作</span></span></p>
+    <h2 class="ab-h2" id="how-h"><span class="ja"><span class="ab-nb">時間割から、</span><span class="ab-nb">授業のないコマを</span><span class="ab-nb">拾います。</span></span><span class="en">It picks out the periods with no class.</span><span class="zh"><span class="ab-nb">从课程表里，</span><span class="ab-nb">找出没有课的时段。</span></span></h2>
+    <div class="ab-prose">
+      <p class="ab-lead reveal"><span class="ja">はじめの3つは RoomRadar が、あとの2つは使う人が<span class="ab-nb">します。</span></span><span class="en">RoomRadar does the first three steps; the last two are up to you.</span><span class="zh">前三步由 RoomRadar 完成，后两步靠<span class="ab-nb">使用者。</span></span></p>
+    </div>
+
+    <figure class="ab-pipe reveal">
+      <div class="ab-pipe-group is-app">
+        <h3 class="ab-pipe-head">
+          <span class="ab-pipe-who"><span class="ja">RoomRadar がすること</span><span class="en">What RoomRadar does</span><span class="zh">RoomRadar 做的事</span></span>
+          <span class="ab-pipe-tag"><span class="ja">時間割で分かる</span><span class="en">Known from the timetable</span><span class="zh">课程表能告诉我们的</span></span>
+        </h3>
+        <ol class="ab-pipe-steps">
+          <li class="ab-pipe-step">
+            <span class="ab-pipe-art" aria-hidden="true"><svg viewBox="0 0 160 110" focusable="false">
+              <rect class="w m" x="46" y="13" width="84" height="86" rx="7" transform="rotate(6 88 56)"/>
+              <rect class="w" x="34" y="11" width="88" height="88" rx="7"/>
+              <path class="t n" d="M49 30h13v13H49zM78.6 30h13v13h-13zM63.8 44h13v13h-13zM93.4 44h13v13h-13zM49 58h13v13H49zM108.2 58h13v13h-13zM78.6 72h13v13h-13zM63.8 86h13v12h-13z"/>
+              <path class="m" d="M48 29v70M62.8 29v70M77.6 29v70M92.4 29v70M107.2 29v70M34 43.5h88M34 57.5h88M34 71.5h88M34 85.5h88"/>
+              <path d="M34 29h88"/>
+              <path class="b n" d="M53.8 20a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0-3.4 0M68.6 20a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0-3.4 0M83.4 20a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0-3.4 0M98.2 20a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0-3.4 0M113 20a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0-3.4 0"/>
+            </svg></span>
+            <h4 class="ab-pipe-t"><span class="ab-pipe-no" aria-hidden="true">1</span><span class="ja">時間割表を読む</span><span class="en">Read the timetables</span><span class="zh">读取课程表</span></h4>
+            <p><span class="ja">教務ページで公開されている、理工学部と大学院などの時間割表（2025・2026年度）を<span class="ab-nb">読みます。</span></span><span class="en">We read the timetables published on the academic affairs page for the College of Science and Technology, the graduate school and others (AY2025 and AY2026).</span><span class="zh">读取教务页面公开的理工学部、研究生院等的课程表（2025・2026<span class="ab-nb">学年）。</span></span></p>
+          </li>
+          <li class="ab-pipe-step">
+            <span class="ab-pipe-art" aria-hidden="true"><svg viewBox="0 0 160 110" focusable="false">
+              <path class="w" d="M44 28v54c0 7 16.1 12.6 36 12.6S116 89 116 82V28"/>
+              <path class="t n" d="M44.8 47c2 5.9 16.8 10.4 35.2 10.4S113.2 52.9 115.2 47v18c-2 5.9-16.8 10.4-35.2 10.4S46.8 70.9 44.8 65z"/>
+              <path d="M44 46c0 7 16.1 12.6 36 12.6S116 53 116 46M44 64c0 7 16.1 12.6 36 12.6S116 71 116 64"/>
+              <ellipse class="w" cx="80" cy="28" rx="36" ry="12.6"/>
+              <path class="bl" d="M67 28.5l8 5.5 17-11.5"/>
+              <text class="tx" x="80" y="52.5" text-anchor="middle">2026</text>
+              <text class="tx" x="80" y="88.5" text-anchor="middle">2025</text>
+            </svg></span>
+            <h4 class="ab-pipe-t"><span class="ab-pipe-no" aria-hidden="true">2</span><span class="ja">データにまとめる</span><span class="en">Build one database</span><span class="zh">整理成数据</span></h4>
+            <p><span class="ja">教室名の全角・半角をそろえ、まとめて書かれた教室を1つずつに分けます。運営が確認できた教室変更も反映<span class="ab-nb">します。</span></span><span class="en">Room names in mixed character widths are unified, and rooms listed together are split into single rooms. Room changes our team has confirmed are applied here too.</span><span class="zh">统一教室名称的全角、半角写法，把合写在一起的教室拆成一间一间。运营方已确认的教室变更也在<span class="ab-nb">这里反映。</span></span></p>
+          </li>
+          <li class="ab-pipe-step">
+            <span class="ab-pipe-art" aria-hidden="true"><svg viewBox="0 0 160 110" focusable="false">
+              <rect class="t" x="20" y="16" width="34" height="30" rx="6"/>
+              <rect class="w m" x="60" y="16" width="34" height="30" rx="6"/>
+              <rect class="t" x="100" y="16" width="34" height="30" rx="6"/>
+              <rect class="w m" x="20" y="54" width="34" height="30" rx="6"/>
+              <rect class="t" x="60" y="54" width="34" height="30" rx="6"/>
+              <rect class="w m" x="100" y="54" width="34" height="30" rx="6"/>
+              <path class="bl" d="M30.5 31.5l4.5 4.5 8.5-9M110.5 31.5l4.5 4.5 8.5-9M70.5 69.5l4.5 4.5 8.5-9"/>
+              <path class="m" d="M69 31h16M29 69h16M109 69h16"/>
+              <circle class="lens" cx="80" cy="68" r="21"/>
+              <path class="hd" d="M95.5 83.5L112 100"/>
+            </svg></span>
+            <h4 class="ab-pipe-t"><span class="ab-pipe-no" aria-hidden="true">3</span><span class="ja">「空き」を出す</span><span class="en">Show the free&nbsp;rooms</span><span class="zh">列出空闲教室</span></h4>
+            <p><span class="ja">選んだ曜日・時限に授業が1つも無い教室が「空き」。開いた瞬間は、いまの時限（休み時間なら次、授業が終わったあとと日曜は次の授業日の<span class="ab-nb">1限</span>）を<span class="ab-nb">出します。</span></span><span class="en">Rooms with no class in the day and period you choose are “free”. On opening, it shows the current period (the next one during a break; after the last class and on Sundays, period 1 of the next class day).</span><span class="zh">所选星期、时段里一节课都没有的教室就是“空闲”。打开时显示当前时段（课间显示下一节；当天课程结束后和周日，显示下一个上课日的<span class="ab-nb">第1节</span>）。</span></p>
+          </li>
+        </ol>
+      </div>
+
+      <div class="ab-pipe-group is-you">
+        <h3 class="ab-pipe-head">
+          <span class="ab-pipe-who"><span class="ja">使う人がすること</span><span class="en">What you do</span><span class="zh">使用者做的事</span></span>
+          <span class="ab-pipe-tag"><span class="ja">行って分かる</span><span class="en">Known only at the door</span><span class="zh">到了门口才知道的</span></span>
+        </h3>
+        <ol class="ab-pipe-steps" start="4">
+          <li class="ab-pipe-step">
+            <span class="ab-pipe-art" aria-hidden="true"><svg viewBox="0 0 160 110" focusable="false">
+              <path d="M22 99h116"/>
+              <rect class="w" x="68" y="11" width="52" height="88" rx="3"/>
+              <rect class="t" x="79" y="22" width="30" height="32" rx="3"/>
+              <path class="m dash" d="M94 33.5a4.5 4.5 0 1 0 .01 0M85.5 54c0-8 17-8 17 0"/>
+              <path class="hd" d="M110 68v8"/>
+              <path class="w" d="M18 40c7.5-10 22.5-10 30 0c-7.5 10-22.5 10-30 0z"/>
+              <circle class="b n" cx="33" cy="40" r="4.6"/>
+              <path class="bl dash" d="M53 39.5l21-2.5"/>
+            </svg></span>
+            <h4 class="ab-pipe-t"><span class="ab-pipe-no" aria-hidden="true">4</span><span class="ja">ドア越しに確かめる</span><span class="en">Check through the door</span><span class="zh">隔着门确认</span></h4>
+            <p><span class="ja">時間割にない使われ方は、RoomRadar には見えません。入る前に、ドア越しに中を<span class="ab-nb">見てください。</span></span><span class="en">RoomRadar can't see use that isn't on the timetable. Look through the door before you go in.</span><span class="zh">课程表上没有的使用情况，RoomRadar 看不到。进门前请先隔着门<span class="ab-nb">看一眼。</span></span></p>
+          </li>
+          <li class="ab-pipe-step">
+            <span class="ab-pipe-art" aria-hidden="true"><svg viewBox="0 0 160 110" focusable="false">
+              <path class="w" d="M42 10h76a8 8 0 0 1 8 8v36a8 8 0 0 1-8 8H91l-11 11-11-11H42a8 8 0 0 1-8-8V18a8 8 0 0 1 8-8z"/>
+              <path class="o" d="M80 19.5l15.5 27h-31z"/>
+              <path class="od" d="M80 29v8.5M80 41.7v.2"/>
+              <circle class="w" cx="44" cy="84" r="6.5"/>
+              <path class="w" d="M31 104c0-11 26-11 26 0"/>
+              <circle class="w" cx="116" cy="84" r="6.5"/>
+              <path class="w" d="M103 104c0-11 26-11 26 0"/>
+            </svg></span>
+            <h4 class="ab-pipe-t"><span class="ab-pipe-no" aria-hidden="true">5</span><span class="ja">使われていたら報告</span><span class="en">Report it if it's in&nbsp;use</span><span class="zh">有人在用就报告</span></h4>
+            <p><span class="ja">「⚠ 実は使われていた」を押すと、次に探す人に伝わります。押したあとは、同じ校舎の別の空き教室を<span class="ab-nb">3つまで</span>案内<span class="ab-nb">します。</span></span><span class="en">Press <span class="ab-ui" lang="ja">「⚠ 実は使われていた」</span> (actually in use) to let the next person know. The app then suggests up to three other free rooms in the same building.</span><span class="zh">按下<span class="ab-ui" lang="ja">“⚠ 実は使われていた”</span>（其实有人在用），下一个找教室的人就能看到。之后会推荐同一栋楼里最多3间其他<span class="ab-nb">空教室。</span></span></p>
+          </li>
+        </ol>
+      </div>
+    </figure>
+
+    <div class="ab-also reveal">
+      <p class="ab-also-h"><span class="ja">ほかにできること</span><span class="en">Also in the app</span><span class="zh">其他功能</span></p>
+      <ul class="ab-chips">
+        <li><span class="ja">年度・学期の切り替え</span><span class="en">Year and term</span><span class="zh">学年・学期切换</span></li>
+        <li><span class="ja">教室名・番号で探す</span><span class="en">Search by room</span><span class="zh">按教室查找</span></li>
+        <li><span class="ja">いま・次・明日</span><span class="en">Now / next / tomorrow</span><span class="zh">现在・下一节・明天</span></li>
+        <li><span class="ja">前の校舎を覚える</span><span class="en">Remembers your building</span><span class="zh">记住上次的教学楼</span></li>
+        <li><span class="ja">ホーム画面に追加</span><span class="en">Add to home screen</span><span class="zh">添加到主屏幕</span></li>
+        <li><span class="ja">季節の見た目（戻せる）</span><span class="en">Seasonal looks (can be turned off)</span><span class="zh">季节外观（可关闭）</span></li>
+      </ul>
+      <p class="ab-more-p"><a class="ab-more" href="index.html#features"><span class="ja">できることの一覧を見る（紹介ページ）</span><span class="en">See everything it does (home page)</span><span class="zh">查看全部功能（首页）</span><span class="ab-more-a" aria-hidden="true">→</span></a></p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       03 どこまで信じてよいか
+  ════════════════════════════════════════════ -->
+  <section class="ab-ch" id="trust" aria-labelledby="trust-h">
+    <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">03</span><span class="ab-ch-name"><span class="ja">どこまで信じてよいか</span><span class="en">How far to trust it</span><span class="zh">可信的范围</span></span></p>
+    <h2 class="ab-h2" id="trust-h"><span class="ja"><span class="ab-nb">「空き」は、</span><span class="ab-nb">時間割の上の</span><span class="ab-nb">話です。</span></span><span class="en">“Free” means free on the timetable.</span><span class="zh"><span class="ab-nb">“空闲”只是</span><span class="ab-nb">课程表上的空闲。</span></span></h2>
+    <div class="ab-prose">
+      <p class="ab-lead reveal"><span class="ja">いちばん大事なことです。「空き」は、時間割に授業が入っていないという意味で、使ってよいという許可では<span class="ab-nb">ありません。</span></span><span class="en">This is the most important part. “Free” means no class is scheduled there. It is not permission to use the room.</span><span class="zh">这是最重要的一点。“空闲”的意思是课程表上没有排课，并不是<span class="ab-nb">使用许可。</span></span></p>
+    </div>
+
+    <div class="ab-know reveal">
+      <div class="ab-know-col is-yes">
+        <h3 class="ab-know-h"><span class="ab-know-ico" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span><span class="ja">RoomRadar に<span class="ab-nb">分かること</span></span><span class="en">What RoomRadar knows</span><span class="zh">RoomRadar 知道的</span></span></h3>
+        <p class="ab-know-sub"><span class="ja">ドアの手前 ― 時間割と報告から</span><span class="en">This side of the door: the timetable and reports</span><span class="zh">门的这一侧：来自课程表和报告</span></p>
+        <ul>
+          <li><span class="ja">その曜日・時限に、時間割で授業が入っている<span class="ab-nb">かどうか</span></span><span class="en">Whether the timetable has a class there for that day and period</span><span class="zh">课程表上那个星期、那个时段<span class="ab-nb">有没有排课</span></span></li>
+          <li><span class="ja">何限まで続けて空いているか</span><span class="en">How many periods in a row a room stays free</span><span class="zh">能连续空到第几节</span></li>
+          <li><span class="ja">運営が確認できた教室変更</span><span class="en">Room changes our team has confirmed</span><span class="zh">运营方已确认的教室变更</span></li>
+          <li><span class="ja">その時限に「実は使われていた」の報告が<span class="ab-nb">あったか</span></span><span class="en">Whether anyone reported the room as in use this period</span><span class="zh">该时段有没有人报告<span class="ab-nb">“其实有人在用”</span></span></li>
+        </ul>
+      </div>
+      <div class="ab-door" aria-hidden="true">
+        <svg viewBox="0 0 72 112" focusable="false">
+          <rect class="w" x="14" y="8" width="44" height="96" rx="3"/>
+          <rect class="t" x="23" y="18" width="26" height="30" rx="3"/>
+          <path class="hd" d="M49 62v9"/>
+          <path d="M4 104h64"/>
+        </svg>
+      </div>
+      <div class="ab-know-col is-no">
+        <h3 class="ab-know-h"><span class="ab-know-ico" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 7l10 10M17 7L7 17"/></svg></span><span><span class="ja">RoomRadar に<span class="ab-nb">分からないこと</span></span><span class="en">What it can't know</span><span class="zh">RoomRadar 不知道的</span></span></h3>
+        <p class="ab-know-sub"><span class="ja">ドアの向こう ― 行ってみないと<span class="ab-nb">分からない</span></span><span class="en">Behind the door: you only know once you're there</span><span class="zh">门的另一侧：到了才知道</span></p>
+        <ul>
+          <li><span class="ja">いま、教室に人がいるかどうか</span><span class="en">Whether anyone is in the room right now</span><span class="zh">此刻教室里有没有人</span></li>
+          <li><span class="ja">休講・補講</span><span class="en">Cancelled and make-up classes</span><span class="zh">停课、补课</span></li>
+          <li><span class="ja">運営が確認できていない<span class="ab-nb">急な教室変更</span></span><span class="en">Sudden room changes our team hasn't confirmed</span><span class="zh">运营方尚未确认的临时教室变更</span></li>
+          <li><span class="ja">試験・時間割にない授業</span><span class="en">Exams and classes not on the timetable</span><span class="zh">考试、课程表上没有的课</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="ab-know-note reveal"><span class="ja">たとえば補講は、時間割に載っていないので「空き」のまま出ます。休講は反対に、時間割どおり「授業あり」のままで、空きの一覧には<span class="ab-nb">出ません。</span></span><span class="en">A make-up class isn't on the timetable, so its room still shows as free. A cancelled class is the reverse: the room stays “class scheduled” and out of the free list.</span><span class="zh">例如补课不在课程表上，所以教室仍显示为空闲。停课则相反，仍按课程表算作有课，不会出现在空闲<span class="ab-nb">名单中。</span></span></p>
+
+    <p class="ab-callout reveal">
+      <svg class="ab-callout-ico" viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 42V8a2 2 0 0 1 2-2h20a2 2 0 0 1 2 2v34"/><path d="M6 42h36"/><rect x="18" y="12" width="12" height="10" rx="1.5"/><circle cx="30.5" cy="30" r="1.5" fill="currentColor" stroke="none"/></svg>
+      <span class="ab-callout-t"><span class="ja"><span class="ab-nb">だから、入る前に</span><span class="ab-nb">ドア越しに確認を。</span></span><span class="en">So check through the door before you go in.</span><span class="zh"><span class="ab-nb">所以，进门前请先</span><span class="ab-nb">隔着门确认。</span></span><small><span class="ja">授業が優先です。</span><span class="en">Classes come first.</span><span class="zh">课程优先。</span></small></span>
+    </p>
+
+    <h3 class="ab-h3" id="report-h"><span class="ja"><span class="ab-nb">使われていたら、</span><span class="ab-nb">次の人に知らせる</span></span><span class="en">If it's in use, let the next person know</span><span class="zh"><span class="ab-nb">有人在用时，</span><span class="ab-nb">告诉下一个人</span></span></h3>
+    <div class="ab-prose">
+      <p class="reveal"><span class="ja">報告が時間割にどう重なるか、架空の教室の1日で<span class="ab-nb">見てみます。</span></span><span class="en">Here's how reports and the timetable play out over one day in a made-up room.</span><span class="zh">下面用一间虚构教室的一天，看看报告如何叠加在<span class="ab-nb">课程表上。</span></span></p>
+    </div>
+
+    <figure class="ab-day reveal" aria-labelledby="day-cap">
+      <figcaption class="ab-day-cap" id="day-cap"><b><span class="ja">ある教室の1日</span><span class="en">One room, one day</span><span class="zh">一间教室的一天</span></b><span class="ab-day-fic"><span class="ja">架空の教室の例です。右の札は表示のイメージです（実際の画面とは色や形が違います）。</span><span class="en">A made-up room. The cards on the right are only an impression of the display (the real screen differs in colour and shape).</span><span class="zh">虚构教室的例子。右侧卡片只是显示效果的示意（与实际画面的颜色和形状不同）。</span></span></figcaption>
+      <div class="ab-daybar" aria-hidden="true">
+        <div class="ab-bar">
+          <span class="ab-seg s-class"><b>1</b></span><span></span>
+          <span class="ab-seg s-free"><b>2</b></span><span class="ab-lunch"></span>
+          <span class="ab-seg s-rep1"><b>3</b><i>⚠</i></span><span></span>
+          <span class="ab-seg s-busy"><b>4</b><i>⚠⚠</i></span><span></span>
+          <span class="ab-seg s-alt"><b>5</b></span><span></span>
+          <span class="ab-seg s-free"><b>6</b></span>
+        </div>
+        <div class="ab-ticks"><span>9:00</span><span>12:30</span><span>13:20</span><span>20:30</span></div>
+      </div>
+      <ol class="ab-slots">
+        <li class="ab-slot">
+          <p class="ab-slot-when"><b><span class="ja">1限</span><span class="en">P1</span><span class="zh">第1节</span></b><span class="ab-mono">9:00–10:40</span></p>
+          <span class="ab-mock is-none" aria-hidden="true"><span class="ja">一覧に出ない</span><span class="en">Not listed</span><span class="zh">不显示</span></span>
+          <span class="ab-tag2 t-class"><span class="ja">授業あり</span><span class="en">Class</span><span class="zh">有课</span></span>
+          <p class="ab-slot-text"><span class="ja">空きの一覧には出ません。</span><span class="en">Not in the free list.</span><span class="zh">不会出现在空闲名单中。</span></p>
+        </li>
+        <li class="ab-slot">
+          <p class="ab-slot-when"><b><span class="ja">2限</span><span class="en">P2</span><span class="zh">第2节</span></b><span class="ab-mono">10:50–12:30</span></p>
+          <span class="ab-mock" aria-hidden="true" lang="ja"><b>教室A</b><small>空き</small></span>
+          <span class="ab-tag2 t-free"><span class="ja">授業なし</span><span class="en">No class</span><span class="zh">没课</span></span>
+          <p class="ab-slot-text"><span class="ja">「空き」として一覧に出ます。</span><span class="en">Shown in the free list.</span><span class="zh">作为“空闲”出现在名单中。</span></p>
+        </li>
+        <li class="ab-slot">
+          <p class="ab-slot-when"><b><span class="ja">3限</span><span class="en">P3</span><span class="zh">第3节</span></b><span class="ab-mono">13:20–15:00</span></p>
+          <span class="ab-mock is-rep" aria-hidden="true" lang="ja"><b>教室A</b><small>⚠1件報告</small></span>
+          <span class="ab-tag2 t-rep"><span class="ja">報告1人</span><span class="en">1 report</span><span class="zh">报告1人</span></span>
+          <p class="ab-slot-text"><span class="ja">一覧に残ったまま、「⚠1件報告」と<span class="ab-nb">出ます。</span></span><span class="en">Stays in the list, marked <span class="ab-ui" lang="ja">「⚠1件報告」</span> (1 report).</span><span class="zh">仍留在名单中，显示<span class="ab-ui" lang="ja">“⚠1件報告”</span>（1条<span class="ab-nb">报告）。</span></span></p>
+        </li>
+        <li class="ab-slot">
+          <p class="ab-slot-when"><b><span class="ja">4限</span><span class="en">P4</span><span class="zh">第4节</span></b><span class="ab-mono">15:10–16:50</span></p>
+          <span class="ab-mock is-busy" aria-hidden="true" lang="ja"><em>使用中の可能性</em><b>教室A</b></span>
+          <span class="ab-tag2 t-busy"><span class="ja">報告2人</span><span class="en">2 reports</span><span class="zh">报告2人</span></span>
+          <p class="ab-slot-text"><span class="ja">2人以上でグレーの「使用中の可能性」に。4限が終わると、報告は自動で<span class="ab-nb">消えます。</span></span><span class="en">Two or more reports turn it grey: <span class="ab-ui" lang="ja">「使用中の可能性」</span> (may be in use). They go when period 4 ends.</span><span class="zh">2人以上报告后变灰，显示<span class="ab-ui" lang="ja">“使用中の可能性”</span>（可能在使用中）。第4节结束后，报告<span class="ab-nb">自动删除。</span></span></p>
+        </li>
+        <li class="ab-slot">
+          <p class="ab-slot-when"><b><span class="ja">5限</span><span class="en">P5</span><span class="zh">第5节</span></b><span class="ab-mono">17:00–18:40</span></p>
+          <span class="ab-mock is-alt" aria-hidden="true" lang="ja"><small>週によっては空き<br>（隔週の授業）</small></span>
+          <span class="ab-tag2 t-alt"><span class="ja">隔週の授業</span><span class="en">Alternate weeks</span><span class="zh">隔周的课</span></span>
+          <p class="ab-slot-text"><span class="ja">どちらの週か時間割から分からないので、空きとは分けて出します。授業がある週は<span class="ab-nb">使えません。</span></span><span class="en">The timetable doesn't say which weeks, so it is listed apart. Not usable in class weeks.</span><span class="zh">课程表看不出是哪一周，所以与空闲教室分开显示。有课的那一周<span class="ab-nb">不能使用。</span></span></p>
+        </li>
+        <li class="ab-slot">
+          <p class="ab-slot-when"><b><span class="ja">6限</span><span class="en">P6</span><span class="zh">第6节</span></b><span class="ab-mono">18:50–20:30</span></p>
+          <span class="ab-mock" aria-hidden="true" lang="ja"><b>教室A</b><small>空き</small></span>
+          <span class="ab-tag2 t-free"><span class="ja">授業なし</span><span class="en">No class</span><span class="zh">没课</span></span>
+          <p class="ab-slot-text"><span class="ja">報告は時限ごとなので、4限の報告は<span class="ab-nb">残っていません。</span></span><span class="en">Reports are per period, so the period-4 reports are gone.</span><span class="zh">报告按时段计算，第4节的报告已经<span class="ab-nb">不在了。</span></span></p>
+        </li>
+      </ol>
+    </figure>
+
+    <div class="ab-report">
+      <div class="ab-rules reveal">
+        <p class="ab-rules-h"><span class="ja">報告の決まり</span><span class="en">How reports work</span><span class="zh">报告的规则</span></p>
+        <dl>
+          <div><dt><span class="ja">2人から</span><span class="en">Two or more</span><span class="zh">2人起</span></dt><dd><span class="ja">「使用中の可能性」になるのは、2人以上が報告した<span class="ab-nb">ときだけです。</span></span><span class="en">A room becomes <span class="ab-ui" lang="ja">「使用中の可能性」</span> only when two or more people report it.</span><span class="zh">只有2人以上报告时，才会显示<span class="ab-ui" lang="ja">“使用中の可能性”</span>。</span></dd></div>
+          <div><dt><span class="ja">1人分</span><span class="en">One per person</span><span class="zh">只算1人</span></dt><dd><span class="ja">同じ人が何度押しても、<span class="ab-nb">1人分です。</span></span><span class="en">Pressing again and again still counts as one person.</span><span class="zh">同一个人按多少次，都<span class="ab-nb">只算1人。</span></span></dd></div>
+          <div><dt><span class="ja">3教室まで</span><span class="en">Up to 3</span><span class="zh">最多3间</span></dt><dd><span class="ja">1人が同じ曜日・時限に報告できるのは、<span class="ab-nb">3教室までです。</span></span><span class="en">One person can report up to three rooms for the same day and&nbsp;period.</span><span class="zh">同一星期、同一时段，1人最多可以报告3<span class="ab-nb">间教室。</span></span></dd></div>
+          <div><dt><span class="ja">時限の終わり</span><span class="en">Period end</span><span class="zh">时段结束</span></dt><dd><span class="ja">時限が終わると自動で消えます。アプリの更新などで途中に消えたときは、気づいた人がもう一度<span class="ab-nb">報告してください。</span></span><span class="en">Deleted automatically when the period ends. If they vanish mid-period (for example, when the app is updated), whoever notices can report again.</span><span class="zh">时段结束后自动删除。如因应用更新等中途消失，请发现的人再<span class="ab-nb">报告一次。</span></span></dd></div>
+          <div><dt><span class="ja">取り消し</span><span class="en">Undo</span><span class="zh">取消</span></dt><dd><span class="ja">報告した端末で同じ教室を開き、<span class="ab-nb">「✓ 報告済み（タップで取り消し）」</span>から。取り消しのコードを持つのは報告した端末だけなので、ほかの端末からは取り消せません。「使用中の可能性」になった教室は開けないので、時限の終わりを<span class="ab-nb">待ちます。</span></span><span class="en">Open the same room on the device you reported from and tap <span class="ab-ui" lang="ja">「✓ 報告済み（タップで取り消し）」</span>. Only the device you reported from keeps the undo code, so you can't undo from another device. A room marked <span class="ab-ui" lang="ja">「使用中の可能性」</span> can't be opened, so those reports expire at the end of the period.</span><span class="zh">在报告时用的设备上打开同一间教室，点<span class="ab-ui" lang="ja">“✓ 報告済み（タップで取り消し）”</span>即可取消。只有报告时用的设备保存着取消代码，所以无法在其他设备上取消。已显示<span class="ab-ui" lang="ja">“使用中の可能性”</span>的教室无法打开，只能等时段结束后<span class="ab-nb">自动删除。</span></span></dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="ab-manners reveal">
+      <h3 class="ab-manners-h"><span class="ja"><span class="ab-nb">空き教室は、</span><span class="ab-nb">みんなで使う場所です</span></span><span class="en">Empty classrooms are shared spaces</span><span class="zh"><span class="ab-nb">空教室是</span><span class="ab-nb">大家共用的地方</span></span></h3>
+      <p class="ab-manners-lead"><span class="ja">使う目的は人それぞれです。お互いの目的を尊重して、周りに配慮して<span class="ab-nb">使いましょう。</span><span class="ab-nb">授業が優先です。</span></span><span class="en">Everyone uses them differently. Respect each other and be considerate. Classes come first.</span><span class="zh">使用目的因人而异。请互相尊重，<span class="ab-nb">照顾周围的人。</span><span class="ab-nb">课程优先。</span></span></p>
+      <ul class="ab-manners-chips">
+        <li><span class="ja">個人学習</span><span class="en">Solo study</span><span class="zh">个人学习</span></li>
+        <li><span class="ja">グループワーク</span><span class="en">Group work</span><span class="zh">小组作业</span></li>
+        <li><span class="ja">学生同士の打合せ</span><span class="en">Student meetings</span><span class="zh">学生讨论</span></li>
+        <li><span class="ja">授業の合間の休憩</span><span class="en">A break between classes</span><span class="zh">课间休息</span></li>
+      </ul>
+      <p class="ab-manners-note"><span class="ja">静かに学習したいときは、図書館か1号館の<span class="ab-nb">CSTギャラリーへ。</span></span><span class="en">For quiet study, head to the library or the CST Gallery in Building 1.</span><span class="zh">需要安静学习时，请前往图书馆或1号馆的CST Gallery。</span></p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       04 情報の扱い（何を・どこに・いつ消えるか）
+  ════════════════════════════════════════════ -->
+  <section class="ab-ch" id="privacy" aria-labelledby="privacy-h">
+    <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">04</span><span class="ab-ch-name"><span class="ja">情報の扱い</span><span class="en">Your data</span><span class="zh">信息处理</span></span></p>
+    <h2 class="ab-h2" id="privacy-h"><span class="ja"><span class="ab-nb">検索アプリは、</span><span class="ab-nb">名前も学籍番号も</span><span class="ab-nb">聞きません。</span></span><span class="en">The app never asks for your name or student ID.</span><span class="zh"><span class="ab-nb">搜索应用</span><span class="ab-nb">不会询问</span><span class="ab-nb">你的姓名和学号。</span></span></h2>
+    <div class="ab-prose">
+      <p class="ab-lead reveal"><span class="ja">会員登録もログインもありません。残るものと、消えるときを表に<span class="ab-nb">しました。</span></span><span class="en">No sign-up, no login. Here is what is kept, where, and when it goes.</span><span class="zh">不需要注册和登录。会留下什么、何时删除，<span class="ab-nb">见下表。</span></span></p>
+    </div>
+
+    <div class="ab-tablebox reveal">
+      <table class="ab-table" role="table">
+        <caption class="ab-vh"><span class="ja">保存するもの・置き場所・消えるとき</span><span class="en">What is stored, where, and when it is deleted</span><span class="zh">保存的内容、位置和删除时间</span></caption>
+        <thead role="rowgroup">
+          <tr role="row">
+            <th scope="col" role="columnheader"><span class="ja">項目</span><span class="en">Item</span><span class="zh">项目</span></th>
+            <th scope="col" role="columnheader"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></th>
+            <th scope="col" role="columnheader"><span class="ja">どこに</span><span class="en">Where</span><span class="zh">位置</span></th>
+            <th scope="col" role="columnheader"><span class="ja">いつ消えるか</span><span class="en">Deleted</span><span class="zh">何时删除</span></th>
+          </tr>
+        </thead>
+        <tbody role="rowgroup">
+          <tr role="row">
+            <th scope="row" role="rowheader"><span class="ja"><span class="ab-nb">「実は使われていた」</span><span class="ab-nb">の報告</span></span><span class="en">“In use” reports</span><span class="zh"><span class="ab-nb">“其实有人在用”</span><span class="ab-nb">的报告</span></span></th>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></span><span class="ab-td"><span class="ja">教室・曜日・時限、取り消し用のコード、報告した人を見分ける識別子（IPアドレスを<span class="ab-nb">ハッシュ化</span><span class="ab-nb">したもの）</span></span><span class="en">Room, day and period; an undo code; an identifier that tells reporters apart (a hash of the IP address)</span><span class="zh">教室、星期、时段；取消用的代码；区分报告者的标识（IP地址的<span class="ab-nb">哈希值）</span></span></span></td>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">どこに</span><span class="en">Where</span><span class="zh">位置</span></span><span class="ab-td"><span class="ab-where is-server"><span class="ja"><span class="ab-nb">アプリの</span><span class="ab-nb">サーバー</span></span><span class="en">The app's&nbsp;server</span><span class="zh">应用的服务器</span></span></span></td>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">いつ消えるか</span><span class="en">Deleted</span><span class="zh">何时删除</span></span><span class="ab-td"><span class="ab-when"><span class="ja"><span class="ab-nb">その時限が</span><span class="ab-nb">終わると、</span><span class="ab-nb">自動で</span></span><span class="en">Automatically, when the period&nbsp;ends</span><span class="zh">该时段结束后<span class="ab-nb">自动删除</span></span></span></span></td>
+          </tr>
+          <tr role="row">
+            <th scope="row" role="rowheader"><span class="ja"><span class="ab-nb">前に選んだ</span><span class="ab-nb">条件</span></span><span class="en">Your last settings</span><span class="zh">上次选择的条件</span></th>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></span><span class="ab-td"><span class="ja">選んだ校舎と「続けて使う」コマ数（自分で選んだ<span class="ab-nb">ときだけ）</span></span><span class="en">The building and “periods in a row” (only when you choose them)</span><span class="zh">所选教学楼和“连续使用”的节数（仅在你自己<span class="ab-nb">选择时）</span></span></span></td>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">どこに</span><span class="en">Where</span><span class="zh">位置</span></span><span class="ab-td"><span class="ab-where is-device"><span class="ja"><span class="ab-nb">この端末の</span> <span class="ab-nb">Cookie</span></span><span class="en">A cookie on&nbsp;this&nbsp;device</span><span class="zh">本设备的 Cookie</span></span></span></td>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">いつ消えるか</span><span class="en">Deleted</span><span class="zh">何时删除</span></span><span class="ab-td"><span class="ab-when"><span class="ja">保存から半年</span><span class="en">Six months after&nbsp;saving</span><span class="zh">保存后半年</span></span></span></td>
+          </tr>
+          <tr role="row">
+            <th scope="row" role="rowheader"><span class="ja"><span class="ab-nb">端末の中の</span><span class="ab-nb">覚え書き</span></span><span class="en">Notes in your browser</span><span class="zh">浏览器里的记录</span></th>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></span><span class="ab-td"><span class="ja">選んだ見た目、最近見た教室、取り消し用の<span class="ab-nb">コードなど</span></span><span class="en">Your chosen look, recent rooms, undo codes and so on</span><span class="zh">所选外观、最近查看的教室、取消代码等</span></span></td>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">どこに</span><span class="en">Where</span><span class="zh">位置</span></span><span class="ab-td"><span class="ab-where is-device"><span class="ja"><span class="ab-nb">この端末の</span><span class="ab-nb">ブラウザ</span></span><span class="en">The browser on&nbsp;this&nbsp;device</span><span class="zh">本设备的浏览器</span></span></span></td>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">いつ消えるか</span><span class="en">Deleted</span><span class="zh">何时删除</span></span><span class="ab-td"><span class="ab-when"><span class="ja"><span class="ab-nb">サイトのデータを</span><span class="ab-nb">消すまで</span></span><span class="en">When you clear site&nbsp;data</span><span class="zh">直到清除<span class="ab-nb">网站数据</span></span></span></span></td>
+          </tr>
+          <tr role="row">
+            <th scope="row" role="rowheader"><span class="ja">操作の記録</span><span class="en">Usage records</span><span class="zh">操作记录</span></th>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></span><span class="ab-td"><span class="ja">検索した条件、開いた教室、報告の回数など。名前などを送る処理は<span class="ab-nb">ありません</span></span><span class="en">What you searched, rooms opened, number of reports and so on. Nothing in our code sends your name or similar details</span><span class="zh">搜索条件、打开的教室、报告次数等。代码中不会发送姓名等<span class="ab-nb">个人信息</span></span></span></td>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">どこに</span><span class="en">Where</span><span class="zh">位置</span></span><span class="ab-td"><span class="ab-where is-ext"><span class="ja"><span class="ab-nb">Google</span> <span class="ab-nb">アナリティクス</span></span><span class="en">Google Analytics</span><span class="zh">Google Analytics</span></span></span></td>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">いつ消えるか</span><span class="en">Deleted</span><span class="zh">何时删除</span></span><span class="ab-td"><span class="ab-when"><span class="ja"><span class="ab-nb">Google の設定と</span><span class="ab-nb">決まりによります</span></span><span class="en">Per Google's settings and&nbsp;policies</span><span class="zh">按 Google 的<span class="ab-nb">设置和规定</span></span></span></span></td>
+          </tr>
+          <tr role="row">
+            <th scope="row" role="rowheader"><span class="ja"><span class="ab-nb">意見箱に</span><span class="ab-nb">書いた内容</span></span><span class="en">Feedback you send</span><span class="zh">意见箱的内容</span></th>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">何を</span><span class="en">What</span><span class="zh">内容</span></span><span class="ab-td"><span class="ja">運営メンバーが改善のために読みます。種類、ご意見・ご要望、連絡先<span class="ab-nb">（任意）</span></span><span class="en">The team reads it to improve the service. Category, your message, a contact (optional)</span><span class="zh">运营成员会阅读并用于改进。类型、意见内容、联系方式<span class="ab-nb">（可选）</span></span></span></td>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">どこに</span><span class="en">Where</span><span class="zh">位置</span></span><span class="ab-td"><span class="ab-where is-ext"><span class="ja"><span class="ab-nb">Google</span> <span class="ab-nb">フォーム</span></span><span class="en">Google Forms</span><span class="zh">Google 表单</span></span></span></td>
+            <td role="cell"><span class="ab-th" aria-hidden="true"><span class="ja">いつ消えるか</span><span class="en">Deleted</span><span class="zh">何时删除</span></span><span class="ab-td"><span class="ab-when"><span class="ja"><span class="ab-nb">自動では</span><span class="ab-nb">消えません</span><span class="ab-nb">（連絡先は</span><span class="ab-nb">書かなくても</span><span class="ab-nb">送れます）</span></span><span class="en">Not deleted automatically (you can leave the contact&nbsp;blank)</span><span class="zh">不会自动删除<span class="ab-nb">（可以不填</span><span class="ab-nb">联系方式）</span></span></span></span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="ab-legend2" aria-hidden="true"><span class="ab-where is-server"><span class="ja">サーバー</span><span class="en">Server</span><span class="zh">服务器</span></span><span class="ab-where is-device"><span class="ja">この端末</span><span class="en">This device</span><span class="zh">本设备</span></span><span class="ab-where is-ext"><span class="ja">外のサービス</span><span class="en">Outside service</span><span class="zh">外部服务</span></span></p>
+    </div>
+
+    <div class="ab-never reveal">
+      <p class="ab-never-h" id="never-h"><span class="ja">検索アプリが保存しないもの</span><span class="en">The app doesn't store</span><span class="zh">搜索应用不保存的</span></p>
+      <ul class="ab-chips is-never" aria-labelledby="never-h">
+        <li><span class="ja">名前・学籍番号・メールアドレス</span><span class="en">Name, student ID, email</span><span class="zh">姓名、学号、邮箱</span></li>
+        <li><span class="ja">IPアドレスそのもの</span><span class="en">Your IP address itself</span><span class="zh">IP地址本身</span></li>
+        <li><b class="ab-chip-k"><span class="ja">使わないもの：</span><span class="en">Not used: </span><span class="zh">不使用：</span></b><span class="ja"><span class="ab-nb">カメラ・</span><span class="ab-nb">マイク・</span><span class="ab-nb">位置情報</span></span><span class="en">camera, microphone, location</span><span class="zh">摄像头、麦克风、位置信息</span></li>
+      </ul>
+      <p class="ab-never-note"><span class="ja">検索アプリは Render、ページは GitHub Pages、フォントは Google Fonts を使っています。これらのサービスの側に残る記録は、それぞれの決まりに<span class="ab-nb">よります。</span></span><span class="en">The app runs on Render, these pages on GitHub Pages, and fonts come from Google Fonts. Any records kept on their side follow each service's own policies.</span><span class="zh">搜索应用使用 Render，页面使用 GitHub Pages，字体使用 Google Fonts。这些服务一侧留下的记录，按各自的<span class="ab-nb">规定处理。</span></span></p>
+    </div>
+
+    <details class="ab-more-d">
+      <summary><span class="ab-more-d-row"><span class="ja">くわしく：端末の中に置くもの・<span class="ab-nb">IPアドレスの使い方</span></span><span class="en">More: what stays on your device, and how IP addresses are used</span><span class="zh">详细：留在设备上的内容、<span class="ab-nb">IP地址的用法</span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+      <dl class="ab-more-dl">
+        <div><dt><span class="ja">端末の中に置くもの</span><span class="en">On your device</span><span class="zh">留在设备上的</span></dt>
+          <dd><span class="ja">選んだ見た目／最近見た教室（6件まで）／報告の取り消し用コード／「何に使う？」をその日に聞いたかどうか／来た日数と「ホーム画面に追加」の案内を閉じたかどうか／紹介ページとこのページで選んだ言語。どれもサーバーには送りません（取り消し用コードは、取り消すときだけ<span class="ab-nb">送ります）。</span></span><span class="en">Your chosen look / recently viewed rooms (up to six) / report undo codes / whether <span class="ab-ui" lang="ja">「何に使う？」</span> was already asked today / how many days you've visited and whether you closed the home-screen tip / the language you picked on the home page and this page. None of this is sent to the server (an undo code is sent only when you undo).</span><span class="zh">所选外观／最近查看的教室（最多6间）／报告的取消代码／当天是否已问过<span class="ab-ui" lang="ja">“何に使う？”</span>／访问天数，以及是否关闭了“添加到主屏幕”的提示／在首页和本页面选择的语言。这些都不会发送到服务器（取消代码只在取消时<span class="ab-nb">发送）。</span></span></dd></div>
+        <div><dt><span class="ja">報告の識別子</span><span class="en">Report identifier</span><span class="zh">报告的标识</span></dt>
+          <dd><span class="ja">接続元のIPアドレスに秘密の値を合わせてハッシュ化した16文字です。IPアドレスそのものは保存しません。時限が終わると、報告と一緒に<span class="ab-nb">消えます。</span></span><span class="en">16 characters made by hashing the connecting IP address with a secret value. The IP address itself is not stored. It is deleted with the report when the period ends.</span><span class="zh">把来源IP地址与一个保密值合在一起做哈希得到的16个字符，不保存IP地址本身。时段结束后与报告<span class="ab-nb">一起删除。</span></span></dd></div>
+        <div><dt><span class="ja">続けざまの操作を止める</span><span class="en">Stopping rapid repeats</span><span class="zh">阻止连续操作</span></dt>
+          <dd><span class="ja">報告や取り消しが短い時間に続いたときに止めるため、アプリは接続元のIPアドレスをサーバーのメモリの上で使います。アプリはこれをファイルには書きません。検索するだけなら、アプリはIPアドレスを<span class="ab-nb">使いません。</span></span><span class="en">To block reports or undos sent in quick succession, the app uses the connecting IP address in the server's memory. The app does not write it to a file. If you only search, the app does not use your IP address.</span><span class="zh">为了拦截短时间内连续的报告或取消，应用会在服务器内存中使用来源IP地址，应用不会把它写入文件。只是搜索的话，应用不会使用<span class="ab-nb">IP地址。</span></span></dd></div>
+        <div><dt><span class="ja">操作の記録の中身</span><span class="en">Usage records in detail</span><span class="zh">操作记录的内容</span></dt>
+          <dd><span class="ja">紹介ページ・このページ・検索画面で、Google アナリティクス（Cookie）を使っています。送っているのは、検索した曜日・時限・校舎、開いた教室の名前、報告と取り消しの回数（教室・曜日・時限つき）、「何に使う？」の答え、見た目の切り替え、アプリを開くボタンを押したこと、意見箱を送ったこと（種類だけ）<span class="ab-nb">などです。</span></span><span class="en">Google Analytics (cookies) is used on the home page, this page and the search screen. We send the day, period and building searched, names of rooms opened, the number of reports and undos (with room, day and period), answers to <span class="ab-ui" lang="ja">「何に使う？」</span>, look changes, taps on the open-app button, and feedback submissions (category only).</span><span class="zh">首页、本页面和搜索页面使用 Google Analytics（Cookie）。发送的是搜索的星期、时段和教学楼，打开的教室名称，报告和取消的次数（含教室、星期、时段），<span class="ab-ui" lang="ja">“何に使う？”</span>的回答，外观切换，点击打开应用的按钮，提交意见箱<span class="ab-nb">（仅类型）等。</span></span></dd></div>
+      </dl>
+    </details>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       05 テスト運用と校舎
+  ════════════════════════════════════════════ -->
+  <section class="ab-ch" id="trial" aria-labelledby="trial-h">
+    <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">05</span><span class="ab-ch-name"><span class="ja">テスト運用と校舎</span><span class="en">The trial &amp; buildings</span><span class="zh">试运营与教学楼</span></span></p>
+    <h2 class="ab-h2" id="trial-h"><span class="ja"><span class="ab-nb">いまは、</span><span class="ab-nb">駿河台の<span class="ab-jnum">2</span>つの校舎で</span><span class="ab-nb">試しています。</span></span><span class="en">For now, we're trying it in two buildings at Surugadai.</span><span class="zh"><span class="ab-nb">目前在骏河台校区的</span><span class="ab-nb">两栋教学楼</span><span class="ab-nb">试运营。</span></span></h2>
+
+    <dl class="ab-trial reveal">
+      <div><dt><span class="ja">期間</span><span class="en">Period</span><span class="zh">期间</span></dt>
+        <dd><span class="ja"><span class="ab-nb">2026年10月13日〜</span><span class="ab-nb">12月19日（予定）</span></span><span class="en">Oct 13 – Dec 19, 2026 (planned)</span><span class="zh"><span class="ab-nb">2026年10月13日〜</span><span class="ab-nb">12月19日（预计）</span></span>
+          <span class="ab-span" id="trialSpan" aria-hidden="true" hidden>
+            <span class="ab-span-track"><span class="ab-span-fill" id="trialFill"></span><span class="ab-span-now" id="trialNow" hidden><span class="ab-span-now-l"><span class="ja">今日</span><span class="en">Today</span><span class="zh">今天</span></span></span></span>
+            <span class="ab-span-ends"><span>10.13</span><span>12.19</span></span>
+          </span>
+        </dd></div>
+      <div><dt><span class="ja">対象</span><span class="en">Where</span><span class="zh">范围</span></dt>
+        <dd><span class="ja">駿河台キャンパス（<span class="ab-nb">タワー・スコラ</span>／<span class="ab-nb">駿河台校舎1号館</span>）</span><span class="en">Surugadai campus (Tower Schola / Surugadai Building 1)</span><span class="zh">骏河台校区（<span class="ab-nb">Tower Schola</span>／<span class="ab-nb">骏河台校舍1号馆）</span></span></dd></div>
+      <div><dt><span class="ja">運営</span><span class="en">Run by</span><span class="zh">运营</span></dt>
+        <dd class="ab-req"><span class="ja">本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</span><span class="en">This service is developed and run by students as part of Nihon University's student project program and is currently in trial operation. It is not an official service provided by the university.</span><span class="zh">本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。</span></dd></div>
+      <div><dt><span class="ja">お願い</span><span class="en">Please</span><span class="zh">请注意</span></dt>
+        <dd><span class="ja">テスト運用中のため、検索結果が実際の使用状況と違うことがあります。入る前にドア越しに確認し、気づいたことは意見箱へ送ってください。</span><span class="en">During the trial, results may differ from how rooms are actually used. Check through the door before going in, and send anything you notice to the feedback box.</span><span class="zh">试运营期间，搜索结果可能与实际使用情况不同。进门前请先隔着门确认，发现问题请通过意见箱告<span class="ab-nb">诉我们。</span></span></dd></div>
+    </dl>
+
+    <h3 class="ab-h3" id="campus-h"><span class="ja">対象の校舎</span><span class="en">The two buildings</span><span class="zh">对象教学楼</span></h3>
+    <p class="ab-vh"><span class="ja">タワー・スコラ 38室、駿河台校舎 26室、合わせて64室。2026年度の検索の対象の教室数です。</span><span class="en">Tower Schola 38 rooms and Surugadai 26 rooms, 64 in total: the rooms searchable for AY2026.</span><span class="zh">Tower Schola 38间，骏河台校舍26间，共64间，为2026学年可搜索的教室数。</span></p>
+    <div class="ab-eq reveal" aria-hidden="true">
+      <p class="ab-eq-term"><span class="ab-num">38</span><span class="ab-eq-l"><span class="ab-eq-n">1</span><span class="ja"><span class="ab-nb">タワー・</span><span class="ab-nb">スコラ</span></span><span class="en">Tower Schola</span><span class="zh">Tower Schola</span></span></p>
+      <span class="ab-eq-op">+</span>
+      <p class="ab-eq-term"><span class="ab-num">26</span><span class="ab-eq-l"><span class="ab-eq-n">2</span><span class="ja"><span class="ab-nb">駿河台</span><span class="ab-nb">校舎</span></span><span class="en">Surugadai</span><span class="zh">骏河台校舍</span></span></p>
+      <span class="ab-eq-op">=</span>
+      <p class="ab-eq-term is-sum"><span class="ab-num">64</span><span class="ab-eq-l"><span class="ja">室<span class="ab-nb">（2026年度）</span></span><span class="en">rooms <span class="ab-nb">(AY2026)</span></span><span class="zh">间<span class="ab-nb">（2026学年）</span></span></span></p>
+    </div>
+
+    <figure class="ab-campus reveal" id="campus">
+      <div class="ab-picks" id="campusPicks" role="group" aria-labelledby="campus-h">
+        <button type="button" class="ab-pick" data-id="all" aria-pressed="true"><span class="ja">全体</span><span class="en">Both</span><span class="zh">全景</span></button>
+        <button type="button" class="ab-pick" data-id="tower" aria-pressed="false"><span class="n" aria-hidden="true">1</span><span class="ja">タワー・スコラ</span><span class="en">Tower Schola</span><span class="zh">Tower Schola</span></button>
+        <button type="button" class="ab-pick" data-id="ichi" aria-pressed="false"><span class="n" aria-hidden="true">2</span><span class="ja">駿河台校舎</span><span class="en">Surugadai</span><span class="zh">骏河台校舍</span></button>
+      </div>
+      <div class="ab-stage" id="campusStage" data-state="still" data-show="all" tabindex="-1">
+        <!-- 3D の模型は、画面に近づいてスクロールが止まってから読み込む（three.js が約 750KB あるため）。
+             読み込む前・使えない環境・JS が動かないときは、この静止の図のまま読める -->
+        <div class="ab-stage-still" id="campusStill">
+          <p class="ab-vh"><span class="ja">図：丸い台の上に、1 タワー・スコラ（高い塔）と 2 駿河台校舎1号館（低い建物）を並べた模式図。</span><span class="en">Illustration: a schematic of 1, Tower Schola (a tall tower), and 2, Surugadai Building 1 (a lower building), on a round base.</span><span class="zh">图：在圆形底座上并排展示 1 Tower Schola（高塔）和 2 骏河台校舍1号馆（较低的建筑）的示意图。</span></p>
+          <svg class="ab-campus-svg" viewBox="100 8 520 446" aria-hidden="true" focusable="false" font-family="'DM Mono', monospace">
+          <ellipse cx="360" cy="309" rx="244.9" ry="141.4" fill="#D8D2C2"/>
+          <ellipse cx="360" cy="300" rx="244.9" ry="141.4" fill="#F1EBDD" stroke="#141413" stroke-opacity="0.12" stroke-width="0.8"/>
+          <g class="ab-bldg" data-b="tower">
+          <polygon points="569.6,301.0 572.3,303.6 475.3,359.6 369.7,298.6 366.9,296.0 472.6,357.0" fill="#29261B" opacity="0.08"/>
+          <polygon points="366.9,296.0 472.6,357.0 472.6,350.0 366.9,289.0" fill="#211E16" stroke="#141413" stroke-opacity="0.3" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="569.6,301.0 472.6,357.0 472.6,350.0 569.6,294.0" fill="#29261B" stroke="#141413" stroke-opacity="0.3" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="463.9,233.0 569.6,294.0 472.6,350.0 366.9,289.0" fill="#EFEADC" stroke="#141413" stroke-opacity="0.3" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="517.6,280.0 542.2,303.6 493.7,331.6 440.0,300.6 415.4,277.0 469.1,308.0" fill="#29261B" opacity="0.08"/>
+          <polygon points="410.2,277.0 469.1,311.0 469.1,297.0 410.2,263.0" fill="#DED8C9" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="522.8,280.0 469.1,311.0 469.1,297.0 522.8,266.0" fill="#E9E4D7" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="463.9,232.0 522.8,266.0 469.1,297.0 410.2,263.0" fill="#F4F1E8" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="415.4,263.0 469.1,294.0 469.1,96.0 415.4,65.0" fill="#E4DFD1" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="517.6,266.0 469.1,294.0 469.1,96.0 517.6,68.0" fill="#EFEBDF" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="463.9,37.0 517.6,68.0 469.1,96.0 415.4,65.0" fill="#FBF9F3" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <line x1="415.4" y1="252.0" x2="469.1" y2="283.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="255.0" x2="469.1" y2="283.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <polygon points="415.4,239.8 469.1,270.8 469.1,262.2 415.4,231.2" fill="#C96A4B"/>
+          <polygon points="517.6,242.8 469.1,270.8 469.1,262.2 517.6,234.2" fill="#D97757"/>
+          <line x1="415.4" y1="241.0" x2="469.1" y2="272.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="244.0" x2="469.1" y2="272.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="230.0" x2="469.1" y2="261.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="233.0" x2="469.1" y2="261.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <polygon points="415.4,217.8 469.1,248.8 469.1,240.2 415.4,209.2" fill="#C96A4B"/>
+          <polygon points="517.6,220.8 469.1,248.8 469.1,240.2 517.6,212.2" fill="#D97757"/>
+          <line x1="415.4" y1="219.0" x2="469.1" y2="250.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="222.0" x2="469.1" y2="250.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="208.0" x2="469.1" y2="239.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="211.0" x2="469.1" y2="239.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="197.0" x2="469.1" y2="228.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="200.0" x2="469.1" y2="228.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="186.0" x2="469.1" y2="217.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="189.0" x2="469.1" y2="217.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="175.0" x2="469.1" y2="206.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="178.0" x2="469.1" y2="206.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="164.0" x2="469.1" y2="195.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="167.0" x2="469.1" y2="195.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="153.0" x2="469.1" y2="184.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="156.0" x2="469.1" y2="184.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="142.0" x2="469.1" y2="173.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="145.0" x2="469.1" y2="173.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="131.0" x2="469.1" y2="162.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="134.0" x2="469.1" y2="162.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="120.0" x2="469.1" y2="151.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="123.0" x2="469.1" y2="151.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="109.0" x2="469.1" y2="140.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="112.0" x2="469.1" y2="140.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="98.0" x2="469.1" y2="129.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="101.0" x2="469.1" y2="129.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="87.0" x2="469.1" y2="118.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="90.0" x2="469.1" y2="118.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="415.4" y1="76.0" x2="469.1" y2="107.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="517.6" y1="79.0" x2="469.1" y2="107.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="421.4" y1="266.4" x2="421.4" y2="68.4" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="427.4" y1="269.9" x2="427.4" y2="71.9" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="433.3" y1="273.3" x2="433.3" y2="75.3" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="439.3" y1="276.8" x2="439.3" y2="78.8" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="445.3" y1="280.2" x2="445.3" y2="82.2" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="451.2" y1="283.7" x2="451.2" y2="85.7" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="457.2" y1="287.1" x2="457.2" y2="89.1" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="463.2" y1="290.6" x2="463.2" y2="92.6" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="511.6" y1="269.5" x2="511.6" y2="71.5" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="505.5" y1="273.0" x2="505.5" y2="75.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="499.4" y1="276.5" x2="499.4" y2="78.5" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="493.4" y1="280.0" x2="493.4" y2="82.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="487.3" y1="283.5" x2="487.3" y2="85.5" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="481.2" y1="287.0" x2="481.2" y2="89.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="475.2" y1="290.5" x2="475.2" y2="92.5" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <polygon points="463.9,43.0 493.4,60.0 470.9,73.0 441.4,56.0" fill="#8E9C72" opacity="0.85"/>
+          <polygon points="457.0,85.0 469.1,92.0 469.1,86.0 457.0,79.0" fill="#DCD6C7" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="484.7,83.0 469.1,92.0 469.1,86.0 484.7,77.0" fill="#E6E1D4" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="472.6,70.0 484.7,77.0 469.1,86.0 457.0,79.0" fill="#F4F1E8" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <ellipse cx="534.5" cy="292.5" rx="6.6" ry="3.0" fill="#29261B" opacity="0.10"/>
+          <circle cx="531.5" cy="284.7" r="6.0" fill="#8E9C72"/>
+          <circle cx="529.8" cy="283.2" r="3.3" fill="#A3B088" opacity="0.9"/>
+          <ellipse cx="536.2" cy="305.5" rx="6.6" ry="3.0" fill="#29261B" opacity="0.10"/>
+          <circle cx="533.2" cy="297.7" r="6.0" fill="#8E9C72"/>
+          <circle cx="531.5" cy="296.2" r="3.3" fill="#A3B088" opacity="0.9"/>
+          <ellipse cx="527.5" cy="318.5" rx="6.6" ry="3.0" fill="#29261B" opacity="0.10"/>
+          <circle cx="524.5" cy="310.7" r="6.0" fill="#8E9C72"/>
+          <circle cx="522.9" cy="309.2" r="3.3" fill="#A3B088" opacity="0.9"/>
+          <ellipse cx="512.0" cy="329.5" rx="6.6" ry="3.0" fill="#29261B" opacity="0.10"/>
+          <circle cx="509.0" cy="321.7" r="6.0" fill="#8E9C72"/>
+          <circle cx="507.3" cy="320.2" r="3.3" fill="#A3B088" opacity="0.9"/>
+          <ellipse cx="489.4" cy="336.5" rx="6.6" ry="3.0" fill="#29261B" opacity="0.10"/>
+          <circle cx="486.4" cy="328.7" r="6.0" fill="#8E9C72"/>
+          <circle cx="484.8" cy="327.2" r="3.3" fill="#A3B088" opacity="0.9"/>
+          <ellipse cx="394.2" cy="293.5" rx="6.6" ry="3.0" fill="#29261B" opacity="0.10"/>
+          <circle cx="391.2" cy="285.7" r="6.0" fill="#8E9C72"/>
+          <circle cx="389.5" cy="284.2" r="3.3" fill="#A3B088" opacity="0.9"/>
+          <ellipse cx="406.3" cy="308.5" rx="6.6" ry="3.0" fill="#29261B" opacity="0.10"/>
+          <circle cx="403.3" cy="300.7" r="6.0" fill="#8E9C72"/>
+          <circle cx="401.6" cy="299.2" r="3.3" fill="#A3B088" opacity="0.9"/>
+          <ellipse cx="423.6" cy="320.5" rx="6.6" ry="3.0" fill="#29261B" opacity="0.10"/>
+          <circle cx="420.6" cy="312.7" r="6.0" fill="#8E9C72"/>
+          <circle cx="418.9" cy="311.2" r="3.3" fill="#A3B088" opacity="0.9"/>
+          <ellipse cx="446.1" cy="329.5" rx="6.6" ry="3.0" fill="#29261B" opacity="0.10"/>
+          <circle cx="443.1" cy="321.7" r="6.0" fill="#8E9C72"/>
+          <circle cx="441.5" cy="320.2" r="3.3" fill="#A3B088" opacity="0.9"/>
+          <line x1="466.5" y1="60.5" x2="466.5" y2="40.5" stroke="#1a1814" stroke-opacity="0.5" stroke-width="1"/>
+          <circle class="ab-bldg-badge" cx="466.5" cy="26.5" r="14" fill="#1a1814"/>
+          <text x="466.5" y="31.5" text-anchor="middle" font-size="14" font-weight="500" fill="#ffffff">1</text>
+          </g>
+          <g class="ab-bldg" data-b="ichi">
+          <polygon points="311.5,292.0 314.2,294.6 241.5,336.6 134.1,274.6 131.4,272.0 238.8,334.0" fill="#29261B" opacity="0.08"/>
+          <polygon points="131.4,272.0 238.8,334.0 238.8,327.0 131.4,265.0" fill="#211E16" stroke="#141413" stroke-opacity="0.3" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="311.5,292.0 238.8,334.0 238.8,327.0 311.5,285.0" fill="#29261B" stroke="#141413" stroke-opacity="0.3" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="204.1,223.0 311.5,285.0 238.8,327.0 131.4,265.0" fill="#EFEADC" stroke="#141413" stroke-opacity="0.3" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="294.2,285.0 302.4,292.9 248.7,323.9 158.6,271.9 150.4,264.0 240.5,316.0" fill="#29261B" opacity="0.08"/>
+          <polygon points="150.4,264.0 240.5,316.0 240.5,254.0 150.4,202.0" fill="#E4DFD1" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="294.2,285.0 240.5,316.0 240.5,254.0 294.2,223.0" fill="#EFEBDF" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="204.1,171.0 294.2,223.0 240.5,254.0 150.4,202.0" fill="#FBF9F3" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="150.4,252.5 240.5,304.5 240.5,296.5 150.4,244.5" fill="#C96A4B"/>
+          <polygon points="294.2,273.5 240.5,304.5 240.5,296.5 294.2,265.5" fill="#D97757"/>
+          <line x1="150.4" y1="253.7" x2="240.5" y2="305.7" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="294.2" y1="274.7" x2="240.5" y2="305.7" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="150.4" y1="243.3" x2="240.5" y2="295.3" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="294.2" y1="264.3" x2="240.5" y2="295.3" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <polygon points="150.4,231.8 240.5,283.8 240.5,275.9 150.4,223.9" fill="#C96A4B"/>
+          <polygon points="294.2,252.8 240.5,283.8 240.5,275.9 294.2,244.9" fill="#D97757"/>
+          <line x1="150.4" y1="233.0" x2="240.5" y2="285.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="294.2" y1="254.0" x2="240.5" y2="285.0" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="150.4" y1="222.7" x2="240.5" y2="274.7" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="294.2" y1="243.7" x2="240.5" y2="274.7" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="150.4" y1="212.3" x2="240.5" y2="264.3" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="294.2" y1="233.3" x2="240.5" y2="264.3" stroke="#141413" stroke-opacity="0.2" stroke-width="0.7"/>
+          <line x1="157.4" y1="268.0" x2="157.4" y2="206.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="164.3" y1="272.0" x2="164.3" y2="210.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="171.2" y1="276.0" x2="171.2" y2="214.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="178.1" y1="280.0" x2="178.1" y2="218.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="185.1" y1="284.0" x2="185.1" y2="222.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="192.0" y1="288.0" x2="192.0" y2="226.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="198.9" y1="292.0" x2="198.9" y2="230.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="205.8" y1="296.0" x2="205.8" y2="234.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="212.8" y1="300.0" x2="212.8" y2="238.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="219.7" y1="304.0" x2="219.7" y2="242.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="226.6" y1="308.0" x2="226.6" y2="246.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="233.6" y1="312.0" x2="233.6" y2="250.0" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="286.5" y1="289.4" x2="286.5" y2="227.4" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="278.8" y1="293.9" x2="278.8" y2="231.9" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="271.2" y1="298.3" x2="271.2" y2="236.3" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="263.5" y1="302.7" x2="263.5" y2="240.7" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="255.8" y1="307.1" x2="255.8" y2="245.1" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <line x1="248.2" y1="311.6" x2="248.2" y2="249.6" stroke="#141413" stroke-opacity="0.09" stroke-width="0.6"/>
+          <polygon points="186.8,193.0 221.4,213.0 221.4,206.0 186.8,186.0" fill="#DCD6C7" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="240.5,202.0 221.4,213.0 221.4,206.0 240.5,195.0" fill="#E6E1D4" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="205.8,175.0 240.5,195.0 221.4,206.0 186.8,186.0" fill="#F4F1E8" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="230.1,218.0 252.6,231.0 252.6,226.0 230.1,213.0" fill="#DCD6C7" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="268.2,222.0 252.6,231.0 252.6,226.0 268.2,217.0" fill="#E6E1D4" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <polygon points="245.7,204.0 268.2,217.0 252.6,226.0 230.1,213.0" fill="#F4F1E8" stroke="#141413" stroke-opacity="0.22" stroke-width="0.8" stroke-linejoin="round"/>
+          <ellipse cx="145.6" cy="275.0" rx="5.7" ry="2.6" fill="#29261B" opacity="0.10"/>
+          <circle cx="142.6" cy="268.0" r="5.2" fill="#8E9C72"/>
+          <circle cx="141.2" cy="266.7" r="2.9" fill="#A3B088" opacity="0.9"/>
+          <ellipse cx="162.9" cy="285.0" rx="5.7" ry="2.6" fill="#29261B" opacity="0.10"/>
+          <circle cx="159.9" cy="278.0" r="5.2" fill="#8E9C72"/>
+          <circle cx="158.5" cy="276.7" r="2.9" fill="#A3B088" opacity="0.9"/>
+          <ellipse cx="180.3" cy="295.0" rx="5.7" ry="2.6" fill="#29261B" opacity="0.10"/>
+          <circle cx="177.3" cy="288.0" r="5.2" fill="#8E9C72"/>
+          <circle cx="175.8" cy="286.7" r="2.9" fill="#A3B088" opacity="0.9"/>
+          <ellipse cx="197.6" cy="305.0" rx="5.7" ry="2.6" fill="#29261B" opacity="0.10"/>
+          <circle cx="194.6" cy="298.0" r="5.2" fill="#8E9C72"/>
+          <circle cx="193.1" cy="296.7" r="2.9" fill="#A3B088" opacity="0.9"/>
+          <ellipse cx="214.9" cy="315.0" rx="5.7" ry="2.6" fill="#29261B" opacity="0.10"/>
+          <circle cx="211.9" cy="308.0" r="5.2" fill="#8E9C72"/>
+          <circle cx="210.5" cy="306.7" r="2.9" fill="#A3B088" opacity="0.9"/>
+          <ellipse cx="232.2" cy="325.0" rx="5.7" ry="2.6" fill="#29261B" opacity="0.10"/>
+          <circle cx="229.2" cy="318.0" r="5.2" fill="#8E9C72"/>
+          <circle cx="227.8" cy="316.7" r="2.9" fill="#A3B088" opacity="0.9"/>
+          <line x1="222.3" y1="205.5" x2="222.3" y2="185.5" stroke="#1a1814" stroke-opacity="0.5" stroke-width="1"/>
+          <circle class="ab-bldg-badge" cx="222.3" cy="171.5" r="14" fill="#1a1814"/>
+          <text x="222.3" y="176.5" text-anchor="middle" font-size="14" font-weight="500" fill="#ffffff">2</text>
+          </g>
+        </svg>
+        </div>
+        <p class="ab-stage-status" role="status">
+          <span class="s-loading" hidden><span class="ja">立体の模型を読み込んでいます…</span><span class="en">Loading the 3D model…</span><span class="zh">正在加载立体模型…</span></span>
+          <span class="s-ready" hidden><span class="ja">左右にドラッグすると回せます</span><span class="en">Drag sideways to rotate</span><span class="zh">左右拖动可以旋转</span></span>
+          <span class="s-failed" hidden><span class="ja">この環境では図で表示しています</span><span class="en">Shown as a drawing in this environment</span><span class="zh">当前环境以示意图显示</span></span>
+        </p>
+        <button type="button" class="ab-stage-load" id="campusLoad" hidden><span class="ja">回せる模型を読み込む（約0.8MB）</span><span class="en">Load the 3D model (about 0.8 MB)</span><span class="zh">加载可旋转的模型（约0.8MB）</span></button>
+      </div>
+      <figcaption class="ab-campus-note">
+        <span class="ja">※ 光っている階は空き教室のイメージで、実際の空き状況ではありません。模型は公開情報の階数・高さをもとにした模式図で、実測ではありません（駿河台校舎は1号館を<span class="ab-nb">表示）。</span></span>
+        <span class="en">* Lit floors are only an illustration of free rooms, not actual availability. The model is a schematic based on public floor counts and heights, not a survey (Surugadai shows Building 1).</span>
+        <span class="zh">※ 发光的楼层只是空教室的示意，不代表实际空闲情况。模型根据公开的楼层数和高度制作，仅为示意，并非实测（骏河台校舍显示<span class="ab-nb">1号馆）。</span></span>
+      </figcaption>
+    </figure>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       06 これまでの歩み（日付の順。月だけの項目は同じ月の日付つきより前）
+  ════════════════════════════════════════════ -->
+  <section class="ab-ch" id="history" aria-labelledby="history-h">
+    <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">06</span><span class="ab-ch-name"><span class="ja">これまでの歩み</span><span class="en">The story so far</span><span class="zh">一路走来</span></span></p>
+    <h2 class="ab-h2" id="history-h"><span class="ja"><span class="ab-nb">少しずつ、</span><span class="ab-nb">直してきました。</span></span><span class="en">Small fixes, one after another.</span><span class="zh"><span class="ab-nb">一点一点，</span><span class="ab-nb">改到现在。</span></span></h2>
+
+    <details class="ab-tl-more">
+      <summary><span class="ab-more-d-row"><span class="ja">それより前（2026年5月〜9月）</span><span class="en">Earlier (May–September 2026)</span><span class="zh">更早（2026年5月〜9月）</span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+      <ol class="ab-tl">
+      <li><time datetime="2026-05-21">2026.05.21</time><p><span class="ja">Instagram で紹介を始めました</span><span class="en">Started posting on Instagram</span><span class="zh">开始在 Instagram 介绍</span></p></li>
+      <li><time datetime="2026-06-10">2026.06.10</time><p><span class="ja">ロゴを新しくしました</span><span class="en">A new logo</span><span class="zh">更换了新标志</span></p></li>
+      <li><time datetime="2026-06-14">2026.06.14</time><p><span class="ja">紹介ページに意見箱</span><span class="en">Added a feedback box to the home page</span><span class="zh">在首页设置了意见箱</span></p></li>
+      <li><time datetime="2026-08-05">2026.08.05</time><p><span class="ja">紹介ページのアドレスを変更</span><span class="en">Home page address changed</span><span class="zh">首页更换为现在的网址</span></p></li>
+      <li><time datetime="2026-09">2026.09</time><p><span class="ja"><span class="ab-nb">時間割データを</span><span class="ab-nb">原本から作り直せるように</span></span><span class="en">Timetable data rebuilt from the sources</span><span class="zh">课程表数据可从原始表重建</span></p></li>
+      </ol>
+    </details>
+    <ol class="ab-tl reveal">
+      <li><time datetime="2026-10">2026.10</time><p><span class="ja">確認できた教室変更を反映</span><span class="en">Confirmed room changes applied</span><span class="zh">反映已确认的教室变更</span></p></li>
+      <li class="is-key"><time datetime="2026-10-13">2026.10.13</time><p><span class="ja">駿河台でテスト運用を開始</span><span class="en">Trial began at Surugadai</span><span class="zh">在骏河台校区开始试运营</span></p></li>
+      <li><time datetime="2026-10-25">2026.10.25</time><p><span class="ja">任意・匿名の質問「何に使う？」</span><span class="en">Optional question <span class="ab-ui" lang="ja">「何に使う？」</span></span><span class="zh">自愿匿名提问<span class="ab-ui" lang="ja">“何に使う？”</span></span></p></li>
+      <li><time datetime="2026-10-30">2026.10.30</time><p><span class="ja">季節の見た目と、戻すスイッチ</span><span class="en">Seasonal looks, with a switch back</span><span class="zh">季节外观和切换开关</span></p></li>
+      <li><time datetime="2026-11-07">2026.11.07</time><p><span class="ja">くわしい説明をこのページへ</span><span class="en">Moved the details to this page</span><span class="zh">把详细说明移到了本页面</span></p></li>
+      <li><time datetime="2026-11-09">2026.11.09</time><p><span class="ja"><span class="ab-nb">校舎を覚える・</span><span class="ab-nb">ホーム画面のアイコン</span></span><span class="en">Remembers your building; app icon</span><span class="zh">记住上次的教学楼；主屏幕图标</span></p></li>
+      <li class="to-plan"><time datetime="2026-11-11">2026.11.11</time><p><span class="ja"><span class="ab-nb">検索画面を整理</span><span class="ab-nb">（時限・校舎のタブ）</span></span><span class="en">Search screen reworked</span><span class="zh">整理搜索页面（时段、教学楼标签）</span></p></li>
+      <li class="is-plan"><time datetime="2026-12-19">2026.12.19</time><p><span class="ja">テスト運用の終了予定日</span><span class="en">Planned end of the trial</span><span class="zh">试运营预计结束日</span></p></li>
+    </ol>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       07 開発メンバー（氏名・役割・所属は変えない。顔写真は使わない）
+  ════════════════════════════════════════════ -->
+  <section class="ab-ch" id="members" aria-labelledby="members-h">
+    <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">07</span><span class="ab-ch-name"><span class="ja">開発メンバー</span><span class="en">The team</span><span class="zh">开发成员</span></span></p>
+    <h2 class="ab-h2" id="members-h"><span class="ja"><span class="ab-nb">学生が作った、</span><span class="ab-nb">学生のための</span><span class="ab-nb">サービスです。</span></span><span class="en">Built by students, for students.</span><span class="zh"><span class="ab-nb">由学生开发，</span><span class="ab-nb">为学生服务。</span></span></h2>
+    <ul class="ab-team reveal" lang="ja">
+      <li class="ab-member">
+        <div class="member-avatar" aria-hidden="true">二</div>
+        <div class="member-name"><span class="ab-nb">二川</span> <span class="ab-nb">航大</span></div>
         <div class="member-role">統括 / Dev</div>
         <div class="member-dept">理工学部<br>物理学科 2年</div>
-      </div>
-      <div class="member-card reveal reveal-delay-2">
-        <div class="member-avatar">川</div>
-        <div class="member-name">川口 ひろき</div>
+      </li>
+      <li class="ab-member">
+        <div class="member-avatar" aria-hidden="true">川</div>
+        <div class="member-name"><span class="ab-nb">川口</span> <span class="ab-nb">ひろき</span></div>
         <div class="member-role">会計</div>
         <div class="member-dept">商学部<br>経営学科 3年</div>
-      </div>
-      <div class="member-card reveal reveal-delay-3">
-        <div class="member-avatar">町</div>
-        <div class="member-name">町野 翼</div>
+      </li>
+      <li class="ab-member">
+        <div class="member-avatar" aria-hidden="true">町</div>
+        <div class="member-name"><span class="ab-nb">町野</span> <span class="ab-nb">翼</span></div>
         <div class="member-role">Dev</div>
         <div class="member-dept">理工学部<br>物理学科 2年</div>
-      </div>
-      <div class="member-card reveal reveal-delay-4">
-        <div class="member-avatar">山</div>
-        <div class="member-name">山田 倖大</div>
+      </li>
+      <li class="ab-member">
+        <div class="member-avatar" aria-hidden="true">山</div>
+        <div class="member-name"><span class="ab-nb">山田</span> <span class="ab-nb">倖大</span></div>
         <div class="member-role">広報</div>
         <div class="member-dept">理工学部<br>物理学科 2年</div>
-      </div>
-      <div class="member-card reveal reveal-delay-4">
-        <div class="member-avatar">松</div>
-        <div class="member-name">松島 福航</div>
+      </li>
+      <li class="ab-member">
+        <div class="member-avatar" aria-hidden="true">松</div>
+        <div class="member-name"><span class="ab-nb">松島</span> <span class="ab-nb">福航</span></div>
         <div class="member-role">広報</div>
         <div class="member-dept">生産工学部<br>環境安全工学科 2年</div>
-      </div>
-      <div class="member-card reveal reveal-delay-4">
-        <div class="member-avatar">古</div>
-        <div class="member-name">古川 尚登</div>
+      </li>
+      <li class="ab-member">
+        <div class="member-avatar" aria-hidden="true">古</div>
+        <div class="member-name"><span class="ab-nb">古川</span> <span class="ab-nb">尚登</span></div>
         <div class="member-role">CM</div>
         <div class="member-dept">理工学部<br>物理学科 2年</div>
-      </div>
+      </li>
+    </ul>
+    <p class="ab-team-note"><span class="en">Names, roles and departments are listed in Japanese.</span><span class="zh">姓名、分工和所属按日语原文列出。</span></p>
 
+    <div class="ab-colophon reveal">
+      <h3 class="ab-colophon-h"><span class="ja">つくり</span><span class="en">How it's built</span><span class="zh">技术构成</span></h3>
+      <dl>
+        <div><dt><span class="ja">検索アプリ</span><span class="en">The app</span><span class="zh">搜索应用</span></dt><dd><span class="ja">Python（Flask）と素の <span class="ab-nb">HTML・CSS・JS</span></span><span class="en">Python (Flask) with plain HTML, CSS and JS</span><span class="zh">Python（Flask）和原生 HTML、<span class="ab-nb">CSS、JS</span></span></dd></div>
+        <div><dt><span class="ja">時間割データ</span><span class="en">Timetable data</span><span class="zh">课程表数据</span></dt><dd><span class="ja">SQLite（時間割表から <span class="ab-nb">Python で作成）</span></span><span class="en">SQLite, built from the timetables in Python</span><span class="zh">SQLite（用 Python 从<span class="ab-nb">课程表生成）</span></span></dd></div>
+        <div><dt><span class="ja">動かしている場所</span><span class="en">Hosting</span><span class="zh">运行位置</span></dt><dd><span class="ja">Render と GitHub&nbsp;Pages</span><span class="en">Render and GitHub Pages</span><span class="zh">Render 和 GitHub Pages</span></dd></div>
+        <div><dt><span class="ja">校舎の模型</span><span class="en">Building model</span><span class="zh">教学楼模型</span></dt><dd><span class="ja">three.js（近づいてから<span class="ab-nb">読み込み）</span></span><span class="en">three.js (loaded when you scroll near)</span><span class="zh">three.js（滚动到附近<span class="ab-nb">时加载）</span></span></dd></div>
+        <div><dt><span class="ja">点検</span><span class="en">Checks</span><span class="zh">检查</span></dt><dd><span class="ja">変更ごとの自動テストと、週1回の<span class="ab-nb">自動点検</span></span><span class="en">Tests on every change and a weekly automated check</span><span class="zh">每次修改的自动测试和每周<span class="ab-nb">自动检查</span></span></dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       08 よくある質問
+  ════════════════════════════════════════════ -->
+  <section class="ab-ch ab-ch-faq" id="faq" aria-labelledby="faq-h">
+    <div class="ab-faq-head">
+      <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">08</span><span class="ab-ch-name"><span class="ja">よくある質問</span><span class="en">FAQ</span><span class="zh">常见问题</span></span></p>
+      <h2 class="ab-h2" id="faq-h"><span class="ja">短く答えます。</span><span class="en">Short answers.</span><span class="zh">简短回答。</span></h2>
+    </div>
+
+    <div class="ab-faq">
+      <details class="ab-q" open>
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">RoomRadar は<span class="ab-nb">大学の公式</span><span class="ab-nb">サービスですか？</span></span><span class="en">Is RoomRadar an official university service?</span><span class="zh">RoomRadar 是<span class="ab-nb">大学的</span><span class="ab-nb">官方服务吗？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <div class="ab-a"><p><span class="ja">いいえ。本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</span><span class="en">No. This service is developed and run by students as part of Nihon University's student project program and is currently in trial operation. It is not an official service provided by the university.</span><span class="zh">不是。本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。</span></p></div>
+      </details>
+      <details class="ab-q">
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">「空き」と出た教室は、<span class="ab-nb">自由に使って</span><span class="ab-nb">よいのですか？</span></span><span class="en">Can I freely use a room shown as “free”?</span><span class="zh">显示“空闲”的教室<span class="ab-nb">可以随便用吗？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <div class="ab-a"><p><span class="ja">「空き」は、時間割の上で授業が入っていないという意味です。使ってよいという許可ではありません。授業が優先です。入る前に、ドア越しに<span class="ab-nb">確認してください。</span></span><span class="en">“Free” means no class is scheduled on the timetable. It is not permission to use the room. Classes come first. Please check through the door before you go in.</span><span class="zh">“空闲”只表示课程表上没有排课，并不是使用许可。课程优先。进门前请先隔着<span class="ab-nb">门确认。</span></span></p></div>
+      </details>
+      <details class="ab-q">
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">「空き」と出たのに、<span class="ab-nb">使われていました。</span><span class="ab-nb">なぜですか？</span></span><span class="en">It said “free”, but the room was in use. Why?</span><span class="zh">显示“空闲”，<span class="ab-nb">却有人在用。</span><span class="ab-nb">为什么？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <div class="ab-a"><p><span class="ja">補講・試験・急に入った授業・運営が確認できていない急な教室変更は、RoomRadar が読む時間割表に載っていないので、「空き」のまま出ます（休講は反対に、「授業あり」のまま出ます）。使われていたら、教室をタップして「実は使われていた」で、次の人に<span class="ab-nb">知らせてください。</span></span><span class="en">Make-up classes, exams, extra classes and sudden room changes our team hasn't confirmed aren't in the timetables RoomRadar reads, so the room still shows as free. (A cancelled class works the other way: the room stays “class scheduled”.) If a room is in use, tap it and use <span class="ab-ui" lang="ja">「実は使われていた」</span> to let the next person know.</span><span class="zh">补课、考试、临时加的课，以及运营方尚未确认的临时教室变更，都不在 RoomRadar 读取的课程表里，所以教室仍显示为空闲（停课则相反，仍显示为有课）。发现有人在用时，请点开教室，用<span class="ab-ui" lang="ja">“実は使われていた”</span>告诉<span class="ab-nb">下一个人。</span></span></p></div>
+      </details>
+      <details class="ab-q">
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja"><span class="ab-nb">まちがえて</span><span class="ab-nb">報告しました。</span><span class="ab-nb">取り消せますか？</span></span><span class="en">I reported a room by mistake. Can I undo it?</span><span class="zh">报告错了，<span class="ab-nb">可以取消吗？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <div class="ab-a"><p><span class="ja">報告した端末で同じ教室をもう一度開くと、「✓ 報告済み（タップで取り消し）」から取り消せます。「使用中の可能性」と表示された教室は開けないので、その場合は時限が終わると自動で<span class="ab-nb">消えます。</span></span><span class="en">Open the same room again on the device you reported from, and undo it from <span class="ab-ui" lang="ja">「✓ 報告済み（タップで取り消し）」</span>. A room marked <span class="ab-ui" lang="ja">「使用中の可能性」</span> can't be opened, so in that case the report is deleted automatically when the period ends.</span><span class="zh">在报告时用的设备上再次打开同一间教室，点<span class="ab-ui" lang="ja">“✓ 報告済み（タップで取り消し）”</span>即可取消。已显示<span class="ab-ui" lang="ja">“使用中の可能性”</span>的教室无法打开，这种情况下报告会在时段结束后<span class="ab-nb">自动删除。</span></span></p></div>
+      </details>
+      <details class="ab-q">
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">前の年度や、<span class="ab-nb">別の学期も</span><span class="ab-nb">見られますか？</span></span><span class="en">Can I look at another year or term?</span><span class="zh">可以查看<span class="ab-nb">其他学年或学期吗？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <div class="ab-a"><p><span class="ja">見られます。2025・2026年度の前期・後期を切り替えられます。何も選ばなければ、いまの年度・いまの学期です（4月1日〜9月20日が前期、それ以外が後期）。曜日・時限・校舎・続けて使うコマ数も<span class="ab-nb">選べます。</span></span><span class="en">Yes. You can switch between the first and second terms of AY2025 and AY2026. If you choose nothing, it uses the current year and term (April 1 to September 20 is the first term; the rest of the year is the second). You can also pick the day, period, building and how many periods in a row.</span><span class="zh">可以。可以切换2025・2026学年的前期和后期。不做选择时，显示当前学年、当前学期（4月1日〜9月20日为前期，其余为后期）。星期、时段、教学楼和连续使用的节数也<span class="ab-nb">可以选择。</span></span></p></div>
+      </details>
+      <details class="ab-q">
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja"><span class="ab-nb">登録やログインは</span><span class="ab-nb">必要ですか？</span> <span class="ab-nb">お金は</span><span class="ab-nb">かかりますか？</span></span><span class="en">Do I need to sign up or <span class="ab-nb">log in?</span> Does it cost anything?</span><span class="zh"><span class="ab-nb">需要注册或登录吗？</span><span class="ab-nb">要收费吗？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <div class="ab-a"><p><span class="ja">どちらも要りません。無料で、ブラウザで開くだけで使えます。アプリのインストールも<span class="ab-nb">要りません。</span></span><span class="en">Neither. It is free and opens in your browser. There is no app to install.</span><span class="zh">都不需要。免费，用浏览器打开就能用，也不用<span class="ab-nb">安装应用。</span></span></p></div>
+      </details>
+      <details class="ab-q">
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">検索画面に出る<span class="ab-nb">「何に使う？」は</span><span class="ab-nb">何ですか？</span></span><span class="en">What is the <span class="ab-ui" lang="ja">「何に使う？」</span> question on the search screen?</span><span class="zh">搜索页面上出现的<span class="ab-nb"><span class="ab-ui" lang="ja">“何に使う？”</span>是什么？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <div class="ab-a"><p><span class="ja">空きコマの使い方を知るための、任意・匿名の質問です。1台につき1日1回までで、答えずに閉じられます。送るのは答えと曜日・時限・校舎だけで、教室名は送りません。全体の集計にだけ<span class="ab-nb">使います。</span></span><span class="en">An optional, anonymous question to learn how free periods are used. It appears at most once a day per device, and you can close it without answering. Only your answer and the day, period and building are sent, not the room name. It is used only for overall totals.</span><span class="zh">这是为了解空闲时段用途而设的自愿、匿名提问。每台设备每天最多出现一次，不回答也可以关掉。发送的只有答案和星期、时段、教学楼，不包含教室名称，仅用于<span class="ab-nb">整体统计。</span></span></p></div>
+      </details>
+      <details class="ab-q">
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja">英語や中国語でも<span class="ab-nb">使えますか？</span></span><span class="en">Is it available in English or Chinese?</span><span class="zh">有英文或中文版吗？</span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <div class="ab-a"><p><span class="ja">紹介ページとこのページは、日本語・英語・中国語で読めます。検索アプリの画面は、日本語<span class="ab-nb">だけです。</span></span><span class="en">The home page and this page are available in Japanese, English and Chinese. The search app itself is in Japanese only.</span><span class="zh">首页和本页面提供日语、英语和中文。搜索应用的界面<span class="ab-nb">只有日语。</span></span></p></div>
+      </details>
+      <details class="ab-q">
+        <summary><span class="ab-q-row"><span class="ab-q-m" aria-hidden="true">Q</span><span class="ab-q-t"><span class="ja"><span class="ab-nb">スマホの</span><span class="ab-nb">ホーム画面に</span><span class="ab-nb">置けますか？</span></span><span class="en">Can I add it to my phone's home screen?</span><span class="zh">可以添加到<span class="ab-nb">手机主屏幕吗？</span></span></span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+        <div class="ab-a"><p><span class="ja">置けます。ブラウザの「ホーム画面に追加」を使うと、アイコンから開けます。別の日にまた来たときから、スマホでは追加のしかたを案内します（×で閉じると<span class="ab-nb">出なくなります）。</span></span><span class="en">Yes. Use your browser's “Add to Home Screen” and it opens from an icon. From a visit on another day, the app shows phone users how to add it (close it with × and it stops appearing).</span><span class="zh">可以。使用浏览器的“添加到主屏幕”，就能从图标打开。从另一天再次访问起，手机上会提示添加方法（点 × 关闭后就不再<span class="ab-nb">出现）。</span></span></p></div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       09 意見を送る
+  ════════════════════════════════════════════ -->
+  <section class="ab-ch" id="voice" aria-labelledby="voice-h">
+    <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">09</span><span class="ab-ch-name"><span class="ja">意見を送る</span><span class="en">Feedback</span><span class="zh">提意见</span></span></p>
+    <h2 class="ab-h2" id="voice-h"><span class="ja"><span class="ab-nb">まちがいを見つけたら、</span><span class="ab-nb">教えてください。</span></span><span class="en">Found a mistake? Tell us.</span><span class="zh"><span class="ab-nb">发现错误，</span><span class="ab-nb">请告诉我们。</span></span></h2>
+    <div class="ab-prose">
+      <p class="ab-lead reveal"><span class="ja">教室データの誤り、使いにくいところ、ほしい機能。気づいたことは、紹介ページの意見箱から送れます（連絡先の入力は<span class="ab-nb">任意です）。</span></span><span class="en">Wrong room data, something hard to use, a feature you'd like: send it through the feedback box on the home page (a contact is optional).</span><span class="zh">教室数据有误、哪里不好用、想要的功能，都可以通过首页的意见箱发给我们（联系方式可以<span class="ab-nb">不填）。</span></span></p>
+    </div>
+    <div class="ab-links reveal">
+      <a class="ab-linkcard" href="index.html#feedback">
+        <span class="ab-linkcard-k"><span class="ja">意見箱</span><span class="en">Feedback box</span><span class="zh">意见箱</span></span>
+        <span class="ab-linkcard-t"><span class="ja">紹介ページのフォームから送る</span><span class="en">Send from the form on the home page</span><span class="zh">通过首页的表单发送</span></span>
+        <span class="ab-linkcard-a" aria-hidden="true">→</span>
+      </a>
+      <a class="ab-linkcard" href="https://www.instagram.com/roomradar_nust/" target="_blank" rel="noopener">
+        <span class="ab-linkcard-k">Instagram</span>
+        <span class="ab-linkcard-t"><span class="ja"><span class="ab-mono">@roomradar_nust</span> で、お知らせを<span class="ab-nb">出しています</span></span><span class="en">News and updates at <span class="ab-mono">@roomradar_nust</span></span><span class="zh">在 <span class="ab-mono">@roomradar_nust</span> <span class="ab-nb">发布通知</span></span></span>
+        <span class="ab-linkcard-a" aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </section>
+
+  </div><!-- /.ab-chapters -->
+  </div><!-- /.ab-body-in -->
+</div><!-- /.ab-body -->
+
+<!-- 結び -->
+<div class="ab-end">
+  <span class="ab-glow ab-glow-end" aria-hidden="true"></span>
+  <div class="ab-wrap">
+    <p class="ab-end-t"><span class="ja"><span class="ab-nb">読んでくれて、</span><span class="ab-nb">ありがとうございます。</span></span><span class="en">Thanks for&nbsp;reading.</span><span class="zh"><span class="ab-nb">感谢你</span><span class="ab-nb">读到这里。</span></span></p>
+    <p class="ab-end-s"><span class="ja">使うときは、<span class="ab-nb">ドア越しの確認だけ、</span><span class="ab-nb">忘れずに。</span></span><span class="en">One last thing: check through the door before you go in.</span><span class="zh">使用时，别忘了先隔着门确认一下。</span></p>
+    <div class="ab-end-actions">
+      <a href="https://nust-room-search.onrender.com" class="cta-btn"><span class="ja">RoomRadarを開く</span><span class="en">Open RoomRadar</span><span class="zh">打开RoomRadar</span><span aria-hidden="true">→</span></a>
+      <a class="ab-back" href="index.html"><span aria-hidden="true">←</span><span class="ja">紹介ページへ戻る</span><span class="en">Back to the home page</span><span class="zh">返回首页</span></a>
     </div>
   </div>
-</section>
-
-<section class="campus" id="campus" aria-labelledby="campus-title">
-  <div class="section-inner">
-    <div class="section-eyebrow reveal">Campus</div>
-    <h2 class="section-title reveal" id="campus-title">
-      <span class="ja">駿河台キャンパスの空き教室を、まとめて。</span>
-      <span class="en">Surugadai campus, one search.</span>
-      <span class="zh">骏河台校区的空教室，一次查完。</span>
-    </h2>
-    <div class="campus-stage reveal" id="campusStage">
-      <!-- 3D は画面に近づいてから読み込む（three.js が約 750KB あるため）。使えない環境ではこの静止表示のまま -->
-      <div class="campus-fallback" id="campusFallback">
-        <span class="campus-loading ja">校舎の模型を読み込み中…</span>
-        <span class="campus-loading en">Loading the campus model…</span>
-        <span class="campus-loading zh">正在加载校舎模型…</span>
-      </div>
-    </div>
-    <div class="campus-picks" role="group" aria-label="校舎">
-      <button type="button" class="campus-pick tower" data-id="tower" aria-pressed="false"><span class="n">1</span>
-        <span class="ja">タワー・スコラ</span><span class="en">Tower Schola</span><span class="zh">Tower Schola</span><em>38<span class="ja">室</span><span class="en"> rooms</span><span class="zh">间</span></em></button>
-      <button type="button" class="campus-pick suruga" data-id="ichi" aria-pressed="false"><span class="n">2</span>
-        <span class="ja">駿河台校舎</span><span class="en">Surugadai</span><span class="zh">骏河台校舍</span><em>26<span class="ja">室</span><span class="en"> rooms</span><span class="zh">间</span></em></button>
-    </div>
-    <p class="campus-note">
-      <span class="ja">※ 模型は公開情報の階数・高さをもとにした模式図で、実測ではありません（駿河台校舎は1号館を表示）。光っている階は空き教室のイメージで、実際の空き状況ではありません。教室数は2026年度の検索対象の数です。</span>
-      <span class="en">* A schematic model based on public floor counts and heights, not a survey (Surugadai shows Building 1). Lit floors are only an illustration, not live availability. Room counts are the rooms searchable for AY2026.</span>
-      <span class="zh">※ 模型根据公开的楼层数和高度制作，仅为示意，并非实测（骏河台校舍显示1号馆）。发光的楼层只是空教室的示意，不代表实际空闲情况。教室数为2026学年可搜索的教室数。</span>
-    </p>
-  </div>
-</section>
-
-<section class="sec sec-back">
-  <div class="sec-inner">
-    <a class="a-link" href="index.html">← <span class="ja">トップへ戻る</span><span class="en">Back to top</span><span class="zh">返回首页</span></a>
-  </div>
-</section>
+</div>
 </main>
 
 <footer>
-  <nav class="foot-links" aria-label="ページ内の案内">
+  <nav class="foot-links" aria-label="ページ内の案内" data-label-en="Footer" data-label-zh="页脚导航">
     <a href="about.html"><span class="ja">このサービスについて</span><span class="en">About</span><span class="zh">关于</span></a>
     <a href="https://www.instagram.com/roomradar_nust/" target="_blank" rel="noopener">Instagram</a>
     <a href="index.html#feedback"><span class="ja">意見箱</span><span class="en">Feedback</span><span class="zh">意见箱</span></a>
@@ -232,68 +921,157 @@ function setLang(lang) {
   const btn = document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`);
   btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true');
   document.documentElement.lang = lang === 'ja' ? 'ja' : lang === 'zh' ? 'zh-Hans' : 'en';
-  try { localStorage.setItem('rr_lp_lang', lang); } catch (e) {}   // about.html と同じ言語で開く
+  try { localStorage.setItem('rr_lp_lang', lang); } catch (e) {}   // index.html と同じ言語で開く
 }
 
 // 前に選んだ言語で開く（端末に保存。2026-11-07）
 try { const saved = localStorage.getItem('rr_lp_lang'); if (saved === 'en' || saved === 'zh') setLang(saved); } catch (e) {}
 
-// アプリを開くボタンが押されたら記録する（どのボタンか。2026-11-09 定着の改善 A5）
+// アプリを開くボタンが押されたら記録する（place は紹介ページと同じ語彙: hero / sticky / cta。目次の「開く」は data-place="sticky"）
+// メモ: 言語ボタンのフォーカスの輪の直し（about.css の .lang-toggle / .lang-btn）は、次に lp.css を触るときに lp.css へ移す
 document.addEventListener('click', e => {
   const a = e.target.closest && e.target.closest('a[href^="https://nust-room-search.onrender.com"]');
   if (!a || typeof gtag !== 'function') return;
-  const place = a.classList.contains('hero-cta') ? 'hero' : a.classList.contains('sticky-cta') ? 'sticky'
-              : a.classList.contains('cta-btn') ? 'cta' : (a.className || 'other');
+  const place = a.dataset.place || (a.classList.contains('hero-cta') ? 'hero' : a.classList.contains('cta-btn') ? 'cta' : 'other');
   gtag('event', 'open_app', { place: String(place).slice(0, 40), page: location.pathname.endsWith('about.html') ? 'about' : 'lp' });
 });
 
-// スクロールアニメーション
-const observer = new IntersectionObserver(
-  entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
-  { threshold: 0.12 }
-);
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+// スクロールで少しだけ動かして出す。隠すのは head で ab-anim が付いたときだけ（動きを減らす設定・古いブラウザでは最初から全部見える）
+if ('IntersectionObserver' in window) {
+  const observer = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } }),
+    { threshold: 0.08, rootMargin: '0px 0px -4% 0px' }
+  );
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  window.abRevealReady = true;
+}
 
 // ════════════════════════════════════════════
-// 3つの校舎の 3D 模型: 画面に近づいてから読み込む。WebGL が使えなければ静止表示のまま
+// 2つの校舎: 静止の図（最初から）→ 近くでスクロールが止まったら 3D の模型。
+// 校舎のボタンは静止の図でも効く（選んだ校舎を図の中で強調）。WebGL が使えない・読み込みに失敗したときは図のまま、文字で知らせる。
+// データ節約の設定の人には自動で読まず、「回せる模型を読み込む」ボタンで選んでもらう。
 // ════════════════════════════════════════════
 (function () {
   const stage = document.getElementById('campusStage');
-  if (!stage || !('IntersectionObserver' in window)) return;
-  const picks = document.querySelectorAll('.campus-pick');
-  let el = null, overview = true;
-  const DEF = { tower: '2-5F', ichi: '3-5F', funa: 'bldg' };
-  function mark(id) { picks.forEach(b => b.setAttribute('aria-pressed', b.dataset.id === id ? 'true' : 'false')); }
+  const group = document.getElementById('campusPicks');
+  if (!stage || !group) return;
+  const picks = group.querySelectorAll('.ab-pick');
+  const loadBtn = document.getElementById('campusLoad');
+  const DEF = { tower: '2-5F', ichi: '3-5F' };
+  const LABEL = {
+    ja: '駿河台キャンパスの2つの校舎の模型（模式図。光る階は空き教室のイメージ）',
+    en: 'A schematic model of the two buildings on the Surugadai campus (lit floors are only an illustration)',
+    zh: '骏河台校区2栋教学楼的模型（示意图，发光楼层仅为示意）',
+  };
+  // 模型の中の番号ボタン（1・2）の読み上げ名。campuses の順（tower → ichi）に並ぶ
+  const BADGE = {
+    ja: ['タワー・スコラ', '駿河台校舎 1号館'],
+    en: ['Tower Schola', 'Surugadai Building 1'],
+    zh: ['Tower Schola', '骏河台校舍1号馆'],
+  };
+  let all = null, one = null, current = 'all', live = false;
+  const lang = () => { const c = document.body.classList; return c.contains('lang-en') ? 'en' : c.contains('lang-zh') ? 'zh' : 'ja'; };
+  // 状態の文字は、いまの状態の1つだけ hidden を外す（ライブ領域の中身が実際に変わるので、読み上げに伝わる）
+  const setState = s => {
+    stage.dataset.state = s;
+    ['loading', 'ready', 'failed'].forEach(k => { const el = stage.querySelector('.s-' + k); if (el) el.hidden = k !== s; });
+  };
+  function mark(id) {
+    current = id; stage.dataset.show = id;
+    picks.forEach(b => b.setAttribute('aria-pressed', b.dataset.id === id ? 'true' : 'false'));
+  }
+  // 読み上げ用の名前を言語に合わせて付け直す（模型の中の canvas にも写す）
+  function relabel() {
+    [all, one].forEach(n => {
+      if (!n) return;
+      n.setAttribute('aria-label', LABEL[lang()]);
+      const c = n.shadowRoot && n.shadowRoot.querySelector('canvas');
+      if (c) c.setAttribute('aria-label', LABEL[lang()]);
+      if (n.shadowRoot) n.shadowRoot.querySelectorAll('button').forEach((b, i) => { if (BADGE[lang()][i]) b.setAttribute('aria-label', BADGE[lang()][i]); });
+    });
+  }
+  if ('MutationObserver' in window) new MutationObserver(relabel).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
   function make(mode, id) {
     const n = document.createElement('rr-campus');
     n.setAttribute('mode', mode); n.setAttribute('theme', 'day');
-    n.setAttribute('aria-label', '日本大学理工学部 駿河台キャンパスの2つの校舎の模型（模式図）');
-    n.setAttribute('campuses', 'tower ichi');   // テスト運用は駿河台キャンパスの2校舎だけが対象（2026-10 学生課と協議）
+    n.setAttribute('aria-label', LABEL[lang()]);
+    n.setAttribute('campuses', 'tower ichi');   // テスト運用の対象は駿河台キャンパスの2校舎だけ
     if (mode === 'overview') n.setAttribute('badges', '');
-    else { n.setAttribute('focus', id); n.setAttribute('zone', DEF[id]); }
-    n.addEventListener('ready', () => stage.classList.add('loaded'));
-    n.addEventListener('error', () => { stage.classList.remove('loaded'); n.remove(); });
-    n.addEventListener('pick', e => show(e.detail.id));
-    if (el) el.remove();
-    stage.appendChild(n); el = n;
+    else { n.setAttribute('zone', DEF[id]); n.setAttribute('focus', id); }
+    n.addEventListener('pick', e => choose(e.detail.id));
+    n.addEventListener('ready', relabel);   // 番号ボタンは、つないだときに日本語の名前で作られる
+    return n;   // 属性とリスナーは、つなぐ前に付ける（error はつないだ瞬間に飛ぶ）
   }
-  // 校舎を選ぶと、その校舎だけの模型に切り替える。同じボタンをもう一度押すと全体に戻る
-  function show(id) {
-    if (!el) return;
-    const same = !overview && el.getAttribute('focus') === id;
-    if (same) { overview = true; make('overview'); mark(null); return; }
-    if (overview) { overview = false; make('single', id); }
-    else { el.setAttribute('zone', DEF[id]); el.setAttribute('focus', id); }
+  // 全体と1棟の模型を1つずつだけ作り、hidden で出し分ける（切り替えのたびに作り直さない）
+  function show3d(id) {
+    if (!all) return;
+    if (id === 'all') { all.hidden = false; if (one) one.hidden = true; return; }
+    if (!one) {
+      const n = make('single', id);
+      n.addEventListener('ready', () => { if (one === n && current !== 'all') all.hidden = true; });
+      n.addEventListener('error', () => { n.remove(); if (one === n) one = null; all.hidden = false; mark('all'); });
+      one = n; stage.appendChild(n); relabel();
+    } else {
+      one.setAttribute('zone', DEF[id]); one.setAttribute('focus', id);
+      one.hidden = false; all.hidden = true;
+    }
+  }
+  function choose(id) {
+    if (id !== 'all' && id === current) id = 'all';       // 同じ校舎をもう一度押すと全体に戻る
     mark(id);
+    if (live) show3d(id);
   }
-  picks.forEach(b => b.addEventListener('click', () => show(b.dataset.id)));
+  picks.forEach(b => b.addEventListener('click', () => choose(b.dataset.id)));
+
+  // 模型が使えなかった: 静止の図に戻し、文字で知らせる（ボタンは図の中の強調として使える）
+  function giveUp() {
+    [all, one].forEach(n => { if (n) n.remove(); });
+    all = one = null; live = false;
+    stage.classList.remove('is-live'); setState('failed');
+  }
+  function start() {
+    // 押したボタンが消えてもフォーカスが迷子にならないよう、先に模型の台へ移す
+    if (loadBtn && document.activeElement === loadBtn) stage.focus({ preventScroll: true });
+    if (loadBtn) loadBtn.hidden = true;
+    setState('loading');
+    import('./assets/lp/rr-campus3d.js').then(() => {
+      const n = make('overview');
+      n.addEventListener('ready', () => {
+        live = true; stage.classList.add('is-live'); setState('ready');
+        if (current !== 'all') show3d(current);
+      });
+      n.addEventListener('error', giveUp);
+      all = n; stage.appendChild(n); relabel();
+    }).catch(giveUp);
+  }
+
+  if (!('IntersectionObserver' in window) || !window.customElements) { setState('failed'); return; }
+  if (navigator.connection && navigator.connection.saveData) {   // 通信量を抑える設定: 押してから読む
+    if (loadBtn) { loadBtn.hidden = false; loadBtn.addEventListener('click', start); }
+    return;
+  }
+  // 近くに来て、スクロールが止まってから読み込む。目次で一気に飛ぶときに横を通り過ぎるだけなら読み込まない
+  // （模型の準備は重く、スクロールの途中で始めると目次のジャンプが途中で止まることがあった）
+  let near = false, started = false, settle = 0;
+  function arm() {
+    clearTimeout(settle);
+    settle = setTimeout(() => {
+      if (!near || started) return;
+      started = true; io.disconnect(); window.removeEventListener('scroll', onScroll);
+      start();
+    }, 350);
+  }
+  function onScroll() { if (near) arm(); }
   const io = new IntersectionObserver(entries => {
-    if (!entries.some(e => e.isIntersecting)) return;
-    io.disconnect();
-    import('./assets/lp/rr-campus3d.js').then(() => make('overview')).catch(() => {});
+    near = entries[entries.length - 1].isIntersecting;
+    if (near) arm();
   }, { rootMargin: '300px 0px' });
   io.observe(stage);
+  window.addEventListener('scroll', onScroll, { passive: true });
 })();
 </script>
+<!-- 目次の現在地・読み上げ名の言語・テスト運用の期間の目印（無くても読める） -->
+<script src="assets/lp/about.js?v=20261116" defer></script>
 </body>
 </html>
