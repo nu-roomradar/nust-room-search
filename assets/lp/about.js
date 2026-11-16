@@ -1,6 +1,6 @@
 /* about.html の小さな演出。無くても全部読める（言語切替・計測・3D 模型の読み込みは about.html の中にある）。
    1) 目次：いま読んでいる章に印を付ける  2) 読み上げ用の名前（aria-label）を言語に合わせる
-   3) テスト運用の期間のうち、今日がどのあたりかの目印 */
+   3) テスト運用の期間のうち、今日がどのあたりかの目印  4) 印刷のときに閉じた details を開く */
 (function () {
   'use strict';
   var doc = document;
@@ -67,5 +67,13 @@
       now.hidden = false; span.hidden = false;
     }
   }
+
+  // ── 4) 印刷するときは、閉じている details（よくある質問・くわしく・それより前の年表）も開いて全部出す。終わったら戻す ──
+  window.addEventListener('beforeprint', function () {
+    Array.prototype.forEach.call(doc.querySelectorAll('details:not([open])'), function (d) { d.setAttribute('data-pr', '1'); d.open = true; });
+  });
+  window.addEventListener('afterprint', function () {
+    Array.prototype.forEach.call(doc.querySelectorAll('details[data-pr]'), function (d) { d.removeAttribute('data-pr'); d.open = false; });
+  });
 
 })();
