@@ -1,138 +1,143 @@
 {
- "updated": "2026-11-09",
+ "updated": "2026-11-16",
  "period": {
-  "start": "2026-10-12",
-  "end": "2026-11-08"
+  "start": "2026-10-19",
+  "end": "2026-11-15"
  },
  "totals": {
   "all": {
-   "active_users": 1565,
-   "new_users": 1536,
-   "sessions": 2399,
-   "page_views": 4128,
-   "events": 14323
+   "active_users": 1819,
+   "new_users": 1790,
+   "sessions": 3055,
+   "page_views": 5404,
+   "events": 19541
   },
   "lp": {
-   "active_users": 858,
-   "new_users": 853,
-   "sessions": 1230,
-   "page_views": 1342,
-   "events": 4374
+   "active_users": 988,
+   "new_users": 984,
+   "sessions": 1517,
+   "page_views": 1661,
+   "events": 5504
   },
   "app": {
-   "active_users": 707,
-   "new_users": 683,
-   "sessions": 1174,
-   "page_views": 2786,
-   "events": 9949
+   "active_users": 831,
+   "new_users": 806,
+   "sessions": 1569,
+   "page_views": 3743,
+   "events": 14037
   }
  },
  "events": {
-  "search": 1161,
-  "report_room": 79,
-  "report_cancel": 14,
+  "search": 1384,
+  "report_room": 102,
+  "report_cancel": 15,
   "feedback_submit": 3,
-  "purpose_study": 52,
-  "purpose_group": 12,
-  "purpose_meeting": 9,
-  "purpose_break": 15,
-  "purpose_other": 5,
-  "purpose_skip": 10
+  "purpose_study": 80,
+  "purpose_group": 15,
+  "purpose_meeting": 12,
+  "purpose_break": 27,
+  "purpose_other": 6,
+  "purpose_skip": 19
  },
  "purposes": [
   {
    "label": "study",
-   "count": 52
+   "count": 80
   },
   {
    "label": "group",
-   "count": 12
-  },
-  {
-   "label": "meeting",
-   "count": 9
-  },
-  {
-   "label": "break",
    "count": 15
   },
   {
+   "label": "meeting",
+   "count": 12
+  },
+  {
+   "label": "break",
+   "count": 27
+  },
+  {
    "label": "other",
-   "count": 5
+   "count": 6
   }
  ],
- "purpose_skip": 10,
+ "purpose_skip": 19,
  "search_building": [
   {
    "label": "all",
-   "count": 550
+   "count": 661
   },
   {
    "label": "tower",
-   "count": 236
+   "count": 305
   },
   {
    "label": "funabashi",
-   "count": 204
+   "count": 226
   },
   {
    "label": "main",
-   "count": 171
+   "count": 192
   }
  ],
  "search_period": [
   {
    "label": "3",
-   "count": 314
-  },
-  {
-   "label": "1",
-   "count": 212
+   "count": 399
   },
   {
    "label": "2",
-   "count": 211
+   "count": 246
   },
   {
    "label": "4",
-   "count": 186
+   "count": 239
+  },
+  {
+   "label": "1",
+   "count": 237
   },
   {
    "label": "5",
-   "count": 120
+   "count": 141
   },
   {
    "label": "6",
-   "count": 118
+   "count": 122
   }
  ],
  "search_day": [
   {
    "label": "木",
-   "count": 478
+   "count": 499
   },
   {
    "label": "水",
-   "count": 261
+   "count": 341
   },
   {
    "label": "金",
-   "count": 169
+   "count": 190
   },
   {
    "label": "火",
-   "count": 120
+   "count": 166
   },
   {
    "label": "月",
-   "count": 106
+   "count": 157
   },
   {
    "label": "土",
-   "count": 27
+   "count": 31
   }
  ],
  "report_rooms": [
+  {
+   "label": "S201",
+   "building": "タワースコラ",
+   "count": 6
+  },
   {
    "label": "S401",
    "building": "タワースコラ",
@@ -140,6 +145,11 @@
   },
   {
    "label": "142",
+   "building": "駿河台校舎",
+   "count": 4
+  },
+  {
+   "label": "132",
    "building": "駿河台校舎",
    "count": 3
   },
@@ -149,7 +159,7 @@
    "count": 3
   },
   {
-   "label": "S201",
+   "label": "S306",
    "building": "タワースコラ",
    "count": 3
   },
@@ -159,27 +169,17 @@
    "count": 3
   },
   {
-   "label": "1042",
-   "building": "船橋校舎",
-   "count": 2
-  },
-  {
    "label": "131",
    "building": "駿河台校舎",
    "count": 2
   },
   {
-   "label": "132",
+   "label": "154",
    "building": "駿河台校舎",
    "count": 2
   },
   {
    "label": "171",
-   "building": "駿河台校舎",
-   "count": 2
-  },
-  {
-   "label": "701752",
    "building": "駿河台校舎",
    "count": 2
   }
@@ -196,32 +196,32 @@
   "火": [
    0,
    1,
-   0,
+   1,
    0,
    0,
    0
   ],
   "水": [
    2,
+   3,
+   5,
    2,
-   2,
-   0,
    0,
    8
   ],
   "木": [
-   6,
-   2,
-   6,
    7,
+   4,
+   8,
+   12,
    4,
    1
   ],
   "金": [
+   5,
+   6,
+   3,
    4,
-   3,
-   3,
-   1,
    3,
    2
   ],
@@ -234,26 +234,70 @@
    0
   ]
  },
+ "report_hotspots": [
+  {
+   "room": "S201",
+   "day": "木",
+   "period": "4",
+   "count": 3
+  },
+  {
+   "room": "154",
+   "day": "金",
+   "period": "2",
+   "count": 2
+  },
+  {
+   "room": "171",
+   "day": "金",
+   "period": "3",
+   "count": 2
+  },
+  {
+   "room": "S201",
+   "day": "月",
+   "period": "4",
+   "count": 2
+  },
+  {
+   "room": "S306",
+   "day": "水",
+   "period": "3",
+   "count": 2
+  },
+  {
+   "room": "S401",
+   "day": "木",
+   "period": "3",
+   "count": 2
+  },
+  {
+   "room": "S505",
+   "day": "金",
+   "period": "5",
+   "count": 2
+  }
+ ],
  "channels": [
   {
    "label": "Referral",
-   "sessions": 1133
+   "sessions": 1506
   },
   {
    "label": "Direct",
-   "sessions": 1117
+   "sessions": 1391
   },
   {
    "label": "Organic Social",
-   "sessions": 91
+   "sessions": 113
   },
   {
    "label": "Organic Search",
-   "sessions": 61
+   "sessions": 70
   },
   {
    "label": "Unassigned",
-   "sessions": 5
+   "sessions": 6
   }
  ]
 }
