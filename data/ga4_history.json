@@ -1,113 +1,5 @@
 [
  {
-  "date": "2026-10-12",
-  "active_users": 18,
-  "new_users": 11,
-  "page_views": 36,
-  "sessions": 21,
-  "lp": {
-   "active_users": 10,
-   "new_users": 7,
-   "page_views": 15,
-   "sessions": 12
-  },
-  "app": {
-   "active_users": 8,
-   "new_users": 4,
-   "page_views": 21,
-   "sessions": 9
-  }
- },
- {
-  "date": "2026-10-13",
-  "active_users": 7,
-  "new_users": 6,
-  "page_views": 14,
-  "sessions": 9,
-  "app": {
-   "active_users": 4,
-   "new_users": 3,
-   "page_views": 10,
-   "sessions": 4
-  },
-  "lp": {
-   "active_users": 3,
-   "new_users": 3,
-   "page_views": 4,
-   "sessions": 5
-  }
- },
- {
-  "date": "2026-10-14",
-  "active_users": 0,
-  "new_users": 0,
-  "page_views": 0,
-  "sessions": 1,
-  "app": {
-   "active_users": 0,
-   "new_users": 0,
-   "page_views": 0,
-   "sessions": 1
-  }
- },
- {
-  "date": "2026-10-15",
-  "active_users": 9,
-  "new_users": 5,
-  "page_views": 14,
-  "sessions": 10,
-  "lp": {
-   "active_users": 5,
-   "new_users": 4,
-   "page_views": 5,
-   "sessions": 5
-  },
-  "app": {
-   "active_users": 4,
-   "new_users": 1,
-   "page_views": 9,
-   "sessions": 5
-  }
- },
- {
-  "date": "2026-10-16",
-  "active_users": 2,
-  "new_users": 1,
-  "page_views": 4,
-  "sessions": 3,
-  "lp": {
-   "active_users": 1,
-   "new_users": 1,
-   "page_views": 1,
-   "sessions": 1
-  },
-  "app": {
-   "active_users": 1,
-   "new_users": 0,
-   "page_views": 3,
-   "sessions": 2
-  }
- },
- {
-  "date": "2026-10-18",
-  "active_users": 4,
-  "new_users": 0,
-  "page_views": 11,
-  "sessions": 7,
-  "app": {
-   "active_users": 4,
-   "new_users": 0,
-   "page_views": 9,
-   "sessions": 5
-  },
-  "lp": {
-   "active_users": 0,
-   "new_users": 0,
-   "page_views": 2,
-   "sessions": 2
-  }
- },
- {
   "date": "2026-10-19",
   "active_users": 4,
   "new_users": 3,
@@ -470,21 +362,154 @@
  },
  {
   "date": "2026-11-08",
-  "active_users": 9,
-  "new_users": 7,
-  "page_views": 32,
-  "sessions": 27,
+  "active_users": 75,
+  "new_users": 56,
+  "page_views": 185,
+  "sessions": 113,
   "app": {
-   "active_users": 8,
-   "new_users": 6,
+   "active_users": 42,
+   "new_users": 30,
+   "page_views": 132,
+   "sessions": 66
+  },
+  "lp": {
+   "active_users": 33,
+   "new_users": 26,
+   "page_views": 53,
+   "sessions": 47
+  }
+ },
+ {
+  "date": "2026-11-09",
+  "active_users": 103,
+  "new_users": 58,
+  "page_views": 252,
+  "sessions": 152,
+  "app": {
+   "active_users": 54,
+   "new_users": 29,
+   "page_views": 177,
+   "sessions": 85
+  },
+  "lp": {
+   "active_users": 49,
+   "new_users": 29,
+   "page_views": 75,
+   "sessions": 67
+  }
+ },
+ {
+  "date": "2026-11-10",
+  "active_users": 9,
+  "new_users": 3,
+  "page_views": 23,
+  "sessions": 23,
+  "app": {
+   "active_users": 6,
+   "new_users": 1,
+   "page_views": 15,
+   "sessions": 15
+  },
+  "lp": {
+   "active_users": 3,
+   "new_users": 2,
+   "page_views": 8,
+   "sessions": 8
+  }
+ },
+ {
+  "date": "2026-11-11",
+  "active_users": 113,
+  "new_users": 62,
+  "page_views": 304,
+  "sessions": 164,
+  "app": {
+   "active_users": 61,
+   "new_users": 30,
+   "page_views": 228,
+   "sessions": 90
+  },
+  "lp": {
+   "active_users": 52,
+   "new_users": 32,
+   "page_views": 76,
+   "sessions": 74
+  }
+ },
+ {
+  "date": "2026-11-12",
+  "active_users": 90,
+  "new_users": 46,
+  "page_views": 265,
+  "sessions": 132,
+  "app": {
+   "active_users": 46,
+   "new_users": 18,
+   "page_views": 199,
+   "sessions": 74
+  },
+  "lp": {
+   "active_users": 44,
+   "new_users": 28,
+   "page_views": 66,
+   "sessions": 58
+  }
+ },
+ {
+  "date": "2026-11-13",
+  "active_users": 103,
+  "new_users": 52,
+  "page_views": 303,
+  "sessions": 147,
+  "app": {
+   "active_users": 58,
+   "new_users": 26,
+   "page_views": 238,
+   "sessions": 95
+  },
+  "lp": {
+   "active_users": 45,
+   "new_users": 26,
+   "page_views": 65,
+   "sessions": 53
+  }
+ },
+ {
+  "date": "2026-11-14",
+  "active_users": 7,
+  "new_users": 3,
+  "page_views": 30,
+  "sessions": 17,
+  "app": {
+   "active_users": 6,
+   "new_users": 2,
    "page_views": 26,
-   "sessions": 21
+   "sessions": 13
   },
   "lp": {
    "active_users": 1,
    "new_users": 1,
-   "page_views": 6,
-   "sessions": 6
+   "page_views": 4,
+   "sessions": 4
+  }
+ },
+ {
+  "date": "2026-11-15",
+  "active_users": 8,
+  "new_users": 4,
+  "page_views": 25,
+  "sessions": 12,
+  "app": {
+   "active_users": 5,
+   "new_users": 1,
+   "page_views": 20,
+   "sessions": 7
+  },
+  "lp": {
+   "active_users": 3,
+   "new_users": 3,
+   "page_views": 5,
+   "sessions": 5
   }
  }
 ]
