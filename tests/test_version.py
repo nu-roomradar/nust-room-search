@@ -88,15 +88,18 @@ class StaticPagesTest(unittest.TestCase):
 class AppPagesTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        # app.py は cwd 直下の DB を使う。ほかのテストが先に import して一時ディレクトリを消していることがあるので、
+        # いつも新しい一時ディレクトリに移り、揮発DBを作り直す
         cls._cwd = os.getcwd()
+        cls._tmp = tempfile.mkdtemp(prefix="rr-ver-")
+        shutil.copy(ROOT / "schedule_final.db", cls._tmp)
+        os.chdir(cls._tmp)
         if "app" in sys.modules:
             cls.rr = sys.modules["app"]
+            cls.rr.init_reports_db()
         else:
-            cls._tmp = tempfile.mkdtemp(prefix="rr-ver-")
-            shutil.copy(ROOT / "schedule_final.db", cls._tmp)
-            os.chdir(cls._tmp)
             sys.path.insert(0, str(ROOT))
-            import app  # noqa: E402  揮発DBは一時ディレクトリに作る
+            import app  # noqa: E402  import 時に揮発DBを cwd（一時ディレクトリ）に作る
             cls.rr = app
         cls.rr.app.config["TESTING"] = True
         cls.client = cls.rr.app.test_client()
@@ -104,6 +107,7 @@ class AppPagesTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         os.chdir(cls._cwd)
+        shutil.rmtree(cls._tmp, ignore_errors=True)
 
     def test_app_reads_version_file(self):
         self.assertEqual(self.rr.SERVICE_VERSION, VERSION)
