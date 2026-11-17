@@ -33,9 +33,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- 日本語は Noto Sans JP（検索アプリ本体とも同じ）。文字のまとまりごとに分割して配信されるので、使う文字の分だけ読み込まれる -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/lp/lp.css?v=20261107">
+<link rel="stylesheet" href="assets/lp/lp.css?v=20261117">
 <!-- このページだけの見た目（読み物の組み）。共有の lp.css は変えず、後ろで上書きする -->
-<link rel="stylesheet" href="assets/lp/about.css?v=20261116">
+<link rel="stylesheet" href="assets/lp/about.css?v=20261117">
 <script>
 // js: JS が動く（JS が無いと動かない部品はこれが無いとき隠す）。
 // ab-anim: スクロールで出す動きの準備。動きを減らす設定でもないときだけ隠し、
@@ -124,7 +124,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
       <li><a href="#trust"><span class="ab-toc-no" aria-hidden="true">03</span><span class="ab-toc-t"><span class="ja">どこまで信じてよいか</span><span class="en">How far to trust it</span><span class="zh">可信的范围</span></span></a></li>
       <li><a href="#privacy"><span class="ab-toc-no" aria-hidden="true">04</span><span class="ab-toc-t"><span class="ja">情報の扱い</span><span class="en">Your data</span><span class="zh">信息处理</span></span></a></li>
       <li><a href="#trial"><span class="ab-toc-no" aria-hidden="true">05</span><span class="ab-toc-t"><span class="ja">テスト運用と校舎</span><span class="en">The trial &amp; buildings</span><span class="zh">试运营与教学楼</span></span></a></li>
-      <li><a href="#history"><span class="ab-toc-no" aria-hidden="true">06</span><span class="ab-toc-t"><span class="ja">これまでの歩み</span><span class="en">The story so far</span><span class="zh">一路走来</span></span></a></li>
+      <li><a href="#history"><span class="ab-toc-no" aria-hidden="true">06</span><span class="ab-toc-t"><span class="ja">バージョン</span><span class="en">Versions</span><span class="zh">版本</span></span></a></li>
       <li><a href="#members"><span class="ab-toc-no" aria-hidden="true">07</span><span class="ab-toc-t"><span class="ja">開発メンバー</span><span class="en">The team</span><span class="zh">开发成员</span></span></a></li>
       <li><a href="#faq"><span class="ab-toc-no" aria-hidden="true">08</span><span class="ab-toc-t"><span class="ja">よくある質問</span><span class="en">FAQ</span><span class="zh">常见问题</span></span></a></li>
       <li><a href="#voice"><span class="ab-toc-no" aria-hidden="true">09</span><span class="ab-toc-t"><span class="ja">意見を送る</span><span class="en">Feedback</span><span class="zh">提意见</span></span></a></li>
@@ -724,32 +724,65 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
   </section>
 
   <!-- ════════════════════════════════════════════
-       06 これまでの歩み（日付の順。月だけの項目は同じ月の日付つきより前）
+       06 バージョン（いまのバージョンと、これまでの歩み。新しい順。番号と日付は docs/CHANGELOG.md、言い方は docs/OPERATIONS.md 4.11 の 6）
   ════════════════════════════════════════════ -->
   <section class="ab-ch" id="history" aria-labelledby="history-h">
-    <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">06</span><span class="ab-ch-name"><span class="ja">これまでの歩み</span><span class="en">The story so far</span><span class="zh">一路走来</span></span></p>
+    <p class="ab-ch-label"><span class="ab-ch-no" aria-hidden="true">06</span><span class="ab-ch-name"><span class="ja">バージョン</span><span class="en">Versions</span><span class="zh">版本</span></span></p>
     <h2 class="ab-h2" id="history-h"><span class="ja"><span class="ab-nb">少しずつ、</span><span class="ab-nb">直してきました。</span></span><span class="en">Small fixes, one after another.</span><span class="zh"><span class="ab-nb">一点一点，</span><span class="ab-nb">改到现在。</span></span></h2>
 
-    <details class="ab-tl-more">
-      <summary><span class="ab-more-d-row"><span class="ja">それより前（2026年5月〜9月）</span><span class="en">Earlier (May–September 2026)</span><span class="zh">更早（2026年5月〜9月）</span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
-      <ol class="ab-tl">
-      <li><time datetime="2026-05-21">2026.05.21</time><p><span class="ja">Instagram で紹介を始めました</span><span class="en">Started posting on Instagram</span><span class="zh">开始在 Instagram 介绍</span></p></li>
-      <li><time datetime="2026-06-10">2026.06.10</time><p><span class="ja">ロゴを新しくしました</span><span class="en">A new logo</span><span class="zh">更换了新标志</span></p></li>
-      <li><time datetime="2026-06-14">2026.06.14</time><p><span class="ja">紹介ページに意見箱</span><span class="en">Added a feedback box to the home page</span><span class="zh">在首页设置了意见箱</span></p></li>
-      <li><time datetime="2026-08-05">2026.08.05</time><p><span class="ja">紹介ページのアドレスを変更</span><span class="en">Home page address changed</span><span class="zh">首页更换为现在的网址</span></p></li>
-      <li><time datetime="2026-09">2026.09</time><p><span class="ja"><span class="ab-nb">時間割データを</span><span class="ab-nb">原本から作り直せるように</span></span><span class="en">Timetable data rebuilt from the sources</span><span class="zh">课程表数据可从原始表重建</span></p></li>
-      </ol>
-    </details>
-    <ol class="ab-tl reveal">
-      <li><time datetime="2026-10">2026.10</time><p><span class="ja">確認できた教室変更を反映</span><span class="en">Confirmed room changes applied</span><span class="zh">反映已确认的教室变更</span></p></li>
-      <li class="is-key"><time datetime="2026-10-13">2026.10.13</time><p><span class="ja">駿河台でテスト運用を開始</span><span class="en">Trial began at Surugadai</span><span class="zh">在骏河台校区开始试运营</span></p></li>
-      <li><time datetime="2026-10-25">2026.10.25</time><p><span class="ja">任意・匿名の質問「何に使う？」</span><span class="en">Optional question <span class="ab-ui" lang="ja">「何に使う？」</span></span><span class="zh">自愿匿名提问<span class="ab-ui" lang="ja">“何に使う？”</span></span></p></li>
-      <li><time datetime="2026-10-30">2026.10.30</time><p><span class="ja">季節の見た目と、戻すスイッチ</span><span class="en">Seasonal looks, with a switch back</span><span class="zh">季节外观和切换开关</span></p></li>
-      <li><time datetime="2026-11-07">2026.11.07</time><p><span class="ja">くわしい説明をこのページへ</span><span class="en">Moved the details to this page</span><span class="zh">把详细说明移到了本页面</span></p></li>
-      <li><time datetime="2026-11-09">2026.11.09</time><p><span class="ja"><span class="ab-nb">校舎を覚える・</span><span class="ab-nb">ホーム画面のアイコン</span></span><span class="en">Remembers your building; app icon</span><span class="zh">记住上次的教学楼；主屏幕图标</span></p></li>
-      <li class="to-plan"><time datetime="2026-11-11">2026.11.11</time><p><span class="ja"><span class="ab-nb">検索画面を整理</span><span class="ab-nb">（時限・校舎のタブ）</span></span><span class="en">Search screen reworked</span><span class="zh">整理搜索页面（时段、教学楼标签）</span></p></li>
-      <li class="is-plan"><time datetime="2026-12-19">2026.12.19</time><p><span class="ja">テスト運用の終了予定日</span><span class="en">Planned end of the trial</span><span class="zh">试运营预计结束日</span></p></li>
+    <!-- いまのバージョン（番号は VERSION と同じ。tests/test_version.py が一致を検査する） -->
+    <div class="ab-ver reveal" id="version">
+      <div class="ab-ver-now">
+        <p class="ab-ver-k"><span class="ja">いまのバージョン</span><span class="en">Current version</span><span class="zh">当前版本</span></p>
+        <p class="ab-ver-v" data-version="2.8.0">v2.8.0</p>
+        <p class="ab-ver-d"><time datetime="2026-11-17">2026.11.17</time></p>
+      </div>
+      <div class="ab-ver-how">
+        <dl class="ab-ver-parts">
+          <div><dt>2</dt><dd><span class="ja">節目</span><span class="en">Milestone</span><span class="zh">阶段</span></dd></div>
+          <div><dt>8</dt><dd><span class="ja">新しくできたこと</span><span class="en">New things</span><span class="zh">新功能</span></dd></div>
+          <div><dt>0</dt><dd><span class="ja">直し</span><span class="en">Fixes</span><span class="zh">修正</span></dd></div>
+        </dl>
+        <p class="ab-ver-p"><span class="ja">新しくできることが増えると真ん中が、直しだけなら右が1つ上がります。左の数字は、テスト運用を始めたときのような大きな節目で上がります。</span><span class="en">The middle number goes up when something new arrives, and the right one when there are only fixes. The left one moves at big milestones, like the start of the trial.</span><span class="zh">有新功能时中间的数字加一，只有修正时右边的数字加一。左边的数字在开始试运营这样的大阶段才会变化。</span></p>
+        <p class="ab-ver-note"><span class="ja">v2.7 より前の番号は、2026年11月にあとからまとめて付けたものです。いまのバージョンは、各ページのいちばん下にも小さく出しています。</span><span class="en">Numbers before v2.7 were assigned afterwards, in November 2026. The current version also appears in small type at the bottom of each page.</span><span class="zh">v2.7 之前的版本号是 2026年11月补上的。当前版本也以小字显示在各页面的最下方。</span></p>
+      </div>
+    </div>
+
+    <h3 class="ab-h3"><span class="ja">これまでの歩み</span><span class="en">The story so far</span><span class="zh">一路走来</span></h3>
+    <ol class="ab-tl ab-vl reveal">
+      <li class="is-plan to-plan"><span class="ab-vl-k"><time datetime="2026-12-19">2026.12.19</time></span><p><span class="ja">テスト運用の終了予定日</span><span class="en">Planned end of the trial</span><span class="zh">试运营预计结束日</span></p></li>
+      <li class="is-key"><span class="ab-vl-k"><span class="ab-vl-v">v2.8.0</span><time datetime="2026-11-17">2026.11.17</time></span><p><span class="ja"><span class="ab-nb">このページを作り直し、</span><span class="ab-nb">バージョンを表示</span></span><span class="en">Rebuilt this page; versions now shown</span><span class="zh">重做本页面，并显示版本号</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v2.7.0</span><time datetime="2026-11-14">2026.11.14</time></span><p><span class="ja">季節の見た目をもう1つ用意</span><span class="en">One more seasonal look</span><span class="zh">又准备了一种季节外观</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v2.6.0</span><time datetime="2026-11-12">2026.11.12</time></span><p><span class="ja"><span class="ab-nb">検索画面を「結果が先」に</span><span class="ab-nb">（時限・校舎のタブ）</span></span><span class="en">Search screen shows results first</span><span class="zh">搜索页面改为“结果优先”（时段、教学楼标签）</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v2.5.0</span><time datetime="2026-11-10">2026.11.10</time></span><p><span class="ja"><span class="ab-nb">ホーム画面のアイコン・</span><span class="ab-nb">前の校舎を覚える</span></span><span class="en">App icon; remembers your building</span><span class="zh">主屏幕图标；记住上次的教学楼</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v2.4.0</span><time datetime="2026-11-08">2026.11.08</time></span><p><span class="ja">「このサービスについて」のページ</span><span class="en">This “About” page</span><span class="zh">“关于”页面</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v2.3.0</span><time datetime="2026-11-07">2026.11.07</time></span><p><span class="ja">クリスマスの見た目</span><span class="en">Christmas look</span><span class="zh">圣诞外观</span></p></li>
+      <li class="is-z"><span class="ab-vl-k"><span class="ab-vl-v">v2.2.1</span><time datetime="2026-11-06">2026.11.06</time></span><p><span class="ja">ハロウィーンのあとは通常の見た目に</span><span class="en">Back to the normal look after Halloween</span><span class="zh">万圣节后恢复普通外观</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v2.2.0</span><time datetime="2026-10-31">2026.10.31</time></span><p><span class="ja">季節の見た目と、戻すスイッチ</span><span class="en">Seasonal looks, with a switch back</span><span class="zh">季节外观和切换开关</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v2.1.0</span><time datetime="2026-10-25">2026.10.25</time></span><p><span class="ja">任意・匿名の質問「何に使う？」</span><span class="en">Optional question <span class="ab-ui" lang="ja">「何に使う？」</span></span><span class="zh">自愿匿名提问<span class="ab-ui" lang="ja">“何に使う？”</span></span></p></li>
+      <li class="is-z"><span class="ab-vl-k"><span class="ab-vl-v">v2.0.3</span><time datetime="2026-10-24">2026.10.24</time></span><p><span class="ja">確認できた教室変更を反映（2件目）</span><span class="en">Second confirmed room change applied</span><span class="zh">反映已确认的教室变更（第2件）</span></p></li>
+      <li class="is-z"><span class="ab-vl-k"><span class="ab-vl-v">v2.0.2</span><time datetime="2026-10-22">2026.10.22</time></span><p><span class="ja">表記の文言を整えた</span><span class="en">Notice wording refined</span><span class="zh">调整了说明文字</span></p></li>
+      <li class="is-z"><span class="ab-vl-k"><span class="ab-vl-v">v2.0.1</span><time datetime="2026-10-16">2026.10.16</time></span><p><span class="ja">安全性の点検</span><span class="en">Security check</span><span class="zh">安全检查</span></p></li>
+      <li class="is-mile"><span class="ab-vl-k"><time datetime="2026-10-13">2026.10.13</time></span><p><span class="ja">駿河台でテスト運用を開始</span><span class="en">Trial began at Surugadai</span><span class="zh">在骏河台校区开始试运营</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v2.0.0</span><time datetime="2026-10-09">2026.10.09</time></span><p><span class="ja">テスト運用版（駿河台キャンパス）</span><span class="en">Trial version (Surugadai Campus)</span><span class="zh">试运营版（骏河台校区）</span></p></li>
     </ol>
+    <details class="ab-tl-more">
+      <summary><span class="ab-more-d-row"><span class="ja">それより前（v0〜v1、2026年1月〜10月）</span><span class="en">Earlier (v0–v1, January–October 2026)</span><span class="zh">更早（v0〜v1，2026年1月〜10月）</span><span class="ab-q-i" aria-hidden="true"></span></span></summary>
+      <ol class="ab-tl ab-vl">
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v1.8.0</span><time datetime="2026-09-28">2026.09.28</time></span><p><span class="ja"><span class="ab-nb">教室名で探せるように・</span><span class="ab-nb">紹介ページを新しく</span></span><span class="en">Search by room name; new home page</span><span class="zh">可按教室名搜索；首页焕新</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v1.7.0</span><time datetime="2026-09-23">2026.09.23</time></span><p><span class="ja"><span class="ab-nb">開いてすぐ「いま使える教室」・</span><span class="ab-nb">教室ごとの1週間</span></span><span class="en">Rooms free now, as soon as you open it; each room’s week</span><span class="zh">打开即显示“现在可用的教室”；每间教室的一周</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v1.6.0</span><time datetime="2026-09-14">2026.09.14</time></span><p><span class="ja">年度と学期を選べるように</span><span class="en">Choose the year and term</span><span class="zh">可选择学年和学期</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v1.5.0</span><time datetime="2026-08-04">2026.08.04</time></span><p><span class="ja">紹介ページのアドレスを変更</span><span class="en">Home page address changed</span><span class="zh">首页更换为现在的网址</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v1.4.0</span><time datetime="2026-06-24">2026.06.24</time></span><p><span class="ja"><span class="ab-nb">紹介ページのメニューと</span><span class="ab-nb">「大学公式ではない」の表記</span></span><span class="en">Home page menu and the “not official” notice</span><span class="zh">首页菜单和“非大学官方”的说明</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v1.3.0</span><time datetime="2026-06-15">2026.06.15</time></span><p><span class="ja">Instagram の QR コード</span><span class="en">Instagram QR code</span><span class="zh">Instagram 二维码</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v1.2.0</span><time datetime="2026-06-14">2026.06.14</time></span><p><span class="ja">紹介ページに意見箱</span><span class="en">Feedback box on the home page</span><span class="zh">在首页设置了意见箱</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v1.1.0</span><time datetime="2026-06-11">2026.06.11</time></span><p><span class="ja">新しいロゴ</span><span class="en">A new logo</span><span class="zh">新标志</span></p></li>
+      <li class="is-mile"><span class="ab-vl-k"><time datetime="2026-05-21">2026.05.21</time></span><p><span class="ja">Instagram で紹介を始めました</span><span class="en">Started posting on Instagram</span><span class="zh">开始在 Instagram 介绍</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v1.0.0</span><time datetime="2026-05-18">2026.05.18</time></span><p><span class="ja">紹介ページを出しました</span><span class="en">The home page went up</span><span class="zh">发布了首页</span></p></li>
+      <li><span class="ab-vl-k"><span class="ab-vl-v">v0</span><time datetime="2026-01">2026.01–05</time></span><p><span class="ja">試作</span><span class="en">Prototypes</span><span class="zh">试作</span></p></li>
+      </ol>
+      <p class="ab-vl-note"><span class="ja">直しだけの版は省いています。</span><span class="en">Versions with only fixes are left out here.</span><span class="zh">这里省略了只有修正的版本。</span></p>
+    </details>
   </section>
 
   <!-- ════════════════════════════════════════════
@@ -909,6 +942,7 @@ try { var rrLang = localStorage.getItem('rr_lp_lang'); if (rrLang === 'en' || rr
   <p class="foot-note"><span class="ja">© 2026 RoomRadar — 本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</span>
   <span class="en">© 2026 RoomRadar — This service is developed and run by students as part of Nihon University's student project program and is currently in trial operation. It is not an official service provided by the university.</span>
   <span class="zh">© 2026 RoomRadar — 本服务是学生作为日本大学“自主创造项目”的一环开发和运营的、正在试运营中的服务，并非大学官方提供的服务。</span></p>
+  <p class="foot-ver"><a href="#version">v2.8.0</a></p>
 </footer>
 
 <script>

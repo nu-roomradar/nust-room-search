@@ -332,6 +332,15 @@ select:focus { outline: none; border-color: var(--accent); }
     font-size: 0.7rem; color: var(--muted); text-align: center; line-height: 1.6;
 }
 
+/* ── 版番号（2026-11-17。docs/OPERATIONS.md 4.11）。足元に小さく出し、押すと about の「バージョン」へ ── */
+.app-ver {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.68rem; letter-spacing: 0.04em; color: var(--muted); text-decoration: none;
+}
+.app-ver:hover, .app-ver:focus-visible { text-decoration: underline; }
+.app-ver-row { margin-top: 6px; }
+.app-ver-foot { text-align: center; padding: 20px 0 28px; }
+
 /* ── 試験運用中・大学公式ではないことの控えめ表記（文言は 2026-10-22 に学生課が提案） ── */
 .test-banner {
     display: flex; align-items: center; gap: 8px;

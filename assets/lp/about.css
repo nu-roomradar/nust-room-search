@@ -525,6 +525,32 @@ html:not(.js) .ab-picks, html:not(.js) .lang-toggle { display: none; }   /* JS �
 .ab-tl-more summary:hover .ab-q-i { border-color: var(--ink); }
 .ab-tl-more .ab-tl { margin: 4px 0 14px; }
 
+/* 06 バージョン（2026-11-17）：いまのバージョンの札と、版ごとの歩み（新しい順） */
+.ab-ver { display: grid; gap: 14px; margin: 4px 0 30px; padding: 18px; background: var(--card); border: 1px solid var(--border); border-radius: var(--ab-r-lg); }
+.ab-ver-now { display: grid; align-content: start; gap: 2px; }
+.ab-ver-k { margin: 0; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em; color: var(--ab-sub); }
+.ab-ver-v { margin: 0; font-family: 'Noto Sans JP', sans-serif; font-weight: 800; font-size: clamp(2.4rem, 11vw, 3.4rem); line-height: 1.1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--ink); }
+.ab-ver-d { margin: 0; font-family: var(--ab-mono); font-size: 0.78rem; letter-spacing: 0.02em; color: var(--ab-sub); }
+.ab-ver-how { display: grid; gap: 10px; align-content: start; }
+.ab-ver-parts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.ab-ver-parts > div { display: grid; justify-items: center; gap: 2px; padding: 9px 6px 8px; border: 1px solid var(--ab-rule); border-radius: 12px; background: var(--bg); text-align: center; }
+.ab-ver-parts > div:nth-child(2) { border-color: var(--ab-blue-a); background: color-mix(in srgb, var(--accent) 6%, var(--card)); }
+.ab-ver-parts dt { font-family: 'Noto Sans JP', sans-serif; font-weight: 800; font-size: 1.3rem; line-height: 1.2; font-variant-numeric: tabular-nums; color: var(--ink); }
+.ab-ver-parts > div:nth-child(2) dt { color: var(--ab-blue); }
+.ab-ver-parts dd { margin: 0; font-size: 0.74rem; font-weight: 700; line-height: 1.4; color: var(--ab-sub); }
+.ab-ver-p { margin: 0; font-size: 0.88rem; line-height: 1.8; color: var(--ab-text); }
+.ab-ver-note { margin: 0; font-size: 0.78rem; line-height: 1.7; color: var(--ab-sub); }
+.ab-vl li { grid-template-columns: 6.2em minmax(0, 1fr); padding-bottom: 11px; }
+.ab-vl-k { display: grid; align-content: start; gap: 0; }
+.ab-vl-v { font-family: var(--ab-mono); font-size: 0.8rem; font-weight: 500; letter-spacing: 0.02em; line-height: 1.6; color: var(--ink); white-space: nowrap; }
+.ab-vl time { font-size: 0.68rem; line-height: 1.5; }
+.ab-vl .is-key .ab-vl-v { color: var(--ab-blue); }
+.ab-vl .is-mile::after { background: var(--ink); border-color: var(--ink); }
+.ab-vl .is-mile time { color: var(--ink); }
+.ab-vl .is-mile p { font-weight: 700; color: var(--ink); }
+.ab-vl-note { margin: -4px 0 14px; padding-left: 22px; font-size: 0.76rem; color: var(--ab-sub); }
+.ab-vl .is-z p { font-size: 0.84rem; color: var(--ab-sub); }
+
 /* ════════════════════════════════════════════
    07：開発メンバー（名簿）・つくり
 ════════════════════════════════════════════ */
@@ -628,6 +654,9 @@ body.lang-zh :is(.ab-notice, .ab-req) { letter-spacing: 0.05em; }   /* 狭い幅
    広い画面
 ════════════════════════════════════════════ */
 @media (min-width: 600px) {
+  .ab-vl li { grid-template-columns: 11.6em minmax(0, 1fr); padding-bottom: 8px; }
+  .ab-vl-k { grid-template-columns: 4.8em auto; column-gap: 10px; align-items: baseline; }
+  .ab-vl-k > time { grid-column: 2; font-size: 0.72rem; line-height: 1.7; }
   .ab-trial { padding: 6px 26px; }
   .ab-trial > div { grid-template-columns: 6.5em minmax(0, 1fr); gap: 20px; padding: 16px 0; }
   .ab-trial dt { padding-top: 0.25em; }
@@ -683,6 +712,7 @@ body.lang-zh :is(.ab-notice, .ab-req) { letter-spacing: 0.05em; }   /* 狭い幅
   .ab-stage { border-radius: var(--ab-r-lg); }
 }
 @media (min-width: 900px) {
+  .ab-ver { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 28px; padding: 24px 28px; }
   .ab-deck { max-width: 44em; }
   .ab-meta { grid-template-columns: repeat(4, 1fr); }
   .ab-meta > div { padding: 16px 16px 0 0; border-bottom: none; }
@@ -817,6 +847,7 @@ body.lang-zh :is(.ab-notice, .ab-req) { letter-spacing: 0.05em; }   /* 狭い幅
   .ab-pick { gap: 6px; padding: 0 11px; font-size: 0.78rem; }
   .ab-a { padding-right: 8px; }
   .ab-tl li { grid-template-columns: 1fr; gap: 0; }
+  .ab-vl-k { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; }
 }
 @media (max-width: 359px) {
   .ab-team { column-gap: 10px; }

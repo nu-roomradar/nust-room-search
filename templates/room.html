@@ -84,6 +84,7 @@
     <div class="card">
         {% include '_room_search_box.html' %}
     </div>
+    <div class="app-ver-foot">{% include "_version.html" %}</div>
 </div>
 <script src="{{ url_for('static', filename='rooms.js') }}?v={{ asset_version }}"></script>
 <script>
