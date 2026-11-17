@@ -1111,6 +1111,10 @@ footer { display: grid; gap: 10px; justify-items: center; }
 .foot-links a { color: inherit; font-weight: 700; text-decoration: none; opacity: 0.85; }
 .foot-links a:hover { opacity: 1; text-decoration: underline; }
 .foot-note { margin: 0; max-width: 760px; text-align: center; }
+/* 版番号（2026-11-17。docs/OPERATIONS.md 4.11）。足元に小さく出し、押すと about の「バージョン」へ */
+.foot-ver { margin: 0; }
+.foot-ver a { color: inherit; text-decoration: none; letter-spacing: 0.08em; }
+.foot-ver a:hover, .foot-ver a:focus-visible { color: var(--ink); text-decoration: underline; }
 @media (min-width: 900px) {
   .sec { padding: 112px 40px; }
   .p-list { grid-template-columns: repeat(3, 1fr); }

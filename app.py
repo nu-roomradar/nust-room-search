@@ -257,6 +257,19 @@ def _asset_version():
 ASSET_VERSION = _asset_version()
 
 
+def _service_version():
+    """利用者に見せる版番号（vX.Y.Z の X.Y.Z。docs/OPERATIONS.md 4.11）。リポジトリ直下の VERSION を読む。
+    紹介ページ・about・dashboard は静的なので同じ番号を直書きしていて、tests/test_version.py が一致を検査する"""
+    try:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'VERSION'), encoding='utf-8') as f:
+            v = f.read().strip()
+    except OSError:
+        return ''
+    return v if re.fullmatch(r'\d+\.\d+\.\d+', v) else ''
+
+SERVICE_VERSION = _service_version()
+
+
 # 期間限定の見た目（季節の着せ替え。2026-10-30 運営）。日本時間の日付で自動で切り替わり、期間が過ぎたら元に戻る。
 # (名前, (開始の月, 日), (終了の月, 日)) を毎年くり返す。中身は static/app.css の .theme-<名前> とテンプレートの飾り。
 # 期間は東京ディズニーリゾートのスペシャルイベントをもとに運営が決めた（2026-10-30）。ハロウィーン 9/16〜11/10、
@@ -357,6 +370,11 @@ def season_choices(now=None):
         return [season]                                  # 確認用に強制したときは、その季節だけ
     names = season_group(season)                         # 同じ組の中で、いまの季節までに始まったもの
     return [n for n in names[:names.index(season) + 1] if n in SEASON_READY]
+
+
+@app.context_processor
+def inject_service_version():
+    return {"rr_version": SERVICE_VERSION}
 
 
 @app.context_processor
