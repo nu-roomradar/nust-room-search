@@ -18,11 +18,11 @@
 .lab.top .big{background:rgba(255,138,61,.18);border-color:rgba(255,170,110,.8);box-shadow:0 0 60px rgba(255,138,61,.45)}
 .lab.top .nm{font-size:74px}
 .lab.top .pc{font-size:110px;color:var(--orange)}
-.chip{position:absolute;left:0;top:0;transform:translate(-50%,-100%);text-align:center;opacity:0}
+.chip{position:absolute;left:0;top:0;transform:translate(-50%,-100%);text-align:center;white-space:nowrap;opacity:0;text-shadow:0 3px 14px rgba(0,0,0,.55)}
 .chip b{display:block;font-family:Syne;font-weight:800;font-size:46px;line-height:1}
 .chip i{display:block;font-style:normal;font-weight:900;font-size:26px;color:var(--sub);margin-top:6px}
 .chip.c1 b{color:var(--orange);font-size:60px}
-.src{position:absolute;left:90px;right:90px;top:1460px;text-align:center;font-weight:500;font-size:30px;line-height:1.6;color:#b7c6e6}
+.src{position:absolute;left:90px;right:90px;top:1460px;text-align:center;font-weight:500;font-size:30px;line-height:1.6;color:#c9d5ee;text-shadow:0 2px 10px rgba(0,0,0,.8)}
 #m .t{top:420px;font-weight:900;font-size:90px;line-height:1.3}
 .chips{position:absolute;left:80px;right:80px;top:820px;display:flex;flex-wrap:wrap;justify-content:center;gap:24px}
 .chips span{font-weight:900;font-size:50px;padding:22px 38px;border-radius:99px;background:rgba(34,197,94,.16);border:3px solid rgba(34,197,94,.6);color:#c8f7d7}
@@ -82,7 +82,8 @@ window.BG3D = async t => {
     const [x, y] = row[r - 1];
     for (const id of [`L${r}`, `C${r}`]) {
       const e = document.getElementById(id);
-      e.style.left = (x * 1080) + 'px'; e.style.top = (y * 1920 - (id[0] === 'C' ? -40 : 0)) + 'px';
+      const px = id[0] === 'L' ? Math.max(230, Math.min(850, x * 1080)) : x * 1080;   // 大きな札は画面の端で切れないように
+      e.style.left = px + 'px'; e.style.top = (y * 1920 - (id[0] === 'C' ? -40 : 0)) + 'px';
     }
   }
 };
@@ -98,13 +99,15 @@ hide(tl, '#a', 1.75, 0.2);
 tl.to('#bg3', { opacity: 1, duration: 0.25 }, 1.85).to(['.shade-top', '.shade-bot'], { opacity: 1, duration: 0.3 }, 1.85)
   .to('#bgblur', { opacity: 0, duration: 0.3 }, 2.0);
 show(tl, '#r', 1.9, 0.15);
-tl.from('#r .head', { y: -30, opacity: 0, duration: 0.3 }, 1.9).from('.src', { opacity: 0, duration: 0.3 }, 2.1);
+tl.from('#r .head', { y: -30, opacity: 0, duration: 0.3 }, 1.9).from('.src', { opacity: 0, duration: 0.3 }, 2.1)
+  .to('#r .head', { opacity: 0, duration: 0.2 }, 6.0).to('#r .head', { opacity: 1, duration: 0.3 }, 7.6);   // 1位の札と重ならないように
 [5, 4, 3, 2, 1].forEach(r => {
   const t = REVEAL[r], up = r === 1 ? 0.9 : 0.55;
-  tl.to(`#L${r}`, { opacity: 1, duration: 0.25 }, t + up * 0.6)
-    .from(`#L${r} .big`, { scale: 0.7, duration: 0.35, ease: 'back.out(2)' }, t + up * 0.6)
-    .fromTo(`#p${r}`, { textContent: 0 }, { textContent: PCT[r], duration: r === 1 ? 0.7 : 0.45, snap: { textContent: 1 }, ease: 'power2.out' }, t + up * 0.6);
-  const next = r === 1 ? 7.0 : REVEAL[r - 1];
+  const on = t + up * 0.4;
+  tl.to(`#L${r}`, { opacity: 1, duration: 0.25 }, on)
+    .from(`#L${r} .big`, { scale: 0.7, duration: 0.35, ease: 'back.out(2)' }, on)
+    .fromTo(`#p${r}`, { textContent: 0 }, { textContent: PCT[r], duration: r === 1 ? 0.7 : 0.45, snap: { textContent: 1 }, ease: 'power2.out' }, on);
+  const next = r === 1 ? 7.6 : REVEAL[r - 1];
   tl.to(`#L${r}`, { opacity: 0, duration: 0.2 }, next).to(`#C${r}`, { opacity: 1, duration: 0.25 }, next + 0.1);
 });
 hide(tl, '#r', 8.5, 0.2);
