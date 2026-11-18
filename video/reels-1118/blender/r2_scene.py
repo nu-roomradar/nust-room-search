@@ -10,7 +10,7 @@ from bpy_extras.object_utils import world_to_camera_view
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "..", "frames2")
 FPS = 30
-F0, F1 = 0, 354
+F0, F1 = 198, 354                    # v3：3D は正解のあと（6.6〜11.8 秒）だけ
 DAYS = "月火水木金"
 GRID = {"月": [49, 40, 42, 46, 51, 61], "火": [43, 30, 29, 33, 52, 57], "水": [38, 31, 24, 28, 48, 59],
         "木": [51, 37, 41, 44, 52, 58], "金": [37, 33, 34, 37, 52, 55]}
@@ -58,7 +58,7 @@ for d, day in enumerate(DAYS):
         o.data.transform(Matrix.Translation((0, 0, 0.5))); o.scale = (1.0, 1.0, h); bpy.ops.object.transform_apply(scale=True)
         md = o.modifiers.new("bevel", "BEVEL"); md.width = 0.1; md.segments = 5; bpy.ops.object.shade_smooth()
         m = mat(f"m_{day}{p}", heat(v), rough=0.32, coat=0.5, strength=0.06); o.data.materials.append(m)
-        t0 = 0.05 + (d * 6 + p) * 0.025                         # 0.05〜0.9 秒で順に
+        t0 = 6.6 + (d * 6 + p) * 0.02                           # 6.6〜7.2 秒で手前から順に（v3）
         o.location = (x, y, -h - 0.05); o.keyframe_insert("location", frame=0); o.keyframe_insert("location", frame=int(t0 * FPS))
         o.location.z = 0; o.keyframe_insert("location", frame=int((t0 + 0.45) * FPS))
         cols[(day, p)] = (o, m, v, h)
@@ -70,18 +70,25 @@ def emit_key(m, frame, strength, color=None):
     p.inputs["Emission Strength"].default_value = strength; p.inputs["Emission Strength"].keyframe_insert("default_value", frame=frame)
 
 ORANGE, CYAN = hex_lin("#ff8a3d"), hex_lin("#3ad1e0")
-# 正解（水曜3限）を光らせ、ほかを少し暗く（5.65〜8.4 秒）
+def base_key(m, frame, color):
+    p = m.node_tree.nodes["Principled BSDF"]
+    p.inputs["Base Color"].default_value = (*color, 1); p.inputs["Base Color"].keyframe_insert("default_value", frame=frame)
+def dim(c, k=0.1): return tuple(x * k for x in c)
+F = lambda t: int(t * FPS)
+# v3：全体が見えたまま、注目する柱だけを残してほかを暗くする
+#   7.3〜9.3 秒：正解の水曜3限（橙に光る）  9.5〜11.8 秒：5限・6限（青緑に光る）
 for (day, p), (o, m, v, h) in cols.items():
-    emit_key(m, int(5.5 * FPS), 0.06, heat(v))
-    if (day, p) == ("水", 3):
-        emit_key(m, int(5.75 * FPS), 3.0, ORANGE); emit_key(m, int(6.3 * FPS), 1.2, ORANGE); emit_key(m, int(8.2 * FPS), 1.2, ORANGE)
-        emit_key(m, int(8.8 * FPS), 0.3, ORANGE)
+    c = heat(v); wed3 = (day, p) == ("水", 3); late = p >= 5
+    base_key(m, F(7.2), c); emit_key(m, F(7.2), 0.06, c)
+    if wed3:
+        base_key(m, F(7.45), ORANGE); emit_key(m, F(7.45), 3.0, ORANGE); emit_key(m, F(7.9), 1.3, ORANGE); emit_key(m, F(9.2), 1.3, ORANGE)
+        base_key(m, F(9.2), ORANGE); base_key(m, F(9.55), dim(c)); emit_key(m, F(9.55), 0.0, c)
     else:
-        emit_key(m, int(5.75 * FPS), 0.0, heat(v)); emit_key(m, int(8.2 * FPS), 0.0, heat(v)); emit_key(m, int(8.8 * FPS), 0.06, heat(v))
-# ねらい目の5限・6限を青緑に光らせる（9.6 秒〜）
-for (day, p), (o, m, v, h) in cols.items():
-    if p >= 5:
-        emit_key(m, int(9.5 * FPS), 0.06, heat(v)); emit_key(m, int(9.9 * FPS), 0.55, CYAN); emit_key(m, int(11.8 * FPS), 0.45, CYAN)
+        base_key(m, F(7.45), dim(c)); emit_key(m, F(7.45), 0.0, c); base_key(m, F(9.2), dim(c))
+        if late:
+            base_key(m, F(9.55), c); emit_key(m, F(9.2), 0.0, c); emit_key(m, F(9.7), 0.6, CYAN); emit_key(m, F(11.8), 0.5, CYAN)
+        else:
+            base_key(m, F(9.55), dim(c))
 
 # ── 光 ──
 def area(name, loc, energy, size, color, target=(0, 2.6, 1.5)):
@@ -100,13 +107,10 @@ bpy.ops.object.camera_add(location=(6, -9, 9)); cam = bpy.context.object; sc.cam
 cam.data.lens = 34; cam.data.dof.use_dof = True; cam.data.dof.focus_object = focus
 c = cam.constraints.new("TRACK_TO"); c.target = focus; c.track_axis = "TRACK_NEGATIVE_Z"; c.up_axis = "UP_Y"
 wx, wy = XY(2, 3)                                         # 水曜3限
-KEYS = [  # (時刻, カメラ, 注目点, 絞り)  0〜5.6 は文字の後ろなのでぼかす
-    (0.0, (7.5, -9.0, 8.5), (cx, cy, 1.2), 1.4),
-    (5.4, (-4.0, -10.5, 7.5), (cx, cy, 1.4), 1.4),
-    (6.4, (wx - 1.6, wy - 3.4, 7.2), (wx, wy, 0.9), 2.8),
-    (8.2, (wx - 0.8, wy - 3.0, 6.6), (wx, wy, 0.9), 2.8),
-    (9.4, (0.6, -11.5, 10.5), (cx, cy + 0.4, 1.0), 5.6),
-    (11.8, (-0.6, -11.0, 10.0), (cx, cy + 0.4, 1.0), 5.6),
+KEYS = [  # (時刻, カメラ, 注目点, 絞り)  v3：寄らずに全体を見せたまま、ゆっくり回り込む
+    (6.6, (1.8, -8.8, 15.0), (cx, cy + 0.2, 0.6), 8.0),
+    (9.3, (0.3, -8.4, 14.4), (cx, cy + 0.2, 0.7), 8.0),
+    (11.8, (-1.3, -8.0, 13.8), (cx, cy + 0.2, 0.8), 8.0),
 ]
 for t, cl, fl, fs in KEYS:
     f = int(t * FPS)
