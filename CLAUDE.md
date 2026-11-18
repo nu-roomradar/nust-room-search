@@ -13,7 +13,7 @@
 - `data/classes_<年度>.csv` — 授業の生データ一覧（`python scripts/export_classes.py` で年度ごとに生成）。DB が捨てている **時間割CD・単位・対象学年・教員名** も入っている。アプリは読まない（検索が使うのは `schedule_final.db` だけ）。
 - `reports.db` — 「実は使われていた」報告の揮発データ（実行時に自動生成）。**コミットしない**（.gitignore済み）再デプロイで消える。反映は自動で授業のない時間にずれるので、main への push は授業中でもよい。**授業中に force で即時反映するときだけ、報告が消えることをユーザーに伝えてから行う**（永続ディスクは付けない方針）。**運営者が Render の Auto-Deploy を Off にし、Secrets に `RENDER_DEPLOY_HOOK` を入れるまでは、従来どおりアプリに影響する push を授業時間外にする**（設定済みかは Actions の「検索アプリを Render に反映」が成功しているかで分かる）。仮予約（`reservations.db`）は 2026-10 に廃止した（ルール3）。
 - **テスト運用（2026-10-13〜12-19、暫定）**：理工学部学生課と協議のうえ実施。対象は駿河台キャンパス（タワースコラ・駿河台校舎）。**船橋校舎は学生課の管轄外**のため、LP・ポスターなどの周知物には載せないが、検索画面では選べる状態を残す（時間割DBの船橋の行は短大の判定にも使うので消さない）。**2026-11 に学生課の担当の先生から「検索画面から船橋校舎を外す」「タワー・スコラは6階まで」の依頼を口頭で受けた。正式なメールが来たら実行する（それまで触らない。`docs/OPERATIONS.md` 8.）**。企画書・窓口は `docs/OPERATIONS.md` 2.
-- `data/instagram_*.json` — Instagram の集計。**2026-08 で収集を終了**し凍結（更新しない）。
+- `data/instagram_*` — Instagram の投稿ごとの数字。2026-08 にいったん止め、**2026-11-18 に週次の記録として再開**した。`instagram-insights.yml` が毎週月曜 6:17 JST に取り、投稿の傾向を見て次の投稿に生かす改善のサイクルに使う（ストーリーは取らない。`docs/OPERATIONS.md` 4.12、分析は `/instagram-review`）。
 - `data/ga4_*` — GA4 の利用状況。`ga4-weekly.yml` が毎週月曜 6:07 JST に直前1週を `data/ga4_weekly.md`（表）に追記する（2026-10 再開。テスト運用の利用データ。Secrets と設定は `docs/OPERATIONS.md` 4.6）。
 
 ## 守るべきルール
@@ -33,6 +33,7 @@
 手順の詳細は `.claude/skills/` にあり、CLAUDE.md には書かない。該当する作業では必ず読む。
 
 - `/instagram-post` — フィード／ストーリー／リール投稿、告知ストーリーの目視確認フロー、キャプション規則、弔事ストーリー、トークン失効時の対処
+- `/instagram-review` — Instagram の投稿の数字（`data/instagram_*`）から伸びた投稿と傾向を見つけ、次の投稿の案と試しを決める改善のサイクル。結果は `docs/instagram_review.md` に残す
 - `/make-poster` — ポスター生成（正式版／静か版、PDF/PPTX）、必須要素、QR の実物デコード確認
 - `/verify-ui` — 画面変更後の Playwright スクショ（PC幅・390px）と表記の目視確認
 - `/make-video` — Instagram 用の動画（リール・CM）づくり。ルール、HyperFrames の使い方とこの環境での注意、AI 動画の扱い、音、確認、保存。**動画の依頼では `/hyperframes` より先に読む**

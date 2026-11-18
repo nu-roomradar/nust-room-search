@@ -213,8 +213,8 @@ class ActionsCheckTests(unittest.TestCase):
     def test_removed_workflow_is_not_reported(self):
         """撤去したワークフローの古い失敗は報告しない（ファイルが無い＝二度と実行されない）"""
         gh = FakeGitHub(runs=[
-            run("Instagramインサイトを記録", "failure", "2026-09-03T00:00:00Z",
-                path=".github/workflows/instagram-insights.yml"),
+            run("Instagramの投稿を集める", "failure", "2026-09-03T00:00:00Z",
+                path=".github/workflows/instagram-fetch.yml"),
             run("CI", "success", "2026-09-07T00:00:00Z"),
         ])
         res = hc.Result()
@@ -235,7 +235,8 @@ class ActionsCheckTests(unittest.TestCase):
         self.assertIsNotNone(paths)
         self.assertIn(".github/workflows/ci.yml", paths)
         self.assertIn(".github/workflows/ops-healthcheck.yml", paths)
-        self.assertNotIn(".github/workflows/instagram-insights.yml", paths)
+        self.assertNotIn(".github/workflows/instagram-fetch.yml", paths)      # 撤去したもの
+        self.assertIn(".github/workflows/instagram-insights.yml", paths)      # 2026-11-18 に作り直した
 
     def test_timed_out_counts_as_failure(self):
         gh = FakeGitHub(runs=[run("CI", "timed_out", "2026-09-07T00:00:00Z")])
