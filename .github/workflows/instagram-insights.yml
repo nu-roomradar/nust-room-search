@@ -1,0 +1,44 @@
+name: Instagram 週次の記録
+
+# 毎週月曜 6:17 JST に、Instagram の投稿ごとの数字（閲覧・リーチ・いいね・保存・シェアなど）と
+# アカウントの数字を data/instagram_* に記録する（2026-11-18 再開。投稿の改善のサイクルの材料）。
+# 分析は .claude/skills/instagram-review/SKILL.md、決まりは docs/OPERATIONS.md 4.12。
+# 必要な Secrets: IG_ACCESS_TOKEN / IG_ACCOUNT_ID（投稿と同じもの。数字を読む権限が要る）
+on:
+  schedule:
+    - cron: "17 21 * * 0"   # 日曜 21:17 UTC = 月曜 6:17 JST（GA4 の記録の10分あと）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: instagram-insights
+  cancel-in-progress: false
+
+jobs:
+  insights:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        # 版とハッシュを固定（.github/requirements/README.md）
+        run: |
+          pip install --require-hashes --only-binary :all: -r .github/requirements/requests.txt
+      - name: Fetch Instagram insights
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_ACCOUNT_ID: ${{ secrets.IG_ACCOUNT_ID }}
+        run: python scripts/fetch_instagram_insights.py
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/instagram_posts.json data/instagram_post_snapshots.json data/instagram_history.json data/instagram_posts.md
+          if git diff --staged --quiet; then echo "変更なし"; exit 0; fi
+          git commit -m "chore: Instagram 週次の記録を更新 ($(TZ=Asia/Tokyo date +%Y-%m-%d))"
+          git pull --rebase origin main && git push
