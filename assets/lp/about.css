@@ -45,6 +45,8 @@
 main:focus { outline: none; }
 /* 言語ボタン: 親の overflow:hidden で輪郭が切れていたので、見えるようにする（共有のナビの直しなので、次に lp.css を触るときに lp.css へ移す） */
 .lang-toggle { overflow: visible; }
+/* スマホではヘッダーの案内バーを出さない（章の目次が上に張り付くので、二重にしない。紹介ページでは出している） */
+@media (max-width: 767px) { .section-nav .nav-links { display: none; } }
 .lang-btn { border-radius: 99px; }
 .lang-btn:focus-visible { outline-offset: 2px; }
 
