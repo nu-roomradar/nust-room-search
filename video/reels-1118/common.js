@@ -20,4 +20,8 @@ function addEnd(tl, at, lead) {
 }
 function show(tl, sel, at, dur = 0.3) { tl.to(sel, { opacity: 1, duration: dur }, at); }
 function hide(tl, sel, at, dur = 0.3) { tl.to(sel, { opacity: 0, duration: dur }, at); }
-window.renderAt = t => { window.TL.seek(t, false); };
+// 3D の背景（Blender で描いたコマ）を使うページは BG3D を決めておく。renderAt は絵が読み終わるまで待つ
+window.renderAt = async t => {
+  window.TL.seek(t, false);
+  if (window.BG3D) await window.BG3D(t);
+};

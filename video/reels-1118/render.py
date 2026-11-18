@@ -26,6 +26,7 @@ with sync_playwright() as p:
     pg = br.new_page(viewport={"width": 1080, "height": 1920})
     errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
     pg.goto(f"http://127.0.0.1:{srv.server_port}/{a.page}", wait_until="load")
+    pg.wait_for_function("window.READY !== false")      # 3D のコマの位置データを読み終えるまで待つ
     pg.evaluate("document.fonts.ready"); pg.wait_for_timeout(500)
     dur = pg.evaluate("window.DURATION")
     if errs: print("JS エラー:", errs); sys.exit(1)

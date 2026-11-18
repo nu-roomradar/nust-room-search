@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8">
+<!-- リール2 v2「クイズ：空き教室がいちばん少ないのは？」（14.4秒）。0〜11.8 秒は Blender で描いた 3D（frames2/。曜日×時限の空き教室の数を高さにした柱）。数字は README -->
+<link rel="stylesheet" href="common.css">
+<style>
+#bg3{position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover}
+#bgblur{position:absolute;inset:-40px;width:1160px;height:2000px;object-fit:cover;filter:blur(22px) brightness(.5);opacity:0}
+.shade{position:absolute;inset:0;background:rgba(4,10,26,.55);opacity:0}
+.shade-top{position:absolute;left:0;right:0;top:0;height:620px;background:linear-gradient(180deg,rgba(4,10,26,.8),rgba(4,10,26,0));opacity:0}
+.shade-bot{position:absolute;left:0;right:0;bottom:0;height:560px;background:linear-gradient(0deg,rgba(4,10,26,.78),rgba(4,10,26,0));opacity:0}
+.quizpill{position:absolute;left:50%;top:330px;transform:translateX(-50%);font-family:Syne;font-weight:800;font-size:46px;letter-spacing:.2em;padding:14px 40px 14px 50px;border-radius:99px;background:linear-gradient(90deg,#ff7a59,#f6a35c)}
+#q .k{top:470px}
+#q .t{top:560px;font-weight:900;font-size:112px;line-height:1.2;text-shadow:0 6px 30px rgba(0,0,0,.5)}
+.opts{position:absolute;left:90px;right:90px;top:620px;display:grid;gap:34px}
+.opt{position:relative;display:flex;align-items:center;gap:34px;padding:34px 40px;border-radius:30px;background:rgba(8,18,44,.72);border:3px solid rgba(160,190,255,.35);box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.opt .l{width:96px;height:96px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-family:Syne;font-weight:800;font-size:54px;background:linear-gradient(135deg,#2f6bff,#22c3e6)}
+.opt .w{font-weight:900;font-size:76px}
+.opt .n{margin-left:auto;font-weight:900;font-size:72px;color:var(--sub);opacity:0}
+.opt .n small{font-size:40px}
+.opt.win{border-color:var(--orange);background:rgba(60,28,10,.75);box-shadow:0 0 60px rgba(246,163,92,.45)}
+.opt.win .n{color:var(--orange)}
+.ok{position:absolute;right:-24px;top:-46px;font-weight:900;font-size:56px;color:#fff;background:var(--red);padding:6px 26px 10px;border-radius:18px;transform:rotate(8deg);opacity:0}
+.count{position:absolute;left:50%;top:1340px;width:200px;height:200px;margin-left:-100px}
+.count svg{position:absolute;inset:0}
+.count b{position:absolute;inset:0;display:grid;place-items:center;font-family:Syne;font-weight:800;font-size:110px}
+.qhead{top:300px;font-weight:900;font-size:62px;line-height:1.35;text-shadow:0 4px 24px rgba(0,0,0,.6)}
+.ans{position:absolute;left:0;top:0;transform:translate(-50%,-100%);text-align:center;white-space:nowrap;opacity:0}
+.ans .box{display:inline-block;padding:18px 34px 20px;border-radius:28px;background:rgba(60,28,10,.72);border:3px solid rgba(255,170,110,.85);box-shadow:0 0 60px rgba(255,138,61,.5)}
+.ans .d{display:block;font-weight:900;font-size:60px}
+.ans .v{display:block;font-family:Syne;font-weight:800;font-size:120px;line-height:1;color:var(--orange)}
+.ans .v small{font-family:'NotoJP';font-weight:900;font-size:52px}
+.ans .stamp{position:absolute;right:-40px;top:-40px;font-weight:900;font-size:50px;color:#fff;background:var(--red);padding:4px 22px 8px;border-radius:16px;transform:rotate(8deg)}
+.after{position:absolute;left:60px;right:60px;top:1380px;text-align:center;font-weight:900;font-size:58px;line-height:1.45;text-shadow:0 4px 24px rgba(0,0,0,.6);opacity:0}
+#h .t{top:200px;font-weight:900;font-size:96px;line-height:1.2;text-shadow:0 6px 30px rgba(0,0,0,.5)}
+.ax{position:absolute;left:0;top:0;transform:translate(-50%,-50%);font-weight:900;font-size:38px;color:#e6ecf8;padding:6px 14px;border-radius:12px;background:rgba(8,18,44,.6);white-space:nowrap;opacity:0}
+.ax.late{color:#0b1730;background:#9fe8f5}
+.callout{position:absolute;left:0;top:0;transform:translate(-50%,-100%);white-space:nowrap;padding:14px 26px;border-radius:22px;background:rgba(8,18,44,.78);border:3px solid #9fe8f5;font-weight:900;font-size:46px;opacity:0}
+.callout b{font-family:Syne;font-weight:800;font-size:64px;color:#9fe8f5}
+.src{position:absolute;left:90px;right:90px;top:1460px;text-align:center;font-weight:500;font-size:30px;line-height:1.6;color:#b7c6e6}
+</style></head>
+<body>
+<div class="bg"></div><div class="grid"></div>
+<img id="bg3" src="frames2/f0000.png" alt="">
+<img id="bgblur" src="frames2/f0354.png" alt="">
+<div class="shade"></div><div class="shade-top"></div><div class="shade-bot"></div>
+
+<div class="scene" id="q">
+  <div class="quizpill">QUIZ</div>
+  <div class="c kick k">駿河台キャンパスで</div>
+  <div class="c t">空き教室が<br><span class="o">いちばん少ない</span><br>のは？</div>
+</div>
+
+<div class="scene" id="o">
+  <div class="c qhead">空き教室が<span class="o">いちばん少ない</span>のは？</div>
+  <div class="c small" style="top:470px;text-shadow:0 2px 12px rgba(0,0,0,.6)">駿河台キャンパス（64室）・2026年度後期</div>
+  <div class="opts">
+    <div class="opt" id="oa"><div class="l">A</div><div class="w">月曜1限</div><div class="n">49<small>室</small></div></div>
+    <div class="opt" id="ob"><div class="l">B</div><div class="w">水曜3限</div><div class="n">24<small>室</small></div><div class="ok">正解</div></div>
+    <div class="opt" id="oc"><div class="l">C</div><div class="w">金曜5限</div><div class="n">52<small>室</small></div></div>
+  </div>
+  <div class="count"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="14"/>
+    <circle id="ring" cx="100" cy="100" r="88" fill="none" stroke="#f6a35c" stroke-width="14" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="0" transform="rotate(-90 100 100)"/></svg><b id="cn">3</b></div>
+</div>
+
+<div class="scene" id="w">
+  <div class="ans" id="ans"><div class="box"><span class="d">水曜3限</span><span class="v"><span id="nb">24</span><small>室</small></span></div><div class="stamp">正解</div></div>
+  <div class="after">いちばん少ない水曜3限でも、<br><span class="o">24室</span>は空いている。</div>
+</div>
+
+<div class="scene" id="h">
+  <div class="c t">ねらい目は<br><span style="color:#9fe8f5">5限・6限</span></div>
+  <div class="ax" id="d0">月</div><div class="ax" id="d1">火</div><div class="ax" id="d2">水</div><div class="ax" id="d3">木</div><div class="ax" id="d4">金</div>
+  <div class="ax" id="p0">1限</div><div class="ax" id="p1">2限</div><div class="ax" id="p2">3限</div><div class="ax" id="p3">4限</div><div class="ax late" id="p4">5限</div><div class="ax late" id="p5">6限</div>
+  <div class="callout" id="mon6">月曜6限 <b>61</b>室 空き</div>
+  <div class="src">柱の高さ＝授業が入っていない教室の数（2026年度後期の時間割。タワー・スコラと駿河台校舎の64室）。時間割にない授業もあります。</div>
+</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="common.js"></script>
+<script>
+const FPS = 30, F0 = 0, F1 = 354;
+let A = null; window.READY = false;
+fetch('frames2/anchors.json').then(r => r.json()).then(j => { A = j; window.READY = true; });
+const bg3 = document.getElementById('bg3');
+const pad = f => String(f).padStart(4, '0');
+const place = (id, [x, y]) => { const e = document.getElementById(id); e.style.left = (x * 1080) + 'px'; e.style.top = (y * 1920) + 'px'; };
+window.BG3D = async t => {
+  const f = Math.max(F0, Math.min(F1, Math.round(t * FPS)));
+  const src = `frames2/f${pad(f)}.png`;
+  if (!bg3.src.endsWith(src)) { bg3.src = src; await bg3.decode(); }
+  const a = A[f] || A[String(f)];
+  place('ans', a.wed3); place('mon6', a.mon6);
+  a.days.forEach((p, i) => place(`d${i}`, p)); a.periods.forEach((p, i) => place(`p${i}`, p));
+};
+
+const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 14.4;
+// 1. 問題（0〜1.8秒）：柱がせり上がる後ろで
+tl.to('.shade', { opacity: 1, duration: 0.01 }, 0);
+show(tl, '#q', 0, 0.01);
+tl.from('.quizpill', { scale: 0.4, opacity: 0, duration: 0.35, ease: 'back.out(2.4)' }, 0)
+  .from('#q .k', { y: 30, opacity: 0, duration: 0.3 }, 0.2)
+  .from('#q .t', { y: 50, opacity: 0, duration: 0.4, ease: 'power3.out' }, 0.35);
+hide(tl, '#q', 1.75, 0.2);
+// 2. 選択肢とカウントダウン（1.9〜5.6秒）
+show(tl, '#o', 1.9, 0.15);
+['#oa', '#ob', '#oc'].forEach((s, i) => tl.from(s, { x: 600, opacity: 0, duration: 0.35, ease: 'power3.out' }, 2.0 + i * 0.18));
+tl.from('.count', { scale: 0.5, opacity: 0, duration: 0.3 }, 2.5)
+  .to('#ring', { attr: { 'stroke-dashoffset': 553 }, duration: 3.0, ease: 'none' }, 2.6)
+  .set('#cn', { textContent: '3' }, 2.6).set('#cn', { textContent: '2' }, 3.6).set('#cn', { textContent: '1' }, 4.6);
+[2.6, 3.6, 4.6].forEach(t => tl.fromTo('#cn', { scale: 1.5 }, { scale: 1, duration: 0.25, ease: 'power3.out' }, t));
+// 3. 正解（5.6〜8.4秒）：札で一瞬見せてから、光る柱へ
+tl.to('.count', { opacity: 0, duration: 0.2 }, 5.55)
+  .to(['#oa', '#oc'], { opacity: 0.35, duration: 0.25 }, 5.65)
+  .set('#ob', { className: 'opt win' }, 5.65)
+  .fromTo('#ob', { scale: 1 }, { scale: 1.06, duration: 0.18, yoyo: true, repeat: 1 }, 5.65)
+  .to('#ob .ok', { opacity: 1, duration: 0.1 }, 5.7)
+  .fromTo('#ob .ok', { scale: 2.2 }, { scale: 1, duration: 0.2, ease: 'power4.in' }, 5.7)
+  .to('.opt .n', { opacity: 1, duration: 0.3 }, 5.8);
+hide(tl, '#o', 6.45, 0.25);
+tl.to('.shade', { opacity: 0, duration: 0.4 }, 6.4).to(['.shade-top', '.shade-bot'], { opacity: 1, duration: 0.4 }, 6.4);
+show(tl, '#w', 6.55, 0.1);
+tl.to('#ans', { opacity: 1, duration: 0.25 }, 6.6)
+  .from('#ans .box', { scale: 0.6, duration: 0.4, ease: 'back.out(2)' }, 6.6)
+  .fromTo('#nb', { textContent: 0 }, { textContent: 24, duration: 0.6, snap: { textContent: 1 }, ease: 'power2.out' }, 6.7)
+  .to('.after', { opacity: 1, duration: 0.35 }, 7.1)
+  .from('.after', { y: 30, duration: 0.35 }, 7.1);
+hide(tl, '#w', 8.3, 0.2);
+// 4. ねらい目（8.4〜11.8秒）：引いて全体、5限・6限が光る
+show(tl, '#h', 8.6, 0.15);
+tl.from('#h .t', { y: 40, opacity: 0, duration: 0.35 }, 8.6)
+  .to('.ax', { opacity: 1, duration: 0.3, stagger: 0.03 }, 9.2)
+  .to('#mon6', { opacity: 1, duration: 0.3 }, 10.0)
+  .from('#mon6', { y: 30, duration: 0.35 }, 10.0)
+  .from('.src', { opacity: 0, duration: 0.3 }, 10.2);
+hide(tl, '#h', 11.7, 0.2);
+tl.to('#bgblur', { opacity: 1, duration: 0.3 }, 11.7).to(['.shade-top', '.shade-bot'], { opacity: 0, duration: 0.3 }, 11.7);
+// 5. 終わりの札（11.8〜14.4秒）
+addEnd(tl, 11.8, 'いま空いている教室は、<br><span class="g">RoomRadar</span> で。');
+tl.to({}, { duration: 0.01 }, window.DURATION);
+</script>
+</body></html>

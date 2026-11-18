@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8">
+<!-- リール3 v2「空きコマ、みんな何してる？」（13.6秒）。1.9〜8.6 秒は Blender で描いた 3D（frames3/）。文字は 3D の棒の位置（frames3/anchors.json）に合わせて重ねる -->
+<link rel="stylesheet" href="common.css">
+<style>
+#bg3{position:absolute;inset:0;width:1080px;height:1920px;object-fit:cover;opacity:0}
+#bgblur{position:absolute;inset:-40px;width:1160px;height:2000px;object-fit:cover;filter:blur(22px) brightness(.5) saturate(1.1);opacity:0}
+.shade-top{position:absolute;left:0;right:0;top:0;height:560px;background:linear-gradient(180deg,rgba(4,10,26,.78),rgba(4,10,26,0));opacity:0}
+.shade-bot{position:absolute;left:0;right:0;bottom:0;height:520px;background:linear-gradient(0deg,rgba(4,10,26,.75),rgba(4,10,26,0));opacity:0}
+#a .k{top:600px}
+#a .t{top:700px;font-size:118px}
+#r .head{top:170px;font-weight:900;font-size:70px;line-height:1.3;text-shadow:0 4px 24px rgba(0,0,0,.5)}
+.lab{position:absolute;left:0;top:0;transform:translate(-50%,-100%);text-align:center;white-space:nowrap;opacity:0;will-change:transform}
+.lab .big{display:inline-block;padding:16px 30px 18px;border-radius:26px;background:rgba(8,18,44,.72);border:2px solid rgba(160,190,255,.35);box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.lab .rk{display:block;font-weight:900;font-size:34px;color:var(--sub);letter-spacing:.06em}
+.lab .nm{display:block;font-weight:900;font-size:58px;line-height:1.15}
+.lab .pc{display:block;font-family:Syne;font-weight:800;font-size:72px;line-height:1.05;color:#9fc1ff}
+.lab.top .big{background:rgba(255,138,61,.18);border-color:rgba(255,170,110,.8);box-shadow:0 0 60px rgba(255,138,61,.45)}
+.lab.top .nm{font-size:74px}
+.lab.top .pc{font-size:110px;color:var(--orange)}
+.chip{position:absolute;left:0;top:0;transform:translate(-50%,-100%);text-align:center;opacity:0}
+.chip b{display:block;font-family:Syne;font-weight:800;font-size:46px;line-height:1}
+.chip i{display:block;font-style:normal;font-weight:900;font-size:26px;color:var(--sub);margin-top:6px}
+.chip.c1 b{color:var(--orange);font-size:60px}
+.src{position:absolute;left:90px;right:90px;top:1460px;text-align:center;font-weight:500;font-size:30px;line-height:1.6;color:#b7c6e6}
+#m .t{top:420px;font-weight:900;font-size:90px;line-height:1.3}
+.chips{position:absolute;left:80px;right:80px;top:820px;display:flex;flex-wrap:wrap;justify-content:center;gap:24px}
+.chips span{font-weight:900;font-size:50px;padding:22px 38px;border-radius:99px;background:rgba(34,197,94,.16);border:3px solid rgba(34,197,94,.6);color:#c8f7d7}
+#m .s{top:1150px;font-weight:700;font-size:42px;color:var(--sub);line-height:1.6}
+</style></head>
+<body>
+<div class="bg"></div><div class="grid"></div>
+<img id="bgblur" src="frames3/f0057.png" alt="">
+<img id="bg3" src="frames3/f0057.png" alt="">
+<div class="shade-top"></div><div class="shade-bot"></div>
+
+<div class="scene" id="a">
+  <div class="c kick k">RoomRadar の利用者に聞きました</div>
+  <div class="c big t">空きコマ、<br><span class="o">みんな何してる？</span></div>
+</div>
+
+<div class="scene" id="r">
+  <div class="c head">空き教室で<span class="o">何をする？</span></div>
+  <div class="lab top" id="L1"><div class="big"><span class="rk">1位</span><span class="nm">個人学習</span><span class="pc"><span id="p1">0</span>%</span></div></div>
+  <div class="lab" id="L2"><div class="big"><span class="rk">2位</span><span class="nm">休憩</span><span class="pc"><span id="p2">0</span>%</span></div></div>
+  <div class="lab" id="L3"><div class="big"><span class="rk">3位</span><span class="nm">グループワーク</span><span class="pc"><span id="p3">0</span>%</span></div></div>
+  <div class="lab" id="L4"><div class="big"><span class="rk">4位</span><span class="nm">打合せ</span><span class="pc"><span id="p4">0</span>%</span></div></div>
+  <div class="lab" id="L5"><div class="big"><span class="rk">5位</span><span class="nm">その他</span><span class="pc"><span id="p5">0</span>%</span></div></div>
+  <div class="chip c1" id="C1"><b>57%</b><i>個人学習</i></div>
+  <div class="chip" id="C2"><b>19%</b><i>休憩</i></div>
+  <div class="chip" id="C3"><b>11%</b><i>グループ</i></div>
+  <div class="chip" id="C4"><b>9%</b><i>打合せ</i></div>
+  <div class="chip" id="C5"><b>4%</b><i>その他</i></div>
+  <div class="src">アプリの任意・匿名の質問「何に使う？」の回答 140件（2026年11月15日まで）</div>
+</div>
+
+<div class="scene" id="m">
+  <div class="c t">空き教室で、<br><span class="g">それぞれの空きコマを。</span></div>
+  <div class="chips"><span>授業が優先</span><span>静かに</span><span>ゴミは持ち帰る</span></div>
+  <div class="c s">空き教室は、みんなで使う場所です。</div>
+</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="common.js"></script>
+<script>
+const FPS = 30, F0 = 57, F1 = 258;
+const PCT = { 1: 57, 2: 19, 3: 11, 4: 9, 5: 4 };
+const REVEAL = { 5: 2.2, 4: 3.0, 3: 3.8, 2: 4.6, 1: 5.9 };        // r3_scene.py と同じ
+let A = null; window.READY = false;
+fetch('frames3/anchors.json').then(r => r.json()).then(j => { A = j; window.READY = true; });
+const bg3 = document.getElementById('bg3'), bgblur = document.getElementById('bgblur');
+const pad = f => String(f).padStart(4, '0');
+// 3D のコマを背景に置き、文字を棒の上の位置に動かす
+window.BG3D = async t => {
+  const f = Math.max(F0, Math.min(F1, Math.round(t * FPS)));
+  const src = `frames3/f${pad(f)}.png`;
+  if (!bg3.src.endsWith(src)) { bg3.src = src; await bg3.decode(); }
+  const blurSrc = t < 5 ? `frames3/f${pad(F0)}.png` : `frames3/f${pad(F1)}.png`;
+  if (!bgblur.src.endsWith(blurSrc)) { bgblur.src = blurSrc; await bgblur.decode(); }
+  const row = A[f] || A[String(f)];
+  for (let r = 1; r <= 5; r++) {
+    const [x, y] = row[r - 1];
+    for (const id of [`L${r}`, `C${r}`]) {
+      const e = document.getElementById(id);
+      e.style.left = (x * 1080) + 'px'; e.style.top = (y * 1920 - (id[0] === 'C' ? -40 : 0)) + 'px';
+    }
+  }
+};
+
+const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 13.6;
+// 1. つかみ（0〜1.8秒）：最初のコマをぼかして後ろに
+tl.to('#bgblur', { opacity: 1, duration: 0.01 }, 0);
+show(tl, '#a', 0, 0.01);
+tl.from('#a .k', { y: 30, opacity: 0, duration: 0.3 }, 0)
+  .from('#a .t', { scale: 1.3, opacity: 0, duration: 0.4, ease: 'power3.out' }, 0.1);
+hide(tl, '#a', 1.75, 0.2);
+// 2. ランキング（1.9〜8.6秒）：3D の上に文字
+tl.to('#bg3', { opacity: 1, duration: 0.25 }, 1.85).to(['.shade-top', '.shade-bot'], { opacity: 1, duration: 0.3 }, 1.85)
+  .to('#bgblur', { opacity: 0, duration: 0.3 }, 2.0);
+show(tl, '#r', 1.9, 0.15);
+tl.from('#r .head', { y: -30, opacity: 0, duration: 0.3 }, 1.9).from('.src', { opacity: 0, duration: 0.3 }, 2.1);
+[5, 4, 3, 2, 1].forEach(r => {
+  const t = REVEAL[r], up = r === 1 ? 0.9 : 0.55;
+  tl.to(`#L${r}`, { opacity: 1, duration: 0.25 }, t + up * 0.6)
+    .from(`#L${r} .big`, { scale: 0.7, duration: 0.35, ease: 'back.out(2)' }, t + up * 0.6)
+    .fromTo(`#p${r}`, { textContent: 0 }, { textContent: PCT[r], duration: r === 1 ? 0.7 : 0.45, snap: { textContent: 1 }, ease: 'power2.out' }, t + up * 0.6);
+  const next = r === 1 ? 7.0 : REVEAL[r - 1];
+  tl.to(`#L${r}`, { opacity: 0, duration: 0.2 }, next).to(`#C${r}`, { opacity: 1, duration: 0.25 }, next + 0.1);
+});
+hide(tl, '#r', 8.5, 0.2);
+tl.to('#bg3', { opacity: 0, duration: 0.25 }, 8.5).to('#bgblur', { opacity: 1, duration: 0.3 }, 8.45)
+  .to(['.shade-top', '.shade-bot'], { opacity: 0, duration: 0.3 }, 8.5);
+// 3. ひとこと（8.7〜11.0秒）
+show(tl, '#m', 8.7, 0.15);
+tl.from('#m .t', { y: 40, opacity: 0, duration: 0.4 }, 8.7)
+  .from('.chips span', { scale: 0.6, opacity: 0, duration: 0.3, stagger: 0.15, ease: 'back.out(2)' }, 9.2)
+  .from('#m .s', { opacity: 0, duration: 0.3 }, 9.8);
+hide(tl, '#m', 10.9, 0.2);
+// 4. 終わりの札（11.0〜13.6秒）
+addEnd(tl, 11.0, '今日の空き教室は、<br><span class="g">RoomRadar</span> で。');
+tl.to({}, { duration: 0.01 }, window.DURATION);
+</script>
+</body></html>
