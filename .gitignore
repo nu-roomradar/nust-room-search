@@ -57,3 +57,6 @@ video/desk-3d/assets/room*.png
 
 # ワークフローの試作用の一時的な作業ツリー（Claude Code が作って消す。コミットしない）
 .claude/worktrees/
+# リールの素材（desk-3d から写して使う。README の手順）
+video/reels-1118/assets/
+video/reels-1118/_video.mp4

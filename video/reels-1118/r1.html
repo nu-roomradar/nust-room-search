@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8">
+<!-- リール1「空きコマあるある」（13秒）：教室を回るたびに授業中 → 開けた瞬間、いま使える教室。アプリの画面は実物（駿河台校舎・水曜3限） -->
+<link rel="stylesheet" href="common.css">
+<style>
+#s2 .head{top:250px;font-weight:900;font-size:62px}
+.doorwrap{position:absolute;left:50%;top:430px;width:500px;height:900px;margin-left:-250px}
+.door{position:absolute;inset:0;border-radius:22px 22px 0 0;background:linear-gradient(180deg,#e9edf3,#cfd6e0);box-shadow:inset 0 0 0 14px #9aa6b8,0 30px 60px rgba(0,0,0,.45)}
+.door .win{position:absolute;left:70px;right:70px;top:120px;height:250px;border-radius:10px;background:linear-gradient(160deg,#2a3550,#141b2c);box-shadow:inset 0 0 0 8px #8794a8}
+.door .win:after{content:'';position:absolute;inset:0;border-radius:10px;background:linear-gradient(115deg,rgba(255,255,255,.18),transparent 40%)}
+.door .plate{position:absolute;left:50%;top:36px;transform:translateX(-50%);min-width:220px;padding:6px 26px;border-radius:10px;background:#fff;color:#0b1730;font-family:'NotoJP';font-weight:900;font-size:56px;white-space:nowrap;letter-spacing:.04em;text-align:center;box-shadow:0 4px 0 #9aa6b8}
+.door .lever{position:absolute;right:40px;top:500px;width:110px;height:26px;border-radius:13px;background:linear-gradient(180deg,#f2f4f7,#9aa3ae);box-shadow:0 6px 10px rgba(0,0,0,.3)}
+.door .lever:before{content:'';position:absolute;right:-6px;top:-14px;width:44px;height:54px;border-radius:12px;background:linear-gradient(180deg,#eef1f5,#a3acb7)}
+.door .floor{position:absolute;left:-60px;right:-60px;bottom:-14px;height:14px;background:#4a5a78;border-radius:4px}
+.stamp{position:absolute;left:50%;top:330px;margin-left:-230px;width:460px;text-align:center;font-weight:900;font-size:128px;color:var(--red);border:12px solid var(--red);border-radius:28px;padding:6px 0 14px;transform:rotate(-12deg);background:rgba(255,255,255,.55);opacity:0}
+.floorlbl{position:absolute;left:0;right:0;top:1380px;text-align:center;font-weight:900;font-size:52px;color:var(--sub)}
+.floorlbl b{color:var(--orange)}
+#s3 .t{top:780px;font-weight:900;font-size:104px;line-height:1.25}
+#s3 .clock{position:absolute;left:50%;top:520px;width:200px;height:200px;margin-left:-100px;border-radius:50%;border:12px solid var(--sub)}
+#s3 .clock i{position:absolute;left:50%;top:50%;width:10px;margin-left:-5px;background:var(--sub);border-radius:5px;transform-origin:50% 0}
+#s4 .h1{top:160px;font-weight:900;font-size:100px;line-height:1.18}
+#s4 .sub{top:420px;font-weight:700;font-size:40px;color:var(--sub)}
+#s4 .phone{left:290px;top:540px;width:500px;height:1020px;border-radius:78px;padding:15px}
+#s4 .phone .scr{border-radius:64px}
+#s4 .ring{position:absolute;border:7px solid var(--orange);border-radius:24px;box-shadow:0 0 30px rgba(246,163,92,.9);opacity:0}
+#s4 .tag{position:absolute;left:60px;top:1250px;padding:16px 26px;border-radius:20px;background:#fff;color:#0b1730;font-weight:900;font-size:40px;line-height:1.3;box-shadow:0 14px 34px rgba(0,0,0,.4);opacity:0}
+#s4 .tag small{display:block;font-size:28px;color:#4b5563;font-weight:700}
+</style></head>
+<body>
+<div class="bg"></div><div class="grid"></div>
+
+<div class="scene" id="s1">
+  <div class="c kick" style="top:600px">日大理工生の</div>
+  <div class="c big l1" style="top:700px">空きコマ90分、</div>
+  <div class="c big o l2" style="top:880px">どこ行く？</div>
+</div>
+
+<div class="scene" id="s2">
+  <div class="c head">とりあえず、教室を探す</div>
+  <div class="doorwrap">
+    <div class="door" id="d1"><div class="plate">S503</div><div class="win"></div><div class="lever"></div><div class="floor"></div><div class="stamp">授業中</div></div>
+    <div class="door" id="d2"><div class="plate">S602</div><div class="win"></div><div class="lever"></div><div class="floor"></div><div class="stamp">授業中</div></div>
+    <div class="door" id="d3"><div class="plate">142</div><div class="win"></div><div class="lever"></div><div class="floor"></div><div class="stamp">授業中</div></div>
+  </div>
+  <div class="floorlbl"><span id="f1">タワー・スコラ <b>5階</b></span></div>
+</div>
+
+<div class="scene" id="s3">
+  <div class="clock"><i style="height:70px;transform:rotate(180deg)"></i><i class="mh" style="height:84px;transform:rotate(120deg)"></i></div>
+  <div class="c t">そして、<br><span class="o">休み時間が終わる。</span></div>
+</div>
+
+<div class="scene" id="s4">
+  <div class="c h1">開けた瞬間、<br><span class="g">いま使える教室。</span></div>
+  <div class="c sub">時間割から、空き教室をすぐ一覧に</div>
+  <div class="phone"><div class="scr"><div class="isl"></div><img src="assets/page0.png" alt=""></div>
+    <div class="ring" style="left:322px;top:672px;width:147px;height:118px"></div></div>
+  <div class="tag">705 は 6限まで空き<small>アプリの実際の画面（駿河台校舎・水曜3限）</small></div>
+</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="common.js"></script>
+<script>
+const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 13.2;
+// 1. つかみ（0〜1.8秒）
+show(tl, '#s1', 0, 0.01);
+tl.from('#s1 .kick', { y: 30, opacity: 0, duration: 0.3 }, 0)
+  .from('#s1 .l1', { scale: 1.35, opacity: 0, duration: 0.35, ease: 'power3.out' }, 0.08)
+  .from('#s1 .l2', { scale: 0.6, opacity: 0, duration: 0.4, ease: 'back.out(2.2)' }, 0.62);
+hide(tl, '#s1', 1.75, 0.2);
+// 2. ドアを回る（1.9〜5.9秒）：入ってくる → 「授業中」
+show(tl, '#s2', 1.9, 0.15);
+tl.from('#s2 .head', { y: -30, opacity: 0, duration: 0.3 }, 1.9);
+gsap.set(['#d2', '#d3'], { x: 760 });
+const floors = ['タワー・スコラ <b>5階</b>', 'タワー・スコラ <b>6階</b>', '駿河台校舎 <b>1号館</b>'];
+[1, 2, 3].forEach((n, i) => {
+  const t0 = 2.0 + i * 1.3;
+  if (i > 0) {
+    tl.to(`#d${n - 1}`, { x: -760, duration: 0.28, ease: 'power2.in' }, t0 - 0.05)
+      .to(`#d${n}`, { x: 0, duration: 0.3, ease: 'power3.out' }, t0)
+      .call(() => {}, null, t0)
+      .set('#f1', { innerHTML: floors[i] }, t0);
+  } else {
+    tl.from('#d1', { x: 760, duration: 0.3, ease: 'power3.out' }, t0);
+  }
+  tl.fromTo(`#d${n} .stamp`, { opacity: 0, scale: 2.4 }, { opacity: 1, scale: 1, duration: 0.18, ease: 'power4.in' }, t0 + 0.5)
+    .to('.doorwrap', { x: 14, duration: 0.04, repeat: 3, yoyo: true }, t0 + 0.68);
+});
+tl.set('#f1', { innerHTML: floors[0] }, 1.9);
+hide(tl, '#s2', 5.85, 0.2);
+// 3. 休み時間が終わる（6.0〜7.2秒）
+show(tl, '#s3', 6.0, 0.15);
+tl.from('#s3 .t', { y: 40, opacity: 0, duration: 0.35 }, 6.05)
+  .fromTo('#s3 .mh', { rotation: 120 }, { rotation: 200, duration: 1.0, ease: 'none' }, 6.0);
+hide(tl, '#s3', 7.1, 0.2);
+// 4. アプリ（7.3〜10.6秒）
+show(tl, '#s4', 7.3, 0.15);
+tl.from('#s4 .h1', { y: 40, opacity: 0, duration: 0.4 }, 7.3)
+  .from('#s4 .sub', { opacity: 0, duration: 0.3 }, 7.6)
+  .from('#s4 .phone', { y: 700, duration: 0.6, ease: 'power3.out' }, 7.35)
+  .to('#s4 .ring', { opacity: 1, duration: 0.2 }, 8.7)
+  .fromTo('#s4 .ring', { scale: 1.4 }, { scale: 1, duration: 0.35, ease: 'back.out(2)' }, 8.7)
+  .to('#s4 .tag', { opacity: 1, duration: 0.25 }, 9.0)
+  .from('#s4 .tag', { y: 40, duration: 0.35, ease: 'power3.out' }, 9.0);
+hide(tl, '#s4', 10.5, 0.2);
+// 5. 終わりの札（10.6〜13.2秒）
+addEnd(tl, 10.6, '空きコマの行き先、<span class="o">すぐ決まる。</span>');
+tl.to({}, { duration: 0.01 }, window.DURATION);
+</script>
+</body></html>

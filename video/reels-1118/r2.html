@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8">
+<!-- リール2「クイズ：空き教室がいちばん少ないのは？」（14.4秒）。数字は schedule_final.db の 2026年度・後期、駿河台キャンパス64室（README の計算） -->
+<link rel="stylesheet" href="common.css">
+<style>
+.quizpill{position:absolute;left:50%;top:330px;transform:translateX(-50%);font-family:Syne;font-weight:800;font-size:46px;letter-spacing:.2em;padding:14px 40px 14px 50px;border-radius:99px;background:linear-gradient(90deg,#ff7a59,#f6a35c)}
+#q .k{top:470px}
+#q .t{top:560px;font-weight:900;font-size:112px;line-height:1.2}
+.opts{position:absolute;left:90px;right:90px;top:700px;display:grid;gap:34px}
+.opt{position:relative;display:flex;align-items:center;gap:34px;padding:34px 40px;border-radius:30px;background:rgba(255,255,255,.07);border:3px solid rgba(127,168,255,.35)}
+.opt .l{width:96px;height:96px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;font-family:Syne;font-weight:800;font-size:54px;background:linear-gradient(135deg,#2f6bff,#22c3e6)}
+.opt .w{font-weight:900;font-size:76px}
+.opt .n{margin-left:auto;font-weight:900;font-size:72px;color:var(--sub);opacity:0}
+.opt .n small{font-size:40px}
+.opt.win{border-color:var(--orange);background:rgba(246,163,92,.14);box-shadow:0 0 60px rgba(246,163,92,.35)}
+.opt.win .n{color:var(--orange)}
+.ok{position:absolute;right:-24px;top:-46px;font-weight:900;font-size:56px;color:#fff;background:var(--red);padding:6px 26px 10px;border-radius:18px;transform:rotate(8deg);opacity:0}
+.count{position:absolute;left:50%;top:1340px;width:200px;height:200px;margin-left:-100px}
+.count svg{position:absolute;inset:0}
+.count b{position:absolute;inset:0;display:grid;place-items:center;font-family:Syne;font-weight:800;font-size:110px}
+.after{position:absolute;left:60px;right:60px;top:1330px;text-align:center;font-weight:900;font-size:58px;line-height:1.45;opacity:0}
+#h .t{top:250px;font-weight:900;font-size:96px;line-height:1.2}
+.heat{position:absolute;left:80px;right:80px;top:560px}
+.heat table{width:100%;border-collapse:separate;border-spacing:10px}
+.heat th{font-weight:900;font-size:40px;color:var(--sub);padding:6px 0}
+.heat td{height:112px;border-radius:18px;text-align:center;font-weight:900;font-size:50px;color:#fff}
+.heat td.hot{outline:6px solid var(--orange);outline-offset:-3px}
+.heat .col6{box-shadow:0 0 0 6px var(--cyan) inset}
+.src{position:absolute;left:90px;right:90px;top:1420px;text-align:center;font-weight:500;font-size:30px;line-height:1.6;color:var(--mute)}
+.callout{position:absolute;left:60px;right:60px;top:1290px;text-align:center;font-weight:900;font-size:54px}
+</style></head>
+<body>
+<div class="bg"></div><div class="grid"></div>
+
+<div class="scene" id="q">
+  <div class="quizpill">QUIZ</div>
+  <div class="c kick k">駿河台キャンパスで</div>
+  <div class="c t">空き教室が<br><span class="o">いちばん少ない</span><br>のは？</div>
+</div>
+
+<div class="scene" id="o">
+  <div class="c" style="top:300px;font-weight:900;font-size:62px;line-height:1.35">空き教室が<span class="o">いちばん少ない</span>のは？</div>
+  <div class="c small" style="top:470px">駿河台キャンパス（64室）・2026年度後期</div>
+  <div class="opts" style="top:620px">
+    <div class="opt" id="oa"><div class="l">A</div><div class="w">月曜1限</div><div class="n">49<small>室</small></div></div>
+    <div class="opt" id="ob"><div class="l">B</div><div class="w">水曜3限</div><div class="n"><span id="nb">24</span><small>室</small></div><div class="ok">正解</div></div>
+    <div class="opt" id="oc"><div class="l">C</div><div class="w">金曜5限</div><div class="n">52<small>室</small></div></div>
+  </div>
+  <div class="count"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="14"/>
+    <circle id="ring" cx="100" cy="100" r="88" fill="none" stroke="#f6a35c" stroke-width="14" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="0" transform="rotate(-90 100 100)"/></svg><b id="cn">3</b></div>
+  <div class="after">いちばん少ない水曜3限でも、<br><span class="o">24室</span>は空いている。</div>
+</div>
+
+<div class="scene" id="h">
+  <div class="c t">ねらい目は<br><span class="g">5限・6限</span></div>
+  <div class="heat"><table id="tb"></table></div>
+  <div class="callout">月曜6限は、<span style="color:var(--cyan)">64室中 61室</span>が空き</div>
+  <div class="src">2026年度後期の時間割（タワー・スコラと駿河台校舎の64室）で、授業が入っていない教室の数。時間割にない授業もあります。</div>
+</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="common.js"></script>
+<script>
+// 授業が入っていない教室の数（月〜金 × 1〜6限）。README の計算と同じ
+const GRID = {"月": [49, 40, 42, 46, 51, 61], "火": [43, 30, 29, 33, 52, 57], "水": [38, 31, 24, 28, 48, 59], "木": [51, 37, 41, 44, 52, 58], "金": [37, 33, 34, 37, 52, 55]};
+const tb = document.getElementById('tb');
+const col = v => { const k = (v - 24) / (61 - 24); const h = 20 + k * 165; return `hsl(${h} ${70 - k * 10}% ${34 + k * 10}%)`; };
+tb.innerHTML = '<tr><th></th>' + [1,2,3,4,5,6].map(p => `<th>${p}限</th>`).join('') + '</tr>' +
+  Object.entries(GRID).map(([d, row]) => `<tr><th>${d}</th>` + row.map((v, i) => `<td class="cell${i >= 4 ? ' late' : ''}${v === 24 ? ' hot' : ''}" style="background:${col(v)}">${v}</td>`).join('') + '</tr>').join('');
+
+const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 14.4;
+// 1. 問題（0〜1.8秒）
+show(tl, '#q', 0, 0.01);
+tl.from('.quizpill', { scale: 0.4, opacity: 0, duration: 0.35, ease: 'back.out(2.4)' }, 0)
+  .from('#q .k', { y: 30, opacity: 0, duration: 0.3 }, 0.2)
+  .from('#q .t', { y: 50, opacity: 0, duration: 0.4, ease: 'power3.out' }, 0.35);
+hide(tl, '#q', 1.75, 0.2);
+// 2. 選択肢とカウントダウン（1.9〜5.6秒）
+show(tl, '#o', 1.9, 0.15);
+['#oa', '#ob', '#oc'].forEach((s, i) => tl.from(s, { x: 600, opacity: 0, duration: 0.35, ease: 'power3.out' }, 2.0 + i * 0.18));
+tl.from('.count', { scale: 0.5, opacity: 0, duration: 0.3 }, 2.5)
+  .to('#ring', { attr: { 'stroke-dashoffset': 553 }, duration: 3.0, ease: 'none' }, 2.6)
+  .set('#cn', { textContent: '3' }, 2.6).set('#cn', { textContent: '2' }, 3.6).set('#cn', { textContent: '1' }, 4.6);
+[2.6, 3.6, 4.6].forEach(t => tl.fromTo('#cn', { scale: 1.5 }, { scale: 1, duration: 0.25, ease: 'power3.out' }, t));
+// 3. 正解（5.6〜8.4秒）
+tl.to('.count', { opacity: 0, duration: 0.2 }, 5.55)
+  .to(['#oa', '#oc'], { opacity: 0.35, duration: 0.25 }, 5.65)
+  .call(() => {}, null, 5.65)
+  .set('#ob', { className: 'opt win' }, 5.65)
+  .fromTo('#ob', { scale: 1 }, { scale: 1.06, duration: 0.18, yoyo: true, repeat: 1 }, 5.65)
+  .to('#ob .ok', { opacity: 1, duration: 0.1 }, 5.7)
+  .fromTo('#ob .ok', { scale: 2.2 }, { scale: 1, duration: 0.2, ease: 'power4.in' }, 5.7)
+  .to('.opt .n', { opacity: 1, duration: 0.3 }, 5.9)
+  .fromTo('#nb', { textContent: 0 }, { textContent: 24, duration: 0.7, snap: { textContent: 1 }, ease: 'power2.out' }, 5.9)
+  .to('.after', { opacity: 1, duration: 0.35 }, 6.6)
+  .from('.after', { y: 30, duration: 0.35 }, 6.6);
+hide(tl, '#o', 8.3, 0.2);
+// 4. ねらい目（8.4〜11.8秒）
+show(tl, '#h', 8.4, 0.15);
+tl.from('#h .t', { y: 40, opacity: 0, duration: 0.35 }, 8.4)
+  .from('.heat tr', { opacity: 0, y: 30, duration: 0.3, stagger: 0.07 }, 8.6)
+  .to('.heat td.late', { boxShadow: '0 0 0 6px #3ad1e0 inset', duration: 0.3 }, 9.6)
+  .from('.callout', { opacity: 0, y: 30, duration: 0.35 }, 9.8)
+  .from('.src', { opacity: 0, duration: 0.3 }, 10.0);
+hide(tl, '#h', 11.7, 0.2);
+// 5. 終わりの札（11.8〜14.4秒）
+addEnd(tl, 11.8, 'いま空いている教室は、<br><span class="g">RoomRadar</span> で。');
+tl.to({}, { duration: 0.01 }, window.DURATION);
+</script>
+</body></html>

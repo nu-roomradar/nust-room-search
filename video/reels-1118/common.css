@@ -1,0 +1,38 @@
+/* リール3本の共通（1080×1920）。書体は fonts/（fetch_fonts.sh。OFL） */
+@font-face{font-family:'NotoJP';font-weight:400;src:url(fonts/NotoSansCJKjp-Regular.otf)}
+@font-face{font-family:'NotoJP';font-weight:500;src:url(fonts/NotoSansCJKjp-Medium.otf)}
+@font-face{font-family:'NotoJP';font-weight:700;src:url(fonts/NotoSansCJKjp-Bold.otf)}
+@font-face{font-family:'NotoJP';font-weight:900;src:url(fonts/NotoSansCJKjp-Black.otf)}
+@font-face{font-family:'Round';font-weight:700;src:url(fonts/MPLUSRounded1c-Bold.ttf)}
+@font-face{font-family:'Round';font-weight:800;src:url(fonts/MPLUSRounded1c-ExtraBold.ttf)}
+@font-face{font-family:'Round';font-weight:900;src:url(fonts/MPLUSRounded1c-Black.ttf)}
+@font-face{font-family:'Syne';font-weight:400 800;src:url(fonts/Syne-wght.ttf)}
+:root{--navy:#071228;--navy2:#0a1f4a;--blue:#4f8cff;--cyan:#3ad1e0;--orange:#f6a35c;--red:#ff4d5e;--ink:#fff;--sub:#c9d5ee;--mute:#8fa3c8}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:var(--navy)}
+body{font-family:'NotoJP',sans-serif;color:var(--ink);position:relative;word-break:keep-all;overflow-wrap:anywhere}
+.bg{position:absolute;inset:0;background:
+  radial-gradient(700px 600px at 50% 0%,rgba(246,163,92,.16),transparent 70%),
+  radial-gradient(620px 520px at 100% 22%,rgba(37,99,235,.40),transparent 70%),
+  radial-gradient(600px 520px at 0% 88%,rgba(20,140,170,.28),transparent 70%),
+  linear-gradient(165deg,#061026 0%,#08183a 55%,#0a1f4a 100%)}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(127,168,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(127,168,255,.06) 1px,transparent 1px);background-size:72px 72px}
+.scene{position:absolute;inset:0;opacity:0}
+.c{position:absolute;left:0;right:0;text-align:center}
+.kick{font-weight:900;font-size:44px;color:var(--orange);letter-spacing:.02em}
+.big{font-weight:900;font-size:132px;line-height:1.12;letter-spacing:-.02em}
+.mid{font-weight:900;font-size:84px;line-height:1.2;letter-spacing:-.01em}
+.small{font-weight:700;font-size:38px;color:var(--sub);line-height:1.6}
+.g{background:linear-gradient(90deg,#5b95ff,#3ad1e0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.o{color:var(--orange)}
+/* 終わりの札（ロゴ・案内・必須の表記） */
+#end .logo{position:absolute;left:50%;top:560px;width:620px;margin-left:-310px}
+#end .name{top:960px;font-weight:900;font-size:56px}
+#end .pill{position:absolute;left:50%;top:1070px;transform:translateX(-50%);white-space:nowrap;font-weight:900;font-size:40px;padding:20px 44px;border-radius:99px;background:linear-gradient(90deg,#2f6bff,#22c3e6)}
+#end .doornote{top:1210px;font-weight:700;font-size:34px;color:#ffd5ad}
+#end .note{position:absolute;left:110px;right:110px;top:1330px;text-align:center;font-weight:500;font-size:30px;line-height:1.6;color:var(--sub)}
+/* スマホの枠（アプリの実画面を入れる） */
+.phone{position:absolute;width:560px;height:1140px;border-radius:84px;padding:16px;background:linear-gradient(135deg,#9aa0ab,#3c4048 30%,#6d727c 55%,#2b2f36 80%,#8d929c);box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 80px rgba(79,140,255,.25)}
+.phone .scr{position:relative;width:100%;height:100%;border-radius:70px;overflow:hidden;background:#0d0f14}
+.phone .scr img{position:absolute;left:0;top:0;width:100%}
+.phone .isl{position:absolute;left:50%;top:30px;width:150px;height:44px;margin-left:-75px;border-radius:99px;background:#000;z-index:3}
