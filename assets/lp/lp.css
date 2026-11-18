@@ -1033,7 +1033,7 @@ footer { font-size: 0.8rem; line-height: 1.7; word-break: auto-phrase; }
 /* ════════════════════════════════════════════
    2026-11-07 整理：ヒーローの仕上げ（配置は変えない）
 ════════════════════════════════════════════ */
-@media (max-width: 767px) { .nav-links { display: none; } }          /* スマホのメニューはロゴと言語だけ */
+/* スマホの案内バーは 11/07 にいったん隠したが、2026-11-18 の運営の依頼で紹介ページでは戻した（横にスワイプ。820px 以下の組みは上の @media）。about は章の目次があるので about.css で隠す */
 .hero-free { margin: 12px 0 0; font-size: 0.78rem; color: var(--muted); letter-spacing: 0.04em;
   opacity: 0; animation: fadeUp 0.7s 0.55s ease forwards; }
 .hero-desc { margin: 18px auto 30px; }
