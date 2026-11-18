@@ -10,6 +10,23 @@
 
 カバーは同じ名前の `-cover.jpg`（つかみの文字が出そろったコマ）。
 
+## v2（2026-11-18、運営の意見「2・3本目のクオリティをもうちょっと上げたら投稿できそう。Blender と連携してよりリアルに」）
+
+- `reel8-quiz-v2.mp4`・`reel9-ranking-v2.mp4`。3D の場面を Blender 4.5（Cycles）で描き、文字はこれまでどおり HTML で重ねた（`r2b.html`・`r3b.html`）。
+- 3D：`blender/r2_scene.py`（曜日×時限の空き教室の数を柱の高さにした街）、`blender/r3_scene.py`（使い方の小物を載せた棒が床の下からせり上がるランキング）。どちらも時刻 t＝フレーム t×30 で、HTML と同じ時刻表で動く。
+- 文字を 3D に合わせる：Blender で棒・柱の画面の位置を `frames*/anchors.json` に書き出し、HTML がそこへ文字を置く（端で切れないよう、大きな札は画面の内側に寄せる）。
+- この環境に GPU は無いので、Cycles は CPU で 720×1280・16サンプル＋ノイズ除去（約9秒/コマ）。HTML 側で 1080×1920 に広げて重ねる。EEVEE はソフトウェアの OpenGL だと遅い（約67秒/コマ）ので使わない。
+- Blender は Python のモジュール `bpy==4.5.16`（PyPI。Python 3.11 用）。作業用の仮想環境に入れて使った（約1GB。リポジトリには入れない）:
+  ```bash
+  python3 -m venv /tmp/blendervenv && /tmp/blendervenv/bin/pip install bpy==4.5.16
+  cd video/reels-1118/blender
+  /tmp/blendervenv/bin/python r3_scene.py preview 2.6,6.4,8.5     # 下書き（小さく）
+  /tmp/blendervenv/bin/python r3_scene.py render                   # 本番（frames3/。止めても続きから。約30分）
+  /tmp/blendervenv/bin/python r2_scene.py render                   # 本番（frames2/。約55分）
+  cd .. && python3 render.py r3b.html --out out-r3b.mp4 --audio r3.wav
+  python3 render.py r2b.html --out out-r2b.mp4 --audio r2.wav
+  ```
+
 ## 数字の根拠
 
 - **クイズ**：`schedule_final.db` の 2026年度・後期。駿河台キャンパス（タワー・スコラ 38室＋駿河台校舎 26室＝64室）で、その曜日・時限に時間割上の授業が入っていない教室の数（隔週の授業も「入っている」に数える）。月〜金×1〜6限の表は `r2.html` の `GRID`。水曜3限の24室は全コマで最少で、3D 広告（cm5）の数字と同じ。
