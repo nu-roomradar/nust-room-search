@@ -8,16 +8,17 @@
 html,body{background:#1d3a30}
 #stage{position:absolute;inset:0;transform-origin:50% 45%}
 #board{position:absolute;inset:0;width:1080px;height:1920px}
-.ch{position:absolute;font-family:'Chalk';color:#f3f1e8;white-space:nowrap;filter:url(#chalk);
-    text-shadow:0 0 2px rgba(255,255,255,.35),0 0 10px rgba(255,255,255,.08);clip-path:inset(0 100% 0 0)}
-.y{color:#f4d35e}.r{color:#ef6b5f}.g{color:#c9d8cf}
+#qa,#tbl,#e1,#e2{transform:translateY(80px)}   /* 黒板が画面いっぱいになったので、文字を少し下げて上下の余白をそろえる */
+.ch{position:absolute;font-family:'Chalk';color:#fbfaf4;white-space:nowrap;filter:url(#chalk);-webkit-text-stroke:1.6px currentColor;
+    text-shadow:0 0 3px rgba(255,255,255,.55),0 0 12px rgba(255,255,255,.14);clip-path:inset(0 100% 0 0)}
+.y{color:#ffd95e}.r{color:#ff7466}.g{color:#dfe9e3}
 svg.draw{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:visible;filter:url(#chalk)}
 svg.draw path,svg.draw line,svg.draw rect,svg.draw ellipse{fill:none;stroke-linecap:round;stroke-linejoin:round}
-.num{position:absolute;font-family:'Chalk';color:#f3f1e8;font-size:50px;width:120px;text-align:center;filter:url(#chalk);opacity:0;text-shadow:0 0 2px rgba(255,255,255,.3)}
-.hd{position:absolute;font-family:'Chalk';color:#c9d8cf;font-size:42px;width:120px;text-align:center;filter:url(#chalk);opacity:0}
+.num{position:absolute;font-family:'Chalk';color:#fbfaf4;font-size:52px;width:120px;text-align:center;filter:url(#chalk);-webkit-text-stroke:1.3px currentColor;opacity:0;text-shadow:0 0 3px rgba(255,255,255,.45)}
+.hd{position:absolute;font-family:'Chalk';color:#e3ece6;font-size:44px;width:120px;text-align:center;filter:url(#chalk);-webkit-text-stroke:1px currentColor;opacity:0}
 #smudge{position:absolute;left:60px;right:60px;top:200px;height:1300px;background:radial-gradient(ellipse at 50% 50%,rgba(220,235,228,.16),rgba(220,235,228,.05) 60%,transparent 80%);filter:blur(30px);opacity:0}
 #eraser{position:absolute;left:0;top:0;width:420px;transform:translate(-50%,-50%) rotate(-8deg);opacity:0;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
-.paper{position:absolute;left:140px;right:140px;top:455px;height:1010px;background:#fbfaf6;border-radius:6px;transform:rotate(-1.4deg);
+.paper{position:absolute;left:140px;right:140px;top:540px;height:1010px;background:#fbfaf6;border-radius:6px;transform:rotate(-1.4deg);
        box-shadow:0 24px 40px rgba(0,0,0,.38);opacity:0;color:#1b2430;text-align:center}
 .paper .tape{position:absolute;width:150px;height:46px;background:rgba(240,228,190,.82);top:-18px}
 .paper .logo{width:400px;margin:70px auto 0;display:block}
@@ -30,9 +31,9 @@ svg.draw path,svg.draw line,svg.draw rect,svg.draw ellipse{fill:none;stroke-line
 <svg width="0" height="0" style="position:absolute">
   <filter id="chalk" x="-5%" y="-5%" width="110%" height="110%">
     <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="4" result="n"/>
-    <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" result="d"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" result="d"/>
     <feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="1" seed="9" result="g"/>
-    <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -1.6 1.35" result="holes"/>
+    <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -0.7 1.25" result="holes"/>
     <feComposite in="d" in2="holes" operator="in"/>
   </filter>
 </svg>
@@ -72,6 +73,7 @@ svg.draw path,svg.draw line,svg.draw rect,svg.draw ellipse{fill:none;stroke-line
   </div>
 
   <div id="smudge"></div>
+  <div id="vig" style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 45%,transparent 55%,rgba(20,24,20,.38) 100%)"></div>
   <img id="eraser" src="assets/eraser.png" alt="">
 
   <!-- 5：終わり（黒板に貼った紙） -->
@@ -94,8 +96,8 @@ const GRID = {"月": [49, 40, 42, 46, 51, 61], "火": [43, 30, 29, 33, 52, 57], 
 const X0 = 210, CW = 124, Y0 = 650, RH = 108;          // 1限の列の左端・列の幅・月曜の行の上端・行の高さ
 const cells = document.getElementById('cells'), grid = document.getElementById('grid');
 let gl = '';
-for (let p = 0; p <= 6; p++) gl += `<line x1="${X0 - 12 + p * CW}" y1="${Y0 - 70}" x2="${X0 - 12 + p * CW}" y2="${Y0 + 5 * RH}" stroke="#d9e4dd" stroke-width="3" class="gl"/>`;
-for (let d = 0; d <= 5; d++) gl += `<line x1="${X0 - 100}" y1="${Y0 + d * RH}" x2="${X0 - 12 + 6 * CW}" y2="${Y0 + d * RH}" stroke="#d9e4dd" stroke-width="3" class="gl"/>`;
+for (let p = 0; p <= 6; p++) gl += `<line x1="${X0 - 12 + p * CW}" y1="${Y0 - 70}" x2="${X0 - 12 + p * CW}" y2="${Y0 + 5 * RH}" stroke="#eef3ef" stroke-width="4" class="gl"/>`;
+for (let d = 0; d <= 5; d++) gl += `<line x1="${X0 - 100}" y1="${Y0 + d * RH}" x2="${X0 - 12 + 6 * CW}" y2="${Y0 + d * RH}" stroke="#eef3ef" stroke-width="4" class="gl"/>`;
 grid.innerHTML = gl;
 [1,2,3,4,5,6].forEach((p, i) => cells.insertAdjacentHTML('beforeend', `<div class="hd" style="left:${X0 - 12 + i * CW}px;top:${Y0 - 66}px">${p}限</div>`));
 Object.entries(GRID).forEach(([d, row], r) => {

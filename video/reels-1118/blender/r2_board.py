@@ -69,7 +69,7 @@ felt = simple("felt", "#2f6aa6", rough=0.95); top = simple("etop", "#d9d4c7", ro
 box("eraser_felt", (0.26, 0.09, 0.025), (-1.4, -0.11, 0.195), felt, 0.008)
 box("eraser_top", (0.26, 0.09, 0.04), (-1.4, -0.11, 0.225), top, 0.012)
 # 壁（明るいクリーム色）と床
-wall = simple("wall", "#e8e1d2", rough=0.9)
+wall = simple("wall", "#b9ab90", rough=0.9)          # 真っ白に見えないよう、落ち着いた砂色に（v4.1）
 box("wall", (14, 0.05, 8), (0, 0.06, 3.0), wall)
 box("floor", (14, 8, 0.05), (0, -3.5, -0.9), simple("floor", "#b08a5e", rough=0.6))
 
@@ -90,9 +90,9 @@ f.data.energy = 220; f.data.size = 5; f.data.color = (0.95, 0.97, 1.0)
 f.rotation_euler = (Vector((0, 0, 1.9)) - Vector((2, -5, 3.5))).to_track_quat("-Z", "Y").to_euler()
 
 # ── カメラ（正面。黒板が画面いっぱい、下に粉受け） ──
-bpy.ops.object.camera_add(location=(0.15, -4.15, 1.62)); cam = bpy.context.object; sc.camera = cam
+bpy.ops.object.camera_add(location=(0.15, -3.55, 1.76)); cam = bpy.context.object; sc.camera = cam   # 寄せて、黒板で画面をほぼ埋める（v4.1）
 cam.rotation_euler = (math.radians(90), 0, 0); cam.data.lens = 30
-cam.data.dof.use_dof = True; cam.data.dof.focus_distance = 4.15; cam.data.dof.aperture_fstop = 5.6
+cam.data.dof.use_dof = True; cam.data.dof.focus_distance = 3.55; cam.data.dof.aperture_fstop = 5.6
 
 sc.render.engine = "CYCLES"; sc.cycles.device = "CPU"; sc.cycles.use_denoising = True; sc.cycles.denoiser = "OPENIMAGEDENOISE"
 sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - Medium High Contrast"
