@@ -51,7 +51,7 @@ svg.draw path,svg.draw line,svg.draw rect,svg.draw ellipse{fill:none;stroke-line
     <div class="ch" id="ob" style="left:150px;top:935px;font-size:88px"><span class="y">B</span>　水曜3限</div>
     <div class="ch" id="oc" style="left:150px;top:1080px;font-size:88px"><span class="y">C</span>　金曜5限</div>
     <div class="ch g" id="na" style="left:690px;top:812px;font-size:64px">49室</div>
-    <div class="ch r" id="nb" style="left:690px;top:957px;font-size:72px">24室</div>
+    <div class="ch r" id="nb" style="left:690px;top:957px;font-size:72px;transform-origin:30% 60%">24室</div>
     <div class="ch g" id="nc" style="left:690px;top:1102px;font-size:64px">52室</div>
     <div class="ch y" id="c3" style="left:842px;top:170px;font-size:150px">3</div>
     <div class="ch y" id="c2" style="left:842px;top:170px;font-size:150px">2</div>
@@ -59,6 +59,7 @@ svg.draw path,svg.draw line,svg.draw rect,svg.draw ellipse{fill:none;stroke-line
     <svg class="draw"><path id="circ" d="M650 958 C 520 922, 210 918, 134 968 C 70 1012, 160 1068, 420 1066 C 640 1064, 700 1010, 666 966 C 640 936, 560 928, 520 930" stroke="#ef6b5f" stroke-width="10"/></svg>
     <div class="ch r" id="ok" style="left:690px;top:392px;font-size:104px;transform:rotate(-8deg)">正解！</div>
     <div class="ch" id="after" style="left:150px;top:1250px;font-size:66px">それでも <span class="r">24室</span> は空いている</div>
+    <svg class="draw"><path id="ul2" d="M455 1338 C 520 1333, 590 1341, 650 1335" stroke="#ff7466" stroke-width="8"/></svg>
   </div>
 
   <!-- 4：ねらい目（チョークの表） -->
@@ -68,8 +69,8 @@ svg.draw path,svg.draw line,svg.draw rect,svg.draw ellipse{fill:none;stroke-line
     <svg class="draw" id="grid"></svg>
     <div id="cells"></div>
     <svg class="draw"><rect id="box56" x="690" y="572" width="256" height="630" rx="40" stroke="#f4d35e" stroke-width="9"/></svg>
-    <div class="ch y" id="note" style="left:120px;top:1232px;font-size:60px">月曜6限は <span style="font-size:76px">61</span>室が空き</div>
-    <div class="ch g" id="src" style="left:120px;top:1352px;font-size:32px;line-height:1.5">2026年度後期の時間割（駿河台キャンパス64室）で<br>授業が入っていない教室の数。時間割にない授業もあります。</div>
+    <div class="ch y" id="note" style="left:120px;top:1262px;font-size:60px">月曜6限は <span style="font-size:76px">61</span>室が空き</div>
+    <div class="ch g" id="src" style="left:120px;top:1380px;font-size:32px;line-height:1.5">2026年度後期の時間割（駿河台キャンパス64室）で<br>授業が入っていない教室の数。時間割にない授業もあります。</div>
   </div>
 
   <div id="smudge"></div>
@@ -93,25 +94,31 @@ svg.draw path,svg.draw line,svg.draw rect,svg.draw ellipse{fill:none;stroke-line
 <script>
 // チョークの表（曜日×時限の、授業が入っていない教室の数）
 const GRID = {"月": [49, 40, 42, 46, 51, 61], "火": [43, 30, 29, 33, 52, 57], "水": [38, 31, 24, 28, 48, 59], "木": [51, 37, 41, 44, 52, 58], "金": [37, 33, 34, 37, 52, 55]};
-const X0 = 210, CW = 124, Y0 = 650, RH = 108;          // 1限の列の左端・列の幅・月曜の行の上端・行の高さ
+const DAYS = ["月", "火", "水", "木", "金"];
+// v6：曜日を横（列）、時限を縦（行）にした（運営の意見）
+const X0 = 250, CW = 146, Y0 = 650, RH = 90;          // 月の列の左端・列の幅・1限の行の上端・行の高さ
 const cells = document.getElementById('cells'), grid = document.getElementById('grid');
 let gl = '';
-for (let p = 0; p <= 6; p++) gl += `<line x1="${X0 - 12 + p * CW}" y1="${Y0 - 70}" x2="${X0 - 12 + p * CW}" y2="${Y0 + 5 * RH}" stroke="#eef3ef" stroke-width="4" class="gl"/>`;
-for (let d = 0; d <= 5; d++) gl += `<line x1="${X0 - 100}" y1="${Y0 + d * RH}" x2="${X0 - 12 + 6 * CW}" y2="${Y0 + d * RH}" stroke="#eef3ef" stroke-width="4" class="gl"/>`;
+for (let c = 0; c <= 5; c++) gl += `<line x1="${X0 - 12 + c * CW}" y1="${Y0 - 70}" x2="${X0 - 12 + c * CW}" y2="${Y0 + 6 * RH}" stroke="#eef3ef" stroke-width="4" class="gl"/>`;
+for (let r = 0; r <= 6; r++) gl += `<line x1="${X0 - 112}" y1="${Y0 + r * RH}" x2="${X0 - 12 + 5 * CW}" y2="${Y0 + r * RH}" stroke="#eef3ef" stroke-width="4" class="gl"/>`;
 grid.innerHTML = gl;
-[1,2,3,4,5,6].forEach((p, i) => cells.insertAdjacentHTML('beforeend', `<div class="hd" style="left:${X0 - 12 + i * CW}px;top:${Y0 - 66}px">${p}限</div>`));
-Object.entries(GRID).forEach(([d, row], r) => {
-  cells.insertAdjacentHTML('beforeend', `<div class="hd row${r}" style="left:${X0 - 118}px;top:${Y0 + r * RH + 22}px;width:100px">${d}</div>`);
-  row.forEach((v, i) => cells.insertAdjacentHTML('beforeend', `<div class="num row${r}${v === 24 ? ' low' : ''}" style="left:${X0 - 12 + i * CW}px;top:${Y0 + r * RH + 26}px;${v === 24 ? 'color:#ef6b5f' : ''}">${v}</div>`));
-});
+DAYS.forEach((d, c) => cells.insertAdjacentHTML('beforeend', `<div class="hd" style="left:${X0 - 12 + c * CW}px;top:${Y0 - 66}px;width:${CW}px">${d}</div>`));
+for (let r = 0; r < 6; r++) {
+  cells.insertAdjacentHTML('beforeend', `<div class="hd row${r}" style="left:${X0 - 124}px;top:${Y0 + r * RH + 18}px;width:110px">${r + 1}限</div>`);
+  DAYS.forEach((d, c) => { const v = GRID[d][r];
+    cells.insertAdjacentHTML('beforeend', `<div class="num row${r}${v === 24 ? ' low' : ''}" style="left:${X0 - 12 + c * CW}px;top:${Y0 + r * RH + 18}px;width:${CW}px;${v === 24 ? 'color:#ff7466' : ''}">${v}</div>`); });
+}
+const box = document.getElementById('box56');                 // 5限・6限の2行を囲む
+box.setAttribute('x', X0 - 122); box.setAttribute('y', Y0 + 4 * RH - 10); box.setAttribute('width', 5 * CW + 122); box.setAttribute('height', 2 * RH + 20); box.setAttribute('rx', 34);
 
-const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 14.4;
+const S = 1.5;                                                // 答えを長く見せる分（v6）。これより後の場面はすべて S 秒ずらす
+const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 14.4 + S;
 const write = (sel, at, dur) => tl.to(sel, { clipPath: 'inset(0 0% 0 0)', duration: dur, ease: 'none' }, at);
 const drawPath = (sel, at, dur) => { const e = document.querySelector(sel); const L = e.getTotalLength ? e.getTotalLength() : 2000;
   gsap.set(e, { strokeDasharray: L, strokeDashoffset: L, opacity: 0 });          // 描きはじめまでは消しておく（丸い線端の点が残らないように）
   tl.set(e, { opacity: 1 }, at).to(e, { strokeDashoffset: 0, duration: dur, ease: 'power1.inOut' }, at); };
 // 黒板全体をゆっくり寄せる（止まった絵に見えないように）
-tl.fromTo('#stage', { scale: 1.0 }, { scale: 1.045, duration: 14.4, ease: 'none' }, 0);
+tl.fromTo('#stage', { scale: 1.0 }, { scale: 1.045, duration: window.DURATION, ease: 'none' }, 0);
 
 // 1. 問題（0〜1.8秒）
 write('#q', 0.02, 0.22); write('#l1', 0.2, 0.32); write('#l2', 0.5, 0.42); write('#l3', 0.95, 0.55); drawPath('#ul', 1.5, 0.28);
@@ -120,36 +127,37 @@ write('#oa', 2.0, 0.34); write('#ob', 2.4, 0.34); write('#oc', 2.8, 0.34);
 write('#c3', 3.4, 0.18); tl.to('#c3', { opacity: 0, duration: 0.12 }, 4.1);
 write('#c2', 4.2, 0.18); tl.to('#c2', { opacity: 0, duration: 0.12 }, 4.9);
 write('#c1', 5.0, 0.16); tl.to('#c1', { opacity: 0, duration: 0.12 }, 5.55);
-// 3. 正解（5.65〜7.2秒）
+// 3. 正解（5.65〜8.7秒。v6 で 1.5 秒長く見せる）
 drawPath('#circ', 5.65, 0.4); write('#ok', 6.05, 0.25);
 write('#na', 6.35, 0.18); write('#nb', 6.5, 0.2); write('#nc', 6.7, 0.18);
-write('#after', 6.75, 0.45);
-// 4. 黒板消しで消す（7.3〜8.0秒）
-tl.to('#eraser', { opacity: 1, duration: 0.05 }, 7.28)
-  .fromTo('#eraser', { left: -160, top: 560 }, { left: 1240, top: 470, duration: 0.34, ease: 'power1.inOut' }, 7.3)
-  .to('#eraser', { left: -160, top: 1040, duration: 0.34, ease: 'power1.inOut' }, 7.66)
-  .to('#eraser', { opacity: 0, duration: 0.05 }, 7.98);
-tl.to('#qa', { opacity: 0.25, duration: 0.3 }, 7.35).to('#qa', { opacity: 0, duration: 0.3 }, 7.7)
-  .to('#smudge', { opacity: 1, duration: 0.3 }, 7.4).to('#smudge', { opacity: 0.55, duration: 0.8 }, 8.0);
-// 5. ねらい目の表（8.1〜11.7秒）
-write('#t1', 8.1, 0.32); write('#t2', 8.42, 0.3);
+write('#after', 6.75, 0.45); drawPath('#ul2', 7.5, 0.3);
+tl.fromTo('#nb', { scale: 1 }, { scale: 1.15, duration: 0.2, yoyo: true, repeat: 1, transformOrigin: '30% 60%' }, 7.9);
+// 4. 黒板消しで消す
+tl.to('#eraser', { opacity: 1, duration: 0.05 }, 7.28 + S)
+  .fromTo('#eraser', { left: -160, top: 560 }, { left: 1240, top: 470, duration: 0.34, ease: 'power1.inOut' }, 7.3 + S)
+  .to('#eraser', { left: -160, top: 1040, duration: 0.34, ease: 'power1.inOut' }, 7.66 + S)
+  .to('#eraser', { opacity: 0, duration: 0.05 }, 7.98 + S);
+tl.to('#qa', { opacity: 0.25, duration: 0.3 }, 7.35 + S).to('#qa', { opacity: 0, duration: 0.3 }, 7.7 + S)
+  .to('#smudge', { opacity: 1, duration: 0.3 }, 7.4 + S).to('#smudge', { opacity: 0.55, duration: 0.8 }, 8.0 + S);
+// 5. ねらい目の表
+write('#t1', 8.1 + S, 0.32); write('#t2', 8.42 + S, 0.3);
 document.querySelectorAll('#grid .gl').forEach((l, i) => {
   const L = Math.hypot(l.x2.baseVal.value - l.x1.baseVal.value, l.y2.baseVal.value - l.y1.baseVal.value);
   gsap.set(l, { strokeDasharray: L, strokeDashoffset: L, opacity: 0 });
-  tl.set(l, { opacity: 1 }, 8.75 + i * 0.03).to(l, { strokeDashoffset: 0, duration: 0.18, ease: 'none' }, 8.75 + i * 0.03);
+  tl.set(l, { opacity: 1 }, 8.75 + S + i * 0.03).to(l, { strokeDashoffset: 0, duration: 0.18, ease: 'none' }, 8.75 + S + i * 0.03);
 });
-tl.to('.hd', { opacity: 1, duration: 0.15, stagger: 0.03 }, 9.05);
-for (let r = 0; r < 5; r++) tl.to(`.num.row${r}`, { opacity: 1, duration: 0.12, stagger: 0.03 }, 9.3 + r * 0.14);
-drawPath('#box56', 10.25, 0.4);
-write('#note', 10.7, 0.42); write('#src', 11.0, 0.35);
-// 6. 終わり：消して、紙を貼る（11.7〜14.4秒）
-tl.to('#eraser', { opacity: 1, duration: 0.05 }, 11.68)
-  .fromTo('#eraser', { left: 1240, top: 760 }, { left: -160, top: 900, duration: 0.32, ease: 'power1.inOut' }, 11.7)
-  .to('#eraser', { opacity: 0, duration: 0.05 }, 12.0)
-  .to('#tbl', { opacity: 0, duration: 0.3 }, 11.72);
-write('#e1', 12.05, 0.36); write('#e2', 12.38, 0.28);
-tl.to('#paper', { opacity: 1, duration: 0.01 }, 12.1)
-  .fromTo('#paper', { y: 120, rotation: 4, scale: 1.04 }, { y: 0, rotation: -1.4, scale: 1, duration: 0.45, ease: 'back.out(1.6)' }, 12.1);
+tl.to('.hd', { opacity: 1, duration: 0.15, stagger: 0.03 }, 9.05 + S);
+for (let r = 0; r < 6; r++) tl.to(`.num.row${r}`, { opacity: 1, duration: 0.12, stagger: 0.03 }, 9.3 + S + r * 0.12);
+drawPath('#box56', 10.25 + S, 0.4);
+write('#note', 10.7 + S, 0.42); write('#src', 11.0 + S, 0.35);
+// 6. 終わり：消して、紙を貼る
+tl.to('#eraser', { opacity: 1, duration: 0.05 }, 11.68 + S)
+  .fromTo('#eraser', { left: 1240, top: 760 }, { left: -160, top: 900, duration: 0.32, ease: 'power1.inOut' }, 11.7 + S)
+  .to('#eraser', { opacity: 0, duration: 0.05 }, 12.0 + S)
+  .to('#tbl', { opacity: 0, duration: 0.3 }, 11.72 + S);
+write('#e1', 12.05 + S, 0.36); write('#e2', 12.38 + S, 0.28);
+tl.to('#paper', { opacity: 1, duration: 0.01 }, 12.1 + S)
+  .fromTo('#paper', { y: 120, rotation: 4, scale: 1.04 }, { y: 0, rotation: -1.4, scale: 1, duration: 0.45, ease: 'back.out(1.6)' }, 12.1 + S);
 tl.to({}, { duration: 0.01 }, window.DURATION);
 </script>
 </body></html>

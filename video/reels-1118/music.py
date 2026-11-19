@@ -232,7 +232,8 @@ def tap():                               # チョークで点を打つ・黒板�
 
 def r2d():
     """クイズ（黒板の版・14.4秒）。木琴と手拍子の明るい音（3本目の紺のスタジオとは別の雰囲気）"""
-    m = Mix(14.4)
+    S = 1.5                               # v6：答えを 1.5 秒長く見せる。黒板消しから後はすべて S 秒ずらす
+    m = Mix(14.4 + S)
     F = {"F": ["F3", "A3", "C4", "F4"], "Dm": ["D3", "F3", "A3", "D4"], "Bb": ["Bb2", "D3", "F3", "Bb3"], "C": ["C3", "E3", "G3", "C4"]}
     prog = ["F", "Dm", "Bb", "C"]; beat = 0.6
     def bed(t0, t1, bar0=0, lively=True):
@@ -257,21 +258,22 @@ def r2d():
     chalk(5.65, 6.05, m, 0.42); m.add(bell(note("C6")), 5.7, 0.35); m.add(bell(note("F6")), 5.85, 0.22)
     m.add(mallet(note("F4"), 1.4) + mallet(note("A4"), 1.4) + mallet(note("C5"), 1.4), 5.65, 0.35)
     chalk(6.05, 6.3, m); chalk(6.35, 6.88, m, 0.25); chalk(6.75, 7.2, m)
-    bed(6.0, 7.3, bar0=0)
+    bed(6.0, 7.3 + S, bar0=0)
+    chalk(7.5, 7.8, m, 0.3); m.add(pop(988), 7.9, 0.35)                 # 「24室」の下線と、数字がはねる
     # 4. 黒板消し
-    m.add(whoosh(0.36), 7.3, 0.55, 0.3); m.add(whoosh(0.36), 7.66, 0.55, -0.3)
+    m.add(whoosh(0.36), 7.3 + S, 0.55, 0.3); m.add(whoosh(0.36), 7.66 + S, 0.55, -0.3)
     # 5. 表を書く
-    chalk(8.1, 8.42, m); chalk(8.42, 8.72, m)
-    for i in range(13): chalk(8.75 + i * 0.03, 8.75 + i * 0.03 + 0.12, m, 0.12)
-    chalk(9.05, 10.1, m, 0.14)
-    chalk(10.25, 10.65, m, 0.32); m.add(bell(note("A5")), 10.3, 0.22)
-    chalk(10.7, 11.12, m); chalk(11.0, 11.35, m, 0.18)
-    bed(8.1, 11.7, bar0=1)
+    chalk(8.1 + S, 8.42 + S, m); chalk(8.42 + S, 8.72 + S, m)
+    for i in range(13): chalk(8.75 + S + i * 0.03, 8.75 + S + i * 0.03 + 0.12, m, 0.12)
+    chalk(9.05 + S, 10.1 + S, m, 0.14)
+    chalk(10.25 + S, 10.65 + S, m, 0.32); m.add(bell(note("A5")), 10.3 + S, 0.22)
+    chalk(10.7 + S, 11.12 + S, m); chalk(11.0 + S, 11.35 + S, m, 0.18)
+    bed(8.1 + S, 11.7 + S, bar0=1)
     # 6. 消して、紙を貼る
-    m.add(whoosh(0.34), 11.7, 0.5); chalk(12.05, 12.4, m); chalk(12.38, 12.66, m)
-    m.add(tap(), 12.5, 0.5); m.add(tap(), 12.56, 0.4)
-    m.add(mallet(note("F3"), 2.0) + mallet(note("C4"), 2.0) + mallet(note("A4"), 2.0) + mallet(note("F5"), 2.0), 12.1, 0.4)
-    bed(12.1, 13.8, bar0=0, lively=False)
+    m.add(whoosh(0.34), 11.7 + S, 0.5); chalk(12.05 + S, 12.4 + S, m); chalk(12.38 + S, 12.66 + S, m)
+    m.add(tap(), 12.5 + S, 0.5); m.add(tap(), 12.56 + S, 0.4)
+    m.add(mallet(note("F3"), 2.0) + mallet(note("C4"), 2.0) + mallet(note("A4"), 2.0) + mallet(note("F5"), 2.0), 12.1 + S, 0.4)
+    bed(12.1 + S, 13.8 + S, bar0=0, lively=False)
     master(m, "r2d", fade_out=0.8)
 
 

@@ -79,10 +79,7 @@ sun.data.energy = 6.5; sun.data.color = (1.0, 0.9, 0.75); sun.data.angle = math.
 sun.rotation_euler = (Vector((0, 0, 1.9)) - Vector((-6, -5, 5))).to_track_quat("-Z", "Y").to_euler()
 # 窓枠（光をさえぎる格子。カメラには映らない）
 win = simple("win", "#222222")
-for k in range(4):
-    o = box(f"mullion{k}", (0.12, 0.12, 6), (-3.4 + k * 1.3, -3.6, 2.6), win); o.visible_camera = False
-for z in (1.2, 3.4):
-    o = box(f"transom{z}", (6, 0.12, 0.12), (-1.5, -3.6, z), win); o.visible_camera = False
+# v6：窓枠の十字の影は「黒い影が気になる」とのことで外した（日の光のやわらかい明暗だけ残す）
 w = bpy.data.worlds.new("w"); sc.world = w; w.use_nodes = True
 w.node_tree.nodes["Background"].inputs[0].default_value = (*lin("#d8dde6"), 1); w.node_tree.nodes["Background"].inputs[1].default_value = 0.35
 bpy.ops.object.light_add(type="AREA", location=(2, -5, 3.5)); f = bpy.context.object
