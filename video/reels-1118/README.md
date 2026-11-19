@@ -55,3 +55,9 @@ python3 render.py r1.html --out out-r1.mp4 --audio r1.wav   # 本番（約2.5分
 
 - 1本の HTML が1本の動画。GSAP のタイムラインを止めたまま持ち、`render.py` が `renderAt(t)` で1コマずつ進めて撮り、ffmpeg でつなぐ（3D が無いので速い。1コマ約0.35秒）。
 - 共通の見た目は `common.css`、終わりの札は `common.js` の `addEnd()`。GSAP は `vendor/gsap.min.js`（npm の gsap@3.14.2 を上の手順で取る。リポジトリには入れない）。
+
+## 2本目 v4（黒板。2026-11-19、運営の意見「3本目と雰囲気が被ってるから全く違うものに」）
+
+- `reel8-quiz-v4.mp4`。背景は `blender/r2_board.py` で描いた昼間の教室の黒板（`assets/board.png`、窓枠の影つき）と黒板消し（`assets/eraser.png`、背景透明）の静止画2枚だけ（Cycles 96サンプル、約2分）。
+- 動きはすべて `r2d.html`：手書き風の書体（Yusei Magic）に SVG のフィルタでチョークのかすれを付け、左から書いていくように見せる。丸・下線・表の線は SVG の線を描き足していく。黒板全体をゆっくり寄せる。
+- 音は `python3 music.py r2d`（木琴・手拍子・チョークで書く音・黒板消し）。チョークの音は高い音が多く、AAC にすると瞬間の値がはみ出しやすいので、まとめるときに `lowpass=f=15000,alimiter=limit=0.79` をかけた。

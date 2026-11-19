@@ -208,5 +208,72 @@ def r3():
     master(m, "r3", fade_out=0.8)
 
 
+def mallet(f, dur=0.9):                  # 木琴のような音（基音＋高い倍音がすぐ消える）
+    t = np.arange(int(dur * SR)) / SR
+    s = (np.sin(2 * np.pi * f * t) * np.exp(-t * 5) + 0.35 * np.sin(2 * np.pi * f * 3.98 * t) * np.exp(-t * 18)
+         + 0.12 * np.sin(2 * np.pi * f * 9.9 * t) * np.exp(-t * 40))
+    return s * np.minimum(t / 0.002, 1)
+
+
+def chalk(t0, t1, m, gain=0.32):         # チョークで書く音：短いこすれを、すき間をあけて並べる
+    t = t0
+    while t < t1:
+        d = rng.uniform(0.045, 0.11); x = noise(d)
+        x = onepole(x, 0.55) - onepole(x, 0.12)                     # 高めの帯域だけ
+        e = np.sin(np.pi * np.arange(len(x)) / len(x)) ** 0.7
+        m.add(x * e * rng.uniform(0.6, 1.0), t, gain, rng.uniform(-0.2, 0.2))
+        t += d + rng.uniform(0.015, 0.05)
+
+
+def tap():                               # チョークで点を打つ・黒板をたたく音
+    t = np.arange(int(0.06 * SR)) / SR
+    return (np.sin(2 * np.pi * 900 * t) * 0.5 + onepole(noise(0.06), 0.5)) * np.exp(-t / 0.01)
+
+
+def r2d():
+    """クイズ（黒板の版・14.4秒）。木琴と手拍子の明るい音（3本目の紺のスタジオとは別の雰囲気）"""
+    m = Mix(14.4)
+    F = {"F": ["F3", "A3", "C4", "F4"], "Dm": ["D3", "F3", "A3", "D4"], "Bb": ["Bb2", "D3", "F3", "Bb3"], "C": ["C3", "E3", "G3", "C4"]}
+    prog = ["F", "Dm", "Bb", "C"]; beat = 0.6
+    def bed(t0, t1, bar0=0, lively=True):
+        k = 0; t = t0
+        while t < t1 - 1e-6:
+            ch = F[prog[(bar0 + k // 4) % 4]]
+            m.add(mallet(note(ch[0]) / 2, 1.0), t, 0.30) if k % 4 == 0 else None
+            for j, n in enumerate((ch[1], ch[3], ch[2], ch[3]) if lively else (ch[1], ch[2])):
+                tt = t + j * beat / (4 if lively else 2)
+                if tt < t1: m.add(mallet(note(n) * 2, 0.6), tt, 0.12, (-0.3, 0.3)[j % 2])
+            if lively and k % 2 == 1: m.add(clap(), t, 0.16, 0.15)
+            if lively: m.add(hat(), t + beat / 2, 0.08, -0.2)
+            k += 1; t += beat
+    # 1. 問題を書く
+    chalk(0.02, 0.24, m, 0.38); chalk(0.2, 0.52, m); chalk(0.5, 0.92, m); chalk(0.95, 1.5, m); chalk(1.5, 1.78, m, 0.25)
+    m.add(mallet(note("F5"), 1.2), 0.05, 0.35); m.add(mallet(note("A5"), 1.2), 0.25, 0.25)
+    bed(1.8, 5.6, lively=False)
+    # 2. 選択肢とカウントダウン
+    for t in (2.0, 2.4, 2.8): chalk(t, t + 0.34, m)
+    for t in (3.4, 4.2, 5.0): m.add(tap(), t, 0.7); chalk(t, t + 0.18, m, 0.3)
+    # 3. 正解（赤い丸・正解！・数字）
+    chalk(5.65, 6.05, m, 0.42); m.add(bell(note("C6")), 5.7, 0.35); m.add(bell(note("F6")), 5.85, 0.22)
+    m.add(mallet(note("F4"), 1.4) + mallet(note("A4"), 1.4) + mallet(note("C5"), 1.4), 5.65, 0.35)
+    chalk(6.05, 6.3, m); chalk(6.35, 6.88, m, 0.25); chalk(6.75, 7.2, m)
+    bed(6.0, 7.3, bar0=0)
+    # 4. 黒板消し
+    m.add(whoosh(0.36), 7.3, 0.55, 0.3); m.add(whoosh(0.36), 7.66, 0.55, -0.3)
+    # 5. 表を書く
+    chalk(8.1, 8.42, m); chalk(8.42, 8.72, m)
+    for i in range(13): chalk(8.75 + i * 0.03, 8.75 + i * 0.03 + 0.12, m, 0.12)
+    chalk(9.05, 10.1, m, 0.14)
+    chalk(10.25, 10.65, m, 0.32); m.add(bell(note("A5")), 10.3, 0.22)
+    chalk(10.7, 11.12, m); chalk(11.0, 11.35, m, 0.18)
+    bed(8.1, 11.7, bar0=1)
+    # 6. 消して、紙を貼る
+    m.add(whoosh(0.34), 11.7, 0.5); chalk(12.05, 12.4, m); chalk(12.38, 12.66, m)
+    m.add(tap(), 12.5, 0.5); m.add(tap(), 12.56, 0.4)
+    m.add(mallet(note("F3"), 2.0) + mallet(note("C4"), 2.0) + mallet(note("A4"), 2.0) + mallet(note("F5"), 2.0), 12.1, 0.4)
+    bed(12.1, 13.8, bar0=0, lively=False)
+    master(m, "r2d", fade_out=0.8)
+
+
 if __name__ == "__main__":
-    {"r1": r1, "r2": r2, "r3": r3}[sys.argv[1]]()
+    {"r1": r1, "r2": r2, "r3": r3, "r2d": r2d}[sys.argv[1]]()

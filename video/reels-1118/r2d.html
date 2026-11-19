@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8">
+<!-- リール2 v4「クイズ：空き教室がいちばん少ないのは？」（14.4秒）。昼間の教室の黒板にチョークで書いていく。
+     黒板と黒板消しは Blender で描いた静止画（assets/board.png・eraser.png）。文字と線はここで重ねる。数字は README（2026年度後期・駿河台64室） -->
+<link rel="stylesheet" href="common.css">
+<style>
+@font-face{font-family:'Chalk';src:url(fonts/YuseiMagic-Regular.ttf)}
+html,body{background:#1d3a30}
+#stage{position:absolute;inset:0;transform-origin:50% 45%}
+#board{position:absolute;inset:0;width:1080px;height:1920px}
+.ch{position:absolute;font-family:'Chalk';color:#f3f1e8;white-space:nowrap;filter:url(#chalk);
+    text-shadow:0 0 2px rgba(255,255,255,.35),0 0 10px rgba(255,255,255,.08);clip-path:inset(0 100% 0 0)}
+.y{color:#f4d35e}.r{color:#ef6b5f}.g{color:#c9d8cf}
+svg.draw{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:visible;filter:url(#chalk)}
+svg.draw path,svg.draw line,svg.draw rect,svg.draw ellipse{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.num{position:absolute;font-family:'Chalk';color:#f3f1e8;font-size:50px;width:120px;text-align:center;filter:url(#chalk);opacity:0;text-shadow:0 0 2px rgba(255,255,255,.3)}
+.hd{position:absolute;font-family:'Chalk';color:#c9d8cf;font-size:42px;width:120px;text-align:center;filter:url(#chalk);opacity:0}
+#smudge{position:absolute;left:60px;right:60px;top:200px;height:1300px;background:radial-gradient(ellipse at 50% 50%,rgba(220,235,228,.16),rgba(220,235,228,.05) 60%,transparent 80%);filter:blur(30px);opacity:0}
+#eraser{position:absolute;left:0;top:0;width:420px;transform:translate(-50%,-50%) rotate(-8deg);opacity:0;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}
+.paper{position:absolute;left:140px;right:140px;top:455px;height:1010px;background:#fbfaf6;border-radius:6px;transform:rotate(-1.4deg);
+       box-shadow:0 24px 40px rgba(0,0,0,.38);opacity:0;color:#1b2430;text-align:center}
+.paper .tape{position:absolute;width:150px;height:46px;background:rgba(240,228,190,.82);top:-18px}
+.paper .logo{width:400px;margin:70px auto 0;display:block}
+.paper .nm{margin-top:26px;font-weight:900;font-size:50px}
+.paper .pill{display:inline-block;margin-top:30px;padding:16px 38px;border-radius:99px;background:linear-gradient(90deg,#2f6bff,#22c3e6);color:#fff;font-weight:900;font-size:38px}
+.paper .dn{margin-top:30px;font-weight:700;font-size:32px;color:#b5651d}
+.paper .nt{margin:24px 58px 0;font-weight:500;font-size:28px;line-height:1.6;color:#4a5260}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <filter id="chalk" x="-5%" y="-5%" width="110%" height="110%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="4" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" result="d"/>
+    <feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="1" seed="9" result="g"/>
+    <feColorMatrix in="g" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -1.6 1.35" result="holes"/>
+    <feComposite in="d" in2="holes" operator="in"/>
+  </filter>
+</svg>
+<div id="stage">
+  <img id="board" src="assets/board.png" alt="">
+
+  <!-- 1〜3：問題・選択肢・正解 -->
+  <div id="qa">
+    <div class="ch y" id="q" style="left:118px;top:232px;font-size:120px">Q.</div>
+    <div class="ch" id="l1" style="left:262px;top:262px;font-size:58px">駿河台キャンパスで</div>
+    <div class="ch" id="l2" style="left:120px;top:380px;font-size:108px">空き教室が</div>
+    <div class="ch" id="l3" style="left:120px;top:520px;font-size:108px">いちばん少ない<span style="font-size:84px">のは？</span></div>
+    <svg class="draw"><path id="ul" d="M128 660 C 330 652, 560 668, 812 655" stroke="#f4d35e" stroke-width="9"/></svg>
+    <div class="ch" id="oa" style="left:150px;top:790px;font-size:88px"><span class="y">A</span>　月曜1限</div>
+    <div class="ch" id="ob" style="left:150px;top:935px;font-size:88px"><span class="y">B</span>　水曜3限</div>
+    <div class="ch" id="oc" style="left:150px;top:1080px;font-size:88px"><span class="y">C</span>　金曜5限</div>
+    <div class="ch g" id="na" style="left:690px;top:812px;font-size:64px">49室</div>
+    <div class="ch r" id="nb" style="left:690px;top:957px;font-size:72px">24室</div>
+    <div class="ch g" id="nc" style="left:690px;top:1102px;font-size:64px">52室</div>
+    <div class="ch y" id="c3" style="left:842px;top:170px;font-size:150px">3</div>
+    <div class="ch y" id="c2" style="left:842px;top:170px;font-size:150px">2</div>
+    <div class="ch y" id="c1" style="left:850px;top:170px;font-size:150px">1</div>
+    <svg class="draw"><path id="circ" d="M650 958 C 520 922, 210 918, 134 968 C 70 1012, 160 1068, 420 1066 C 640 1064, 700 1010, 666 966 C 640 936, 560 928, 520 930" stroke="#ef6b5f" stroke-width="10"/></svg>
+    <div class="ch r" id="ok" style="left:690px;top:392px;font-size:104px;transform:rotate(-8deg)">正解！</div>
+    <div class="ch" id="after" style="left:150px;top:1250px;font-size:66px">それでも <span class="r">24室</span> は空いている</div>
+  </div>
+
+  <!-- 4：ねらい目（チョークの表） -->
+  <div id="tbl">
+    <div class="ch" id="t1" style="left:120px;top:236px;font-size:100px">ねらい目は</div>
+    <div class="ch y" id="t2" style="left:120px;top:372px;font-size:120px">5限・6限</div>
+    <svg class="draw" id="grid"></svg>
+    <div id="cells"></div>
+    <svg class="draw"><rect id="box56" x="690" y="572" width="256" height="630" rx="40" stroke="#f4d35e" stroke-width="9"/></svg>
+    <div class="ch y" id="note" style="left:120px;top:1232px;font-size:60px">月曜6限は <span style="font-size:76px">61</span>室が空き</div>
+    <div class="ch g" id="src" style="left:120px;top:1352px;font-size:32px;line-height:1.5">2026年度後期の時間割（駿河台キャンパス64室）で<br>授業が入っていない教室の数。時間割にない授業もあります。</div>
+  </div>
+
+  <div id="smudge"></div>
+  <img id="eraser" src="assets/eraser.png" alt="">
+
+  <!-- 5：終わり（黒板に貼った紙） -->
+  <div class="ch" id="e1" style="left:120px;top:236px;font-size:76px">いま空いている教室は、</div>
+  <div class="ch" id="e2" style="left:120px;top:342px;font-size:76px"><span class="y">RoomRadar</span> で。</div>
+  <div class="paper" id="paper"><div class="tape" style="left:60px;transform:rotate(-6deg)"></div><div class="tape" style="right:60px;transform:rotate(5deg)"></div>
+    <img class="logo" src="assets/logo.png" alt="">
+    <div class="nm">空き教室検索 <span style="font-family:Syne;font-weight:800">RoomRadar</span></div>
+    <div class="pill">プロフィールのリンクから</div>
+    <div class="dn">使う前に、ドア越しに確認を。</div>
+    <div class="nt">本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</div>
+  </div>
+</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="common.js"></script>
+<script>
+// チョークの表（曜日×時限の、授業が入っていない教室の数）
+const GRID = {"月": [49, 40, 42, 46, 51, 61], "火": [43, 30, 29, 33, 52, 57], "水": [38, 31, 24, 28, 48, 59], "木": [51, 37, 41, 44, 52, 58], "金": [37, 33, 34, 37, 52, 55]};
+const X0 = 210, CW = 124, Y0 = 650, RH = 108;          // 1限の列の左端・列の幅・月曜の行の上端・行の高さ
+const cells = document.getElementById('cells'), grid = document.getElementById('grid');
+let gl = '';
+for (let p = 0; p <= 6; p++) gl += `<line x1="${X0 - 12 + p * CW}" y1="${Y0 - 70}" x2="${X0 - 12 + p * CW}" y2="${Y0 + 5 * RH}" stroke="#d9e4dd" stroke-width="3" class="gl"/>`;
+for (let d = 0; d <= 5; d++) gl += `<line x1="${X0 - 100}" y1="${Y0 + d * RH}" x2="${X0 - 12 + 6 * CW}" y2="${Y0 + d * RH}" stroke="#d9e4dd" stroke-width="3" class="gl"/>`;
+grid.innerHTML = gl;
+[1,2,3,4,5,6].forEach((p, i) => cells.insertAdjacentHTML('beforeend', `<div class="hd" style="left:${X0 - 12 + i * CW}px;top:${Y0 - 66}px">${p}限</div>`));
+Object.entries(GRID).forEach(([d, row], r) => {
+  cells.insertAdjacentHTML('beforeend', `<div class="hd row${r}" style="left:${X0 - 118}px;top:${Y0 + r * RH + 22}px;width:100px">${d}</div>`);
+  row.forEach((v, i) => cells.insertAdjacentHTML('beforeend', `<div class="num row${r}${v === 24 ? ' low' : ''}" style="left:${X0 - 12 + i * CW}px;top:${Y0 + r * RH + 26}px;${v === 24 ? 'color:#ef6b5f' : ''}">${v}</div>`));
+});
+
+const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 14.4;
+const write = (sel, at, dur) => tl.to(sel, { clipPath: 'inset(0 0% 0 0)', duration: dur, ease: 'none' }, at);
+const drawPath = (sel, at, dur) => { const e = document.querySelector(sel); const L = e.getTotalLength ? e.getTotalLength() : 2000;
+  gsap.set(e, { strokeDasharray: L, strokeDashoffset: L, opacity: 0 });          // 描きはじめまでは消しておく（丸い線端の点が残らないように）
+  tl.set(e, { opacity: 1 }, at).to(e, { strokeDashoffset: 0, duration: dur, ease: 'power1.inOut' }, at); };
+// 黒板全体をゆっくり寄せる（止まった絵に見えないように）
+tl.fromTo('#stage', { scale: 1.0 }, { scale: 1.045, duration: 14.4, ease: 'none' }, 0);
+
+// 1. 問題（0〜1.8秒）
+write('#q', 0.02, 0.22); write('#l1', 0.2, 0.32); write('#l2', 0.5, 0.42); write('#l3', 0.95, 0.55); drawPath('#ul', 1.5, 0.28);
+// 2. 選択肢とカウントダウン（2.0〜5.6秒）
+write('#oa', 2.0, 0.34); write('#ob', 2.4, 0.34); write('#oc', 2.8, 0.34);
+write('#c3', 3.4, 0.18); tl.to('#c3', { opacity: 0, duration: 0.12 }, 4.1);
+write('#c2', 4.2, 0.18); tl.to('#c2', { opacity: 0, duration: 0.12 }, 4.9);
+write('#c1', 5.0, 0.16); tl.to('#c1', { opacity: 0, duration: 0.12 }, 5.55);
+// 3. 正解（5.65〜7.2秒）
+drawPath('#circ', 5.65, 0.4); write('#ok', 6.05, 0.25);
+write('#na', 6.35, 0.18); write('#nb', 6.5, 0.2); write('#nc', 6.7, 0.18);
+write('#after', 6.75, 0.45);
+// 4. 黒板消しで消す（7.3〜8.0秒）
+tl.to('#eraser', { opacity: 1, duration: 0.05 }, 7.28)
+  .fromTo('#eraser', { left: -160, top: 560 }, { left: 1240, top: 470, duration: 0.34, ease: 'power1.inOut' }, 7.3)
+  .to('#eraser', { left: -160, top: 1040, duration: 0.34, ease: 'power1.inOut' }, 7.66)
+  .to('#eraser', { opacity: 0, duration: 0.05 }, 7.98);
+tl.to('#qa', { opacity: 0.25, duration: 0.3 }, 7.35).to('#qa', { opacity: 0, duration: 0.3 }, 7.7)
+  .to('#smudge', { opacity: 1, duration: 0.3 }, 7.4).to('#smudge', { opacity: 0.55, duration: 0.8 }, 8.0);
+// 5. ねらい目の表（8.1〜11.7秒）
+write('#t1', 8.1, 0.32); write('#t2', 8.42, 0.3);
+document.querySelectorAll('#grid .gl').forEach((l, i) => {
+  const L = Math.hypot(l.x2.baseVal.value - l.x1.baseVal.value, l.y2.baseVal.value - l.y1.baseVal.value);
+  gsap.set(l, { strokeDasharray: L, strokeDashoffset: L, opacity: 0 });
+  tl.set(l, { opacity: 1 }, 8.75 + i * 0.03).to(l, { strokeDashoffset: 0, duration: 0.18, ease: 'none' }, 8.75 + i * 0.03);
+});
+tl.to('.hd', { opacity: 1, duration: 0.15, stagger: 0.03 }, 9.05);
+for (let r = 0; r < 5; r++) tl.to(`.num.row${r}`, { opacity: 1, duration: 0.12, stagger: 0.03 }, 9.3 + r * 0.14);
+drawPath('#box56', 10.25, 0.4);
+write('#note', 10.7, 0.42); write('#src', 11.0, 0.35);
+// 6. 終わり：消して、紙を貼る（11.7〜14.4秒）
+tl.to('#eraser', { opacity: 1, duration: 0.05 }, 11.68)
+  .fromTo('#eraser', { left: 1240, top: 760 }, { left: -160, top: 900, duration: 0.32, ease: 'power1.inOut' }, 11.7)
+  .to('#eraser', { opacity: 0, duration: 0.05 }, 12.0)
+  .to('#tbl', { opacity: 0, duration: 0.3 }, 11.72);
+write('#e1', 12.05, 0.36); write('#e2', 12.38, 0.28);
+tl.to('#paper', { opacity: 1, duration: 0.01 }, 12.1)
+  .fromTo('#paper', { y: 120, rotation: 4, scale: 1.04 }, { y: 0, rotation: -1.4, scale: 1, duration: 0.45, ease: 'back.out(1.6)' }, 12.1);
+tl.to({}, { duration: 0.01 }, window.DURATION);
+</script>
+</body></html>
