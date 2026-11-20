@@ -72,8 +72,13 @@ data/source/ に置かれた `<区分番号>_<区分名>_<学科番号>_<学科�
          例外: 「まち製図室1～5」は S 始まりでないのにタワースコラにあり、DB では
          同じセルの先頭教室の校舎を引き継いでいる（BUILDING_INHERIT_ROOMS）。
 [classrooms] schedules に出た教室名から**年度ごとに**作る（"0000" は除く）。building は
-         その教室がその年度の schedules で最も多く取った校舎（最頻値）。短期大学部（区分2）の
+         その教室がその年度の schedules で最も多くのコマ（学期・曜日・時限）を取った校舎（最頻値。
+         同じ数なら タワースコラ → 駿河台校舎 → 船橋校舎 の順）。短期大学部（区分2）の
          行からは作らない（短大専用教室を検索対象に増やさないため）。
+[授業のない教室] その年度の時間割に授業が1つも無い教室は schedules に出てこないので、上の作り方では
+         マスタに入らず、検索に出ない（いつも空いているのに見つからない）。運営者が現地で「使える」と
+         確かめた教室だけ、EXTRA_ROOMS に年度・教室・校舎・理由を書いてマスタに足す（2026-11〜）。
+         前の年度のマスタから自動では引き継がない（無くなった教室を「空き」に出さないため）。
 
 ────────────────────────────────────────────────────────────────────────
 既知の未解決（翌年度に向けて）
@@ -173,6 +178,18 @@ ROOM_FIXES = {
     "112/3": ("1122/3", "2025年度 航空宇宙工学科の原本。同じ授業（航空宇宙工学実験ⅡA/ⅡB 月3・4限）が"
                         "2026年度は 1122/3 で、教室 112 はどの原本にも無い"),
 }
+# その年度の時間割に授業が無く、schedules からは作れない教室（[授業のない教室]）。
+# 年度 → [(教室, 校舎, 理由)]。運営者が現地で使えると確かめたものだけを書く。
+EXTRA_ROOMS = {
+    2026: [
+        ("153", "駿河台校舎", "2026-11-20 運営者が使えると確認。2025年度は授業18コマ、2026年度は授業なし"),
+        ("709", "駿河台校舎", "2026-11-20 運営者の指示。2025年度は授業あり、2026年度は授業なし"),
+        ("761", "駿河台校舎", "2026-11-20 運営者の指示。2025年度は授業あり、2026年度は授業なし"),
+        ("762", "駿河台校舎", "2026-11-20 運営者の指示。2025年度は授業あり、2026年度は授業なし"),
+        ("771", "駿河台校舎", "2026-11-20 運営者の指示。2025年度は授業あり、2026年度は授業なし"),
+    ],
+}
+
 BUILDING_ORDER = ("タワースコラ", "駿河台校舎", "船橋校舎")
 
 # 年度は行に持たせる。複数年度を同じ DB に同居させ、アプリ側で選べるようにするため。
@@ -674,14 +691,18 @@ def build_classrooms(rows, stats):
     年度で教室が増減しうるので、年度をまたいで混ぜない。混ぜると、翌年度に無くなった
     教室を「空き」として出してしまう（行っても使えない = 一番困る外し方）。
     """
-    seen, counts = [], collections.defaultdict(collections.Counter)
-    for year, _, _, _, _, room, building, _ in rows:
+    # 校舎は「コマ（学期・曜日・時限）の数」で比べる。行の数で比べると、同じ授業が学科ごとの
+    # 原本に重ねて載っている年度（2026年度の船橋の一般教育。15学科 × 20コマ）で数がふくらみ、
+    # 駿河台校舎の 134・143・144 が船橋校舎に入ってしまう（2026-11 に直した）。
+    seen, slots = [], collections.defaultdict(lambda: collections.defaultdict(set))
+    for year, _, term, day, period, room, building, _ in rows:
         if room == ROOM_PLACEHOLDER:      # 教室未定の仮名。マスタには入れない
             continue
         key = (year, room)
-        if key not in counts:
+        if key not in slots:
             seen.append(key)
-        counts[key][building] += 1
+        slots[key][building].add((term, day, period))
+    counts = {k: collections.Counter({b: len(v) for b, v in d.items()}) for k, d in slots.items()}
     out = []
     for key in seen:
         year, room = key
@@ -690,10 +711,22 @@ def build_classrooms(rows, stats):
                           key=lambda kv: (-kv[1], BUILDING_ORDER.index(kv[0])
                                           if kv[0] in BUILDING_ORDER else len(BUILDING_ORDER)))[0][0]
         if len(tally) > 1:
-            detail = " / ".join(f"{b}{n}行" for b, n in tally.most_common())
+            detail = " / ".join(f"{b}{n}コマ" for b, n in tally.most_common())
             stats.warn(f"{year}年度 教室「{room}」の校舎が schedules 内で割れています（{detail}）。"
                        f"マスタは最頻値の {building} にしました")
         out.append((year, room, building))
+    # 授業のない教室を足す。もう入っている教室は足さない（時間割に出てきた年度は、そちらが正）
+    have = {(y, r) for y, r, _ in out}
+    years = {y for y, _, _ in out}
+    for year in sorted(EXTRA_ROOMS):
+        if year not in years:
+            continue
+        for room, building, _reason in EXTRA_ROOMS[year]:
+            if (year, room) in have:
+                stats.warn(f"{year}年度 教室「{room}」は時間割に出てきたので、EXTRA_ROOMS の行は使いません（消してください）")
+                continue
+            out.append((year, room, building))
+            have.add((year, room))
     return out
 
 
