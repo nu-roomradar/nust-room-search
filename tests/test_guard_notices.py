@@ -33,6 +33,7 @@ class GuardNoticesTests(unittest.TestCase):
         self.write("templates/room_search.html", APP)   # 教室から探す
         self.write("index.html", INDEX)
         self.write("about.html", INDEX)                 # LP の「このサービスについて」（2026-11-07）
+        self.write("intro.html", INDEX)                 # はじめての人への紹介（2026-11-20）
         self.write("dashboard.html", DASH)
         self.write("scripts/post_to_instagram.py", POST)
         self.write("scripts/make_poster.py", POSTER)

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-L1T1CDZ05N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-L1T1CDZ05N');
+</script>
+<title>RoomRadar の紹介 — 日大理工 空き教室検索</title>
+<meta name="description" content="空きコマに教室のドアを開けたら、授業中だった。そんな気まずさを減らしたくて、学生が作った空き教室検索です。本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。">
+<link rel="canonical" href="https://nu-roomradar.github.io/nust-room-search/intro.html">
+<meta name="theme-color" content="#f5f3ee">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/lp/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/lp/icon-180.png">
+<!-- LINE・Instagram などで共有したときのプレビュー。試験運用中で大学公式ではないことを必ず入れる -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RoomRadar">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:url" content="https://nu-roomradar.github.io/nust-room-search/intro.html">
+<meta property="og:title" content="RoomRadar の紹介 — 日大理工の空き教室検索（学生開発・試験運用中）">
+<meta property="og:description" content="時間割をもとに、いま授業のない教室を一覧で出します。本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。">
+<meta property="og:image" content="https://nu-roomradar.github.io/nust-room-search/assets/lp/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="RoomRadar 日大理工の空き教室が、開いた瞬間わかる。試験運用中のサービスです（大学が公式に提供するサービスではありません）">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&family=Syne:wght@700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- サービス紹介ページ（2026-12-12 の自主創造プロジェクト交流会で、URL か QR を渡して見てもらう）。日本語だけ・JS なし。
+     CLAUDE.md ルール1：「試験運用中・大学公式ではない」表記は、上（題のすぐ下）と足元の2か所。
+     対象は駿河台キャンパスだけ。利用の数字・12/19 より後の約束は書かない。出す数字は教室マスタから数えた 72（38＋34）だけ。
+     見た目は assets/lp/lp.css（共通）＋ assets/lp/intro.css（このページの分だけ） -->
+<link rel="stylesheet" href="assets/lp/lp.css?v=20261118">
+<link rel="stylesheet" href="assets/lp/intro.css?v=20261120">
+</head>
+<body class="intro-page">
+
+<a class="in-skip" href="#main">本文へ移動</a>
+
+<header class="section-nav" id="siteNav">
+  <a class="nav-logo" href="index.html" aria-label="RoomRadar 紹介ページへ">
+    <img src="assets/lp/logo-nav.png" alt="RoomRadar" width="130" height="76">
+  </a>
+  <nav class="nav-links" aria-label="サイトの案内">
+    <a href="index.html">紹介ページ</a>
+    <a href="about.html">このサービスについて</a>
+  </nav>
+  <div class="nav-right">
+    <a class="in-nav-cta" href="https://nust-room-search.onrender.com">検索する</a>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ════════ 題：困りごとの場面 → 何のサービスか → 必須の表記 → 3つの問い ════════ -->
+<section class="in-hero" id="top">
+  <div class="bg-circle bg-circle-1" aria-hidden="true"></div>
+  <div class="bg-circle bg-circle-2" aria-hidden="true"></div>
+  <div class="in-hero-inner">
+    <p class="hero-eyebrow"><span class="dot" aria-hidden="true"></span>自主創造プロジェクト · RoomRadar</p>
+    <h1 class="in-h1"><span class="in-nb">空きコマに</span><span class="in-nb">教室のドアを</span><span class="in-nb">開けたら、</span><span class="in-nb in-acc">授業中だった。</span></h1>
+    <p class="in-lead">あの気まずさを減らしたくて、作りました。<br><b class="in-name">RoomRadar</b> は、日本大学理工学部の空き教室を、時間割から探せるサービスです。いまは駿河台キャンパスが対象です。</p>
+    <a href="https://nust-room-search.onrender.com" class="hero-cta">検索してみる<span class="arrow" aria-hidden="true">→</span></a>
+    <p class="hero-free in-free"><span class="in-nb">登録なし・無料。</span><span class="in-nb">「空き」は時間割の上の話です。</span><span class="in-nb">入る前に、ドア越しに確かめてください。</span></p>
+    <p class="hero-note in-notice"><span class="hero-note-tag">TEST</span>本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</p>
+
+    <nav class="in-qs" aria-label="このページの中身">
+      <p class="in-qs-lead">1〜2分で読めます。問いは3つです。</p>
+      <ol class="in-qs-list">
+        <li><a href="#q1"><span class="in-q-no" aria-hidden="true">1</span>何ができる？</a></li>
+        <li><a href="#q2"><span class="in-q-no" aria-hidden="true">2</span>どこまで信じてよい？</a></li>
+        <li><a href="#q3"><span class="in-q-no" aria-hidden="true">3</span>だれがやっている？</a></li>
+      </ol>
+    </nav>
+  </div>
+</section>
+
+<!-- ════════ 問い1 何ができる？ ════════ -->
+<section class="sec" id="q1" aria-labelledby="q1-h">
+  <div class="sec-inner">
+    <div class="in-two">
+      <div class="in-two-text">
+        <p class="sec-eyebrow"><span class="in-q-no" aria-hidden="true">1</span>何ができる？</p>
+        <h2 class="sec-title" id="q1-h">開くだけで、いま授業のない教室が出ます。</h2>
+        <p class="in-text">どの教室で授業があるかは、時間割表に書いてあります。でも、歩きながら全部は見られません。RoomRadar が、かわりに全部読みます。</p>
+
+        <ol class="in-steps">
+          <li>
+            <span class="in-step-no" aria-hidden="true">1</span>
+            <div><h3>開く</h3><p>いまの時限に授業のない教室が、すぐ出ます。</p></div>
+          </li>
+          <li>
+            <span class="in-step-no" aria-hidden="true">2</span>
+            <div><h3>必要なら条件を変える</h3><p>曜日・時限・校舎を選べます。続けて空いている教室だけにもできます。</p></div>
+          </li>
+          <li>
+            <span class="in-step-no in-step-no-warn" aria-hidden="true">3</span>
+            <div><h3>ドア越しに確かめてから入る</h3><p>時間割にない授業や、急な変更もあります。</p></div>
+          </li>
+        </ol>
+
+        <div class="in-count">
+          <p class="in-count-top"><span class="in-count-label">対象の教室</span><span class="in-count-num">72<small>室</small></span></p>
+          <div class="in-bar" aria-hidden="true"><span class="in-bar-tower"></span><span class="in-bar-suruga"></span></div>
+          <ul class="in-count-legend">
+            <li><span class="in-dot in-dot-tower" aria-hidden="true"></span>タワー・スコラ <b>38室</b></li>
+            <li><span class="in-dot in-dot-suruga" aria-hidden="true"></span>駿河台校舎 <b>34室</b></li>
+          </ul>
+          <p class="in-count-note">駿河台キャンパス・2026年度の時間割から</p>
+        </div>
+      </div>
+
+      <figure class="in-shot">
+        <div class="in-phone">
+          <img src="assets/lp/app-screen.webp" width="780" height="1688" loading="lazy"
+               alt="RoomRadar の検索画面。水曜3限の駿河台校舎で、授業のない教室が13室と出ている">
+        </div>
+        <figcaption>実際の画面（水曜3限・駿河台校舎を選んだ例）</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 問い2 どこまで信じてよい？（このページでいちばん大事な所） ════════ -->
+<section class="sec" id="q2" aria-labelledby="q2-h">
+  <div class="sec-inner">
+    <p class="sec-eyebrow"><span class="in-q-no" aria-hidden="true">2</span>どこまで信じてよい？</p>
+    <h2 class="sec-title" id="q2-h">「空き」は、時間割の上で授業が無い、という意味です。</h2>
+
+    <div class="in-warn">
+      <svg class="in-door" viewBox="0 0 96 120" aria-hidden="true" focusable="false">
+        <rect x="14" y="8" width="68" height="106" rx="4" fill="none" stroke="currentColor" stroke-width="3"/>
+        <rect x="32" y="22" width="32" height="34" rx="3" fill="#fff" stroke="currentColor" stroke-width="3"/>
+        <path d="M38 46h20M42 46v6M54 46v6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="70" cy="70" r="3.4" fill="currentColor"/>
+        <path d="M6 114h84" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <p class="in-warn-lead">使ってよいという許可ではありません。<br>入る前に、必ずドア越しに確かめてください。</p>
+        <p class="in-warn-sub">授業が優先です。空き教室は、みんなで使う場所です。</p>
+      </div>
+    </div>
+
+    <div class="in-know">
+      <div class="in-know-col in-know-yes">
+        <h3><span class="in-mark" aria-hidden="true"></span>分かること</h3>
+        <ul>
+          <li>その時限に、授業が入っていない教室</li>
+        </ul>
+        <p class="in-know-src">元は、教務のページで公開されている時間割表です。</p>
+      </div>
+      <div class="in-know-col in-know-no">
+        <h3><span class="in-mark" aria-hidden="true"></span>分からないこと</h3>
+        <ul>
+          <li>時間割にない授業や行事</li>
+          <li>急な変更</li>
+          <li>いま人がいるかどうか</li>
+        </ul>
+      </div>
+    </div>
+    <p class="in-text in-report">行ってみて使われていたら、画面から知らせることができます。知らせが重なると「使用中の可能性」と出て、次に探す人に伝わります。</p>
+
+    <dl class="in-trial">
+      <div><dt>いまの状況</dt><dd>テスト運用中</dd></div>
+      <div><dt>期間</dt><dd><span class="in-nb">2026年10月13日〜</span><span class="in-nb">12月19日（予定）</span></dd></div>
+      <div><dt>対象</dt><dd><span class="in-nb">駿河台キャンパスの</span><span class="in-nb">2つの建物</span><span class="in-nb">（タワー・スコラ、</span><span class="in-nb">駿河台校舎）</span></dd></div>
+      <div><dt>そのあと</dt><dd>まだ決まっていません。</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ════════ 問い3 だれがやっている？（氏名・役割・所属は about.html の「開発メンバー」と同じ。変えない。顔写真は使わない） ════════ -->
+<section class="sec" id="q3" aria-labelledby="q3-h">
+  <div class="sec-inner">
+    <p class="sec-eyebrow"><span class="in-q-no" aria-hidden="true">3</span>だれがやっている？</p>
+    <h2 class="sec-title" id="q3-h">学生6人で作って、動かしています。</h2>
+    <p class="in-text">日本大学の「自主創造プロジェクト」の一つです。学部をこえて集まっています。</p>
+    <ul class="in-team">
+      <li class="in-member">
+        <div class="member-avatar" aria-hidden="true">二</div>
+        <div class="member-name"><span class="in-nb">二川</span> <span class="in-nb">航大</span></div>
+        <div class="member-role">統括 / Dev</div>
+        <div class="member-dept">理工学部<br>物理学科 2年</div>
+      </li>
+      <li class="in-member">
+        <div class="member-avatar" aria-hidden="true">川</div>
+        <div class="member-name"><span class="in-nb">川口</span> <span class="in-nb">ひろき</span></div>
+        <div class="member-role">会計</div>
+        <div class="member-dept">商学部<br>経営学科 3年</div>
+      </li>
+      <li class="in-member">
+        <div class="member-avatar" aria-hidden="true">町</div>
+        <div class="member-name"><span class="in-nb">町野</span> <span class="in-nb">翼</span></div>
+        <div class="member-role">Dev</div>
+        <div class="member-dept">理工学部<br>物理学科 2年</div>
+      </li>
+      <li class="in-member">
+        <div class="member-avatar" aria-hidden="true">山</div>
+        <div class="member-name"><span class="in-nb">山田</span> <span class="in-nb">倖大</span></div>
+        <div class="member-role">広報</div>
+        <div class="member-dept">理工学部<br>物理学科 2年</div>
+      </li>
+      <li class="in-member">
+        <div class="member-avatar" aria-hidden="true">松</div>
+        <div class="member-name"><span class="in-nb">松島</span> <span class="in-nb">福航</span></div>
+        <div class="member-role">広報</div>
+        <div class="member-dept">生産工学部<br>環境安全工学科 2年</div>
+      </li>
+      <li class="in-member">
+        <div class="member-avatar" aria-hidden="true">古</div>
+        <div class="member-name"><span class="in-nb">古川</span> <span class="in-nb">尚登</span></div>
+        <div class="member-role">CM</div>
+        <div class="member-dept">理工学部<br>物理学科 2年</div>
+      </li>
+    </ul>
+    <p class="in-more"><a class="a-link" href="about.html">くわしくは「このサービスについて」へ <span aria-hidden="true">→</span></a></p>
+  </div>
+</section>
+
+<!-- ════════ 最後に一言（役の名前・人数は書かない） ════════ -->
+<section class="sec" id="join" aria-labelledby="join-h">
+  <div class="sec-inner">
+    <div class="in-join">
+      <div class="in-join-body">
+        <p class="sec-eyebrow">最後に一言</p>
+        <h2 class="sec-title" id="join-h">いっしょにやってみたい人へ。</h2>
+        <p class="in-join-text">興味がある人は、Instagram（<span class="in-handle">@roomradar_nust</span>）の DM へ。</p>
+        <div class="in-join-actions">
+          <a class="in-btn" href="https://www.instagram.com/roomradar_nust/" target="_blank" rel="noopener">Instagram を開く<span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+      <figure class="in-qr">
+        <img src="assets/lp/instagram-qr.png" width="410" height="410" loading="lazy" alt="Instagram @roomradar_nust につながる QR コード">
+        <figcaption>@roomradar_nust</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- フッター -->
+<footer>
+  <nav class="foot-links" aria-label="サイトの案内（足元）">
+    <a href="https://nust-room-search.onrender.com">RoomRadar を開く</a>
+    <a href="index.html">紹介ページ</a>
+    <a href="about.html">このサービスについて</a>
+  </nav>
+  <p class="foot-note">© 2026 RoomRadar — 本サービスは、学生が「自主創造プロジェクト」の一環として開発・運営している試験運用中のサービスです。大学が公式に提供するサービスではありません。</p>
+  <p class="foot-ver"><a href="about.html#version">v2.9.0</a></p>
+</footer>
+
+</body>
+</html>
