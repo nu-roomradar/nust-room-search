@@ -1,0 +1,219 @@
+/* サービス紹介ページ（intro.html）の分だけ。色・字・ボタン・足元は lp.css のものを使う。
+   2026-12-12 の交流会で渡すページ。スマホで1〜2分。JS なし（lp.css の .reveal は使わない） */
+
+.in-nb { display: inline-block; }   /* 言葉の途中で折らない */
+.in-skip {
+  position: absolute; left: 12px; top: -60px; z-index: 200; padding: 10px 16px; border-radius: 10px;
+  background: var(--ink); color: #fff; font-weight: 700; font-size: 0.9rem; text-decoration: none;
+}
+.in-skip:focus { top: 8px; }
+.intro-page :is(a, button):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.intro-page section[id] { scroll-margin-top: 16px; }
+
+/* ── 上のバー：リンク2つ＋「検索する」。スマホ幅でも1行に収める ── */
+.in-nav-cta {
+  display: inline-flex; align-items: center; min-height: 36px; padding: 0 16px; border-radius: 99px;
+  background: var(--ink); color: #fff; font-size: 0.82rem; font-weight: 700; text-decoration: none; white-space: nowrap;
+  transition: transform 0.2s;
+}
+.in-nav-cta:hover { transform: translateY(-1px); }
+@media (max-width: 820px) {
+  .intro-page .nav-links {
+    justify-content: flex-end; margin: 0 4px; padding-right: 0;
+    -webkit-mask-image: none; mask-image: none;
+  }
+  .intro-page .nav-logo { flex: 0 0 auto; }
+  .intro-page .nav-right { flex: 0 0 auto; }
+  .in-nav-cta { min-height: 34px; padding: 0 13px; font-size: 0.76rem; }
+}
+@media (max-width: 440px) {
+  .intro-page .section-nav { padding: 0 10px; }
+  .intro-page .nav-logo img { height: 28px; }
+  .intro-page .nav-links { margin: 0 2px; }
+  .intro-page .nav-links a { padding: 8px 5px; font-size: 0.7rem; letter-spacing: -0.01em; }
+  .in-nav-cta { padding: 0 11px; font-size: 0.72rem; }
+}
+
+/* ── 題 ── */
+.in-hero {
+  position: relative; overflow: hidden; text-align: center;
+  padding: 128px 24px 72px;
+}
+.in-hero-inner { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; }
+.in-hero .hero-eyebrow { margin-bottom: 24px; text-transform: none; letter-spacing: 0.08em; }
+.in-h1 {
+  font-family: 'Noto Sans JP', sans-serif; font-weight: 800;
+  font-size: clamp(1.85rem, 7.4vw, 3.4rem); line-height: 1.32; letter-spacing: -0.01em; color: var(--ink);
+  animation: fadeUp 0.7s 0.2s ease both;
+}
+.in-acc { color: var(--accent); }
+.in-name { font-weight: 800; color: var(--ink); }
+.in-hero .in-free { max-width: 30em; margin-left: auto; margin-right: auto; font-size: 0.84rem; line-height: 1.75; letter-spacing: 0.02em; }
+.in-lead {
+  max-width: 34em; margin: 22px auto 30px; font-size: clamp(1rem, 2.4vw, 1.1rem); line-height: 1.9; color: var(--muted);
+  word-break: auto-phrase; animation: fadeUp 0.7s 0.35s ease both;
+}
+.in-hero .in-notice { margin-top: 32px; font-size: 0.84rem; line-height: 1.75; }
+
+/* 3つの問い（下の区切りへ移る札） */
+.in-qs { margin: 36px auto 0; max-width: 640px; animation: fadeUp 0.7s 0.85s ease both; }
+.in-qs-lead { font-size: 0.86rem; font-weight: 600; color: var(--muted); margin-bottom: 12px; }
+.in-qs-list { list-style: none; display: grid; gap: 8px; }
+.in-qs-list a {
+  display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 10px 16px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  color: var(--ink); font-weight: 700; font-size: 0.98rem; text-decoration: none; text-align: left;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.in-qs-list a::after { content: '↓'; margin-left: auto; color: var(--muted); font-weight: 500; }
+.in-qs-list a:hover { border-color: var(--accent); transform: translateY(-2px); }
+.in-q-no {
+  flex-shrink: 0; display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
+  background: var(--accent); color: #fff; font-family: 'Noto Sans JP', sans-serif; font-size: 0.82rem; font-weight: 800;
+  letter-spacing: 0; line-height: 1;
+}
+.sec-eyebrow .in-q-no { margin-right: 10px; vertical-align: 0.05em; }
+.intro-page .sec-eyebrow { font-size: 0.86rem; letter-spacing: 0.06em; text-transform: none; margin-bottom: 14px; }
+.intro-page .sec-title { font-size: clamp(1.5rem, 5.4vw, 2.3rem); line-height: 1.45; margin-bottom: 20px; }
+
+.in-text { max-width: 40em; font-size: 0.96rem; line-height: 1.9; color: var(--muted); }
+
+/* ── 問い1：手順・教室の数・画面 ── */
+.in-two { display: grid; gap: 40px; }
+.in-steps { list-style: none; display: grid; gap: 14px; margin: 26px 0 0; }
+.in-steps li { display: flex; gap: 14px; align-items: flex-start; }
+.in-step-no {
+  flex-shrink: 0; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--card); border: 1.5px solid var(--ink); color: var(--ink); font-weight: 800; font-size: 0.92rem;
+}   /* 問いの番号（青の塗り）と見分けるため、手順は枠だけの丸 */
+.in-step-no-warn { border-color: #b45309; background: #fffbeb; color: #b45309; }
+.in-steps h3 { margin: 4px 0 2px; font-size: 1rem; font-weight: 800; line-height: 1.5; color: var(--ink); }
+.in-steps p { font-size: 0.9rem; line-height: 1.75; color: var(--muted); }
+
+.in-count {
+  margin-top: 28px; padding: 20px; border-radius: 18px; background: var(--card); border: 1px solid var(--border);
+}
+.in-count-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.in-count-label { font-size: 0.9rem; font-weight: 700; color: var(--muted); }
+.in-count-num { font-size: 2.6rem; font-weight: 800; line-height: 1; letter-spacing: -0.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.in-count-num small { margin-left: 3px; font-size: 0.4em; font-weight: 700; color: var(--muted); letter-spacing: 0; }
+.in-bar { display: flex; gap: 3px; height: 12px; margin: 14px 0 12px; }
+.in-bar span { border-radius: 99px; }
+.in-bar-tower { flex: 38 1 0; background: var(--tower); }
+.in-bar-suruga { flex: 26 1 0; background: var(--suruga); }
+.in-count-legend { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 0.9rem; color: var(--ink); }
+.in-count-legend b { font-weight: 800; }
+.in-dot { display: inline-block; width: 10px; height: 10px; margin-right: 7px; border-radius: 50%; }
+.in-dot-tower { background: var(--tower); }
+.in-dot-suruga { background: var(--suruga); }
+.in-count-note { margin-top: 10px; font-size: 0.78rem; color: var(--muted); }
+
+/* 画面：下を切って、検索欄から結果の1段目までを見せる */
+.in-shot { margin: 0 auto; width: min(72vw, 280px); text-align: center; }
+.in-phone { border-radius: 36px; padding: 8px; background: #1a1814; box-shadow: 0 30px 60px -28px rgba(26,24,20,0.5); }
+.in-phone img {
+  display: block; width: 100%; height: auto; aspect-ratio: 780 / 1556; object-fit: cover; object-position: top;
+  border-radius: 28px;
+}
+.in-shot figcaption { margin-top: 12px; font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+/* ── 問い2：「空き」の意味（いちばん目立たせる） ── */
+.in-warn {
+  display: flex; gap: 18px; align-items: center; padding: 22px 20px; border-radius: 20px;
+  background: #fffbeb; border: 2px solid #f59e0b;
+}
+.in-door { flex-shrink: 0; width: 62px; height: auto; color: #b45309; }
+.in-warn-lead { font-size: 1.08rem; font-weight: 800; line-height: 1.7; color: var(--ink); word-break: auto-phrase; }
+.in-warn-sub { margin-top: 8px; font-size: 0.9rem; line-height: 1.75; color: #6b4a12; }
+
+.in-know { display: grid; gap: 12px; margin: 30px 0 0; }
+.in-know-col { padding: 18px 20px; border-radius: 16px; background: var(--card); border: 1px solid var(--border); }
+.in-know-col h3 { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 1rem; font-weight: 800; color: var(--ink); }
+.in-know-col ul { list-style: none; display: grid; gap: 6px; }
+.in-know-col li { position: relative; padding-left: 1.1em; font-size: 0.94rem; line-height: 1.7; color: var(--ink); }
+.in-know-col li::before { content: ''; position: absolute; left: 0.1em; top: 0.72em; width: 5px; height: 5px; border-radius: 50%; background: var(--muted); }
+.in-know-src { margin-top: 10px; font-size: 0.8rem; line-height: 1.7; color: var(--muted); }
+.in-mark { position: relative; flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; }
+.in-know-yes { border-color: rgba(22,163,74,0.35); }
+.in-know-yes .in-mark { background: var(--suruga); }
+.in-know-yes .in-mark::after {   /* チェックのしるし */
+  content: ''; position: absolute; left: 7px; top: 4px; width: 6px; height: 10px;
+  border-right: 2.5px solid #fff; border-bottom: 2.5px solid #fff; transform: rotate(45deg);
+}
+.in-know-no .in-mark { background: #8a8578; }
+.in-know-no .in-mark::after {    /* 「？」の代わりの横線 */
+  content: ''; position: absolute; left: 6px; top: 10px; width: 10px; height: 2.5px; border-radius: 2px; background: #fff;
+}
+.in-report { margin-top: 18px; }
+
+.in-trial { display: grid; margin: 30px 0 0; border-top: 1px solid var(--ink); }
+.in-trial > div { display: grid; grid-template-columns: 6em minmax(0, 1fr); gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.in-trial dt { font-size: 0.84rem; font-weight: 700; color: var(--muted); line-height: 1.7; }
+.in-trial dd { font-size: 0.96rem; font-weight: 700; color: var(--ink); line-height: 1.7; }
+
+/* ── 問い3：メンバー（about.html の名簿と同じ見た目。丸は lp.css の .member-avatar） ── */
+.in-team { list-style: none; display: grid; grid-template-columns: 1fr 1fr; column-gap: 14px; margin: 22px 0 0; border-top: 1px solid var(--ink); }
+.in-member {
+  display: grid; grid-template-columns: 36px minmax(0, 1fr); grid-template-areas: "av name" "av role" "dept dept";
+  column-gap: 10px; row-gap: 2px; align-items: center; padding: 14px 0 12px; border-bottom: 1px solid var(--border); min-width: 0;
+}
+.in-team .member-avatar { grid-area: av; width: 36px; height: 36px; margin: 0; font-size: 0.95rem; transition: none; }
+.in-team .member-name { grid-area: name; align-self: end; margin: 0; font-family: 'Noto Sans JP', sans-serif; font-size: 0.96rem; font-weight: 800; line-height: 1.5; color: var(--ink); }
+.in-team .member-role {
+  grid-area: role; align-self: start; justify-self: start; margin: 0; padding: 1px 9px;
+  background: var(--card); border: 1px solid rgba(37,99,235,0.3); font-size: 0.76rem; white-space: nowrap;
+}
+.in-team .member-dept { grid-area: dept; align-self: start; margin-top: 6px; font-size: 0.8rem; line-height: 1.55; color: var(--muted); }
+.in-more { margin-top: 24px; }
+
+/* ── 最後に一言 ── */
+.in-join { display: grid; gap: 28px; padding: 28px 22px; border-radius: 22px; background: var(--card); border: 1px solid var(--border); }
+.in-join .sec-title { margin-bottom: 12px; }
+.in-join-text { font-size: 1.02rem; font-weight: 600; line-height: 1.9; color: var(--ink); word-break: auto-phrase; }
+.in-handle { font-family: 'DM Mono', 'Noto Sans JP', monospace; font-weight: 500; color: var(--accent); white-space: nowrap; }
+.in-join-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.in-join-actions .a-link { margin-top: 0; }
+.in-btn {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 24px; border-radius: 99px;
+  background: linear-gradient(180deg, #2a2723 0%, #1a1814 100%); color: #fff; font-weight: 700; font-size: 0.95rem; text-decoration: none;
+  box-shadow: 0 12px 30px -12px rgba(26,24,20,0.55); transition: transform 0.2s;
+}
+.in-btn:hover { transform: translateY(-2px); }
+.in-qr { justify-self: center; text-align: center; }
+.in-qr img { display: block; width: 148px; height: 148px; padding: 8px; border-radius: 16px; background: #fff; border: 1px solid var(--border); }
+.in-qr figcaption { margin-top: 8px; font-family: 'DM Mono', 'Noto Sans JP', monospace; font-size: 0.8rem; color: var(--muted); }
+
+/* 足元：このページには下に固定のボタンが無いので、lp.css がスマホで足している余白を戻す */
+@media (max-width: 767px) {
+  .intro-page footer { padding-bottom: 32px; }
+  .in-hero { padding: 100px 20px 48px; }
+  .intro-page .sec { padding-top: 48px; padding-bottom: 48px; }   /* 節のあいだを少し詰める */
+}
+
+/* ── 広い画面 ── */
+@media (min-width: 700px) {
+  .in-qs-list { grid-template-columns: repeat(3, 1fr); }
+  .in-qs-list a { flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px 16px; font-size: 0.94rem; }
+  .in-qs-list a::after { display: none; }
+  .in-know { grid-template-columns: 1fr 1fr; }
+  .in-team { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 28px; }
+  .in-trial { grid-template-columns: 1fr 1fr; column-gap: 28px; }
+  .in-join { grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 40px 44px; }
+  .in-warn { padding: 28px 32px; gap: 26px; }
+  .in-door { width: 78px; }
+  .in-warn-lead { font-size: 1.25rem; }
+}
+@media (min-width: 900px) {
+  .in-two { grid-template-columns: minmax(0, 1fr) 300px; gap: 64px; align-items: start; }
+  .in-shot { width: 300px; }
+}
+
+/* 動きを減らす設定のときは、現れる動きも止める */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .in-h1, .in-lead, .in-qs, .in-hero .hero-eyebrow, .in-hero .hero-cta, .in-hero .hero-free, .in-hero .hero-note {
+    animation: none !important; opacity: 1 !important; transform: none !important;
+  }
+  .in-hero .hero-eyebrow .dot { animation: none !important; }
+  .in-nav-cta, .in-btn, .in-qs-list a { transition: none; }
+}
