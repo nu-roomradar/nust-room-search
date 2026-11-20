@@ -100,7 +100,7 @@
 .in-bar { display: flex; gap: 3px; height: 12px; margin: 14px 0 12px; }
 .in-bar span { border-radius: 99px; }
 .in-bar-tower { flex: 38 1 0; background: var(--tower); }
-.in-bar-suruga { flex: 26 1 0; background: var(--suruga); }
+.in-bar-suruga { flex: 34 1 0; background: var(--suruga); }
 .in-count-legend { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 0.9rem; color: var(--ink); }
 .in-count-legend b { font-weight: 800; }
 .in-dot { display: inline-block; width: 10px; height: 10px; margin-right: 7px; border-radius: 50%; }
