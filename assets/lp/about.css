@@ -884,3 +884,6 @@ body.lang-zh :is(.ab-notice, .ab-req) { letter-spacing: 0.05em; }   /* 狭い幅
   .ab-day, .ab-day * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .ab-glow-end { display: none; }
 }
+
+/* 開発メンバーの学年の注（2026-11-20） */
+.ab-team-year { margin: 14px 0 0; font-size: .82rem; line-height: 1.7; color: var(--ab-sub); }
