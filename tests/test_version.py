@@ -44,7 +44,7 @@ class VersionSourceTest(unittest.TestCase):
 
 class StaticPagesTest(unittest.TestCase):
     def test_lp_and_about_footer(self):
-        for name, href in (("index.html", "about.html#version"), ("about.html", "#version")):
+        for name, href in (("index.html", "about.html#version"), ("intro.html", "about.html#version"), ("about.html", "#version")):
             with self.subTest(page=name):
                 found = re.findall(r'<p class="foot-ver"><a href="([^"]+)">v([\d.]+)</a></p>', read(name))
                 self.assertEqual(found, [(href, VERSION)])
