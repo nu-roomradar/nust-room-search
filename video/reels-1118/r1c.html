@@ -22,11 +22,12 @@
 .floorlbl b{color:var(--orange)}
 #s3 .t{top:1010px;font-weight:900;font-size:104px;line-height:1.25}
 #s4 .h1{top:160px;font-weight:900;font-size:100px;line-height:1.18}
+#s4 .hl{color:#8fdcff}
 #s4 .sub{top:420px;font-weight:700;font-size:40px;color:#e3ebfb}
 #s4 .phone{left:290px;top:540px;width:500px;height:1020px;border-radius:78px;padding:15px}
 #s4 .phone .scr{border-radius:64px}
 #s4 .ring{position:absolute;border:7px solid var(--orange);border-radius:24px;box-shadow:0 0 30px rgba(246,163,92,.9);opacity:0}
-#s4 .tag{position:absolute;left:60px;top:1330px;padding:16px 26px;border-radius:20px;background:#fff;color:#0b1730;font-weight:900;font-size:40px;line-height:1.3;box-shadow:0 14px 34px rgba(0,0,0,.4);opacity:0}
+#s4 .tag{position:absolute;left:60px;top:1466px;padding:16px 26px;border-radius:20px;background:#fff;color:#0b1730;font-weight:900;font-size:40px;line-height:1.3;box-shadow:0 14px 34px rgba(0,0,0,.4);opacity:0}
 #s4 .tag small{display:block;font-size:28px;color:#4b5563;font-weight:700}
 </style></head>
 <body>
@@ -52,7 +53,7 @@
 </div>
 
 <div class="scene" id="s4">
-  <div class="c h1 ts">開けた瞬間、<br><span class="g">いま使える教室。</span></div>
+  <div class="c h1 ts">開けた瞬間、<br><span class="hl">いま使える教室。</span></div>
   <div class="c sub ts">時間割から、空き教室をすぐ一覧に</div>
   <div class="phone"><div class="scr"><div class="isl"></div><img src="assets/page1.png" alt=""></div>
     <div class="ring" style="left:175px;top:790px;width:147px;height:118px"></div></div>
@@ -82,7 +83,10 @@ window.BG3D = async t => {
   if (!bg3.src.endsWith(src)) { bg3.src = src; await bg3.decode(); }
   const b = whip(t);
   bg3.style.filter = b > 0.3 ? `blur(${b.toFixed(1)}px)` : 'none';
-  bg3.style.transform = b > 0.3 ? 'scale(1.04)' : 'none';
+  // つかみの間は少し寄せる（右の壁の時計が題の横に見えないように）。左端を軸にして、右を画面の外へ出す
+  const hook = t < 1.88;
+  bg3.style.transformOrigin = hook ? '0% 55%' : '50% 50%';
+  bg3.style.transform = hook ? 'scale(1.17)' : (b > 0.3 ? 'scale(1.04)' : 'none');
   const row = (A && (A[f] || A[String(f)])) || [];
   for (let i = 0; i < 3; i++) {
     const a = row[i], e = document.getElementById(`st${i + 1}`);
