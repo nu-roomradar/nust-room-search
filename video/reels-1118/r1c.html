@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8">
+<!-- リール1 v3「空きコマあるある」（13.2秒）。0〜7.2 秒は Blender で描いた校舎の廊下・ドア・時計（frames1/）。
+     「授業中」のはんこは 3D のドアの位置（frames1/anchors.json）に合わせて重ねる。7.3 秒からは空いている教室（frames1/room.png）とアプリの実画面。
+     アプリの画面は実物（駿河台校舎・水曜3限。2026-11-22 に撮り直し。18室） -->
+<link rel="stylesheet" href="common.css">
+<style>
+#bg3,#room{position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover;opacity:0;will-change:transform,filter}
+#room{transform-origin:50% 45%}
+.sh{position:absolute;left:0;right:0;opacity:0;pointer-events:none}
+.sh.all{top:0;bottom:0;background:radial-gradient(900px 760px at 50% 44%,rgba(4,10,26,.82),rgba(4,10,26,.45) 70%,rgba(4,10,26,.3))}
+.sh.top{top:0;height:520px;background:linear-gradient(180deg,rgba(4,10,26,.86),rgba(4,10,26,0))}
+.sh.bot{bottom:0;height:760px;background:linear-gradient(0deg,rgba(4,10,26,.9),rgba(4,10,26,.55) 55%,rgba(4,10,26,0))}
+.sh.dark{top:0;bottom:0;background:rgba(4,10,26,.62)}
+.ts{text-shadow:0 4px 26px rgba(0,0,0,.65),0 2px 6px rgba(0,0,0,.5)}
+#s1 .kick{top:610px;font-size:48px}
+#s1 .big{font-size:132px}
+#s2 .head{top:150px;font-weight:900;font-size:66px}
+.stamp{position:absolute;left:0;top:0;width:500px;margin-left:-250px;margin-top:-110px;text-align:center;font-weight:900;font-size:136px;line-height:1;color:var(--red);
+  border:13px solid var(--red);border-radius:30px;padding:16px 0 26px;background:rgba(255,255,255,.94);box-shadow:0 22px 50px rgba(0,0,0,.45);opacity:0;white-space:nowrap}
+.floorlbl{position:absolute;left:50%;top:1500px;transform:translateX(-50%);white-space:nowrap;padding:16px 40px;border-radius:99px;background:rgba(6,14,34,.72);border:2px solid rgba(160,190,255,.3);font-weight:900;font-size:50px;color:#fff}
+.floorlbl b{color:var(--orange)}
+#s3 .t{top:1010px;font-weight:900;font-size:104px;line-height:1.25}
+#s4 .h1{top:160px;font-weight:900;font-size:100px;line-height:1.18}
+#s4 .sub{top:420px;font-weight:700;font-size:40px;color:#e3ebfb}
+#s4 .phone{left:290px;top:540px;width:500px;height:1020px;border-radius:78px;padding:15px}
+#s4 .phone .scr{border-radius:64px}
+#s4 .ring{position:absolute;border:7px solid var(--orange);border-radius:24px;box-shadow:0 0 30px rgba(246,163,92,.9);opacity:0}
+#s4 .tag{position:absolute;left:60px;top:1330px;padding:16px 26px;border-radius:20px;background:#fff;color:#0b1730;font-weight:900;font-size:40px;line-height:1.3;box-shadow:0 14px 34px rgba(0,0,0,.4);opacity:0}
+#s4 .tag small{display:block;font-size:28px;color:#4b5563;font-weight:700}
+</style></head>
+<body>
+<div class="bg"></div>
+<img id="bg3" src="frames1/f0000.png" alt="">
+<img id="room" src="frames1/room.png" alt="">
+<div class="sh all" id="shAll"></div><div class="sh top" id="shTop"></div><div class="sh bot" id="shBot"></div><div class="sh dark" id="shDark"></div>
+
+<div class="scene" id="s1">
+  <div class="c kick ts">日大理工生の</div>
+  <div class="c big l1 ts" style="top:700px">空きコマ100分、</div>
+  <div class="c big o l2 ts" style="top:880px">どこ行く？</div>
+</div>
+
+<div class="scene" id="s2">
+  <div class="c head ts">とりあえず、教室を探す</div>
+  <div class="stamp" id="st1">授業中</div><div class="stamp" id="st2">授業中</div><div class="stamp" id="st3">授業中</div>
+  <div class="floorlbl"><span id="f1">タワー・スコラ <b>5階</b></span></div>
+</div>
+
+<div class="scene" id="s3">
+  <div class="c t ts">そして、<br><span class="o">休み時間が終わる。</span></div>
+</div>
+
+<div class="scene" id="s4">
+  <div class="c h1 ts">開けた瞬間、<br><span class="g">いま使える教室。</span></div>
+  <div class="c sub ts">時間割から、空き教室をすぐ一覧に</div>
+  <div class="phone"><div class="scr"><div class="isl"></div><img src="assets/page1.png" alt=""></div>
+    <div class="ring" style="left:175px;top:790px;width:147px;height:118px"></div></div>
+  <div class="tag">705 は 6限まで空き<small>アプリの実際の画面（駿河台校舎・水曜3限）</small></div>
+</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="common.js"></script>
+<script>
+const FPS = 30, F0 = 0, F1 = 216, T3D = 7.2;
+const T0 = [2.0, 3.3, 4.6];                                   // ドアに着く時刻（r1_corridor.py と同じ）
+let A = null; window.READY = false;
+fetch('frames1/anchors.json').then(r => r.json()).then(j => { A = j; window.READY = true; });
+const bg3 = document.getElementById('bg3');
+const pad = f => String(f).padStart(4, '0');
+// カメラが速く動いている間だけ、背景をぼかす（次のドアへ振る感じ）
+function whip(t) {
+  let b = 0;
+  for (const [a, z] of [[1.85, 2.27], [3.25, 3.57], [4.55, 4.87]]) {
+    if (t > a && t < z) b = Math.max(b, Math.sin(Math.PI * (t - a) / (z - a)) * 16);
+  }
+  return b;
+}
+window.BG3D = async t => {
+  const f = Math.max(F0, Math.min(F1, Math.round(t * FPS)));
+  const src = `frames1/f${pad(f)}.png`;
+  if (!bg3.src.endsWith(src)) { bg3.src = src; await bg3.decode(); }
+  const b = whip(t);
+  bg3.style.filter = b > 0.3 ? `blur(${b.toFixed(1)}px)` : 'none';
+  bg3.style.transform = b > 0.3 ? 'scale(1.04)' : 'none';
+  const row = (A && (A[f] || A[String(f)])) || [];
+  for (let i = 0; i < 3; i++) {
+    const a = row[i], e = document.getElementById(`st${i + 1}`);
+    if (!a) continue;
+    e.style.left = ((a[0] - 0.10) * 1080) + 'px'; e.style.top = ((a[1] + 0.035) * 1920) + 'px';
+  }
+};
+
+const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 13.2;
+tl.set('#bg3', { opacity: 1 }, 0);
+// 1. つかみ（0〜1.85秒）：廊下を進む
+tl.set('#shAll', { opacity: 1 }, 0);
+show(tl, '#s1', 0, 0.01);
+tl.from('#s1 .kick', { y: 30, opacity: 0, duration: 0.3 }, 0)
+  .from('#s1 .l1', { scale: 1.35, opacity: 0, duration: 0.35, ease: 'power3.out' }, 0.08)
+  .from('#s1 .l2', { scale: 0.6, opacity: 0, duration: 0.4, ease: 'back.out(2.2)' }, 0.62);
+hide(tl, '#s1', 1.7, 0.2); tl.to('#shAll', { opacity: 0, duration: 0.25 }, 1.7);
+// 2. ドアを回る（1.9〜5.9秒）
+show(tl, '#s2', 1.9, 0.15);
+tl.to(['#shTop', '#shBot'], { opacity: 1, duration: 0.25 }, 1.85)
+  .from('#s2 .head', { y: -30, opacity: 0, duration: 0.3 }, 1.95);
+const floors = ['タワー・スコラ <b>5階</b>', 'タワー・スコラ <b>6階</b>', '駿河台校舎 <b>1号館</b>'];
+T0.forEach((t0, i) => {
+  tl.set('#f1', { innerHTML: floors[i] }, i === 0 ? 1.9 : t0 + 0.1);
+  if (i > 0) tl.fromTo('.floorlbl', { scale: 0.9 }, { scale: 1, duration: 0.2, ease: 'back.out(2)' }, t0 + 0.1);
+  tl.fromTo(`#st${i + 1}`, { opacity: 0, scale: 2.4, rotation: -12 }, { opacity: 1, scale: 1, rotation: -12, duration: 0.18, ease: 'power4.in' }, t0 + 0.5)
+    .to('#bg3', { x: 12, duration: 0.04, repeat: 3, yoyo: true }, t0 + 0.68)
+    .set('#bg3', { x: 0 }, t0 + 0.86)
+    .to(`#st${i + 1}`, { opacity: 0, duration: 0.08 }, t0 + 1.22);
+});
+hide(tl, '#s2', 5.82, 0.12);
+// 3. 休み時間が終わる（5.95〜7.2秒）：壁の時計
+show(tl, '#s3', 5.97, 0.15);
+tl.to('#shTop', { opacity: 0, duration: 0.1 }, 5.9)
+  .from('#s3 .t', { y: 40, opacity: 0, duration: 0.35 }, 6.02);
+hide(tl, '#s3', 7.05, 0.18);
+// 4. アプリ（7.3〜10.5秒）：空いている教室を背景に
+tl.to('#bg3', { opacity: 0, duration: 0.2 }, 7.12)
+  .fromTo('#room', { opacity: 0, scale: 1.12, filter: 'blur(0px) brightness(1.05)' }, { opacity: 1, duration: 0.25 }, 7.12)
+  .to('#room', { scale: 1.0, duration: 6.0, ease: 'none' }, 7.12)
+  .to('#room', { filter: 'blur(7px) brightness(0.62)', duration: 0.5 }, 7.45)
+  .to('#shBot', { opacity: 0, duration: 0.2 }, 7.12)
+  .to('#shTop', { opacity: 1, duration: 0.3 }, 7.3);
+show(tl, '#s4', 7.3, 0.15);
+tl.from('#s4 .h1', { y: 40, opacity: 0, duration: 0.4 }, 7.3)
+  .from('#s4 .sub', { opacity: 0, duration: 0.3 }, 7.6)
+  .from('#s4 .phone', { y: 900, duration: 0.6, ease: 'power3.out' }, 7.4)
+  .to('#s4 .ring', { opacity: 1, duration: 0.2 }, 8.7)
+  .fromTo('#s4 .ring', { scale: 1.4 }, { scale: 1, duration: 0.35, ease: 'back.out(2)' }, 8.7)
+  .to('#s4 .tag', { opacity: 1, duration: 0.25 }, 9.0)
+  .from('#s4 .tag', { y: 40, duration: 0.35, ease: 'power3.out' }, 9.0);
+hide(tl, '#s4', 10.5, 0.2);
+// 5. 終わりの札（10.6〜13.2秒）
+tl.to('#shDark', { opacity: 1, duration: 0.35 }, 10.5)
+  .to('#room', { filter: 'blur(16px) brightness(0.5)', duration: 0.4 }, 10.5);
+addEnd(tl, 10.6, '空きコマの行き先、<span class="o">すぐ決まる。</span>');
+tl.to({}, { duration: 0.01 }, window.DURATION);
+</script>
+</body></html>
