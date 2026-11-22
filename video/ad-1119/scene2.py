@@ -176,7 +176,7 @@ def cyclorama(m, y_front=-3.0, y_wall=1.5, r=0.9, height=3.2, half_w=4.0):
 if MODE == "hero":
     world("#050a18", 0.35)
     cyclorama(mat("ground", "#07112a", rough=0.5, coat=0.25, sheen=0.15, bump=(700, 0.03)))
-    g = group("cluster", (0.012, 0, 0)); g.rotation_euler.z = math.radians(-13)
+    g = group("cluster", (-0.035, 0, 0)); g.rotation_euler.z = math.radians(-13)   # 2026-11-22 運営「もうちょいスマホが左」
     # 本の束（背表紙が手前）。上の本の角にスマホを立てかける
     hs = (0.031, 0.024, 0.03); z = 0.0
     cols = ("#22366a", "#d6cfbd", "#b5623c")
@@ -264,7 +264,7 @@ elif MODE == "room":
         for col in range(3):
             desk(-2.2 + col * 2.0, 1.2 + row * 1.5)
     desk(0.25, 1.2, chair=False)                                # 手前の机（主役を置く）
-    g = group("onDesk", (0.06, 1.14, 0.735)); g.rotation_euler.z = math.radians(-12)
+    g = group("onDesk", (0.24, 1.2, 0.735)); g.rotation_euler.z = math.radians(-8)   # 2026-11-22 運営「もうちょっと中央寄りで、もうちょい上に」
     b0 = book("bk", 0.2, 0.14, 0.028, (0.02, 0.085, 0), math.radians(3), "#22366a", parent=g)
     ph = phone(parent=g, glow=2.0); ph.rotation_euler = (math.radians(60), 0, 0); ph.location = (0.0, 0.0, 0.0655)
     pencil((0.16, -0.06, 0.0), math.radians(-28), parent=g)
@@ -278,7 +278,7 @@ elif MODE == "room":
     fm = bpy.data.materials.new("fog"); fm.use_nodes = True; n = fm.node_tree.nodes; l = fm.node_tree.links
     n.remove(n["Principled BSDF"]); vs = n.new("ShaderNodeVolumeScatter"); vs.inputs["Density"].default_value = 0.012; vs.inputs["Anisotropy"].default_value = 0.6
     l.new(vs.outputs["Volume"], n["Material Output"].inputs["Volume"]); fog.data.materials.append(fm)
-    camera((0.4, 0.5, 0.99), (-0.55, 4.4, 1.4), 30, fstop=2.2, focus=(0.06, 1.14, 0.8))
+    camera((0.4, 0.5, 0.99), (-0.45, 4.4, 1.08), 30, fstop=2.2, focus=(0.24, 1.2, 0.8))
 
 # ── 書き出し ──
 sc.render.engine = "CYCLES"; sc.cycles.device = "CPU"; sc.cycles.use_denoising = True; sc.cycles.denoiser = "OPENIMAGEDENOISE"
