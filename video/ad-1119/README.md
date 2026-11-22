@@ -51,3 +51,6 @@
 - キャッチコピーは、3枚とも核の言葉「「開けたら、空いてる」を当たり前に。」（2026-10-21 運営決定）。決まりどおり「時間割にない授業もあります。入る前に、ドア越しに確認を。」と組で出す。
 - 左上にロゴ（`video/cm-ai/rr_logo_hd.png`）と「RoomRadar／空き教室検索」。下に必須の表記（学生課の文言）。
 - 作り方：`python3 compose3.py renders/hero2_final.png ../../assets/instagram/ad/ad3-hero.png`（door・room も同じ）。
+- 2026-11-22 運営「2枚目はすごくいい感じ。1、3をキャッチコピー変更と余白のバランスを整えて」→ 1枚目は「探す五分、／過ごす五分。」（10/21 運営決定の言葉。縦書きなので数字は漢数字）、3枚目は「空きコマに、／行き先を。」。字を大きくして、2行目の下げ幅を小さく、右の余白を広げた：
+  `python3 compose3.py renders/hero2_final.png ../../assets/instagram/ad/ad3-hero.png "copy=探す五分、|過ごす五分。" size=76 top=118 drop=1.6em right=140`
+  `python3 compose3.py renders/room2_final.png ../../assets/instagram/ad/ad3-room.png "copy=空きコマに、|行き先を。" size=80 top=130 drop=1.6em right=140`
