@@ -44,3 +44,10 @@
 - 作り方：`scene2.py <hero|door|room> final` → `compose.py <背景> "<1行目>|<2行目>" <出力> [side=left] [mark=0] [size=76] [shade=0.5]`。コピーの差し替えは compose だけですぐできる。
 - キャッチコピーの候補（出し直し）：九十分の、居場所。／空きコマに、行き先を。／扉の前で、迷わない。／行き先のある、空きコマ。／次の一限まで、ここにいる。／歩き回らない、空きコマ。／探す時間を、過ごす時間に。／時間割のすきまに、あかりを。
 - 1回目の3枚（`ad-desk-*.png`）も残してある。
+
+## v3（2026-11-22、運営「全部にロゴ入れて、決めたキャッチコピー使って」）
+
+- `assets/instagram/ad/ad3-hero.png`・`ad3-door.png`・`ad3-room.png`。背景は v2 と同じ（`renders/*2_final.png`）。
+- キャッチコピーは、3枚とも核の言葉「「開けたら、空いてる」を当たり前に。」（2026-10-21 運営決定）。決まりどおり「時間割にない授業もあります。入る前に、ドア越しに確認を。」と組で出す。
+- 左上にロゴ（`video/cm-ai/rr_logo_hd.png`）と「RoomRadar／空き教室検索」。下に必須の表記（学生課の文言）。
+- 作り方：`python3 compose3.py renders/hero2_final.png ../../assets/instagram/ad/ad3-hero.png`（door・room も同じ）。
