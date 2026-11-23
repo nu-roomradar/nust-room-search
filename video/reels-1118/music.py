@@ -277,5 +277,29 @@ def r2d():
     master(m, "r2d", fade_out=0.8)
 
 
+def soft(f, dur=2.6, d=1.1):               # やわらかい鍵盤のような音（倍音を少なく、ゆっくり消える）
+    t = np.arange(int(dur * SR)) / SR
+    s = sum(a * np.sin(2 * np.pi * f * k * t) * np.exp(-t / (d / k ** 0.6)) for k, a in ((1, 1.0), (2, 0.32), (3, 0.12), (4, 0.05)))
+    return s * np.minimum(t / 0.012, 1)
+
+
+def r4():
+    """「開けたら、空いてる」（11.0秒）。静かな和音と、ゆっくりした分散。場面の切り替え（3.3・5.7・8.1秒）で和音が変わる"""
+    m = Mix(11.0)
+    CH = {"D": ["D3", "A3", "E4", "F#4"], "Bm": ["B2", "F#3", "D4", "A4"], "G": ["G2", "D3", "B3", "A4"], "Dend": ["D3", "A3", "F#4", "D5"]}
+    plan = [(0.0, 3.3, "D"), (3.3, 5.7, "Bm"), (5.7, 8.1, "G"), (8.1, 11.0, "Dend")]
+    for t0, t1, name in plan:
+        ch = [note(n) for n in CH[name]]
+        m.add(pad(ch[:3], t1 - t0 + 0.4), max(0, t0 - 0.2), 0.20)                # 下に薄く敷く和音
+        m.add(soft(ch[0] / 2, 3.0, 1.6), t0, 0.34)                               # 低い音
+        seq = [ch[1], ch[2], ch[3], ch[2]] if name != "Dend" else [ch[1], ch[2], ch[3]]
+        for j, f in enumerate(seq):                                              # ゆっくりした分散（0.6秒おき）
+            tt = t0 + 0.3 + j * 0.6
+            if tt < t1 - 0.2 or name == "Dend": m.add(soft(f, 2.4), tt, 0.26, (-0.25, 0.25)[j % 2])
+    for t, f, g in ((0.15, "A5", 0.10), (3.3, "F#5", 0.09), (5.7, "D5", 0.09), (8.1, "D6", 0.11)):
+        m.add(bell(note(f)), t, g, 0.1)                                          # 切り替えの合図（小さく）
+    master(m, "r4", fade_out=1.6)
+
+
 if __name__ == "__main__":
-    {"r1": r1, "r2": r2, "r3": r3, "r2d": r2d}[sys.argv[1]]()
+    {"r1": r1, "r2": r2, "r3": r3, "r2d": r2d, "r4": r4}[sys.argv[1]]()
