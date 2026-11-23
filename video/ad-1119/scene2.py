@@ -13,6 +13,7 @@ SCREEN = os.path.join(HERE, "assets", "screen.png")
 SHEET = os.path.join(HERE, "assets", "timetable.png")
 argv = sys.argv[1:]
 MODE, Q = argv[0], (argv[1] if len(argv) > 1 else "preview")
+TALL = len(argv) > 2 and argv[2] == "tall"      # 動画用の縦長（1080×1920）。横の写る範囲は変えず、上下を広げる
 random.seed(7)
 bpy.ops.wm.read_factory_settings(use_empty=True)
 sc = bpy.context.scene
@@ -72,7 +73,7 @@ def spot(name, loc, target, energy, angle, blend=0.6, color=(1, 1, 1), soft=0.05
 
 def camera(loc, target, lens, fstop=None, focus=None):
     bpy.ops.object.camera_add(location=loc); c = bpy.context.object; sc.camera = c
-    aim(c, target); c.data.lens = lens
+    aim(c, target); c.data.lens = lens * (0.72 if TALL else 1.0)
     if fstop:
         c.data.dof.use_dof = True; c.data.dof.aperture_fstop = fstop
         c.data.dof.focus_distance = (Vector(focus or target) - Vector(loc)).length
@@ -284,10 +285,10 @@ elif MODE == "room":
 sc.render.engine = "CYCLES"; sc.cycles.device = "CPU"; sc.cycles.use_denoising = True; sc.cycles.denoiser = "OPENIMAGEDENOISE"
 sc.cycles.max_bounces = 6; sc.cycles.volume_bounces = 0; sc.cycles.volume_step_rate = 2.0
 sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - High Contrast"
-sc.render.resolution_x, sc.render.resolution_y = 1080, 1350
+sc.render.resolution_x, sc.render.resolution_y = 1080, (1920 if TALL else 1350)
 if Q == "preview":
     sc.render.resolution_percentage = 40; sc.cycles.samples = 48
 else:
     sc.render.resolution_percentage = 100; sc.cycles.samples = 256
-sc.render.filepath = os.path.join(OUT, f"{MODE}2_{Q}.png"); bpy.ops.render.render(write_still=True)
+sc.render.filepath = os.path.join(OUT, f"{MODE}2{'t' if TALL else ''}_{Q}.png"); bpy.ops.render.render(write_still=True)
 print("書き出し", sc.render.filepath)
