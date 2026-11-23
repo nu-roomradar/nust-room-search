@@ -54,3 +54,4 @@
 - 2026-11-22 運営「2枚目はすごくいい感じ。1、3をキャッチコピー変更と余白のバランスを整えて」→ 1枚目は「探す五分、／過ごす五分。」（10/21 運営決定の言葉。縦書きなので数字は漢数字）、3枚目は「空きコマに、／行き先を。」。字を大きくして、2行目の下げ幅を小さく、右の余白を広げた：
   `python3 compose3.py renders/hero2_final.png ../../assets/instagram/ad/ad3-hero.png "copy=探す五分、|過ごす五分。" size=76 top=118 drop=1.6em right=140`
   `python3 compose3.py renders/room2_final.png ../../assets/instagram/ad/ad3-room.png "copy=空きコマに、|行き先を。" size=80 top=130 drop=1.6em right=140`
+- 2026-11-23 運営の意見で置き直し：1枚目は鉛筆を全部入れて右へ（スマホと本は動かさない）、3枚目はスマホと本をカメラに近づけて大きく、カメラを少し低く（`scene2.py`）。**同日、運営が3枚とも OK。** 出す場所と時期はまだ決めていない（Instagram に出すときは `/instagram-post` の手順で入力一式の承認を取る）。
