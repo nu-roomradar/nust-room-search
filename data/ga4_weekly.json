@@ -226,5 +226,32 @@
    "purpose_other": 1,
    "purpose_skip": 8
   }
+ },
+ {
+  "week_start": "2026-11-16",
+  "week_end": "2026-11-22",
+  "app": {
+   "users": 197,
+   "sessions": 373,
+   "page_views": 867
+  },
+  "lp": {
+   "users": 158,
+   "sessions": 231,
+   "page_views": 269
+  },
+  "events": {
+   "search": 67,
+   "report_room": 9,
+   "report_cancel": 0,
+   "reserve_room": 0,
+   "feedback_submit": 0,
+   "purpose_study": 20,
+   "purpose_group": 1,
+   "purpose_meeting": 4,
+   "purpose_break": 6,
+   "purpose_other": 0,
+   "purpose_skip": 6
+  }
  }
 ]

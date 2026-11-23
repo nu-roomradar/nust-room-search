@@ -1,119 +1,5 @@
 [
  {
-  "date": "2026-10-19",
-  "active_users": 4,
-  "new_users": 3,
-  "page_views": 12,
-  "sessions": 6,
-  "lp": {
-   "active_users": 2,
-   "new_users": 2,
-   "page_views": 2,
-   "sessions": 2
-  },
-  "app": {
-   "active_users": 2,
-   "new_users": 1,
-   "page_views": 10,
-   "sessions": 4
-  }
- },
- {
-  "date": "2026-10-20",
-  "active_users": 8,
-  "new_users": 6,
-  "page_views": 20,
-  "sessions": 10,
-  "app": {
-   "active_users": 5,
-   "new_users": 3,
-   "page_views": 16,
-   "sessions": 6
-  },
-  "lp": {
-   "active_users": 3,
-   "new_users": 3,
-   "page_views": 4,
-   "sessions": 4
-  }
- },
- {
-  "date": "2026-10-21",
-  "active_users": 4,
-  "new_users": 3,
-  "page_views": 12,
-  "sessions": 5,
-  "lp": {
-   "active_users": 2,
-   "new_users": 2,
-   "page_views": 2,
-   "sessions": 2
-  },
-  "app": {
-   "active_users": 2,
-   "new_users": 1,
-   "page_views": 10,
-   "sessions": 3
-  }
- },
- {
-  "date": "2026-10-22",
-  "active_users": 9,
-  "new_users": 3,
-  "page_views": 19,
-  "sessions": 10,
-  "app": {
-   "active_users": 5,
-   "new_users": 0,
-   "page_views": 12,
-   "sessions": 6
-  },
-  "lp": {
-   "active_users": 4,
-   "new_users": 3,
-   "page_views": 7,
-   "sessions": 4
-  }
- },
- {
-  "date": "2026-10-24",
-  "active_users": 2,
-  "new_users": 2,
-  "page_views": 4,
-  "sessions": 2,
-  "lp": {
-   "active_users": 1,
-   "new_users": 1,
-   "page_views": 1,
-   "sessions": 1
-  },
-  "app": {
-   "active_users": 1,
-   "new_users": 1,
-   "page_views": 3,
-   "sessions": 1
-  }
- },
- {
-  "date": "2026-10-25",
-  "active_users": 12,
-  "new_users": 5,
-  "page_views": 26,
-  "sessions": 16,
-  "app": {
-   "active_users": 8,
-   "new_users": 2,
-   "page_views": 19,
-   "sessions": 9
-  },
-  "lp": {
-   "active_users": 4,
-   "new_users": 3,
-   "page_views": 7,
-   "sessions": 7
-  }
- },
- {
   "date": "2026-10-26",
   "active_users": 16,
   "new_users": 8,
@@ -510,6 +396,139 @@
    "new_users": 3,
    "page_views": 5,
    "sessions": 5
+  }
+ },
+ {
+  "date": "2026-11-16",
+  "active_users": 69,
+  "new_users": 40,
+  "page_views": 179,
+  "sessions": 93,
+  "app": {
+   "active_users": 38,
+   "new_users": 20,
+   "page_views": 137,
+   "sessions": 54
+  },
+  "lp": {
+   "active_users": 31,
+   "new_users": 20,
+   "page_views": 42,
+   "sessions": 39
+  }
+ },
+ {
+  "date": "2026-11-17",
+  "active_users": 76,
+  "new_users": 42,
+  "page_views": 206,
+  "sessions": 102,
+  "app": {
+   "active_users": 43,
+   "new_users": 21,
+   "page_views": 161,
+   "sessions": 65
+  },
+  "lp": {
+   "active_users": 33,
+   "new_users": 21,
+   "page_views": 45,
+   "sessions": 37
+  }
+ },
+ {
+  "date": "2026-11-18",
+  "active_users": 97,
+  "new_users": 49,
+  "page_views": 252,
+  "sessions": 133,
+  "app": {
+   "active_users": 62,
+   "new_users": 30,
+   "page_views": 192,
+   "sessions": 86
+  },
+  "lp": {
+   "active_users": 35,
+   "new_users": 19,
+   "page_views": 60,
+   "sessions": 47
+  }
+ },
+ {
+  "date": "2026-11-19",
+  "active_users": 84,
+  "new_users": 38,
+  "page_views": 228,
+  "sessions": 121,
+  "app": {
+   "active_users": 47,
+   "new_users": 17,
+   "page_views": 175,
+   "sessions": 71
+  },
+  "lp": {
+   "active_users": 37,
+   "new_users": 21,
+   "page_views": 53,
+   "sessions": 50
+  }
+ },
+ {
+  "date": "2026-11-20",
+  "active_users": 75,
+  "new_users": 37,
+  "page_views": 177,
+  "sessions": 103,
+  "app": {
+   "active_users": 42,
+   "new_users": 18,
+   "page_views": 126,
+   "sessions": 58
+  },
+  "lp": {
+   "active_users": 33,
+   "new_users": 19,
+   "page_views": 51,
+   "sessions": 45
+  }
+ },
+ {
+  "date": "2026-11-21",
+  "active_users": 14,
+  "new_users": 4,
+  "page_views": 60,
+  "sessions": 29,
+  "app": {
+   "active_users": 10,
+   "new_users": 2,
+   "page_views": 51,
+   "sessions": 22
+  },
+  "lp": {
+   "active_users": 4,
+   "new_users": 2,
+   "page_views": 9,
+   "sessions": 7
+  }
+ },
+ {
+  "date": "2026-11-22",
+  "active_users": 13,
+  "new_users": 7,
+  "page_views": 34,
+  "sessions": 25,
+  "app": {
+   "active_users": 7,
+   "new_users": 3,
+   "page_views": 25,
+   "sessions": 17
+  },
+  "lp": {
+   "active_users": 6,
+   "new_users": 4,
+   "page_views": 9,
+   "sessions": 8
   }
  }
 ]
