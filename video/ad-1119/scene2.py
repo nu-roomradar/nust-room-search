@@ -187,7 +187,7 @@ if MODE == "hero":
     ph = phone(parent=g); ph.rotation_euler = (math.radians(72), 0, 0); ph.location = (0.0, 0.0, 0.0716)
     # 手前に時間割の紙と鉛筆、左奥にマグ
     sheet((0.088, -0.13, 0.0006), math.radians(-22), parent=g, size=(0.105, 0.148))      # 時間割のカード（A6）
-    pencil((-0.035, -0.165, 0.001), math.radians(11), parent=g)
+    pencil((0.03, -0.155, 0.001), math.radians(8), parent=g)       # 2026-11-22 運営「鉛筆を全部入れて、もうちょい右に」（スマホは動かさない）
     mug((-0.15, 0.05, 0), parent=g, color="#1f2e55")
     # 光：左から低いあたたかい光、右奥から青い縁の光、背景にぼんやりした明るみ
     spot("key", (-0.75, -0.6, 0.46), (0.0, -0.01, 0.075), 52, 22, blend=0.9, color=(1.0, 0.78, 0.56), soft=0.05)
@@ -264,7 +264,7 @@ elif MODE == "room":
         for col in range(3):
             desk(-2.2 + col * 2.0, 1.2 + row * 1.5)
     desk(0.25, 1.2, chair=False)                                # 手前の机（主役を置く）
-    g = group("onDesk", (0.24, 1.2, 0.735)); g.rotation_euler.z = math.radians(-8)   # 2026-11-22 運営「もうちょっと中央寄りで、もうちょい上に」
+    g = group("onDesk", (0.24, 1.06, 0.735)); g.rotation_euler.z = math.radians(-8)   # 2026-11-22 運営「スマホをもうちょい大きめに」→ カメラに近づける   # 2026-11-22 運営「もうちょっと中央寄りで、もうちょい上に」
     b0 = book("bk", 0.2, 0.14, 0.028, (0.02, 0.085, 0), math.radians(3), "#22366a", parent=g)
     ph = phone(parent=g, glow=2.0); ph.rotation_euler = (math.radians(60), 0, 0); ph.location = (0.0, 0.0, 0.0655)
     pencil((0.16, -0.06, 0.0), math.radians(-28), parent=g)
@@ -278,7 +278,7 @@ elif MODE == "room":
     fm = bpy.data.materials.new("fog"); fm.use_nodes = True; n = fm.node_tree.nodes; l = fm.node_tree.links
     n.remove(n["Principled BSDF"]); vs = n.new("ShaderNodeVolumeScatter"); vs.inputs["Density"].default_value = 0.012; vs.inputs["Anisotropy"].default_value = 0.6
     l.new(vs.outputs["Volume"], n["Material Output"].inputs["Volume"]); fog.data.materials.append(fm)
-    camera((0.4, 0.5, 0.99), (-0.45, 4.4, 1.08), 30, fstop=2.2, focus=(0.24, 1.2, 0.8))
+    camera((0.4, 0.5, 0.92), (-0.45, 4.4, 0.92), 30, fstop=2.2, focus=(0.24, 1.06, 0.8))
 
 # ── 書き出し ──
 sc.render.engine = "CYCLES"; sc.cycles.device = "CPU"; sc.cycles.use_denoising = True; sc.cycles.denoiser = "OPENIMAGEDENOISE"
