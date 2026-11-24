@@ -341,5 +341,43 @@ def r5():
     master(m, "r5", fade_out=1.4)
 
 
+def wind(dur):                             # 夜の風（こもった雑音が、ゆっくり強くなったり弱くなったり）
+    t = np.arange(int(dur * SR)) / SR
+    x = onepole(noise(dur), 0.02)
+    return x * (0.6 + 0.4 * np.sin(2 * np.pi * 0.23 * t) * np.sin(2 * np.pi * 0.11 * t + 1)) * np.minimum(t / 1.0, 1)
+
+
+def sleigh_crash():                        # たくさんの鈴が一度に鳴る「しゃらん」
+    m = np.zeros(int(2.0 * SR))
+    for k in range(18):
+        f = 2400 + 1600 * rng.random(); i = int(rng.random() * 0.12 * SR)
+        b = bell(f)[: len(m) - i] * (0.5 + 0.5 * rng.random())
+        m[i:i + len(b)] += b
+    return m
+
+
+def r6():
+    """カミングスーン（13.5秒）。風と低いうなり → オルゴールのような細い音 → 「どん＋しゃらん」で扉 → 鼓動 → 箱が飛び出す → 無音 → 日付の和音"""
+    m = Mix(13.5)
+    m.add(wind(10.6), 0.0, 0.5)
+    m.add(drone(note("A1"), 5.5, swell=True), 0.0, 0.45)
+    for t, n in ((1.2, "E6"), (2.0, "C6"), (2.6, "G5"), (3.4, "A5"), (4.3, "E5")):   # オルゴールのような、ゆっくりした音（既存の曲ではない）
+        for d, g in ((0, 0.16), (0.21, 0.07), (0.43, 0.03)):                           # かすかな響き
+            m.add(bell(note(n)), t + d, g, (-0.3, 0.3)[int(d * 10) % 2])
+    m.add(whoosh(0.9), 4.65, 0.3)
+    m.add(impact(), 5.5, 0.9); m.add(sleigh_crash(), 5.5, 0.38, 0.1)
+    m.add(drone(note("D2"), 2.9, swell=False), 5.5, 0.3)
+    for t in (6.1, 6.85, 7.6): m.add(thud(), t, 0.35)                                 # 鼓動のような低い音
+    m.add(impact(), 7.1, 0.25)                                                         # 遠くでもう一度
+    m.add(impact(), 8.4, 0.45); m.add(drone(note("E2"), 2.2, swell=True), 8.4, 0.35)
+    m.add(pop(520), 9.15, 0.5); m.add(onepole(noise(0.5), 0.15) * np.exp(-np.arange(int(0.5 * SR)) / SR / 0.12), 9.15, 0.5)
+    m.add(sleigh_crash(), 9.18, 0.22, -0.1)
+    m.add(impact(), 10.58, 0.75)                                                       # 暗転の「どん」。そのあと無音
+    for f, d in (("A3", 0), ("C#4", 0.06), ("E4", 0.12), ("A4", 0.18), ("E5", 0.26)):  # 日付が出るところの和音
+        m.add(soft(note(f), 2.8, 1.8), 11.0 + d, 0.2)
+    m.add(bell(note("A6")), 11.05, 0.12)
+    master(m, "r6", fade_out=1.2)
+
+
 if __name__ == "__main__":
-    {"r1": r1, "r2": r2, "r3": r3, "r2d": r2d, "r4": r4, "r5": r5}[sys.argv[1]]()
+    {"r1": r1, "r2": r2, "r3": r3, "r2d": r2d, "r4": r4, "r5": r5, "r6": r6}[sys.argv[1]]()

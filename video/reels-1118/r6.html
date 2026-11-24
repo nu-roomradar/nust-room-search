@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8">
+<!-- リール6「クリスマスモード カミングスーン」（13.5秒）。季節の見た目の予告動画の作り方（暗闇に光る形 → 引くと画面の中だったと分かる →
+     雷のような音で場面が変わる → 地面から何かが飛び出して暗転 → 日付）を参考に、クリスマスと RoomRadar に置きかえた。特定の会社の映像・ロゴ・曲は使わない。
+     3D は video/xmas-1124/teaser.py（night・door・gift）。assets/xm_* はその renders/ への近道（リンク）。字は最後の札だけ。 -->
+<link rel="stylesheet" href="common.css">
+<style>
+body{background:#000}
+.bg{background:#000}
+.shot{position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover;opacity:0;will-change:transform,opacity,filter}
+#iris{position:absolute;inset:0;pointer-events:none}
+.flash{position:absolute;inset:0;background:#fff;opacity:0}
+.black{position:absolute;inset:0;background:#000;opacity:0}
+#cs{position:absolute;inset:0;opacity:0;background:radial-gradient(760px 640px at 50% 44%,rgba(40,24,30,.9),#000 75%)}
+#cs .k{position:absolute;left:0;right:0;top:640px;text-align:center;font-family:Syne;font-weight:700;font-size:40px;letter-spacing:.62em;padding-left:.62em;color:rgba(255,236,210,.92)}
+#cs .d{position:absolute;left:0;right:0;top:740px;text-align:center;font-family:Syne;font-weight:800;font-size:230px;line-height:1;letter-spacing:.02em;color:#fff;text-shadow:0 0 50px rgba(255,190,120,.45)}
+#cs .m{position:absolute;left:0;right:0;top:1030px;text-align:center;font-weight:900;font-size:60px;letter-spacing:.14em;color:#fff}
+#cs .m b{color:#ffcf8a}
+#cs .logo{position:absolute;left:50%;top:1190px;width:300px;margin-left:-150px;opacity:.95}
+#cs .n{position:absolute;left:110px;right:110px;top:1440px;text-align:center;font-weight:500;font-size:30px;line-height:1.6;color:rgba(220,228,244,.82)}
+#cs .door{position:absolute;left:0;right:0;top:1360px;text-align:center;font-weight:700;font-size:32px;color:#ffd9b0}
+</style></head>
+<body>
+<div class="bg"></div>
+<img class="shot" id="sn" src="assets/xm_night/f0000.png" alt="">
+<img class="shot" id="sd" src="assets/xm_door/f0000.png" alt="" style="transform-origin:42% 40%">
+<img class="shot" id="sg" src="assets/xm_gift/f0000.png" alt="">
+<canvas id="iris" width="1080" height="1920"></canvas>
+<div class="flash" id="flash"></div>
+<div class="black" id="blk"></div>
+<div id="cs">
+  <div class="k">COMING SOON</div>
+  <div class="d">12.1</div>
+  <div class="m">RoomRadar <b>クリスマスモード</b></div>
+  <img class="logo" src="assets/logo.png" alt="">
+  <div class="door">使う前に、ドア越しに確認を。</div>
+  <div class="n"></div>
+</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="common.js"></script>
+<script>
+document.querySelector('#cs .n').textContent = NOTE;
+const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 13.5;
+const FPS = 30, A0 = 0, A1 = 5.5, B1 = 8.4, C1 = 10.6;          // 夜の教室 → 扉 → 雪とプレゼント → 暗転
+const NF = 165, GF = 66;
+const pad = f => String(f).padStart(4, '0');
+const sn = document.getElementById('sn'), sg = document.getElementById('sg');
+const iris = document.getElementById('iris').getContext('2d');
+// 暗闇の中に、星の光だけが見える穴。だんだん開く（0〜3秒）
+function drawIris(t) {
+  iris.clearRect(0, 0, 1080, 1920);
+  const open = Math.min(1, Math.max(0, (t - 0.6) / 2.6));
+  if (open >= 1 || t > A1) return;
+  const r0 = 120 + 1500 * open * open, soft = 220 + 500 * open;
+  const g = iris.createRadialGradient(540, 860, Math.max(1, r0 - soft), 540, 860, r0 + soft);
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,1)');
+  iris.fillStyle = g; iris.fillRect(0, 0, 1080, 1920);
+}
+window.BG3D = async t => {
+  if (t < A1 + 0.05) {
+    const f = Math.min(NF, Math.max(0, Math.round(t * FPS)));
+    const src = `assets/xm_night/f${pad(f)}.png`;
+    if (!sn.src.endsWith(src)) { sn.src = src; await sn.decode(); }
+  }
+  if (t >= B1 - 0.05 && t <= C1 + 0.05) {
+    const f = Math.min(GF, Math.max(0, Math.round((t - B1) * FPS)));
+    const src = `assets/xm_gift/f${pad(f)}.png`;
+    if (!sg.src.endsWith(src)) { sg.src = src; await sg.decode(); }
+  }
+  drawIris(t);
+  // 扉の場面：電球が少しまたたく
+  if (t > A1 && t < B1) document.getElementById('sd').style.filter = `brightness(${(1 + 0.06 * Math.sin(t * 23) * Math.sin(t * 7)).toFixed(3)})`;
+};
+// 1. 夜の教室（0〜5.5秒）
+tl.set('#sn', { opacity: 1 }, 0).set('#sn', { opacity: 0 }, A1);
+// 2. 雷のような光で、扉へ（5.5〜8.4秒）
+tl.set('#sd', { opacity: 1 }, A1)
+  .fromTo('#flash', { opacity: 0 }, { opacity: 0.9, duration: 0.05 }, A1 - 0.02)
+  .to('#flash', { opacity: 0, duration: 0.5, ease: 'power2.out' }, A1 + 0.05)
+  .fromTo('#sd', { scale: 1.0 }, { scale: 1.1, duration: B1 - A1, ease: 'none' }, A1)
+  .fromTo('#flash', { opacity: 0 }, { opacity: 0.35, duration: 0.04 }, 7.1)                 // 遠くでもう一度光る
+  .to('#flash', { opacity: 0, duration: 0.3 }, 7.14)
+  .set('#sd', { opacity: 0 }, B1);
+// 3. 雪の上（8.4〜10.6秒）
+tl.set('#sg', { opacity: 1 }, B1)
+  .fromTo('#flash', { opacity: 0 }, { opacity: 0.5, duration: 0.04 }, B1 - 0.02)
+  .to('#flash', { opacity: 0, duration: 0.25 }, B1 + 0.03)
+  .fromTo('#sg', { scale: 1.0 }, { scale: 1.06, duration: C1 - B1, ease: 'power1.in' }, B1)
+  .to('#sg', { x: 10, duration: 0.04, repeat: 5, yoyo: true }, B1 + 0.78)                  // 箱が飛び出す瞬間にゆれる
+  .set('#sg', { x: 0 }, B1 + 1.0);
+// 4. 暗転 → 日付（10.6〜13.5秒）
+tl.set('#blk', { opacity: 1 }, C1)
+  .to('#cs', { opacity: 1, duration: 0.6 }, C1 + 0.35)
+  .from('#cs .k', { letterSpacing: '1.1em', opacity: 0, duration: 1.2, ease: 'power3.out' }, C1 + 0.35)
+  .from('#cs .d', { scale: 0.92, opacity: 0, duration: 0.9, ease: 'power3.out' }, C1 + 0.6)
+  .from(['#cs .m', '#cs .logo'], { opacity: 0, y: 20, duration: 0.6 }, C1 + 1.0)
+  .from(['#cs .door', '#cs .n'], { opacity: 0, duration: 0.5 }, C1 + 1.2);
+tl.to({}, { duration: 0.01 }, window.DURATION);
+</script>
+</body></html>
