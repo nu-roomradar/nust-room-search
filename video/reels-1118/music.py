@@ -356,28 +356,122 @@ def sleigh_crash():                        # たくさんの鈴が一度に鳴�
     return m
 
 
+def fft_filter(x, gain):                    # 周波数ごとに大きさを変える（gain は周波数 Hz の配列を受けて倍率を返す関数）
+    X = np.fft.rfft(x); f = np.fft.rfftfreq(len(x), 1 / SR)
+    return np.fft.irfft(X * gain(f), len(x))
+
+
+def _saws(fs, t, detunes, vib):
+    s = np.zeros_like(t)
+    for f in fs:
+        for d in detunes:
+            ph = np.cumsum(f * (1 + d) * (1 + vib * (1 + 40 * d))) / SR
+            s += 2 * (ph % 1.0) - 1
+    return s / (len(fs) * len(detunes))
+
+
+def strings(names, dur, att=0.6, rel=0.8, cutoff=2200):   # 弦の和音（少しずつずらした のこぎり波を重ね、高い音を丸める）
+    t = np.arange(int(dur * SR)) / SR
+    s = _saws([note(n) for n in names], t, (-0.004, 0.0, 0.0045), 0.0022 * np.sin(2 * np.pi * 5.1 * t))
+    s = fft_filter(s, lambda f: (f > 45) / np.sqrt(1 + (f / cutoff) ** 4))
+    return s * np.minimum(t / att, 1) * np.minimum((dur - t) / rel, 1).clip(0, 1)
+
+
+def choir(names, dur, att=1.0, rel=1.0):    # 聖歌隊のような「あー」（声の響きの山を3つ作る）
+    t = np.arange(int(dur * SR)) / SR
+    s = _saws([note(n) for n in names], t, (-0.003, 0.003), 0.004 * np.sin(2 * np.pi * 5.6 * t))
+    fm = lambda f: (f > 60) * (0.06 + sum(a * np.exp(-((f - F) / w) ** 2) for F, a, w in ((730, 1.0, 140), (1090, 0.55, 160), (2440, 0.28, 240)))) / np.sqrt(1 + (f / 3600) ** 6)
+    return fft_filter(s, fm) * 2.2 * np.minimum(t / att, 1) * np.minimum((dur - t) / rel, 1).clip(0, 1)
+
+
+def celesta(f, dur=1.6):                    # チェレスタ（オルゴールのような、やわらかい金属の鍵盤）
+    t = np.arange(int(dur * SR)) / SR
+    s = (np.sin(2 * np.pi * f * t) * np.exp(-t / 0.9) + 0.25 * np.sin(2 * np.pi * 2 * f * t) * np.exp(-t / 0.35)
+         + 0.16 * np.sin(2 * np.pi * 4 * f * t) * np.exp(-t / 0.16) + 0.1 * np.sin(2 * np.pi * 2.76 * f * t) * np.exp(-t / 0.05))
+    return s * np.minimum(t / 0.0015, 1)
+
+
+def toll(f, dur=5.0):                       # 教会の鐘（低いうなりと、ずれた倍音が長く残る）
+    t = np.arange(int(dur * SR)) / SR
+    parts = ((0.5, 0.3, 2.4), (1.0, 1.0, 2.4), (1.19, 0.42, 1.7), (1.5, 0.32, 1.3), (2.0, 0.45, 1.1), (2.51, 0.22, 0.7), (3.0, 0.18, 0.55), (4.07, 0.1, 0.35))
+    s = sum(a * np.sin(2 * np.pi * f * r * t) * np.exp(-t / d) for r, a, d in parts)
+    s *= 1 + 0.12 * np.sin(2 * np.pi * 1.3 * t)
+    return s * np.minimum(t / 0.002, 1)
+
+
+def timp(f):                                # ティンパニのような低い「どーん」
+    t = np.arange(int(1.2 * SR)) / SR
+    body = np.sin(2 * np.pi * np.cumsum(f * (1 + 0.08 * np.exp(-t / 0.05))) / SR) * np.exp(-t / 0.55)
+    return body + 0.3 * onepole(noise(1.2), 0.08) * np.exp(-t / 0.03)
+
+
 def r6():
-    """カミングスーン（16.5秒。2026-11-24 運営「最後の余韻が短い」で 13.5 → 16.5）。風と低いうなり → オルゴールのような細い音 → 「どん＋しゃらん」で扉 → 鼓動 → 箱が飛び出す → 無音 → 日付の和音"""
-    m = Mix(16.5)
-    m.add(wind(10.6), 0.0, 0.5)
-    m.add(drone(note("A1"), 5.5, swell=True), 0.0, 0.45)
-    for t, n in ((1.2, "E6"), (2.0, "C6"), (2.6, "G5"), (3.4, "A5"), (4.3, "E5")):   # オルゴールのような、ゆっくりした音（既存の曲ではない）
-        for d, g in ((0, 0.16), (0.21, 0.07), (0.43, 0.03)):                           # かすかな響き
-            m.add(bell(note(n)), t + d, g, (-0.3, 0.3)[int(d * 10) % 2])
-    m.add(whoosh(0.9), 4.65, 0.3)
-    m.add(impact(), 5.5, 0.9); m.add(sleigh_crash(), 5.5, 0.38, 0.1)
-    m.add(drone(note("D2"), 2.9, swell=False), 5.5, 0.3)
-    for t in (6.1, 6.85, 7.6): m.add(thud(), t, 0.35)                                 # 鼓動のような低い音
-    m.add(impact(), 7.1, 0.25)                                                         # 遠くでもう一度
-    m.add(impact(), 8.4, 0.45); m.add(drone(note("E2"), 2.2, swell=True), 8.4, 0.35)
-    m.add(pop(520), 9.15, 0.5); m.add(onepole(noise(0.5), 0.15) * np.exp(-np.arange(int(0.5 * SR)) / SR / 0.12), 9.15, 0.5)
-    m.add(sleigh_crash(), 9.18, 0.22, -0.1)
-    m.add(impact(), 10.58, 0.75)                                                       # 暗転の「どん」。そのあと無音
-    for f, d in (("A3", 0), ("C#4", 0.06), ("E4", 0.12), ("A4", 0.18), ("E5", 0.26)):  # 日付が出るところの和音
-        m.add(soft(note(f), 5.4, 2.8), 11.0 + d, 0.2)
-    m.add(soft(note("A2"), 5.4, 3.2), 11.0, 0.1)                                   # 下で長く響く音（余韻）
-    m.add(bell(note("A6")), 11.05, 0.12)
-    m.add(bell(note("E6")), 12.7, 0.06); m.add(bell(note("A6")), 14.2, 0.045)       # 雪のように、まばらに
+    """カミングスーン（16.5秒）。2026-11-24 運営「音楽をもっとクリスマスに」で作り直し（その前は、風と低いうなりの暗い音）。
+    鈴・チェレスタ・弦・聖歌隊ふうの声・教会の鐘・ハープの音で、イ長調・3拍子のオリジナルの旋律（既存の曲ではない）。
+    星（チェレスタの旋律と弦、鈴がだんだん）→ 扉で鐘と「しゃらん」→ ずん・ちゃっ・ちゃっのワルツ → 箱が飛び出す前の高まり → 飛び出してきらきら →
+    暗転で止めて低い鐘 → 日付で温かい和音と声（A → D/A → A で終わる）。場面の時刻は r6.html と同じ"""
+    m = Mix(16.5); B = 0.55
+    jr = np.random.default_rng(11)          # 鈴の音のばらつき（ほかのリールの音を変えないよう、別の種）
+    def jingle(dur=0.35):
+        t = np.arange(int(dur * SR)) / SR; out = np.zeros_like(t)
+        for _ in range(7):
+            f = 2600 + 4400 * jr.random(); o = int(jr.random() * 0.022 * SR); d = 0.05 + 0.12 * jr.random(); tt = t[: len(t) - o]
+            out[o:] += (np.sin(2 * np.pi * f * tt) + 0.4 * np.sin(2 * np.pi * f * 2.31 * tt)) * np.exp(-tt / d) * (0.5 + 0.5 * jr.random())
+        nz = fft_filter(jr.standard_normal(len(t)), lambda fr: (fr > 4500) * 1.0)
+        return (out / 7 + 0.35 * nz * np.exp(-t / 0.018))
+    JING = [2.6 * jingle() for _ in range(10)]          # 鈴がほかの楽器に埋もれないよう大きめに
+    def sleigh(t0, t1, step, g0, g1, accent=2):
+        k, t = 0, t0
+        while t < t1 - 1e-6:
+            g = g0 + (g1 - g0) * (t - t0) / max(1e-6, t1 - t0)
+            m.add(JING[k % 10], t, g * (1.0 if k % accent == 0 else 0.6), (-0.25, 0.25)[k % 2]); k += 1; t += step
+    def shake(t0, g):                       # 鈴をひと振り
+        for k in range(7): m.add(JING[k % 10], t0 + k * 0.06, g * np.sin(np.pi * (k + 0.5) / 7), (-0.3, 0.3)[k % 2])
+    def cel(n, t, g, pan=0.0): m.add(celesta(note(n)), t, g, pan); m.add(bell(note(n) * 2), t, g * 0.12, -pan)
+
+    # 1. 星（0〜5.5秒）：3拍子の旋律。A → F#m → D・E
+    m.add(wind(3.5), 0.0, 0.16)
+    for n, t in (("E5", 0.55), ("A5", 1.1), ("C#6", 1.65), ("B5", 2.2), ("A5", 3.025), ("F#5", 3.3), ("A5", 3.85), ("D6", 4.4), ("C#6", 4.95), ("B5", 5.225)):
+        cel(n, t, 0.3, 0.1)
+    m.add(strings(("A2", "E3", "A3", "C#4"), 1.75, att=1.3, rel=0.4), 0.55, 0.14)
+    m.add(strings(("F#2", "C#3", "F#3", "A3"), 1.75, att=0.5, rel=0.4), 2.2, 0.18)
+    m.add(strings(("D3", "F#3", "A3", "D4"), 1.15, att=0.3, rel=0.3), 3.85, 0.2)
+    m.add(strings(("E3", "G#3", "B3", "E4"), 0.62, att=0.1, rel=0.08), 4.95, 0.24)
+    sleigh(2.2, 5.45, B / 2, 0.04, 0.15)
+    for i, n in enumerate(("A4", "B4", "C#5", "D5", "E5", "F#5", "G#5", "A5", "B5", "C#6", "D6", "E6")):   # ハープのかけ上がり
+        m.add(pluck(note(n), 1.2, 0.8), 4.95 + 0.5 * i / 12, 0.1, -0.4 + 0.8 * i / 12)
+    # 2. 扉（5.5〜8.4秒）：鐘・ティンパニ・「しゃらん」・弦 → ワルツ
+    m.add(toll(note("A2")), 5.5, 0.36); m.add(timp(note("A1")), 5.5, 0.42); m.add(sleigh_crash(), 5.5, 0.3, 0.1)
+    m.add(strings(("A2", "E3", "A3", "C#4", "E4", "A4"), 1.7, att=0.02, rel=1.1, cutoff=3200), 5.5, 0.26)
+    for bar, (bass, ch) in enumerate((("A2", ("C#5", "E5", "A5")), ("D3", ("D5", "F#5", "A5")))):
+        t = 5.5 + bar * 3 * B
+        m.add(pluck(note(bass), 0.9, 0.5), t, 0.45)
+        for j in (1, 2):
+            for n in ch: m.add(celesta(note(n)), t + j * B, 0.06, (-0.3, 0.3)[j - 1])
+    for n, t in (("C#6", 5.5), ("E6", 6.6), ("F#6", 7.15), ("E6", 7.7), ("D6", 8.25)): cel(n, t, 0.24)
+    sleigh(5.5, 8.4, B / 2, 0.13, 0.17)
+    m.add(toll(note("E3")), 7.1, 0.12, -0.3)                                           # 遠くでもう一度
+    # 3. 雪の上（8.4〜10.6秒）：高まり → 箱が飛び出してきらきら
+    m.add(impact(), 8.4, 0.28)
+    m.add(strings(("E3", "G#3", "B3", "D4", "E4"), 0.78, att=0.6, rel=0.04), 8.4, 0.24)
+    sleigh(8.4, 9.15, B / 4, 0.07, 0.2)
+    for i, n in enumerate(("E5", "G#5", "B5", "D6", "E6", "G#6")): cel(n, 8.5 + i * 0.11, 0.15)
+    m.add(pop(520), 9.15, 0.4); m.add(sleigh_crash(), 9.15, 0.28, -0.1)
+    for n in ("A6", "C#7", "E7"): m.add(bell(note(n)), 9.16, 0.05)
+    m.add(strings(("A2", "E3", "A3", "C#4", "E4"), 1.45, att=0.03, rel=0.3), 9.15, 0.22)
+    for n, t in (("E6", 9.45), ("C#6", 9.725), ("B5", 10.0), ("A5", 10.275)): cel(n, t, 0.2)
+    sleigh(9.15, 10.55, B / 2, 0.13, 0.11)
+    # 暗転：ここまでの音を止め、低い鐘だけ残す
+    k0, k1 = int(10.56 * SR), int(10.6 * SR); g = np.ones(m.n); g[k0:k1] = np.linspace(1, 0, k1 - k0); g[k1:] = 0
+    m.L *= g; m.R *= g
+    m.add(impact(), 10.58, 0.4); m.add(toll(note("A2")), 10.58, 0.22)
+    # 4. 日付（11.0〜16.5秒）：A → D/A → A。弦と声、チェレスタ、鈴をひと振りずつ
+    for names, t0, d, a, r in ((("A2", "E3", "A3", "C#4", "E4"), 11.0, 2.4, 0.9, 0.6), (("A2", "D3", "F#3", "A3", "D4"), 13.2, 1.3, 0.4, 0.5), (("A2", "E3", "A3", "C#4", "E4"), 14.3, 2.2, 0.5, 1.6)):
+        m.add(strings(names, d, att=a, rel=r), t0, 0.2)
+        m.add(choir(names[2:], d, att=a + 0.3, rel=r), t0 + 0.05, 0.16)
+    for n, t, gg in (("E6", 11.05, 0.24), ("C#6", 11.6, 0.22), ("A5", 12.15, 0.22), ("B5", 12.7, 0.22), ("A5", 13.25, 0.2), ("C#6", 14.3, 0.2), ("A5", 14.32, 0.14)):
+        cel(n, t, gg)
+    for t, gg in ((11.0, 0.12), (12.1, 0.09), (13.2, 0.08), (14.3, 0.07), (15.4, 0.05)): shake(t, gg)
     master(m, "r6", fade_out=2.0)
 
 
