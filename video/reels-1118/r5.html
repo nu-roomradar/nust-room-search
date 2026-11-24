@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="UTF-8">
+<!-- リール5「クリスマスモード」（12.5秒）。季節の見た目の予告動画の作り方（暗い画面から少しずつ見せる・細く間をあけた字・切り替わる一瞬に光と音を集める）を参考にした。
+     特定の会社の映像・ロゴ・曲は使わない。アプリの画面は実物（駿河台校舎・12/1 火 3限。video/xmas-1124/capture.py で撮影）。
+     素材：assets/xmas_normal.png・assets/xmas_xmas.png（1170×2532。撮った画像の上から1画面ぶん） -->
+<link rel="stylesheet" href="common.css">
+<style>
+body{background:#000}
+.bg{background:#000}
+#glow{position:absolute;inset:0;opacity:0;background:
+  radial-gradient(620px 520px at 50% 52%,rgba(255,196,120,.30),transparent 70%),
+  radial-gradient(900px 700px at 12% 92%,rgba(220,40,60,.22),transparent 70%),
+  radial-gradient(900px 700px at 92% 10%,rgba(40,170,110,.20),transparent 70%)}
+.bokeh{position:absolute;border-radius:50%;filter:blur(30px);opacity:0}
+.slit{position:absolute;left:50%;top:960px;width:0;height:3px;margin-left:0;background:linear-gradient(90deg,transparent,#fff,transparent);box-shadow:0 0 30px 6px rgba(255,255,255,.55)}
+.stage{position:absolute;inset:0;perspective:1800px}
+#ph{left:260px;top:390px;transform-origin:50% 50%;opacity:0}
+#ph .scr img{transition:none}
+#ph .scr .x{opacity:0}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;mix-blend-mode:screen}
+.tap{position:absolute;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;border:5px solid rgba(255,255,255,.95);box-shadow:0 0 24px rgba(255,255,255,.8);opacity:0}
+.flake{position:absolute;left:0;top:0;border-radius:50%;background:#fff;opacity:0;will-change:transform}
+.thin{position:absolute;left:0;right:0;text-align:center;color:#fff;letter-spacing:.42em;font-weight:500}
+#t0{top:1560px;font-size:30px;color:rgba(255,255,255,.72);opacity:0}
+#t1{top:230px;font-size:38px;opacity:0;text-shadow:0 2px 16px rgba(0,0,0,.8)}
+#title{position:absolute;left:0;right:0;top:700px;text-align:center;opacity:0}
+#title .k{font-family:Syne;font-weight:700;font-size:34px;letter-spacing:.5em;color:rgba(255,236,200,.9);padding-left:.5em}
+#title .m{margin-top:26px;font-weight:900;font-size:120px;letter-spacing:.08em;line-height:1.1;color:#fff;text-shadow:0 0 40px rgba(255,210,150,.45)}
+#title .s{margin-top:34px;font-weight:700;font-size:40px;letter-spacing:.06em;color:#f3e6cf;line-height:1.6}
+#title .s small{display:block;font-size:30px;font-weight:500;color:rgba(255,255,255,.7)}
+#ask{position:absolute;left:0;right:0;top:760px;text-align:center;opacity:0}
+#ask .q{font-weight:900;font-size:92px;line-height:1.25;color:#fff}
+#ask .q b{color:#ffcf8a}
+#ask .r{margin-top:40px;font-weight:700;font-size:44px;line-height:1.6;color:#f3e6cf}
+.caution{position:absolute;left:0;right:0;top:1650px;text-align:center;font-weight:700;font-size:34px;line-height:1.55;color:#ffd9b0;opacity:0;text-shadow:0 2px 14px rgba(0,0,0,.8)}
+#end{background:radial-gradient(800px 700px at 50% 40%,rgba(30,40,70,.9),#03050c)}
+</style></head>
+<body>
+<div class="bg"></div>
+<div id="glow"></div>
+<div id="bokehs"></div>
+<div class="slit" id="slit"></div>
+<div class="stage">
+  <div class="phone" id="ph"><div class="scr"><div class="isl"></div>
+    <img class="n" src="assets/xmas_normal.png" alt=""><img class="x" src="assets/xmas_xmas.png" alt="">
+    <div class="tap" id="tap" style="left:397px;top:334px"></div>
+  </div></div>
+</div>
+<div id="snow"></div>
+<div class="flash" id="flash"></div>
+<div class="thin" id="t0">いつもの、空き教室検索。</div>
+<div class="thin" id="t1">12月だけの、見た目に。</div>
+<div id="title"><div class="k">ROOMRADAR</div><div class="m">クリスマス<br>モード</div>
+  <div class="s">検索画面が、12月の見た目に。<small>切り替えで、いつもの見た目に戻せます</small></div></div>
+<div id="ask"><div class="q">次の空きコマ、<br><b>もう決めた？</b></div><div class="r">空きコマが同じ友だちに、<br>送ってみて。</div></div>
+<div class="caution" id="cau">時間割にない授業もあります。<br>入る前に、ドア越しに確認を。</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="common.js"></script>
+<script>
+const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 12.5;
+const T_SWITCH = 3.55;
+// 雪と光の粒（毎回同じ位置になるよう、決まった数列で並べる）
+let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const flakes = [];
+for (let i = 0; i < 140; i++) {
+  const e = document.createElement('div'); e.className = 'flake';
+  const s = 3 + rnd() * 9; e.style.width = e.style.height = s + 'px';
+  document.getElementById('snow').appendChild(e);
+  flakes.push({ e, x: rnd() * 1080, y0: rnd() * 1920, v: 70 + rnd() * 120 + s * 8, sway: 10 + rnd() * 30, ph: rnd() * 6.28, o: .45 + rnd() * .5 });
+}
+const BCOL = ['rgba(255,80,90,.75)', 'rgba(255,200,110,.8)', 'rgba(60,200,130,.7)', 'rgba(255,240,210,.7)'];
+for (let i = 0; i < 16; i++) {
+  const e = document.createElement('div'); e.className = 'bokeh';
+  const s = 40 + rnd() * 80; Object.assign(e.style, { width: s + 'px', height: s + 'px', left: rnd() * 1080 - s / 2 + 'px', top: rnd() * 1920 - s / 2 + 'px', background: BCOL[i % 4] });
+  document.getElementById('bokehs').appendChild(e);
+}
+// 1コマごとに、雪の位置と明るさを時刻から決める
+window.BG3D = async t => {
+  const on = Math.max(0, Math.min(1, (t - T_SWITCH) / 0.5));
+  const fade = t > 11.9 ? Math.max(0, 1 - (t - 11.9) / 0.4) : 1;
+  for (const f of flakes) {
+    const y = (f.y0 + (t - T_SWITCH + 3) * f.v) % 2000 - 40;
+    const x = f.x + Math.sin(t * 0.9 + f.ph) * f.sway;
+    f.e.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+    f.e.style.opacity = (on * f.o * fade).toFixed(3);
+  }
+};
+
+// 1. 暗いところに、細い光の線（0〜1.3秒）
+tl.to('#slit', { width: 760, marginLeft: -380, duration: 0.9, ease: 'power2.out' }, 0.15)
+  .to('#slit', { opacity: 0, duration: 0.35 }, 1.05);
+// 2. いつもの画面が、暗い中から（1.2〜3.5秒）
+tl.fromTo('#ph', { opacity: 0, rotationY: 24, rotationX: 8, scale: 0.86, y: 60 }, { opacity: 1, rotationY: 10, rotationX: 4, scale: 0.92, y: 0, duration: 2.2, ease: 'power2.out' }, 1.15)
+  .to('#t0', { opacity: 1, duration: 0.5 }, 1.6)
+  .to('#t0', { opacity: 0, duration: 0.3 }, 3.15);
+// 3. 🎄 を押す → 光って、クリスマスの見た目に（3.3〜4.2秒）
+tl.fromTo('#tap', { opacity: 0, scale: 1.6 }, { opacity: 1, scale: 1, duration: 0.18, ease: 'power2.out' }, 3.28)
+  .to('#tap', { opacity: 0, scale: 0.7, duration: 0.25 }, 3.5)
+  .to('#ph .scr .x', { opacity: 1, duration: 0.08 }, T_SWITCH)
+  .fromTo('#flash', { opacity: 0 }, { opacity: 0.6, duration: 0.06 }, T_SWITCH)
+  .to('#flash', { opacity: 0, duration: 0.6, ease: 'power2.out' }, T_SWITCH + 0.06)
+  .to('#glow', { opacity: 1, duration: 0.8 }, T_SWITCH)
+  .to('.bokeh', { opacity: 0.45, duration: 1.0, stagger: 0.03 }, T_SWITCH + 0.05)
+  .to('#ph', { rotationY: 0, rotationX: 0, scale: 1.0, duration: 0.9, ease: 'power3.out' }, T_SWITCH);
+// 4. 寄って、帯（Merry Christmas）を見せる（4.2〜6.6秒）
+tl.to('#ph', { scale: 1.32, y: 330, duration: 2.6, ease: 'power1.inOut' }, 4.2)
+  .to('#t1', { opacity: 1, duration: 0.5 }, 4.5)
+  .to('#t1', { opacity: 0, duration: 0.3 }, 6.3);
+// 5. 題（6.6〜8.9秒）
+tl.to('#ph', { opacity: 0, scale: 1.5, duration: 0.45, ease: 'power2.in' }, 6.45)
+  .to('#title', { opacity: 1, duration: 0.5 }, 6.75)
+  .from('#title .m', { letterSpacing: '0.4em', duration: 1.6, ease: 'power3.out' }, 6.75)
+  .to('#title', { opacity: 0, duration: 0.35 }, 8.65);
+// 6. 問いかけ（9.0〜10.6秒）
+tl.to('#ask', { opacity: 1, duration: 0.4 }, 8.95)
+  .from('#ask .q', { y: 40, duration: 0.5, ease: 'power3.out' }, 8.95)
+  .from('#ask .r', { opacity: 0, duration: 0.4 }, 9.5)
+  .to('#ask', { opacity: 0, duration: 0.3 }, 10.4)
+  .to('#cau', { opacity: 1, duration: 0.4 }, 6.8)
+  .to('#cau', { opacity: 0, duration: 0.3 }, 10.4);
+// 7. 終わりの札（10.6〜12.5秒）
+addEnd(tl, 10.6, '今日から、<span class="o">クリスマスモード。</span>');
+tl.to({}, { duration: 0.01 }, window.DURATION);
+</script>
+</body></html>

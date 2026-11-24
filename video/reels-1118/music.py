@@ -302,5 +302,44 @@ def r4():
     master(m, "r4", fade_out=1.6)
 
 
+def drone(f, dur, swell=True):              # 低くうなる音（予告動画の暗い出だし）。だんだん大きくなる
+    t = np.arange(int(dur * SR)) / SR
+    s = np.sin(2 * np.pi * f * t) + 0.5 * np.sin(2 * np.pi * f * 2.003 * t) + 0.25 * np.sin(2 * np.pi * f * 3.01 * t)
+    g = (t / dur) ** 1.6 if swell else np.ones_like(t)
+    return s * g * np.minimum((dur - t) / 0.05, 1).clip(0, 1)
+
+
+def impact():                              # 切り替わる一瞬の「どん」（低い音＋きらっとした高い音）
+    t = np.arange(int(2.2 * SR)) / SR
+    low = np.sin(2 * np.pi * np.cumsum(38 + 70 * np.exp(-t / 0.08)) / SR) * np.exp(-t / 0.7)
+    air = onepole(noise(2.2), 0.08) * np.exp(-t / 0.35) * 0.35
+    return low + air
+
+
+def r5():
+    """クリスマスモード（12.5秒）。暗いうなり → 切り替えの「どん」→ 鈴のような分散と和音（C の明るい進行）→ 終わりの和音"""
+    m = Mix(12.5)
+    m.add(drone(note("C2"), 3.55), 0.0, 0.55)                                   # 出だしの低いうなり
+    m.add(whoosh(1.2), 2.35, 0.35)                                               # 切り替えの前の吸い込み
+    for t in (1.2, 1.9, 2.5, 3.0, 3.3): m.add(tick(1500), t, 0.12, 0.2)          # 時計のような小さな音
+    m.add(impact(), 3.55, 0.9)
+    m.add(bell(note("E6")), 3.56, 0.32, 0.2); m.add(bell(note("G6")), 3.62, 0.22, -0.2); m.add(bell(note("C7")), 3.7, 0.16)
+    CH = [("C", ["C3", "G3", "E4", "G4", "C5"]), ("Am", ["A2", "E3", "C4", "E4", "A4"]), ("F", ["F2", "C3", "A3", "C4", "F4"]), ("G", ["G2", "D3", "B3", "D4", "G4"])]
+    t = 3.6; k = 0
+    while t < 10.5:
+        name, ch = CH[k % 4]; fs = [note(n) for n in ch]
+        m.add(pad(fs[1:4], 1.9), t, 0.22)
+        m.add(soft(fs[0] / 2 * 2, 2.6, 1.4), t, 0.30)
+        for j in range(8):                                                      # 鈴のような細かい分散（0.22秒おき）
+            f = fs[1 + (j % 4)] * 4
+            m.add(bell(f), t + j * 0.22, 0.05 + 0.02 * (j % 2), (-0.35, 0.35)[j % 2])
+        t += 1.75; k += 1
+    m.add(impact(), 6.75, 0.35)                                                  # 題が出るところで、軽く
+    for f, d in (("C4", 0), ("E4", 0.05), ("G4", 0.1), ("C5", 0.15), ("E5", 0.2)):
+        m.add(soft(note(f), 2.6, 1.6), 10.6 + d, 0.22)                          # 終わりの和音
+    m.add(bell(note("C7")), 10.65, 0.14)
+    master(m, "r5", fade_out=1.4)
+
+
 if __name__ == "__main__":
-    {"r1": r1, "r2": r2, "r3": r3, "r2d": r2d, "r4": r4}[sys.argv[1]]()
+    {"r1": r1, "r2": r2, "r3": r3, "r2d": r2d, "r4": r4, "r5": r5}[sys.argv[1]]()
