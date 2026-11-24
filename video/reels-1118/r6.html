@@ -6,7 +6,8 @@
      2026-11-24 運営「スマホ画面の作り込み・ドアのシーンの余白のバランス・最後の画面は文字を減らして日本語の書体に」→
        机のスマホの画面は、3D の画面の四隅（teaser.py night corners → screen.json）に合わせて、8倍で撮ったアプリの実画面（capture.py hd）を
        くっきり重ねる。電球のまたたき・星の光・ガラスの映り込み・画面上の丸い切り欠きを足す。扉は真ん中に描き直した（teaser.py door final）。
-       最後の札は「12.1」「クリスマスモード、はじまる。」とロゴ・必須の表記だけ。書体は明朝（Noto Serif CJK JP）。 -->
+       最後の札は「12.1」「クリスマスモード、はじまる。」とロゴ・必須の表記だけ。書体は明朝（Noto Serif CJK JP）。
+     同日 運営「最後の余韻が短い」→ 13.5 → 16.5 秒。札が出そろってから約3秒、ゆっくり寄りながら細かい雪を降らせ、最後は黒へ溶かす（くり返し再生でも頭の暗闇へつながる）。 -->
 <link rel="stylesheet" href="common.css">
 <style>
 @font-face{font-family:'Min';font-weight:500;src:url(fonts/NotoSerifCJKjp-Medium.otf)}
@@ -38,6 +39,7 @@ body{background:#000}
 <div class="flash" id="flash"></div>
 <div class="black" id="blk"></div>
 <div id="cs">
+  <canvas id="csfx" width="1080" height="1920" style="position:absolute;inset:0"></canvas>
   <div class="d">12.1</div>
   <div class="rule"></div>
   <div class="m">クリスマスモード、はじまる。</div>
@@ -49,7 +51,7 @@ body{background:#000}
 <script src="common.js"></script>
 <script>
 document.querySelector('#cs .n').textContent = NOTE;
-const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 13.5;
+const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 16.5;
 const FPS = 30, A1 = 5.5, B1 = 8.4, C1 = 10.6;          // 夜の教室 → 扉 → 雪とプレゼント → 暗転
 const NF = 165, GF = 66;
 const pad = f => String(f).padStart(4, '0');
@@ -125,6 +127,18 @@ function placeScreen(f) {
   scrEl.style.transform = quadMatrix([g(q[0]), g(q[1]), g(q[3]), g(q[2])]);
   return q[4];
 }
+// 最後の札に、ゆっくり降る細かい雪（余韻）。毎回同じ位置になるよう、決まった数列で並べる
+const fx = document.getElementById('csfx').getContext('2d');
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const FLK = Array.from({ length: 48 }, () => ({ x: rnd() * 1080, y: rnd() * 1920, r: 1.6 + rnd() * 3.2, v: 38 + rnd() * 52, sw: 8 + rnd() * 22, ph: rnd() * 6.28, o: 0.22 + rnd() * 0.38 }));
+function drawEndSnow(t) {
+  fx.clearRect(0, 0, 1080, 1920);
+  const a = Math.min(1, Math.max(0, (t - C1 - 0.8) / 1.2)), dt = t - C1;
+  for (const f of FLK) {
+    const y = (f.y + dt * f.v) % 1960 - 20, x = f.x + Math.sin(t * 0.8 + f.ph) * f.sw;
+    fx.fillStyle = `rgba(255,246,232,${(f.o * a).toFixed(3)})`; fx.beginPath(); fx.arc(x, y, f.r, 0, Math.PI * 2); fx.fill();
+  }
+}
 // 暗闇の中に、星の光だけが見える穴。だんだん開く（0〜3秒）
 function drawIris(t, cx, cy) {
   iris.clearRect(0, 0, 1080, 1920);
@@ -149,6 +163,7 @@ window.BG3D = async t => {
     if (!sg.src.endsWith(src)) { sg.src = src; await sg.decode(); }
   }
   drawIris(t, star[0], star[1]);
+  if (t > C1) drawEndSnow(t);
   // 扉の場面：電球が少しまたたく。前後の暗い場面になじむよう少し暗く
   if (t > A1 && t < B1) document.getElementById('sd').style.filter = `brightness(${(0.9 * (1 + 0.05 * Math.sin(t * 23) * Math.sin(t * 7))).toFixed(3)}) contrast(1.05)`;
 };
@@ -176,7 +191,9 @@ tl.set('#blk', { opacity: 1 }, C1)
   .from('#cs .rule', { scaleX: 0, duration: 0.7, ease: 'power2.out' }, C1 + 0.9)
   .from('#cs .m', { opacity: 0, letterSpacing: '.3em', duration: 1.0, ease: 'power3.out' }, C1 + 0.95)
   .from('#cs .logo', { opacity: 0, y: 14, duration: 0.6 }, C1 + 1.3)
-  .from('#cs .n', { opacity: 0, duration: 0.5 }, C1 + 1.4);
+  .from('#cs .n', { opacity: 0, duration: 0.5 }, C1 + 1.4)
+  .fromTo('#cs', { scale: 1 }, { scale: 1.04, duration: window.DURATION - C1 - 0.35, ease: 'none' }, C1 + 0.35)   // 余韻：ゆっくり寄る
+  .to('#cs', { opacity: 0, duration: 1.1, ease: 'power1.in' }, window.DURATION - 1.2);                               // 最後は黒へ
 tl.to({}, { duration: 0.01 }, window.DURATION);
 </script>
 </body></html>
