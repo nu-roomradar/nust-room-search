@@ -25,17 +25,14 @@ body{{background:radial-gradient(900px 600px at 70% 40%,#1a2742,#0b1222 70%);fon
 img.ad{{position:absolute;display:block;box-shadow:0 18px 50px rgba(0,0,0,.55)}}
 """
 if kind == "a":
+    # 2026-11-24 運営「表示がちょっと小さくて見づらい」→ LINE のカード（幅 500px ほど）でも読めるよう、字を大きく・数を減らす
     body = f"""<img class="ad" src="{door}" style="left:0;top:0;width:504px;height:630px;box-shadow:none">
 <div style="position:absolute;left:504px;top:0;width:60px;height:630px;background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(0,0,0,0))"></div>
-<div style="position:absolute;left:584px;right:64px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center">
-  <div style="font-weight:700;font-size:24px;letter-spacing:.18em;color:#ffd9b0">はじめての人へ</div>
-  <div style="margin-top:14px;font-weight:900;font-size:64px;line-height:1.25">2分でわかる<br><span style="font-family:Syne;font-weight:800;font-size:50px;letter-spacing:.01em">RoomRadar</span></div>
-  <div style="margin-top:22px;font-weight:700;font-size:25px;line-height:1.6;color:#cfd9ee">日大理工の空き教室を、<br>時間割から探せるサービスです。</div>
-  <div style="margin-top:26px;display:flex;gap:12px;flex-wrap:wrap">
-    <span style="padding:8px 16px;border-radius:99px;border:2px solid rgba(160,190,255,.45);font-weight:700;font-size:19px">何ができる？</span>
-    <span style="padding:8px 16px;border-radius:99px;border:2px solid rgba(160,190,255,.45);font-weight:700;font-size:19px">どこまで信じてよい？</span>
-    <span style="padding:8px 16px;border-radius:99px;border:2px solid rgba(160,190,255,.45);font-weight:700;font-size:19px">だれがやっている？</span>
-  </div>
+<div style="position:absolute;left:566px;right:40px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center">
+  <div style="font-weight:900;font-size:34px;letter-spacing:.14em;color:#ffd9b0">はじめての人へ</div>
+  <div style="margin-top:10px;font-weight:900;font-size:92px;line-height:1.12;letter-spacing:-.01em">2分でわかる</div>
+  <div style="margin-top:6px;font-family:Syne;font-weight:800;font-size:60px;line-height:1.1">RoomRadar</div>
+  <div style="margin-top:26px;font-weight:900;font-size:34px;line-height:1.45;color:#dfe7f6">日大理工の空き教室を、<br>時間割から探せる。</div>
 </div>"""
 elif kind == "b":
     body = f"""<img class="ad" src="{hero}" style="left:-150px;top:70px;width:392px;height:490px;opacity:.55;filter:saturate(.8)">
