@@ -1,10 +1,11 @@
 """リール3本の音（numpy で合成。既存の曲は使わない）。場面の時刻は各 HTML のタイムラインと同じ。
-  python3 music.py r1   → r1.wav（-14 LUFS にそろえる）
+  python3 music.py r1   → r1.wav（TARGET_LUFS＝-17 LUFS にそろえる。2026-11-24 までは -14）
 音程は倍音の足し算で作るので、ずれない（Karplus-Strong は使わない。make-video の手順書 6）。"""
 import re, subprocess, sys, wave
 import numpy as np
 
 SR = 44100
+TARGET_LUFS = -17.0                     # 音の大きさのめあて。2026-11-24 運営「若干音が大きい」で -14 → -17（3dB 小さく）
 rng = np.random.default_rng(7)          # 毎回同じ音になるよう、雑音の種を固定
 
 
@@ -137,12 +138,12 @@ def master(m, name, fade_out):
         a = np.abs(x); over = a > 0.78
         y = x.copy(); y[over] = np.sign(x[over]) * (0.78 + 0.1 * np.tanh((a[over] - 0.78) / 0.1))
         return y
-    first = lufs_of(raw); gain = 10 ** ((-14.0 - first) / 20)
+    first = lufs_of(raw); gain = 10 ** ((TARGET_LUFS - first) / 20)
     for _ in range(4):                    # はんこなどの大きな音を抑えると全体が下がるので、測り直して合わせる
         out_st = limit(st * gain); write(f"{name}.wav", out_st)
         got = lufs_of(f"{name}.wav")
-        if abs(got + 14.0) < 0.3: break
-        gain *= 10 ** ((-14.0 - got) / 20)
+        if abs(got - TARGET_LUFS) < 0.3: break
+        gain *= 10 ** ((TARGET_LUFS - got) / 20)
     print(f"{name}.wav  元 {first:.1f} LUFS → {got:.1f} LUFS（倍率 {gain:.2f}）")
 
 
