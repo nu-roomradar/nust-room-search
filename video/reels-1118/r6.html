@@ -2,40 +2,46 @@
 <html lang="ja"><head><meta charset="UTF-8">
 <!-- リール6「クリスマスモード カミングスーン」（13.5秒）。季節の見た目の予告動画の作り方（暗闇に光る形 → 引くと画面の中だったと分かる →
      雷のような音で場面が変わる → 地面から何かが飛び出して暗転 → 日付）を参考に、クリスマスと RoomRadar に置きかえた。特定の会社の映像・ロゴ・曲は使わない。
-     3D は video/xmas-1124/teaser.py（night・door・gift）。assets/xm_* はその renders/ への近道（リンク）。字は最後の札だけ。 -->
+     3D は video/xmas-1124/teaser.py（night・door・gift）。assets/xm_* はその renders/ への近道（リンク）。字は最後の札だけ。
+     2026-11-24 運営「スマホ画面の作り込み・ドアのシーンの余白のバランス・最後の画面は文字を減らして日本語の書体に」→
+       机のスマホの画面は、3D の画面の四隅（teaser.py night corners → screen.json）に合わせて、8倍で撮ったアプリの実画面（capture.py hd）を
+       くっきり重ねる。電球のまたたき・星の光・ガラスの映り込み・画面上の丸い切り欠きを足す。扉は真ん中に描き直した（teaser.py door final）。
+       最後の札は「12.1」「クリスマスモード、はじまる。」とロゴ・必須の表記だけ。書体は明朝（Noto Serif CJK JP）。 -->
 <link rel="stylesheet" href="common.css">
 <style>
+@font-face{font-family:'Min';font-weight:500;src:url(fonts/NotoSerifCJKjp-Medium.otf)}
+@font-face{font-family:'Min';font-weight:600;src:url(fonts/NotoSerifCJKjp-SemiBold.otf)}
+@font-face{font-family:'Min';font-weight:700;src:url(fonts/NotoSerifCJKjp-Bold.otf)}
 body{background:#000}
 .bg{background:#000}
 .shot{position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover;opacity:0;will-change:transform,opacity,filter}
+#scr{position:absolute;left:0;top:0;transform-origin:0 0;opacity:0}
 #iris{position:absolute;inset:0;pointer-events:none}
-.vig{position:absolute;inset:0;opacity:0;pointer-events:none;background:radial-gradient(900px 1300px at 46% 44%,rgba(0,0,0,0) 40%,rgba(0,0,0,.62) 100%)}
+.vig{position:absolute;inset:0;opacity:0;pointer-events:none;background:radial-gradient(1000px 1500px at 50% 46%,rgba(0,0,0,0) 46%,rgba(0,0,0,.55) 100%)}
 .flash{position:absolute;inset:0;background:#fff;opacity:0}
 .black{position:absolute;inset:0;background:#000;opacity:0}
-#cs{position:absolute;inset:0;opacity:0;background:radial-gradient(760px 640px at 50% 44%,rgba(40,24,30,.9),#000 75%)}
-#cs .k{position:absolute;left:0;right:0;top:640px;text-align:center;font-family:Syne;font-weight:700;font-size:40px;letter-spacing:.62em;padding-left:.62em;color:rgba(255,236,210,.92)}
-#cs .d{position:absolute;left:0;right:0;top:740px;text-align:center;font-family:Syne;font-weight:800;font-size:230px;line-height:1;letter-spacing:.02em;color:#fff;text-shadow:0 0 50px rgba(255,190,120,.45)}
-#cs .m{position:absolute;left:0;right:0;top:1030px;text-align:center;font-weight:900;font-size:60px;letter-spacing:.14em;color:#fff}
-#cs .m b{color:#ffcf8a}
-#cs .logo{position:absolute;left:50%;top:1190px;width:300px;margin-left:-150px;opacity:.95}
-#cs .n{position:absolute;left:110px;right:110px;top:1440px;text-align:center;font-weight:500;font-size:30px;line-height:1.6;color:rgba(220,228,244,.82)}
-#cs .door{position:absolute;left:0;right:0;top:1360px;text-align:center;font-weight:700;font-size:32px;color:#ffd9b0}
+#cs{position:absolute;inset:0;opacity:0;background:radial-gradient(820px 700px at 50% 42%,rgba(46,26,30,.85),#000 78%)}
+#cs .d{position:absolute;left:0;right:0;top:560px;text-align:center;font-family:'Min';font-weight:700;font-size:250px;line-height:1;letter-spacing:.04em;padding-left:.04em;color:#fff6ea;text-shadow:0 0 60px rgba(255,190,120,.42)}
+#cs .rule{position:absolute;left:50%;top:890px;width:120px;height:2px;margin-left:-60px;background:linear-gradient(90deg,transparent,#e9c27c,transparent)}
+#cs .m{position:absolute;left:0;right:0;top:940px;text-align:center;font-family:'Min';font-weight:600;font-size:56px;letter-spacing:.12em;padding-left:.12em;color:#f4e6d2}
+#cs .logo{position:absolute;left:50%;top:1100px;width:190px;margin-left:-95px;opacity:.92}
+#cs .n{position:absolute;left:130px;right:130px;top:1330px;text-align:center;font-weight:400;font-size:27px;line-height:1.75;color:rgba(214,222,238,.66)}
 </style></head>
 <body>
 <div class="bg"></div>
 <img class="shot" id="sn" src="assets/xm_night/f0000.png" alt="">
-<img class="shot" id="sd" src="assets/xm_door/f0000.png" alt="" style="transform-origin:42% 40%">
+<canvas id="scr" width="3120" height="6620"></canvas>
+<img class="shot" id="sd" src="assets/xm_door/f0000.png" alt="" style="transform-origin:50% 47%">
 <img class="shot" id="sg" src="assets/xm_gift/f0000.png" alt="">
 <canvas id="iris" width="1080" height="1920"></canvas>
 <div class="vig" id="vig"></div>
 <div class="flash" id="flash"></div>
 <div class="black" id="blk"></div>
 <div id="cs">
-  <div class="k">COMING SOON</div>
   <div class="d">12.1</div>
-  <div class="m">RoomRadar <b>クリスマスモード</b></div>
+  <div class="rule"></div>
+  <div class="m">クリスマスモード、はじまる。</div>
   <img class="logo" src="assets/logo.png" alt="">
-  <div class="door">使う前に、ドア越しに確認を。</div>
   <div class="n"></div>
 </div>
 
@@ -44,44 +50,116 @@ body{background:#000}
 <script>
 document.querySelector('#cs .n').textContent = NOTE;
 const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 13.5;
-const FPS = 30, A0 = 0, A1 = 5.5, B1 = 8.4, C1 = 10.6;          // 夜の教室 → 扉 → 雪とプレゼント → 暗転
+const FPS = 30, A1 = 5.5, B1 = 8.4, C1 = 10.6;          // 夜の教室 → 扉 → 雪とプレゼント → 暗転
 const NF = 165, GF = 66;
 const pad = f => String(f).padStart(4, '0');
 const sn = document.getElementById('sn'), sg = document.getElementById('sg');
 const iris = document.getElementById('iris').getContext('2d');
+
+// ── 机のスマホの画面（くっきり重ねる） ──
+const SW = 3120, SH = 6620, RAD = 362;                    // 画面の大きさ（3D の画面と同じ縦横比）と角の丸み
+const scrEl = document.getElementById('scr'), sx = scrEl.getContext('2d');
+const app = new Image(); app.src = 'assets/xm_screen_hd.png';
+let QUAD = null;                                          // 各コマの [左上, 右上, 右下, 左下, 星]（1080×1920 の絵の上の位置）
+window.READY = false;
+Promise.all([fetch('assets/xm_night/screen.json').then(r => r.json()).then(j => { QUAD = j; }), app.decode()]).then(() => { window.READY = true; });
+// 画面の上の電球（撮った画面で測った位置。赤・黄・緑・青のくり返し）
+const BULB = [[0.0513, 0.0236, '255,90,100'], [0.1538, 0.0284, '255,205,80'], [0.2564, 0.0245, '80,220,130'], [0.3590, 0.0284, '90,150,255'],
+              [0.4615, 0.0236, '255,90,100'], [0.5641, 0.0284, '255,205,80'], [0.6667, 0.0245, '80,220,130'], [0.7692, 0.0284, '90,150,255'],
+              [0.8718, 0.0236, '255,90,100'], [0.9744, 0.0284, '255,205,80']];
+const STAR = [0.897, 0.092];
+function drawScreen(t) {
+  sx.clearRect(0, 0, SW, SH);
+  sx.save(); sx.beginPath(); sx.roundRect(0, 0, SW, SH, RAD); sx.clip();
+  sx.drawImage(app, 0, 0, SW, SH);
+  sx.globalCompositeOperation = 'lighter';
+  // 電球が1つずつ、ゆっくりまたたく
+  BULB.forEach(([u, v, c], k) => {
+    const a = 0.25 + 0.75 * Math.pow(0.5 + 0.5 * Math.sin(t * 2.6 + k * 1.9), 2);
+    const x = u * SW, y = v * SH, g = sx.createRadialGradient(x, y, 0, x, y, 120);
+    g.addColorStop(0, `rgba(${c},${(0.85 * a).toFixed(3)})`); g.addColorStop(0.35, `rgba(${c},${(0.28 * a).toFixed(3)})`); g.addColorStop(1, `rgba(${c},0)`);
+    sx.fillStyle = g; sx.fillRect(x - 120, y - 120, 240, 240);
+  });
+  // ロゴの横の星が光る（はじめは強く、引くにつれて落ち着く）
+  const sxp = STAR[0] * SW, syp = STAR[1] * SH, pw = (t < 3 ? 1 : Math.max(0.35, 1 - (t - 3) / 2.5)) * (0.85 + 0.15 * Math.sin(t * 5.3));
+  let g = sx.createRadialGradient(sxp, syp, 0, sxp, syp, 420);
+  g.addColorStop(0, `rgba(255,236,170,${(0.75 * pw).toFixed(3)})`); g.addColorStop(0.25, `rgba(255,200,110,${(0.30 * pw).toFixed(3)})`); g.addColorStop(1, 'rgba(255,190,90,0)');
+  sx.fillStyle = g; sx.fillRect(sxp - 420, syp - 420, 840, 840);
+  // 星の光の筋（細い十字）
+  sx.save(); sx.translate(sxp, syp); sx.rotate(0.12 + t * 0.05);
+  for (const [w, h] of [[900, 10], [10, 620]]) {
+    const lg = w > h ? sx.createLinearGradient(-w / 2, 0, w / 2, 0) : sx.createLinearGradient(0, -h / 2, 0, h / 2);
+    lg.addColorStop(0, 'rgba(255,240,200,0)'); lg.addColorStop(0.5, `rgba(255,244,214,${(0.55 * pw).toFixed(3)})`); lg.addColorStop(1, 'rgba(255,240,200,0)');
+    sx.fillStyle = lg; sx.fillRect(-w / 2, -h / 2, w, h);
+  }
+  sx.restore();
+  sx.globalCompositeOperation = 'source-over';
+  // ガラスの映り込み（斜めの淡い光の帯。カメラが引くのに合わせて少し動く）
+  const off = -0.25 + t * 0.12, lg = sx.createLinearGradient(SW * (off), 0, SW * (off + 0.9), SH * 0.55);
+  lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(0.45, 'rgba(255,255,255,0)'); lg.addColorStop(0.5, 'rgba(255,255,255,0.07)');
+  lg.addColorStop(0.62, 'rgba(255,255,255,0.025)'); lg.addColorStop(1, 'rgba(255,255,255,0)');
+  sx.fillStyle = lg; sx.fillRect(0, 0, SW, SH);
+  // 画面の上の丸い切り欠き（カメラの入った黒い横長の島）
+  const iw = SW * 0.30, ih = SH * 0.042, ix = (SW - iw) / 2, iy = SH * 0.013;
+  sx.fillStyle = '#000'; sx.beginPath(); sx.roundRect(ix, iy, iw, ih, ih / 2); sx.fill();
+  const lx = ix + iw - ih * 0.62, ly = iy + ih / 2, lr = ih * 0.2;
+  let cg = sx.createRadialGradient(lx - lr * 0.3, ly - lr * 0.3, 0, lx, ly, lr);
+  cg.addColorStop(0, 'rgba(70,90,150,.9)'); cg.addColorStop(0.5, 'rgba(20,26,48,1)'); cg.addColorStop(1, 'rgba(8,10,16,1)');
+  sx.fillStyle = cg; sx.beginPath(); sx.arc(lx, ly, lr, 0, Math.PI * 2); sx.fill();
+  // 縁の内側をほんの少し暗く（ガラスの厚み）
+  sx.strokeStyle = 'rgba(0,0,0,.35)'; sx.lineWidth = 18; sx.beginPath(); sx.roundRect(9, 9, SW - 18, SH - 18, RAD - 9); sx.stroke();
+  sx.restore();
+}
+// 長方形 → 四隅（射影）の matrix3d
+function adj(m) { return [m[4]*m[8]-m[5]*m[7], m[2]*m[7]-m[1]*m[8], m[1]*m[5]-m[2]*m[4], m[5]*m[6]-m[3]*m[8], m[0]*m[8]-m[2]*m[6], m[2]*m[3]-m[0]*m[5], m[3]*m[7]-m[4]*m[6], m[1]*m[6]-m[0]*m[7], m[0]*m[4]-m[1]*m[3]]; }
+function mm(a, b) { const c = []; for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { let s = 0; for (let k = 0; k < 3; k++) s += a[3*i+k] * b[3*k+j]; c.push(s); } return c; }
+function mv(m, v) { return [m[0]*v[0]+m[1]*v[1]+m[2]*v[2], m[3]*v[0]+m[4]*v[1]+m[5]*v[2], m[6]*v[0]+m[7]*v[1]+m[8]*v[2]]; }
+function basis(p) { const m = [p[0][0], p[1][0], p[2][0], p[0][1], p[1][1], p[2][1], 1, 1, 1]; const v = mv(adj(m), [p[3][0], p[3][1], 1]); return mm(m, [v[0], 0, 0, 0, v[1], 0, 0, 0, v[2]]); }
+function quadMatrix(dst) {          // dst = [左上, 右上, 左下, 右下]
+  const s = basis([[0, 0], [SW, 0], [0, SH], [SW, SH]]), d = basis(dst), h = mm(d, adj(s)).map(x => x / mm(d, adj(s))[8]);
+  return `matrix3d(${h[0]},${h[3]},0,${h[6]},${h[1]},${h[4]},0,${h[7]},0,0,1,0,${h[2]},${h[5]},0,${h[8]})`;
+}
+function placeScreen(f) {
+  const q = QUAD[f], c = [(q[0][0] + q[2][0]) / 2, (q[0][1] + q[2][1]) / 2];
+  const g = p => [c[0] + (p[0] - c[0]) * 1.004, c[1] + (p[1] - c[1]) * 1.004];   // ほんの少し大きく（下の 3D の画面の縁を隠す）
+  scrEl.style.transform = quadMatrix([g(q[0]), g(q[1]), g(q[3]), g(q[2])]);
+  return q[4];
+}
 // 暗闇の中に、星の光だけが見える穴。だんだん開く（0〜3秒）
-function drawIris(t) {
+function drawIris(t, cx, cy) {
   iris.clearRect(0, 0, 1080, 1920);
   const open = Math.min(1, Math.max(0, (t - 0.6) / 2.6));
   if (open >= 1 || t > A1) return;
   const r0 = 120 + 1500 * open * open, soft = 220 + 500 * open;
-  const g = iris.createRadialGradient(540, 860, Math.max(1, r0 - soft), 540, 860, r0 + soft);
+  const g = iris.createRadialGradient(cx, cy, Math.max(1, r0 - soft), cx, cy, r0 + soft);
   g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,1)');
   iris.fillStyle = g; iris.fillRect(0, 0, 1080, 1920);
 }
 window.BG3D = async t => {
+  let star = [540, 960];
   if (t < A1 + 0.05) {
     const f = Math.min(NF, Math.max(0, Math.round(t * FPS)));
     const src = `assets/xm_night/f${pad(f)}.png`;
     if (!sn.src.endsWith(src)) { sn.src = src; await sn.decode(); }
+    drawScreen(t); star = placeScreen(f);
   }
   if (t >= B1 - 0.05 && t <= C1 + 0.05) {
     const f = Math.min(GF, Math.max(0, Math.round((t - B1) * FPS)));
     const src = `assets/xm_gift/f${pad(f)}.png`;
     if (!sg.src.endsWith(src)) { sg.src = src; await sg.decode(); }
   }
-  drawIris(t);
-  // 扉の場面：電球が少しまたたく
-  if (t > A1 && t < B1) document.getElementById('sd').style.filter = `brightness(${(0.84 * (1 + 0.06 * Math.sin(t * 23) * Math.sin(t * 7))).toFixed(3)}) contrast(1.06)`;   // 前後の暗い場面になじむよう少し暗く
+  drawIris(t, star[0], star[1]);
+  // 扉の場面：電球が少しまたたく。前後の暗い場面になじむよう少し暗く
+  if (t > A1 && t < B1) document.getElementById('sd').style.filter = `brightness(${(0.9 * (1 + 0.05 * Math.sin(t * 23) * Math.sin(t * 7))).toFixed(3)}) contrast(1.05)`;
 };
 // 1. 夜の教室（0〜5.5秒）
-tl.set('#sn', { opacity: 1 }, 0).set('#sn', { opacity: 0 }, A1);
+tl.set(['#sn', '#scr'], { opacity: 1 }, 0).set(['#sn', '#scr'], { opacity: 0 }, A1);
 // 2. 雷のような光で、扉へ（5.5〜8.4秒）
 tl.set('#sd', { opacity: 1 }, A1).set('#vig', { opacity: 1 }, A1).set('#vig', { opacity: 0 }, B1)
   .fromTo('#flash', { opacity: 0 }, { opacity: 0.9, duration: 0.05 }, A1 - 0.02)
   .to('#flash', { opacity: 0, duration: 0.5, ease: 'power2.out' }, A1 + 0.05)
-  .fromTo('#sd', { scale: 1.0 }, { scale: 1.1, duration: B1 - A1, ease: 'none' }, A1)
-  .fromTo('#flash', { opacity: 0 }, { opacity: 0.35, duration: 0.04 }, 7.1)                 // 遠くでもう一度光る
+  .fromTo('#sd', { scale: 1.0 }, { scale: 1.06, duration: B1 - A1, ease: 'none' }, A1)
+  .fromTo('#flash', { opacity: 0 }, { opacity: 0.3, duration: 0.04 }, 7.1)                 // 遠くでもう一度光る
   .to('#flash', { opacity: 0, duration: 0.3 }, 7.14)
   .set('#sd', { opacity: 0 }, B1);
 // 3. 雪の上（8.4〜10.6秒）
@@ -94,10 +172,11 @@ tl.set('#sg', { opacity: 1 }, B1)
 // 4. 暗転 → 日付（10.6〜13.5秒）
 tl.set('#blk', { opacity: 1 }, C1)
   .to('#cs', { opacity: 1, duration: 0.6 }, C1 + 0.35)
-  .from('#cs .k', { letterSpacing: '1.1em', opacity: 0, duration: 1.2, ease: 'power3.out' }, C1 + 0.35)
-  .from('#cs .d', { scale: 0.92, opacity: 0, duration: 0.9, ease: 'power3.out' }, C1 + 0.6)
-  .from(['#cs .m', '#cs .logo'], { opacity: 0, y: 20, duration: 0.6 }, C1 + 1.0)
-  .from(['#cs .door', '#cs .n'], { opacity: 0, duration: 0.5 }, C1 + 1.2);
+  .from('#cs .d', { scale: 0.94, opacity: 0, filter: 'blur(14px)', duration: 1.1, ease: 'power3.out' }, C1 + 0.35)
+  .from('#cs .rule', { scaleX: 0, duration: 0.7, ease: 'power2.out' }, C1 + 0.9)
+  .from('#cs .m', { opacity: 0, letterSpacing: '.3em', duration: 1.0, ease: 'power3.out' }, C1 + 0.95)
+  .from('#cs .logo', { opacity: 0, y: 14, duration: 0.6 }, C1 + 1.3)
+  .from('#cs .n', { opacity: 0, duration: 0.5 }, C1 + 1.4);
 tl.to({}, { duration: 0.01 }, window.DURATION);
 </script>
 </body></html>

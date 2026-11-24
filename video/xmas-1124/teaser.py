@@ -1,7 +1,8 @@
 """クリスマスモードの「カミングスーン」予告（リール⑥）の 3D（Blender 4.5 / Cycles）。
 参考にしたのは、季節の見た目の予告動画の作り方（暗闇に光る形 → 引くと画面の中だったと分かる → 雷のような音で場面が変わる →
 最後に地面から何かが飛び出して暗転）。特定の会社の映像・ロゴ・曲は使わない。中身はクリスマスと RoomRadar に置きかえる。
-  <blendervenv>/bin/python teaser.py night <preview|anim>   夜の教室。机のスマホ（クリスマスの見た目の画面）に寄ったところから引く（0〜5.5秒）
+  <blendervenv>/bin/python teaser.py night <preview|anim|corners>   夜の教室。机のスマホ（クリスマスの見た目の画面）に寄ったところから引く（0〜5.5秒）
+      corners：画面の四隅と星が各コマで絵のどこに写るかを renders/night/screen.json に書く（HTML で画面をくっきり重ねる）
   <blendervenv>/bin/python teaser.py door  <preview|final>  夜の廊下。リースとサンタの帽子をつけた教室の扉（1枚。動きは HTML）
   <blendervenv>/bin/python teaser.py gift  <preview|anim>   雪の上。光る飾り玉の手前で、雪の中からプレゼントの箱が飛び出す（2秒）
 ヘルパーは ../ad-1119/scene2.py の前半をそのまま使う（同じ質感にそろえるため）。"""
@@ -170,9 +171,10 @@ elif MODE == "door":
     area("hatkey", (0.6, -1.2, 2.8), (-0.5, 0.0, 2.2), 45, 1.0, (1.0, 0.85, 0.75), glossy=False)
     bpy.ops.mesh.primitive_cube_add(size=1, location=(0, -3.0, 2.0)); fog = bpy.context.object; fog.scale = (14, 6.2, 12); bpy.ops.object.transform_apply(scale=True)
     fm = bpy.data.materials.new("fog"); fm.use_nodes = True; n = fm.node_tree.nodes; l = fm.node_tree.links
-    n.remove(n["Principled BSDF"]); vs = n.new("ShaderNodeVolumeScatter"); vs.inputs["Density"].default_value = 0.016; vs.inputs["Anisotropy"].default_value = 0.55
+    n.remove(n["Principled BSDF"]); vs = n.new("ShaderNodeVolumeScatter"); vs.inputs["Density"].default_value = 0.011; vs.inputs["Anisotropy"].default_value = 0.55
     l.new(vs.outputs["Volume"], n["Material Output"].inputs["Volume"]); fog.data.materials.append(fm)
-    camera((0.3, -2.55, 1.3), (-0.42, 0.0, 1.55), 30, fstop=4.0, focus=(-0.5, 0.0, 1.5))
+    # 2026-11-24 運営「ドアのシーンの余白のバランス」→ 扉（電球と帽子まで）を真ん中に、上下の余白をそろえる（HTML で 1.06 倍まで寄っても切れない）
+    camera((0.05, -3.4, 1.32), (-0.5, 0.0, 1.32), 33, fstop=5.6, focus=(-0.5, 0.0, 1.4))
 
 elif MODE == "gift":
     F0, F1 = 0, 66
@@ -234,6 +236,18 @@ sc.cycles.max_bounces = 5; sc.cycles.volume_bounces = 0; sc.cycles.volume_step_r
 sc.view_settings.view_transform = "AgX"; sc.view_settings.look = "AgX - High Contrast"
 sc.render.resolution_x, sc.render.resolution_y = 1080, 1920
 sc.render.use_persistent_data = True
+if Q == "corners":                                            # 画面の四隅と星が、各コマで絵のどこに写るか（HTML でくっきりした画面を重ねるため。2026-11-24）
+    import json
+    from bpy_extras.object_utils import world_to_camera_view
+    pts_l = ((-Wp / 2, Hp / 2), (Wp / 2, Hp / 2), (Wp / 2, -Hp / 2), (-Wp / 2, -Hp / 2), ((0.90 - 0.5) * Wp, (0.5 - 0.092) * Hp))
+    res = []
+    for f in range(F0, F1 + 1):
+        sc.frame_set(f); fr = []
+        for lx, ly in pts_l:
+            v = world_to_camera_view(sc, sc.camera, ph.matrix_world @ Vector((lx, ly, 0.0045)))
+            fr.append([round(v.x * 1080, 2), round((1 - v.y) * 1920, 2)])
+        res.append(fr)
+    json.dump(res, open(os.path.join(OUT, "screen.json"), "w")); print("四隅", len(res), "コマ"); sys.exit(0)
 if Q == "preview":
     sc.render.resolution_percentage = 33; sc.cycles.samples = 24
     frames = [F0] if F0 == F1 else [F0, (F0 + F1) // 2, F1] if MODE == "night" else [0, 26, 31, 40]
