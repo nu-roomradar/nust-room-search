@@ -9,6 +9,7 @@ body{background:#000}
 .bg{background:#000}
 .shot{position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover;opacity:0;will-change:transform,opacity,filter}
 #iris{position:absolute;inset:0;pointer-events:none}
+.vig{position:absolute;inset:0;opacity:0;pointer-events:none;background:radial-gradient(900px 1300px at 46% 44%,rgba(0,0,0,0) 40%,rgba(0,0,0,.62) 100%)}
 .flash{position:absolute;inset:0;background:#fff;opacity:0}
 .black{position:absolute;inset:0;background:#000;opacity:0}
 #cs{position:absolute;inset:0;opacity:0;background:radial-gradient(760px 640px at 50% 44%,rgba(40,24,30,.9),#000 75%)}
@@ -26,6 +27,7 @@ body{background:#000}
 <img class="shot" id="sd" src="assets/xm_door/f0000.png" alt="" style="transform-origin:42% 40%">
 <img class="shot" id="sg" src="assets/xm_gift/f0000.png" alt="">
 <canvas id="iris" width="1080" height="1920"></canvas>
+<div class="vig" id="vig"></div>
 <div class="flash" id="flash"></div>
 <div class="black" id="blk"></div>
 <div id="cs">
@@ -70,12 +72,12 @@ window.BG3D = async t => {
   }
   drawIris(t);
   // 扉の場面：電球が少しまたたく
-  if (t > A1 && t < B1) document.getElementById('sd').style.filter = `brightness(${(1 + 0.06 * Math.sin(t * 23) * Math.sin(t * 7)).toFixed(3)})`;
+  if (t > A1 && t < B1) document.getElementById('sd').style.filter = `brightness(${(0.84 * (1 + 0.06 * Math.sin(t * 23) * Math.sin(t * 7))).toFixed(3)}) contrast(1.06)`;   // 前後の暗い場面になじむよう少し暗く
 };
 // 1. 夜の教室（0〜5.5秒）
 tl.set('#sn', { opacity: 1 }, 0).set('#sn', { opacity: 0 }, A1);
 // 2. 雷のような光で、扉へ（5.5〜8.4秒）
-tl.set('#sd', { opacity: 1 }, A1)
+tl.set('#sd', { opacity: 1 }, A1).set('#vig', { opacity: 1 }, A1).set('#vig', { opacity: 0 }, B1)
   .fromTo('#flash', { opacity: 0 }, { opacity: 0.9, duration: 0.05 }, A1 - 0.02)
   .to('#flash', { opacity: 0, duration: 0.5, ease: 'power2.out' }, A1 + 0.05)
   .fromTo('#sd', { scale: 1.0 }, { scale: 1.1, duration: B1 - A1, ease: 'none' }, A1)
