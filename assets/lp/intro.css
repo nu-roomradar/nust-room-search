@@ -8,7 +8,10 @@
 }
 .in-skip:focus { top: 8px; }
 .intro-page :is(a, button):focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-.intro-page section[id] { scroll-margin-top: 16px; }
+.intro-page section[id] { scroll-margin-top: 72px; }   /* 上のバーが付いてくるので、その下に見出しが来るように */
+
+/* 上のバー：下へ読み進めても付いてくる（このページは長いので、どこからでも「検索する」へ行けるように。2026-11-24） */
+.intro-page .section-nav { position: fixed; }
 
 /* ── 上のバー：リンク2つ＋「検索する」。スマホ幅でも1行に収める ── */
 .in-nav-cta {
@@ -27,11 +30,13 @@
   .in-nav-cta { min-height: 34px; padding: 0 13px; font-size: 0.76rem; }
 }
 @media (max-width: 440px) {
-  .intro-page .section-nav { padding: 0 10px; }
-  .intro-page .nav-logo img { height: 28px; }
-  .intro-page .nav-links { margin: 0 2px; }
-  .intro-page .nav-links a { padding: 8px 5px; font-size: 0.7rem; letter-spacing: -0.01em; }
-  .in-nav-cta { padding: 0 11px; font-size: 0.72rem; }
+  /* スマホ：字が小さく詰まって見えたので（2026-11-24 運営）、「紹介ページ」はロゴ（押すと紹介ページへ）に任せて隠し、残りを大きくする */
+  .intro-page .section-nav { padding: 0 12px; }
+  .intro-page .nav-logo img { height: 30px; }
+  .intro-page .nav-links { margin: 0 6px; }
+  .intro-page .nav-links a[href="index.html"] { display: none; }
+  .intro-page .nav-links a { padding: 8px 10px; font-size: 0.8rem; }
+  .in-nav-cta { padding: 0 14px; font-size: 0.8rem; }
 }
 
 /* ── 題 ── */
@@ -171,7 +176,8 @@
 .in-join .sec-title { margin-bottom: 12px; }
 .in-join-text { font-size: 1.02rem; font-weight: 600; line-height: 1.9; color: var(--ink); word-break: auto-phrase; }
 .in-handle { font-family: 'DM Mono', 'Noto Sans JP', monospace; font-weight: 500; color: var(--accent); white-space: nowrap; }
-.in-join-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.in-join-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-top: 20px; }
+.in-join-actions .in-handle { font-size: 0.9rem; }
 .in-join-actions .a-link { margin-top: 0; }
 .in-btn {
   display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 24px; border-radius: 99px;
@@ -182,6 +188,13 @@
 .in-qr { justify-self: center; text-align: center; }
 .in-qr img { display: block; width: 148px; height: 148px; padding: 8px; border-radius: 16px; background: #fff; border: 1px solid var(--border); }
 .in-qr figcaption { margin-top: 8px; font-family: 'DM Mono', 'Noto Sans JP', monospace; font-size: 0.8rem; color: var(--muted); }
+/* スマホ：見ている端末そのものでは QR を読めないので隠し、ボタンを横いっぱいにして真ん中にそろえる（2026-11-24 運営「ボタンの位置と文のバランス」） */
+@media (max-width: 719px) {
+  .in-join { text-align: center; padding: 32px 22px; }
+  .in-join-actions { flex-direction: column; gap: 10px; }
+  .in-join-actions .in-btn { width: 100%; justify-content: center; }
+  .in-qr { display: none; }
+}
 
 /* 足元：このページには下に固定のボタンが無いので、lp.css がスマホで足している余白を戻す */
 @media (max-width: 767px) {
@@ -198,7 +211,9 @@
   .in-know { grid-template-columns: 1fr 1fr; }
   .in-team { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 28px; }
   .in-trial { grid-template-columns: 1fr 1fr; column-gap: 28px; }
-  .in-join { grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 40px 44px; }
+  .in-join { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 40px; padding: 44px 52px; }
+  .in-join-text { font-size: 1.15rem; }
+  .in-qr img { width: 168px; height: 168px; }
   .in-warn { padding: 28px 32px; gap: 26px; }
   .in-door { width: 78px; }
   .in-warn-lead { font-size: 1.25rem; }
