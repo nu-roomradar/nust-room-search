@@ -1,11 +1,11 @@
 """リール3本の音（numpy で合成。既存の曲は使わない）。場面の時刻は各 HTML のタイムラインと同じ。
-  python3 music.py r1   → r1.wav（TARGET_LUFS＝-20 LUFS にそろえる。2026-11-24 までは -14、11-25 までは -17）
+  python3 music.py r1   → r1.wav（TARGET_LUFS＝-22 LUFS にそろえる。2026-11-24 までは -14、11-25 に -17 → -20 → -22）
 音程は倍音の足し算で作るので、ずれない（Karplus-Strong は使わない。make-video の手順書 6）。"""
 import re, subprocess, sys, wave
 import numpy as np
 
 SR = 44100
-TARGET_LUFS = -20.0                     # 音の大きさのめあて。2026-11-24 運営「若干音が大きい」で -14 → -17、11-25「まだ結構大きい」で -20（さらに 3dB 小さく）
+TARGET_LUFS = -22.0                     # 音の大きさのめあて。2026-11-24 運営「若干音が大きい」で -14 → -17、11-25「まだ結構大きい」で -20、同日「もうちょいだけ下げて」で -22
 rng = np.random.default_rng(7)          # 毎回同じ音になるよう、雑音の種を固定
 
 
