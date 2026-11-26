@@ -4,6 +4,7 @@
   <blendervenv>/bin/python teaser.py night <preview|anim|corners>   夜の教室。机のスマホ（クリスマスの見た目の画面）に寄ったところから引く（0〜5.5秒）
       corners：画面の四隅と星が各コマで絵のどこに写るかを renders/night/screen.json に書く（HTML で画面をくっきり重ねる）
   <blendervenv>/bin/python teaser.py door  <preview|final>  夜の廊下。リースとサンタの帽子をつけた教室の扉（1枚。動きは HTML）
+  <blendervenv>/bin/python teaser.py open  <preview|anim>   雪の上。箱のふたが開いて中から光があふれる（本編の出だし。3.2秒）
   <blendervenv>/bin/python teaser.py gift  <preview|anim>   雪の上。光る飾り玉の手前で、雪の中からプレゼントの箱が飛び出す（2秒）
 ヘルパーは ../ad-1119/scene2.py の前半をそのまま使う（同じ質感にそろえるため）。"""
 import os, sys, math, random
@@ -176,8 +177,8 @@ elif MODE == "door":
     # 2026-11-24 運営「ドアのシーンの余白のバランス」→ 扉（電球と帽子まで）を真ん中に、上下の余白をそろえる（HTML で 1.06 倍まで寄っても切れない）
     camera((0.05, -3.4, 1.32), (-0.5, 0.0, 1.32), 33, fstop=5.6, focus=(-0.5, 0.0, 1.4))
 
-elif MODE == "gift":
-    F0, F1 = 0, 66
+elif MODE in ("gift", "open"):                               # open：本編（リール⑤ v4）の出だし。箱のふたが開いて、中から光があふれる（3.2秒）
+    F0, F1 = (0, 66) if MODE == "gift" else (0, 96)
     world("#0b1530", 0.5)
     # 雪の地面（でこぼこ）
     bpy.ops.mesh.primitive_plane_add(size=4, location=(0, 1.6, 0)); gnd = bpy.context.object
@@ -199,12 +200,12 @@ elif MODE == "gift":
     bw1 = box("bw1", (0.12, 0.03, 0.07), (-0.05, 0, 0.31), ribm, bevel=0.012, rot=(0, math.radians(30), 0))
     bw2 = box("bw2", (0.12, 0.03, 0.07), (0.05, 0, 0.31), ribm, bevel=0.012, rot=(0, math.radians(-30), 0))
     for o in (b0, lid, r1, r2, r3, r4, bw1, bw2): o.parent = g
-    for f, z, rot in ((0, -0.32, 0), (22, -0.32, 0), (30, 0.10, -6), (36, 0.03, 4), (41, 0.0, -2), (46, 0.0, 0), (66, 0.0, 0)):
+    for f, z, rot in () if MODE == "open" else ((0, -0.32, 0), (22, -0.32, 0), (30, 0.10, -6), (36, 0.03, 4), (41, 0.0, -2), (46, 0.0, 0), (66, 0.0, 0)):
         g.location.z = z; g.keyframe_insert("location", index=2, frame=f)
         g.rotation_euler.y = math.radians(rot); g.keyframe_insert("rotation_euler", index=1, frame=f)
     # 飛び散る雪
     snowm = mat("puff", "#eef3ff", rough=0.8, sheen=0.6)
-    for k in range(70):
+    for k in range(70 if MODE == "gift" else 0):
         o = sphere(f"pf{k}", random.uniform(0.004, 0.011), (0, 0.35, -0.1), snowm, seg=14)
         a = random.uniform(0, 2 * math.pi); r = random.uniform(0.12, 0.5); up = random.uniform(0.15, 0.55)
         o.scale = (0.001,) * 3; o.keyframe_insert("scale", frame=24)
@@ -233,7 +234,25 @@ elif MODE == "gift":
         for fc in o.animation_data.action.fcurves:
             for kp in fc.keyframe_points: kp.interpolation = "LINEAR"
     cam, focus = track_cam((0.05, -0.75, 0.22), (0.0, 0.4, 0.14), 34, 2.8)
-    keycam(cam, focus, [(0.0, (0.05, -0.75, 0.22), (0.0, 0.4, 0.1)), (2.2, (0.03, -0.66, 0.24), (0.0, 0.38, 0.16))])
+    if MODE == "gift":
+        keycam(cam, focus, [(0.0, (0.05, -0.75, 0.22), (0.0, 0.4, 0.1)), (2.2, (0.03, -0.66, 0.24), (0.0, 0.38, 0.16))])
+    else:
+        keycam(cam, focus, [(0.0, (0.05, -0.78, 0.2), (0.0, 0.4, 0.12)), (3.2, (0.0, -0.56, 0.3), (0.0, 0.36, 0.24))])
+        g.location.z = 0.0
+        lidg = group("lidg", (0, 0.14, 0.22)); lidg.parent = g                   # ふたの後ろの辺をちょうつがいにする
+        for o in (lid, r3, r4, bw1, bw2): o.parent = lidg; o.location = Vector(o.location) - Vector((0, 0.14, 0.22))
+        for f, ax, ay, dz in ((0, 0, 0, 0), (14, 0, 0, 0), (18, -3, 2, 0.004), (22, -1, -2, 0.002), (26, -5, 2, 0.006), (30, -2, -1, 0.003), (36, -6, 1, 0.012),
+                              (56, -10, 4, 0.055), (72, -7, 6, 0.075), (96, -9, 9, 0.09)):   # 光に押されて、ふたが少し傾いたまま浮き上がる
+            lidg.rotation_euler = (math.radians(ax), math.radians(ay), 0); lidg.keyframe_insert("rotation_euler", frame=f)
+            lidg.location.z = 0.22 + dz; lidg.keyframe_insert("location", index=2, frame=f)
+        # 箱の中の光（ふたのすき間からもれ、開くとあふれる）
+        gm = bpy.data.materials.new("glowin"); gm.use_nodes = True; gp = gm.node_tree.nodes["Principled BSDF"]
+        gp.inputs["Base Color"].default_value = (1, 0.8, 0.45, 1); gp.inputs["Emission Color"].default_value = (1.0, 0.78, 0.42, 1)
+        bpy.ops.mesh.primitive_plane_add(size=1, location=(0, 0, 0.2)); gl = bpy.context.object; gl.scale = (0.235, 0.235, 1); gl.data.materials.append(gm); gl.parent = g
+        bpy.ops.object.light_add(type="POINT", location=(0, 0, 0.2)); pin = bpy.context.object; pin.parent = g; pin.data.color = (1.0, 0.76, 0.4); pin.data.shadow_soft_size = 0.08
+        for f, e, w in ((0, 0, 0), (14, 0, 0), (26, 3, 1.5), (36, 8, 6), (52, 30, 40), (70, 60, 110), (96, 140, 320)):
+            gp.inputs["Emission Strength"].default_value = e; gp.inputs["Emission Strength"].keyframe_insert("default_value", frame=f)
+            pin.data.energy = w; pin.data.keyframe_insert("energy", frame=f)
 
 # ── 書き出し ──
 sc.render.engine = "CYCLES"; sc.cycles.device = "CPU"; sc.cycles.use_denoising = True; sc.cycles.denoiser = "OPENIMAGEDENOISE"
@@ -255,7 +274,7 @@ if Q == "corners":                                            # 画面の四隅�
     json.dump(res, open(os.path.join(OUT, "screen.json"), "w")); print("四隅", len(res), "コマ"); sys.exit(0)
 if Q == "preview":
     sc.render.resolution_percentage = 33; sc.cycles.samples = 24
-    frames = [F0] if F0 == F1 else [F0, (F0 + F1) // 2, F1] if MODE == "night" else [0, 26, 31, 40]
+    frames = [F0] if F0 == F1 else [F0, (F0 + F1) // 2, F1] if MODE == "night" else [0, 26, 31, 40] if MODE == "gift" else [0, 30, 56, 96]
 elif Q == "final":
     sc.render.resolution_percentage = 100; sc.cycles.samples = 128; frames = [F0]
 else:                                                         # anim：720×1280・少ないサンプル＋ノイズ除去（CPU のため）
