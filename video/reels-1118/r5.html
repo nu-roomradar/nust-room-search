@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja"><head><meta charset="UTF-8">
-<!-- リール5「クリスマスモード」本編（15.4秒）。2026-11-26 に作り直し（v2）。
+<!-- リール5「クリスマスモード」本編（15.4秒）。2026-11-26 に作り直し（v2）、同日さらに磨いた（v3：出だしに「12月1日。」、🎄 から丸く広がる切り替え、電球が順に灯る、部屋に光がこぼれる）。
      カミングスーン（r6.html。夜の教室の机のスマホから引いていく）の続きとして、同じ 3D のコマを逆に流して机のスマホへ寄り、
      画面の 🎄 を押すとクリスマスの見た目に変わる。画面は 8倍で撮ったアプリの実画面（video/xmas-1124/capture.py hd。通常とクリスマスの2枚）を、
      3D の画面の四隅（teaser.py night corners → screen.json）に合わせてくっきり重ねる。
@@ -18,13 +18,15 @@ body{background:#000}
 #scr{position:absolute;left:0;top:0;transform-origin:0 0}
 #snow,#csfx{position:absolute;inset:0;pointer-events:none}
 .bokeh{position:absolute;border-radius:50%;filter:blur(34px);opacity:0;mix-blend-mode:screen}
+#spill{position:absolute;inset:0;opacity:0;mix-blend-mode:screen;background:radial-gradient(900px 1100px at 52% 58%,rgba(255,196,120,.34),rgba(60,160,110,.10) 55%,transparent 75%)}
+#date{position:absolute;left:0;right:0;top:300px;text-align:center;font-family:'Min';font-weight:600;font-size:66px;letter-spacing:.3em;padding-left:.3em;color:rgba(255,244,228,.92);opacity:0;text-shadow:0 2px 24px rgba(0,0,0,.8)}
 .flash{position:absolute;inset:0;background:#fff;opacity:0}
 .black{position:absolute;inset:0;background:#000}
 #ask{position:absolute;inset:0;opacity:0}
 #ask .q{position:absolute;left:0;right:0;top:700px;text-align:center;font-family:'Min';font-weight:700;font-size:92px;line-height:1.38;letter-spacing:.06em;padding-left:.06em;color:#fff7ec;text-shadow:0 0 40px rgba(255,200,140,.35)}
 #ask .q b{font-weight:700;color:#ffd79a}
 #ask .r{position:absolute;left:0;right:0;top:1010px;text-align:center;font-family:'Min';font-weight:600;font-size:44px;letter-spacing:.08em;padding-left:.08em;color:#f0e2cc}
-#ask .c{position:absolute;left:0;right:0;top:1360px;text-align:center;font-weight:500;font-size:30px;line-height:1.7;color:rgba(255,222,190,.85)}
+#ask .c{position:absolute;left:0;right:0;top:1360px;text-align:center;font-weight:500;font-size:33px;line-height:1.7;color:rgba(255,226,196,.95);text-shadow:0 2px 14px rgba(0,0,0,.7)}
 #cs{position:absolute;inset:0;opacity:0;background:radial-gradient(820px 700px at 50% 42%,rgba(46,26,30,.88),#000 78%)}
 #cs .d{position:absolute;left:0;right:0;top:520px;text-align:center;font-family:'Min';font-weight:700;font-size:250px;line-height:1;letter-spacing:.04em;padding-left:.04em;color:#fff6ea;text-shadow:0 0 60px rgba(255,190,120,.42)}
 #cs .rule{position:absolute;left:50%;top:850px;width:120px;height:2px;margin-left:-60px;background:linear-gradient(90deg,transparent,#e9c27c,transparent)}
@@ -38,7 +40,9 @@ body{background:#000}
   <img id="sn" src="assets/xm_night/f0165.png" alt="">
   <canvas id="scr" width="3120" height="6620"></canvas>
 </div>
+<div id="spill"></div>
 <div id="bokehs"></div>
+<div id="date">12月1日。</div>
 <canvas id="snow" width="1080" height="1920"></canvas>
 <div class="flash" id="flash"></div>
 <div id="ask">
@@ -78,16 +82,24 @@ const BULB = [[0.0513, 0.0236, '255,90,100'], [0.1538, 0.0284, '255,205,80'], [0
               [0.8718, 0.0236, '255,90,100'], [0.9744, 0.0284, '255,205,80']];
 const STAR = [0.897, 0.092], TREE = [0.751, 0.293];                 // ロゴの横の星、切り替えの 🎄
 function drawScreen(t) {
-  const x = Math.min(1, Math.max(0, (t - SW_T) / 0.08));             // 0：通常 → 1：クリスマス
+  // 🎄 を押したところから、クリスマスの見た目が丸く広がる（0.95秒）。v3（2026-11-26）
+  const k0 = Math.min(1, Math.max(0, (t - SW_T) / 0.95)), wr = Math.pow(k0, 1.5) * 6400, tx = TREE[0] * SW, ty = TREE[1] * SH;
   sx.clearRect(0, 0, SW, SH);
   sx.save(); sx.beginPath(); sx.roundRect(0, 0, SW, SH, RAD); sx.clip();
   sx.drawImage(appN, 0, 0, SW, SH);
-  if (x > 0) { sx.globalAlpha = x; sx.drawImage(appX, 0, 0, SW, SH); sx.globalAlpha = 1; }
+  if (k0 > 0) { sx.save(); sx.beginPath(); sx.arc(tx, ty, wr, 0, Math.PI * 2); sx.clip(); sx.drawImage(appX, 0, 0, SW, SH); sx.restore(); }
+  if (k0 > 0 && k0 < 1) {                                             // 広がる縁が金色に光る
+    sx.globalCompositeOperation = 'lighter';
+    const rg = sx.createRadialGradient(tx, ty, Math.max(0, wr - 260), tx, ty, wr + 60);
+    rg.addColorStop(0, 'rgba(255,220,150,0)'); rg.addColorStop(0.8, `rgba(255,226,160,${(0.75 * (1 - k0)).toFixed(3)})`); rg.addColorStop(1, 'rgba(255,255,255,0)');
+    sx.fillStyle = rg; sx.fillRect(0, 0, SW, SH); sx.globalCompositeOperation = 'source-over';
+  }
   sx.globalCompositeOperation = 'lighter';
   const on = Math.min(1, Math.max(0, (t - SW_T) / 0.6));
   if (on > 0) {
     BULB.forEach(([u, v, c], k) => {                                  // 電球が1つずつ、ゆっくりまたたく
-      const a = on * (0.25 + 0.75 * Math.pow(0.5 + 0.5 * Math.sin(t * 2.6 + k * 1.9), 2));
+      const lit = Math.min(1, Math.max(0, (t - SW_T - 0.3 - k * 0.07) / 0.12));                      // 左から順に灯る
+      const a = lit * (0.25 + 0.75 * Math.pow(0.5 + 0.5 * Math.sin(t * 2.6 + k * 1.9), 2)) * (1 + 1.2 * Math.max(0, 1 - (t - SW_T - 0.3 - k * 0.07) / 0.4));
       const bx = u * SW, by = v * SH, g = sx.createRadialGradient(bx, by, 0, bx, by, 120);
       g.addColorStop(0, `rgba(${c},${(0.85 * a).toFixed(3)})`); g.addColorStop(0.35, `rgba(${c},${(0.28 * a).toFixed(3)})`); g.addColorStop(1, `rgba(${c},0)`);
       sx.fillStyle = g; sx.fillRect(bx - 120, by - 120, 240, 240);
@@ -105,7 +117,7 @@ function drawScreen(t) {
     sx.restore();
   }
   // 切り替えの一瞬、画面全体がふわっと光る
-  const fl = t > SW_T && t < SW_T + 0.5 ? (1 - (t - SW_T) / 0.5) * 0.5 : 0;
+  const fl = t > SW_T && t < SW_T + 0.4 ? (1 - (t - SW_T) / 0.4) * 0.12 : 0;
   if (fl > 0) { sx.fillStyle = `rgba(255,236,200,${fl.toFixed(3)})`; sx.fillRect(0, 0, SW, SH); }
   sx.globalCompositeOperation = 'source-over';
   // 🎄 を押す指の輪（3.25〜3.55秒）
@@ -172,11 +184,15 @@ window.BG3D = async t => {
   drawSnow(fx, FLK, t, END, Math.min(1, Math.max(0, (t - END - 0.8) / 1.2)), 1);
 };
 // 0. 暗いところから、夜の教室の机へ
-tl.fromTo('#blk', { opacity: 1 }, { opacity: 0, duration: 0.8, ease: 'power1.out' }, 0);
+tl.fromTo('#blk', { opacity: 1 }, { opacity: 0, duration: 0.8, ease: 'power1.out' }, 0)
+  .fromTo('#date', { opacity: 0, letterSpacing: '.5em' }, { opacity: 1, letterSpacing: '.3em', duration: 0.9, ease: 'power2.out' }, 0.45)
+  .to('#date', { opacity: 0, duration: 0.4 }, 2.7);
 // 1. 🎄 を押して、クリスマスの見た目に（3.55秒）
-tl.fromTo('#flash', { opacity: 0 }, { opacity: 0.32, duration: 0.05 }, SW_T)
+tl.fromTo('#flash', { opacity: 0 }, { opacity: 0.12, duration: 0.05 }, SW_T)
   .to('#flash', { opacity: 0, duration: 0.55, ease: 'power2.out' }, SW_T + 0.05)
   .to('.bokeh', { opacity: 0.5, duration: 1.0, stagger: 0.04 }, SW_T + 0.05)
+  .to('#spill', { opacity: 1, duration: 0.9, ease: 'power2.out' }, SW_T + 0.1)
+  .to('#spill', { opacity: 0, duration: 0.4 }, END - 0.2)
   .fromTo('#stage', { scale: 1 }, { scale: 1.06, duration: ASK - P1 + 0.4, ease: 'sine.inOut' }, P1);
 // 2. 問いかけ（6.55〜9.4秒）：画面はぼかして暗く
 tl.to('#stage', { filter: 'blur(12px) brightness(0.42)', duration: 0.5, ease: 'power1.inOut' }, ASK - 0.1)
