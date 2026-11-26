@@ -78,8 +78,8 @@ body{background:#000}
 <script>
 const MODE = 'ac';
 document.querySelector('#cs .n').textContent = NOTE;
-const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 20.6;
-const S = 3.55, BAR = 1.5, ASK = 12.55, END = 15.55, K = 632 / 390;     // 光があふれる時刻・1小節・問いかけ・最後の札・画面の倍率
+const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 22.1;
+const S = 3.55, BAR = 1.5, ASK = 14.05, END = 17.05, K = 632 / 390;     // 光があふれる時刻・1小節・問いかけ・最後の札・画面の倍率
 const bar = k => S + BAR * k;
 const pad = f => String(f).padStart(4, '0');
 const box = document.getElementById('box');
@@ -164,8 +164,10 @@ tl.fromTo('#flash', { opacity: 0 }, { opacity: 0.5, duration: 0.12, ease: 'power
   .fromTo('#ph', { scale: 0.16, y: 190, rotation: -14 }, { scale: 0.24, y: -330, rotation: 8, duration: 0.5, ease: 'power2.out' }, S - 0.05)
   .set('#stage', { clipPath: 'none' }, S + 0.45)
   .to('#ph', { scale: 1, y: 0, rotation: 0, duration: 0.85, ease: 'back.out(1.15)' }, S + 0.45)
-  .to('#box', { filter: 'blur(16px) brightness(0.5)', duration: 0.8, ease: 'power1.inOut' }, S + 0.4)
-  .to('#world', { opacity: 1, duration: 0.9, ease: 'power1.inOut' }, S + 0.6)
+  // v6（運営「裏の背景の部分が消えてるから直して」）：スマホの後ろの箱と雪の景色を消さない。少しぼかして暗くするだけにして、夜の色はうすく重ねる
+  .to('#box', { filter: 'blur(7px) brightness(0.62)', duration: 0.8, ease: 'power1.inOut' }, S + 0.4)
+  .to('#world', { opacity: 0.28, duration: 0.9, ease: 'power1.inOut' }, S + 0.6)
+  .to('#box', { scale: 1.1, duration: END - S, ease: 'none' }, S)
   .to('.bokeh', { opacity: 0.5, duration: 1.0, stagger: 0.04 }, S + 0.8);
 $('lab1').innerHTML = 'いつもの見た目';
 $('lab2').innerHTML = '<b>クリスマスの見た目</b>';
@@ -180,8 +182,8 @@ const cut = (id, at) => tl.set('.ly', { opacity: 0 }, at).fromTo(id, { opacity: 
   .set('#lab2', { opacity: 0 }, at).set('#lab1', { opacity: 1 }, at);
 tl.set('#L1', { opacity: 1 }, 0).fromTo('#lab1', { opacity: 0 }, { opacity: 1, duration: 0.3 }, S + 0.8);
 sweep('#L2', bar(0) + 1.15);                          // 検索（スマホが出そろってから）
-cut('#L3', bar(2)); sweep('#L4', bar(2) + 0.6);       // 教室の1週間
-cut('#L5', bar(4)); sweep('#L6', bar(4) + 0.6);       // 教室さがし
+cut('#L3', bar(3)); sweep('#L4', bar(3) + 0.6);       // 教室の1週間
+cut('#L5', bar(5)); sweep('#L6', bar(5) + 0.6);       // 教室さがし
 // 2. 問いかけ（9.55〜12.4秒）：スマホは後ろへ下がってぼける
 tl.to('#stage', { filter: 'blur(14px) brightness(0.4)', scale: 0.92, duration: 0.5, ease: 'power1.inOut' }, ASK - 0.15)
   .to('.lab', { opacity: 0, duration: 0.3 }, ASK - 0.2)
