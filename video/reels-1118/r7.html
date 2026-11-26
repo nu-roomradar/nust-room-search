@@ -37,6 +37,7 @@ body{background:#000}
 #ask .c{position:absolute;left:0;right:0;top:1350px;text-align:center;font-weight:500;font-size:33px;line-height:1.7;color:rgba(255,226,196,.95);text-shadow:0 2px 14px rgba(0,0,0,.7)}
 #cs{position:absolute;inset:0;opacity:0;background:radial-gradient(820px 700px at 50% 42%,rgba(46,26,30,.88),#000 78%)}
 #cs .d{position:absolute;left:0;right:0;top:520px;text-align:center;font-family:'Min';font-weight:700;font-size:250px;line-height:1;letter-spacing:.04em;padding-left:.04em;color:#fff6ea;text-shadow:0 0 60px rgba(255,190,120,.42)}
+#cs .tree{position:absolute;left:0;right:0;top:300px;text-align:center;font-size:170px;line-height:1;filter:drop-shadow(0 0 40px rgba(120,230,150,.45)) drop-shadow(0 0 14px rgba(255,220,140,.5))}
 #cs .rule{position:absolute;left:50%;top:850px;width:120px;height:2px;margin-left:-60px;background:linear-gradient(90deg,transparent,#e9c27c,transparent)}
 #cs .m{position:absolute;left:0;right:0;top:900px;text-align:center;font-family:'Min';font-weight:600;font-size:60px;line-height:1.55;letter-spacing:.12em;padding-left:.12em;color:#f4e6d2}
 #cs .logo{position:absolute;left:50%;top:1130px;width:190px;margin-left:-95px;opacity:.92}
@@ -65,6 +66,7 @@ body{background:#000}
 </div>
 <div id="cs">
   <canvas id="csfx" width="1080" height="1920"></canvas>
+  <div class="tree">🎄</div>
   <div class="d">12.1</div>
   <div class="rule"></div>
   <div class="m">クリスマスモード、<br>はじまりました。</div>
@@ -195,6 +197,7 @@ tl.to('#stage', { filter: 'blur(14px) brightness(0.4)', scale: 0.92, duration: 0
 // 3. 最後の札（12.55秒〜）
 tl.to('#cs', { opacity: 1, duration: 0.6 }, END - 0.1)
   .from('#cs .d', { scale: 0.94, opacity: 0, filter: 'blur(14px)', duration: 1.1, ease: 'power3.out' }, END)
+  .from('#cs .tree', { scale: 0.5, opacity: 0, y: 30, duration: 0.8, ease: 'back.out(1.8)' }, END + 0.25)   // v8：ひと目でクリスマスモードと分かるように（運営）
   .from('#cs .rule', { scaleX: 0, duration: 0.7, ease: 'power2.out' }, END + 0.5)
   .from('#cs .m', { opacity: 0, letterSpacing: '.28em', duration: 1.0, ease: 'power3.out' }, END + 0.55)
   .from('#cs .logo', { opacity: 0, y: 14, duration: 0.6 }, END + 0.9)
