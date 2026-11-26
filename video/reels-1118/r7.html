@@ -53,11 +53,12 @@ body{background:#000}
   <div id="ph"><div id="scr">
     <img class="ly" id="L1" alt=""><img class="ly" id="L2" alt=""><img class="ly" id="L3" alt=""><img class="ly" id="L4" alt="">
     <img class="ly" id="L5" alt=""><img class="ly" id="L6" alt=""><img class="ly" id="L7" alt="">
+    <canvas id="scrfx" width="632" height="1368" style="position:absolute;left:0;top:0;z-index:6"></canvas>
     <div id="edge"></div><div id="tap"></div><div class="sheen"></div><div class="isl"></div>
   </div></div>
 </div>
 <canvas id="snow" width="1080" height="1920"></canvas>
-<div class="lab" id="lab1"></div><div class="lab" id="lab2"></div>
+<div class="lab" id="lab1"></div><div class="lab" id="lab2"></div><div class="lab" id="lab3"></div>
 <div class="flash" id="flash"></div>
 <div id="ask">
   <div class="q">次の空きコマ、<br><b>もう決めた？</b></div>
@@ -78,7 +79,7 @@ body{background:#000}
 <script src="vendor/gsap.min.js"></script>
 <script src="common.js"></script>
 <script>
-const MODE = 'ac';
+const MODE = 'a';
 document.querySelector('#cs .n').textContent = NOTE;
 const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 22.1;
 const S = 3.55, BAR = 1.5, ASK = 14.05, END = 17.05, K = 632 / 390;     // 光があふれる時刻・1小節・問いかけ・最後の札・画面の倍率
@@ -87,7 +88,7 @@ const pad = f => String(f).padStart(4, '0');
 const box = document.getElementById('box');
 const $ = id => document.getElementById(id);
 const SRC = MODE === 'a'
-  ? { L1: 'main_x', L2: 'nextlong_x', L3: 'room_x' }
+  ? { L1: 'main_x', L2: 'nextlong_x', L3: 'room_x', L4: 'find_x' }
   : { L1: 'main_n', L2: 'main_x', L3: 'room_n', L4: 'room_x', L5: 'find_n', L6: 'find_x' };
 window.READY = false;
 Promise.all(Object.entries(SRC).map(([id, n]) => { $(id).src = `assets/xs_${n}.png`; return $(id).decode(); })).then(() => { window.READY = true; });
@@ -136,6 +137,26 @@ function drawGlow(t) {
   }
   gw.globalCompositeOperation = 'source-over';
 }
+// スマホの画面の上：電球がまたたき、雪が降る（アプリの飾りは撮った絵では止まっているので、動きを足す）
+const sf = $('scrfx').getContext('2d');
+const BULB = [[0.0513, 0.0236, '255,90,100'], [0.1538, 0.0284, '255,205,80'], [0.2564, 0.0245, '80,220,130'], [0.3590, 0.0284, '90,150,255'], [0.4615, 0.0236, '255,90,100'],
+              [0.5641, 0.0284, '255,205,80'], [0.6667, 0.0245, '80,220,130'], [0.7692, 0.0284, '90,150,255'], [0.8718, 0.0236, '255,90,100'], [0.9744, 0.0284, '255,205,80']];
+const SFL = Array.from({ length: 36 }, () => ({ x: rnd() * 632, y: rnd() * 1368, r: 1.2 + rnd() * 2.6, v: 40 + rnd() * 70, sw: 6 + rnd() * 14, ph: rnd() * 6.28, o: 0.3 + rnd() * 0.45 }));
+function drawScrFx(t) {
+  sf.clearRect(0, 0, 632, 1368);
+  if (t < S + 1.2 || t > END + 0.5) return;
+  sf.globalCompositeOperation = 'lighter';
+  BULB.forEach(([u, v, c], k) => {
+    const a = 0.2 + 0.8 * Math.pow(0.5 + 0.5 * Math.sin(t * 2.6 + k * 1.9), 2), x = u * 632, y = v * 1368 * (844 / 844), g = sf.createRadialGradient(x, y, 0, x, y, 26);
+    g.addColorStop(0, `rgba(${c},${(0.85 * a).toFixed(3)})`); g.addColorStop(0.4, `rgba(${c},${(0.25 * a).toFixed(3)})`); g.addColorStop(1, `rgba(${c},0)`);
+    sf.fillStyle = g; sf.fillRect(x - 26, y - 26, 52, 52);
+  });
+  sf.globalCompositeOperation = 'source-over';
+  for (const f of SFL) {
+    const y = (f.y + t * f.v) % 1400 - 16, x = f.x + Math.sin(t * 0.9 + f.ph) * f.sw;
+    sf.fillStyle = `rgba(255,250,240,${f.o.toFixed(3)})`; sf.beginPath(); sf.arc(x, y, f.r, 0, Math.PI * 2); sf.fill();
+  }
+}
 window.BG3D = async t => {
   if (t < S + 1.8) {
     const f = Math.min(96, Math.max(0, Math.round(t * 30)));
@@ -146,6 +167,7 @@ window.BG3D = async t => {
   const a = Math.min(1, Math.max(0, (t - S - 0.8) / 0.8)) * (t > END + 0.2 ? Math.max(0, 1 - (t - END - 0.2) / 0.4) : 1);
   drawSnow(sw, FL, t, 0, a);
   drawSnow(fx, FLK, t, END, Math.min(1, Math.max(0, (t - END - 0.8) / 1.2)));
+  drawScrFx(t);
   // スマホがゆっくり揺れる
   if (t > S + 1.3 && t < END + 0.5) gsap.set('#ph', { rotationY: 5 * Math.sin((t - S - 1.3) * 0.9), rotationX: 2.2 * Math.sin((t - S - 1.3) * 0.7) });
 };
@@ -171,21 +193,22 @@ tl.fromTo('#flash', { opacity: 0 }, { opacity: 0.5, duration: 0.12, ease: 'power
   .to('#world', { opacity: 0.28, duration: 0.9, ease: 'power1.inOut' }, S + 0.6)
   .to('#box', { scale: 1.1, duration: END - S, ease: 'none' }, S)
   .to('.bokeh', { opacity: 0.5, duration: 1.0, stagger: 0.04 }, S + 0.8);
-$('lab1').innerHTML = 'いつもの見た目';
-$('lab2').innerHTML = '<b>クリスマスの見た目</b>';
-// 1画面＝2小節（3秒）：いつもの見た目は短く、金色の線が走ったあとのクリスマスの見た目を長く見せる（v5。運営「クリスマスの見た目の表示時間が極端に短い」）
-const sweep = (to, at) => {
-  tl.set(to, { opacity: 1, clipPath: 'inset(0 100% 0 0)' }, at)
-    .to(to, { clipPath: 'inset(0 0% 0 0)', duration: 0.45, ease: 'power2.inOut' }, at)
-    .fromTo('#edge', { left: 0, opacity: 1 }, { left: 632, duration: 0.45, ease: 'power2.inOut', immediateRender: false }, at).set('#edge', { opacity: 0 }, at + 0.45)
-    .to('#lab1', { opacity: 0, duration: 0.2 }, at).to('#lab2', { opacity: 1, duration: 0.25 }, at + 0.15);
-};
-const cut = (id, at) => tl.set('.ly', { opacity: 0 }, at).fromTo(id, { opacity: 1, scale: 1.04, clipPath: 'none' }, { scale: 1, duration: 0.35, ease: 'power2.out', immediateRender: false }, at)
-  .set('#lab2', { opacity: 0 }, at).set('#lab1', { opacity: 1 }, at);
-tl.set('#L1', { opacity: 1 }, 0).fromTo('#lab1', { opacity: 0 }, { opacity: 1, duration: 0.3 }, S + 0.8);
-sweep('#L2', bar(0) + 1.15);                          // 検索（スマホが出そろってから）
-cut('#L3', bar(3)); sweep('#L4', bar(3) + 0.6);       // 教室の1週間
-cut('#L5', bar(5)); sweep('#L6', bar(5) + 0.6);       // 教室さがし
+// v9（2026-11-26 運営「やっぱり A 案にして、それをブラッシュアップして」）：クリスマスの見た目のアプリを、実際に使う流れで見せる。
+//   検索（3秒）→「次」を押す → 一覧を流す → 教室 133 を押す → 教室の1週間 → 教室さがし。画面の上では電球がまたたき、雪が降る
+$('lab1').innerHTML = '検索画面が、<b>クリスマスに。</b>';
+$('lab2').innerHTML = '教室の1週間も、<b>クリスマスに。</b>';
+$('lab3').innerHTML = '教室さがしも、<b>クリスマスに。</b>';
+const lab = (from, to, at) => tl.to(from, { opacity: 0, y: -10, duration: 0.25 }, at).fromTo(to, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, immediateRender: false }, at + 0.2);
+const slide = (id, at) => tl.fromTo(id, { opacity: 1, x: 632 }, { x: 0, duration: 0.42, ease: 'power3.out', immediateRender: false }, at);
+tl.set('#L1', { opacity: 1 }, 0)
+  .fromTo('#lab1', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, S + 0.9);
+tapAt(195, 390, bar(2));                                                   // 「次（火曜4限）」を押す
+tl.to('#L2', { opacity: 1, duration: 0.18 }, bar(2) + 0.08)
+  .to('#L2', { y: -150 * K, duration: 0.9, ease: 'power2.inOut' }, bar(2) + 0.7)        // 一覧を下へ流して
+  .to('#L2', { y: 0, duration: 0.8, ease: 'power2.inOut' }, bar(3) + 0.45);             // 上へ戻る
+tapAt(316, 597, bar(4));                                                   // 教室 133 を押す
+slide('#L3', bar(4) + 0.08); lab('#lab1', '#lab2', bar(4) + 0.05);         // 教室の1週間
+slide('#L4', bar(6)); lab('#lab2', '#lab3', bar(6) - 0.05);                // 教室さがし
 // 2. 問いかけ（9.55〜12.4秒）：スマホは後ろへ下がってぼける
 tl.to('#stage', { filter: 'blur(14px) brightness(0.4)', scale: 0.92, duration: 0.5, ease: 'power1.inOut' }, ASK - 0.15)
   .to('.lab', { opacity: 0, duration: 0.3 }, ASK - 0.2)
