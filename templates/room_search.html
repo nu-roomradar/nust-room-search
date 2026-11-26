@@ -10,11 +10,20 @@
 </head>
 <body{% if season and season_on %} class="theme-{{ season }}"{% endif %}>
 {% include "_season_boot.html" %}
-{# クリスマスの見た目のときは、検索画面と同じ雪・電球・木・プレゼントを背景に出す（2026-11-26 運営。それまでは色が変わるだけだった）。
-   星とそりは検索画面のロゴの横に合わせた位置なので、ここでは出さない #}
-{% if 'christmas' in season_choices %}<div class="season-deco s-christmas" aria-hidden="true">
+{# 季節の見た目のときは、検索画面と同じ飾りを背景に出す（2026-11-26 運営。それまでは色が変わるだけだった）。
+   ハロウィーンの月、クリスマスの星とそり、お正月の初日の出と霞は、検索画面のロゴの横に合わせた位置で、
+   ここでは上の「大学公式ではない」の表記に重なるので出さない #}
+{% if 'halloween' in season_choices %}<div class="season-deco s-halloween" aria-hidden="true">
+  <i class="web web-tl"></i><i class="web web-br"></i>
+  <span class="bat b1">🦇</span><span class="bat b2">🦇</span><span class="bat b3">🦇</span>
+  <span class="ghost g1">👻</span><span class="pk p1">🎃</span><span class="pk p2">🎃</span>
+</div>{% endif %}{% if 'christmas' in season_choices %}<div class="season-deco s-christmas" aria-hidden="true">
   <i class="x-snow"></i><i class="x-snow x-s2"></i><i class="x-wire"></i><i class="x-lights"></i>
   <span class="x-tree">🎄</span><span class="x-gift">🎁</span>
+</div>{% endif %}
+{% if 'newyear' in season_choices %}<div class="season-deco s-newyear" aria-hidden="true">
+  <i class="ny-haku"></i><i class="ny-nami"></i><i class="ny-fuji"></i>
+  <span class="ny-kite">🪁</span>
 </div>{% endif %}
 <div class="wrap room-page">
     <div class="test-banner">
