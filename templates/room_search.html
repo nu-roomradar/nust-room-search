@@ -10,6 +10,12 @@
 </head>
 <body{% if season and season_on %} class="theme-{{ season }}"{% endif %}>
 {% include "_season_boot.html" %}
+{# クリスマスの見た目のときは、検索画面と同じ雪・電球・木・プレゼントを背景に出す（2026-11-26 運営。それまでは色が変わるだけだった）。
+   星とそりは検索画面のロゴの横に合わせた位置なので、ここでは出さない #}
+{% if 'christmas' in season_choices %}<div class="season-deco s-christmas" aria-hidden="true">
+  <i class="x-snow"></i><i class="x-snow x-s2"></i><i class="x-wire"></i><i class="x-lights"></i>
+  <span class="x-tree">🎄</span><span class="x-gift">🎁</span>
+</div>{% endif %}
 <div class="wrap room-page">
     <div class="test-banner">
         <span class="test-tag">TEST</span>
