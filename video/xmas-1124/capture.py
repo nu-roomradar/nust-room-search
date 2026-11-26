@@ -1,7 +1,7 @@
 """クリスマスの動画に使うアプリの実画面を撮る（駿河台校舎・12/1 火 3限）。通常の見た目と、クリスマスの見た目の2枚。
   先に起動： python3 fakeapp.py 13:40 5071 &
 船橋校舎のタブは映さない。報告は入れない。
-  python3 capture.py hd   カミングスーンの動画で、机のスマホに重ねるくっきりした画面（クリスマスの見た目・1画面ぶん・8倍の解像度）→ assets/xmas_screen_hd.png"""
+  python3 capture.py hd   机のスマホに重ねるくっきりした画面（1画面ぶん・8倍の解像度）→ assets/xmas_screen_hd.png（クリスマス）・normal_screen_hd.png（通常。2026-11-26 リール⑤ v2 で追加）"""
 import os, sys
 from playwright.sync_api import sync_playwright
 HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(HERE, "assets")
@@ -21,7 +21,7 @@ def gs(route):
     route.fulfill(status=200, content_type="font/otf", body=open(path, "rb").read(), headers={"Access-Control-Allow-Origin": "*"})
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path=find_chrome())
-    for name, theme in ((("xmas_screen_hd", None),) if HD else (("normal", "off"), ("xmas", None))):
+    for name, theme in ((("normal_screen_hd", "off"), ("xmas_screen_hd", None)) if HD else (("normal", "off"), ("xmas", None))):
         ctx = b.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=DSF, timezone_id="Asia/Tokyo", locale="ja-JP")
         init = "try{localStorage.setItem('rr_visits','1');localStorage.setItem('rr_a2hs','1');" + (f"localStorage.setItem('rr_theme','{theme}');" if theme else "localStorage.removeItem('rr_theme');") + "}catch(e){}"
         ctx.add_init_script(init)

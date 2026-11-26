@@ -1,126 +1,199 @@
 <!DOCTYPE html>
 <html lang="ja"><head><meta charset="UTF-8">
-<!-- リール5「クリスマスモード」（12.5秒）。季節の見た目の予告動画の作り方（暗い画面から少しずつ見せる・細く間をあけた字・切り替わる一瞬に光と音を集める）を参考にした。
-     特定の会社の映像・ロゴ・曲は使わない。アプリの画面は実物（駿河台校舎・12/1 火 3限。video/xmas-1124/capture.py で撮影）。
-     素材：assets/xmas_normal.png・assets/xmas_xmas.png（1170×2532。撮った画像の上から1画面ぶん） -->
+<!-- リール5「クリスマスモード」本編（15.4秒）。2026-11-26 に作り直し（v2）。
+     カミングスーン（r6.html。夜の教室の机のスマホから引いていく）の続きとして、同じ 3D のコマを逆に流して机のスマホへ寄り、
+     画面の 🎄 を押すとクリスマスの見た目に変わる。画面は 8倍で撮ったアプリの実画面（video/xmas-1124/capture.py hd。通常とクリスマスの2枚）を、
+     3D の画面の四隅（teaser.py night corners → screen.json）に合わせてくっきり重ねる。
+     字は問いかけと最後の札だけ。書体は明朝（Noto Serif CJK JP）。最後は「12.1／クリスマスモード、はじまりました。」で、カミングスーンの札と対にした。
+     特定の会社の映像・ロゴ・曲は使わない。音は music.py r5（-22 LUFS）。 -->
 <link rel="stylesheet" href="common.css">
 <style>
+@font-face{font-family:'Min';font-weight:500;src:url(fonts/NotoSerifCJKjp-Medium.otf)}
+@font-face{font-family:'Min';font-weight:600;src:url(fonts/NotoSerifCJKjp-SemiBold.otf)}
+@font-face{font-family:'Min';font-weight:700;src:url(fonts/NotoSerifCJKjp-Bold.otf)}
 body{background:#000}
 .bg{background:#000}
-#glow{position:absolute;inset:0;opacity:0;background:
-  radial-gradient(620px 520px at 50% 52%,rgba(255,196,120,.30),transparent 70%),
-  radial-gradient(900px 700px at 12% 92%,rgba(220,40,60,.22),transparent 70%),
-  radial-gradient(900px 700px at 92% 10%,rgba(40,170,110,.20),transparent 70%)}
-.bokeh{position:absolute;border-radius:50%;filter:blur(30px);opacity:0}
-.slit{position:absolute;left:50%;top:960px;width:0;height:3px;margin-left:0;background:linear-gradient(90deg,transparent,#fff,transparent);box-shadow:0 0 30px 6px rgba(255,255,255,.55)}
-.stage{position:absolute;inset:0;perspective:1800px}
-#ph{left:260px;top:390px;transform-origin:50% 50%;opacity:0}
-#ph .scr img{transition:none}
-#ph .scr .x{opacity:0}
-.flash{position:absolute;inset:0;background:#fff;opacity:0;mix-blend-mode:screen}
-.tap{position:absolute;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;border:5px solid rgba(255,255,255,.95);box-shadow:0 0 24px rgba(255,255,255,.8);opacity:0}
-.flake{position:absolute;left:0;top:0;border-radius:50%;background:#fff;opacity:0;will-change:transform}
-.thin{position:absolute;left:0;right:0;text-align:center;color:#fff;letter-spacing:.42em;font-weight:500}
-#t0{top:1560px;font-size:30px;color:rgba(255,255,255,.72);opacity:0}
-#t1{top:230px;font-size:38px;opacity:0;text-shadow:0 2px 16px rgba(0,0,0,.8)}
-#title{position:absolute;left:0;right:0;top:700px;text-align:center;opacity:0}
-#title .k{font-family:Syne;font-weight:700;font-size:34px;letter-spacing:.5em;color:rgba(255,236,200,.9);padding-left:.5em}
-#title .m{margin-top:26px;font-weight:900;font-size:120px;letter-spacing:.08em;line-height:1.1;color:#fff;text-shadow:0 0 40px rgba(255,210,150,.45)}
-#title .s{margin-top:34px;font-weight:700;font-size:40px;letter-spacing:.06em;color:#f3e6cf;line-height:1.6}
-#title .s small{display:block;font-size:30px;font-weight:500;color:rgba(255,255,255,.7)}
-#ask{position:absolute;left:0;right:0;top:760px;text-align:center;opacity:0}
-#ask .q{font-weight:900;font-size:92px;line-height:1.25;color:#fff}
-#ask .q b{color:#ffcf8a}
-#ask .r{margin-top:40px;font-weight:700;font-size:44px;line-height:1.6;color:#f3e6cf}
-.caution{position:absolute;left:0;right:0;top:1650px;text-align:center;font-weight:700;font-size:34px;line-height:1.55;color:#ffd9b0;opacity:0;text-shadow:0 2px 14px rgba(0,0,0,.8)}
-#end{background:radial-gradient(800px 700px at 50% 40%,rgba(30,40,70,.9),#03050c)}
+#stage{position:absolute;inset:0;transform-origin:540px 880px;will-change:transform,filter}
+#sn{position:absolute;left:0;top:0;width:1080px;height:1920px;object-fit:cover}
+#scr{position:absolute;left:0;top:0;transform-origin:0 0}
+#snow,#csfx{position:absolute;inset:0;pointer-events:none}
+.bokeh{position:absolute;border-radius:50%;filter:blur(34px);opacity:0;mix-blend-mode:screen}
+.flash{position:absolute;inset:0;background:#fff;opacity:0}
+.black{position:absolute;inset:0;background:#000}
+#ask{position:absolute;inset:0;opacity:0}
+#ask .q{position:absolute;left:0;right:0;top:700px;text-align:center;font-family:'Min';font-weight:700;font-size:92px;line-height:1.38;letter-spacing:.06em;padding-left:.06em;color:#fff7ec;text-shadow:0 0 40px rgba(255,200,140,.35)}
+#ask .q b{font-weight:700;color:#ffd79a}
+#ask .r{position:absolute;left:0;right:0;top:1010px;text-align:center;font-family:'Min';font-weight:600;font-size:44px;letter-spacing:.08em;padding-left:.08em;color:#f0e2cc}
+#ask .c{position:absolute;left:0;right:0;top:1360px;text-align:center;font-weight:500;font-size:30px;line-height:1.7;color:rgba(255,222,190,.85)}
+#cs{position:absolute;inset:0;opacity:0;background:radial-gradient(820px 700px at 50% 42%,rgba(46,26,30,.88),#000 78%)}
+#cs .d{position:absolute;left:0;right:0;top:520px;text-align:center;font-family:'Min';font-weight:700;font-size:250px;line-height:1;letter-spacing:.04em;padding-left:.04em;color:#fff6ea;text-shadow:0 0 60px rgba(255,190,120,.42)}
+#cs .rule{position:absolute;left:50%;top:850px;width:120px;height:2px;margin-left:-60px;background:linear-gradient(90deg,transparent,#e9c27c,transparent)}
+#cs .m{position:absolute;left:0;right:0;top:900px;text-align:center;font-family:'Min';font-weight:600;font-size:60px;line-height:1.55;letter-spacing:.12em;padding-left:.12em;color:#f4e6d2}
+#cs .logo{position:absolute;left:50%;top:1130px;width:190px;margin-left:-95px;opacity:.92}
+#cs .n{position:absolute;left:130px;right:130px;top:1340px;text-align:center;font-weight:400;font-size:27px;line-height:1.75;color:rgba(214,222,238,.66)}
 </style></head>
 <body>
 <div class="bg"></div>
-<div id="glow"></div>
-<div id="bokehs"></div>
-<div class="slit" id="slit"></div>
-<div class="stage">
-  <div class="phone" id="ph"><div class="scr"><div class="isl"></div>
-    <img class="n" src="assets/xmas_normal.png" alt=""><img class="x" src="assets/xmas_xmas.png" alt="">
-    <div class="tap" id="tap" style="left:397px;top:334px"></div>
-  </div></div>
+<div id="stage">
+  <img id="sn" src="assets/xm_night/f0165.png" alt="">
+  <canvas id="scr" width="3120" height="6620"></canvas>
 </div>
-<div id="snow"></div>
+<div id="bokehs"></div>
+<canvas id="snow" width="1080" height="1920"></canvas>
 <div class="flash" id="flash"></div>
-<div class="thin" id="t0">いつもの、空き教室検索。</div>
-<div class="thin" id="t1">12月だけの、見た目に。</div>
-<div id="title"><div class="k">ROOMRADAR</div><div class="m">クリスマス<br>モード</div>
-  <div class="s">検索画面が、12月の見た目に。<small>切り替えで、いつもの見た目に戻せます</small></div></div>
-<div id="ask"><div class="q">次の空きコマ、<br><b>もう決めた？</b></div><div class="r">空きコマが同じ友だちに、<br>送ってみて。</div></div>
-<div class="caution" id="cau">時間割にない授業もあります。<br>入る前に、ドア越しに確認を。</div>
+<div id="ask">
+  <div class="q">次の空きコマ、<br><b>もう決めた？</b></div>
+  <div class="r">空きコマが同じ友だちに、送ってみて。</div>
+  <div class="c">時間割にない授業もあります。<br>入る前に、ドア越しに確認を。</div>
+</div>
+<div id="cs">
+  <canvas id="csfx" width="1080" height="1920"></canvas>
+  <div class="d">12.1</div>
+  <div class="rule"></div>
+  <div class="m">クリスマスモード、<br>はじまりました。</div>
+  <img class="logo" src="assets/logo.png" alt="">
+  <div class="n"></div>
+</div>
+<div class="black" id="blk"></div>
 
 <script src="vendor/gsap.min.js"></script>
 <script src="common.js"></script>
 <script>
-const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 12.5;
-const T_SWITCH = 3.55;
-// 雪と光の粒（毎回同じ位置になるよう、決まった数列で並べる）
-let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-const flakes = [];
-for (let i = 0; i < 140; i++) {
-  const e = document.createElement('div'); e.className = 'flake';
-  const s = 3 + rnd() * 9; e.style.width = e.style.height = s + 'px';
-  document.getElementById('snow').appendChild(e);
-  flakes.push({ e, x: rnd() * 1080, y0: rnd() * 1920, v: 70 + rnd() * 120 + s * 8, sway: 10 + rnd() * 30, ph: rnd() * 6.28, o: .45 + rnd() * .5 });
-}
-const BCOL = ['rgba(255,80,90,.75)', 'rgba(255,200,110,.8)', 'rgba(60,200,130,.7)', 'rgba(255,240,210,.7)'];
-for (let i = 0; i < 16; i++) {
-  const e = document.createElement('div'); e.className = 'bokeh';
-  const s = 40 + rnd() * 80; Object.assign(e.style, { width: s + 'px', height: s + 'px', left: rnd() * 1080 - s / 2 + 'px', top: rnd() * 1920 - s / 2 + 'px', background: BCOL[i % 4] });
-  document.getElementById('bokehs').appendChild(e);
-}
-// 1コマごとに、雪の位置と明るさを時刻から決める
-window.BG3D = async t => {
-  const on = Math.max(0, Math.min(1, (t - T_SWITCH) / 0.5));
-  const fade = t > 11.9 ? Math.max(0, 1 - (t - 11.9) / 0.4) : 1;
-  for (const f of flakes) {
-    const y = (f.y0 + (t - T_SWITCH + 3) * f.v) % 2000 - 40;
-    const x = f.x + Math.sin(t * 0.9 + f.ph) * f.sway;
-    f.e.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
-    f.e.style.opacity = (on * f.o * fade).toFixed(3);
-  }
-};
+document.querySelector('#cs .n').textContent = NOTE;
+const tl = gsap.timeline({ paused: true }); window.TL = tl; window.DURATION = 15.4;
+const P0 = 1.2, P1 = 3.0, SW_T = 3.55, ASK = 6.55, END = 9.4, FH = 112;   // FH：寄り終わりのコマ（画面の上のロゴと飾りまで見える）     // 寄る → 切り替え → 問いかけ → 最後の札
+const pad = f => String(f).padStart(4, '0');
+const sn = document.getElementById('sn');
 
-// 1. 暗いところに、細い光の線（0〜1.3秒）
-tl.to('#slit', { width: 760, marginLeft: -380, duration: 0.9, ease: 'power2.out' }, 0.15)
-  .to('#slit', { opacity: 0, duration: 0.35 }, 1.05);
-// 2. いつもの画面が、暗い中から（1.2〜3.5秒）
-tl.fromTo('#ph', { opacity: 0, rotationY: 24, rotationX: 8, scale: 0.86, y: 60 }, { opacity: 1, rotationY: 10, rotationX: 4, scale: 0.92, y: 0, duration: 2.2, ease: 'power2.out' }, 1.15)
-  .to('#t0', { opacity: 1, duration: 0.5 }, 1.6)
-  .to('#t0', { opacity: 0, duration: 0.3 }, 3.15);
-// 3. 🎄 を押す → 光って、クリスマスの見た目に（3.3〜4.2秒）
-tl.fromTo('#tap', { opacity: 0, scale: 1.6 }, { opacity: 1, scale: 1, duration: 0.18, ease: 'power2.out' }, 3.28)
-  .to('#tap', { opacity: 0, scale: 0.7, duration: 0.25 }, 3.5)
-  .to('#ph .scr .x', { opacity: 1, duration: 0.08 }, T_SWITCH)
-  .fromTo('#flash', { opacity: 0 }, { opacity: 0.6, duration: 0.06 }, T_SWITCH)
-  .to('#flash', { opacity: 0, duration: 0.6, ease: 'power2.out' }, T_SWITCH + 0.06)
-  .to('#glow', { opacity: 1, duration: 0.8 }, T_SWITCH)
-  .to('.bokeh', { opacity: 0.45, duration: 1.0, stagger: 0.03 }, T_SWITCH + 0.05)
-  .to('#ph', { rotationY: 0, rotationX: 0, scale: 1.0, duration: 0.9, ease: 'power3.out' }, T_SWITCH);
-// 4. 寄って、帯（Merry Christmas）を見せる（4.2〜6.6秒）
-tl.to('#ph', { scale: 1.32, y: 330, duration: 2.6, ease: 'power1.inOut' }, 4.2)
-  .to('#t1', { opacity: 1, duration: 0.5 }, 4.5)
-  .to('#t1', { opacity: 0, duration: 0.3 }, 6.3);
-// 5. 題（6.6〜8.9秒）
-tl.to('#ph', { opacity: 0, scale: 1.5, duration: 0.45, ease: 'power2.in' }, 6.45)
-  .to('#title', { opacity: 1, duration: 0.5 }, 6.75)
-  .from('#title .m', { letterSpacing: '0.4em', duration: 1.6, ease: 'power3.out' }, 6.75)
-  .to('#title', { opacity: 0, duration: 0.35 }, 8.65);
-// 6. 問いかけ（9.0〜10.6秒）
-tl.to('#ask', { opacity: 1, duration: 0.4 }, 8.95)
-  .from('#ask .q', { y: 40, duration: 0.5, ease: 'power3.out' }, 8.95)
-  .from('#ask .r', { opacity: 0, duration: 0.4 }, 9.5)
-  .to('#ask', { opacity: 0, duration: 0.3 }, 10.4)
-  .to('#cau', { opacity: 1, duration: 0.4 }, 6.8)
-  .to('#cau', { opacity: 0, duration: 0.3 }, 10.4);
-// 7. 終わりの札（10.6〜12.5秒）
-addEnd(tl, 10.6, '今日から、<span class="o">クリスマスモード。</span>');
+// ── 机のスマホの画面（くっきり重ねる。r6.html と同じ作り） ──
+const SW = 3120, SH = 6620, RAD = 362;
+const scrEl = document.getElementById('scr'), sx = scrEl.getContext('2d');
+const appN = new Image(); appN.src = 'assets/xm_normal_hd.png';
+const appX = new Image(); appX.src = 'assets/xm_screen_hd.png';
+let QUAD = null;
+window.READY = false;
+Promise.all([fetch('assets/xm_night/screen.json').then(r => r.json()).then(j => { QUAD = j; }), appN.decode(), appX.decode()]).then(() => { window.READY = true; });
+const BULB = [[0.0513, 0.0236, '255,90,100'], [0.1538, 0.0284, '255,205,80'], [0.2564, 0.0245, '80,220,130'], [0.3590, 0.0284, '90,150,255'],
+              [0.4615, 0.0236, '255,90,100'], [0.5641, 0.0284, '255,205,80'], [0.6667, 0.0245, '80,220,130'], [0.7692, 0.0284, '90,150,255'],
+              [0.8718, 0.0236, '255,90,100'], [0.9744, 0.0284, '255,205,80']];
+const STAR = [0.897, 0.092], TREE = [0.751, 0.293];                 // ロゴの横の星、切り替えの 🎄
+function drawScreen(t) {
+  const x = Math.min(1, Math.max(0, (t - SW_T) / 0.08));             // 0：通常 → 1：クリスマス
+  sx.clearRect(0, 0, SW, SH);
+  sx.save(); sx.beginPath(); sx.roundRect(0, 0, SW, SH, RAD); sx.clip();
+  sx.drawImage(appN, 0, 0, SW, SH);
+  if (x > 0) { sx.globalAlpha = x; sx.drawImage(appX, 0, 0, SW, SH); sx.globalAlpha = 1; }
+  sx.globalCompositeOperation = 'lighter';
+  const on = Math.min(1, Math.max(0, (t - SW_T) / 0.6));
+  if (on > 0) {
+    BULB.forEach(([u, v, c], k) => {                                  // 電球が1つずつ、ゆっくりまたたく
+      const a = on * (0.25 + 0.75 * Math.pow(0.5 + 0.5 * Math.sin(t * 2.6 + k * 1.9), 2));
+      const bx = u * SW, by = v * SH, g = sx.createRadialGradient(bx, by, 0, bx, by, 120);
+      g.addColorStop(0, `rgba(${c},${(0.85 * a).toFixed(3)})`); g.addColorStop(0.35, `rgba(${c},${(0.28 * a).toFixed(3)})`); g.addColorStop(1, `rgba(${c},0)`);
+      sx.fillStyle = g; sx.fillRect(bx - 120, by - 120, 240, 240);
+    });
+    const px = STAR[0] * SW, py = STAR[1] * SH, pw = on * (0.75 + 0.25 * Math.sin(t * 5.3)) * (t < SW_T + 1.2 ? 1.5 - (t - SW_T) / 2.4 : 1);
+    const g = sx.createRadialGradient(px, py, 0, px, py, 420);       // 星が光る（切り替わった直後は強く）
+    g.addColorStop(0, `rgba(255,236,170,${(0.7 * pw).toFixed(3)})`); g.addColorStop(0.25, `rgba(255,200,110,${(0.28 * pw).toFixed(3)})`); g.addColorStop(1, 'rgba(255,190,90,0)');
+    sx.fillStyle = g; sx.fillRect(px - 420, py - 420, 840, 840);
+    sx.save(); sx.translate(px, py); sx.rotate(0.12 + t * 0.05);
+    for (const [w, h] of [[900, 10], [10, 620]]) {
+      const lg = w > h ? sx.createLinearGradient(-w / 2, 0, w / 2, 0) : sx.createLinearGradient(0, -h / 2, 0, h / 2);
+      lg.addColorStop(0, 'rgba(255,240,200,0)'); lg.addColorStop(0.5, `rgba(255,244,214,${(0.5 * pw).toFixed(3)})`); lg.addColorStop(1, 'rgba(255,240,200,0)');
+      sx.fillStyle = lg; sx.fillRect(-w / 2, -h / 2, w, h);
+    }
+    sx.restore();
+  }
+  // 切り替えの一瞬、画面全体がふわっと光る
+  const fl = t > SW_T && t < SW_T + 0.5 ? (1 - (t - SW_T) / 0.5) * 0.5 : 0;
+  if (fl > 0) { sx.fillStyle = `rgba(255,236,200,${fl.toFixed(3)})`; sx.fillRect(0, 0, SW, SH); }
+  sx.globalCompositeOperation = 'source-over';
+  // 🎄 を押す指の輪（3.25〜3.55秒）
+  if (t > 3.22 && t < SW_T + 0.15) {
+    const k = (t - 3.22) / (SW_T + 0.15 - 3.22), r = 150 + 90 * Math.min(1, k * 2.2), a = k < 0.25 ? k / 0.25 : Math.max(0, 1 - (k - 0.25) / 0.75);
+    sx.strokeStyle = `rgba(255,255,255,${(0.9 * a).toFixed(3)})`; sx.lineWidth = 22; sx.beginPath(); sx.arc(TREE[0] * SW, TREE[1] * SH, r, 0, Math.PI * 2); sx.stroke();
+    sx.fillStyle = `rgba(255,255,255,${(0.18 * a).toFixed(3)})`; sx.beginPath(); sx.arc(TREE[0] * SW, TREE[1] * SH, r * 0.92, 0, Math.PI * 2); sx.fill();
+  }
+  // ガラスの映り込み・上の切り欠き・縁
+  const off = -0.25 + t * 0.06, lg = sx.createLinearGradient(SW * off, 0, SW * (off + 0.9), SH * 0.55);
+  lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(0.45, 'rgba(255,255,255,0)'); lg.addColorStop(0.5, 'rgba(255,255,255,0.06)');
+  lg.addColorStop(0.62, 'rgba(255,255,255,0.02)'); lg.addColorStop(1, 'rgba(255,255,255,0)');
+  sx.fillStyle = lg; sx.fillRect(0, 0, SW, SH);
+  const iw = SW * 0.30, ih = SH * 0.042, ix = (SW - iw) / 2, iy = SH * 0.013;
+  sx.fillStyle = '#000'; sx.beginPath(); sx.roundRect(ix, iy, iw, ih, ih / 2); sx.fill();
+  const lx = ix + iw - ih * 0.62, ly = iy + ih / 2, lr = ih * 0.2;
+  const cg = sx.createRadialGradient(lx - lr * 0.3, ly - lr * 0.3, 0, lx, ly, lr);
+  cg.addColorStop(0, 'rgba(70,90,150,.9)'); cg.addColorStop(0.5, 'rgba(20,26,48,1)'); cg.addColorStop(1, 'rgba(8,10,16,1)');
+  sx.fillStyle = cg; sx.beginPath(); sx.arc(lx, ly, lr, 0, Math.PI * 2); sx.fill();
+  sx.strokeStyle = 'rgba(0,0,0,.35)'; sx.lineWidth = 18; sx.beginPath(); sx.roundRect(9, 9, SW - 18, SH - 18, RAD - 9); sx.stroke();
+  sx.restore();
+}
+function adj(m) { return [m[4]*m[8]-m[5]*m[7], m[2]*m[7]-m[1]*m[8], m[1]*m[5]-m[2]*m[4], m[5]*m[6]-m[3]*m[8], m[0]*m[8]-m[2]*m[6], m[2]*m[3]-m[0]*m[5], m[3]*m[7]-m[4]*m[6], m[1]*m[6]-m[0]*m[7], m[0]*m[4]-m[1]*m[3]]; }
+function mm(a, b) { const c = []; for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) { let s = 0; for (let k = 0; k < 3; k++) s += a[3*i+k] * b[3*k+j]; c.push(s); } return c; }
+function mv(m, v) { return [m[0]*v[0]+m[1]*v[1]+m[2]*v[2], m[3]*v[0]+m[4]*v[1]+m[5]*v[2], m[6]*v[0]+m[7]*v[1]+m[8]*v[2]]; }
+function basis(p) { const m = [p[0][0], p[1][0], p[2][0], p[0][1], p[1][1], p[2][1], 1, 1, 1]; const v = mv(adj(m), [p[3][0], p[3][1], 1]); return mm(m, [v[0], 0, 0, 0, v[1], 0, 0, 0, v[2]]); }
+function quadMatrix(dst) {
+  const s = basis([[0, 0], [SW, 0], [0, SH], [SW, SH]]), d = basis(dst), h0 = mm(d, adj(s)), h = h0.map(x => x / h0[8]);
+  return `matrix3d(${h[0]},${h[3]},0,${h[6]},${h[1]},${h[4]},0,${h[7]},0,0,1,0,${h[2]},${h[5]},0,${h[8]})`;
+}
+function placeScreen(f) {
+  const q = QUAD[f], c = [(q[0][0] + q[2][0]) / 2, (q[0][1] + q[2][1]) / 2];
+  const g = p => [c[0] + (p[0] - c[0]) * 1.004, c[1] + (p[1] - c[1]) * 1.004];
+  scrEl.style.transform = quadMatrix([g(q[0]), g(q[1]), g(q[3]), g(q[2])]);
+}
+// ── 雪と光の粒（切り替わってから。毎回同じ位置になるよう、決まった数列で並べる） ──
+let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const sw = document.getElementById('snow').getContext('2d'), fx = document.getElementById('csfx').getContext('2d');
+const FL = Array.from({ length: 130 }, () => ({ x: rnd() * 1080, y: rnd() * 1920, r: 1.6 + rnd() * 4.2, v: 60 + rnd() * 120, sw: 10 + rnd() * 30, ph: rnd() * 6.28, o: 0.35 + rnd() * 0.5 }));
+const FLK = Array.from({ length: 48 }, () => ({ x: rnd() * 1080, y: rnd() * 1920, r: 1.6 + rnd() * 3.2, v: 38 + rnd() * 52, sw: 8 + rnd() * 22, ph: rnd() * 6.28, o: 0.22 + rnd() * 0.38 }));
+const BCOL = ['rgba(255,80,90,.7)', 'rgba(255,200,110,.75)', 'rgba(60,200,130,.6)', 'rgba(255,240,210,.6)'];
+const BPOS = [[90, 260], [980, 380], [150, 1500], [960, 1640], [60, 900], [1020, 1080], [300, 120], [780, 1820], [520, 1760], [880, 160]];
+BPOS.forEach(([x, y], i) => {
+  const e = document.createElement('div'); e.className = 'bokeh'; const s = 70 + (i * 37) % 90;
+  Object.assign(e.style, { width: s + 'px', height: s + 'px', left: x - s / 2 + 'px', top: y - s / 2 + 'px', background: BCOL[i % 4] });
+  document.getElementById('bokehs').appendChild(e);
+});
+function drawSnow(ctx, flakes, t, t0, alpha, fall) {
+  ctx.clearRect(0, 0, 1080, 1920);
+  if (alpha <= 0) return;
+  for (const f of flakes) {
+    const y = (f.y + (t - t0) * f.v * fall) % 1960 - 20, x = f.x + Math.sin(t * 0.8 + f.ph) * f.sw;
+    ctx.fillStyle = `rgba(255,248,236,${(f.o * alpha).toFixed(3)})`; ctx.beginPath(); ctx.arc(x, y, f.r, 0, Math.PI * 2); ctx.fill();
+  }
+}
+window.BG3D = async t => {
+  // 机のスマホへ寄る：カミングスーンのコマ（165 → 112）を逆に、同じ速さで流す
+  const f = t < P0 ? 165 : t < P1 ? Math.round(165 - (t - P0) / (P1 - P0) * (165 - FH)) : FH;
+  const src = `assets/xm_night/f${pad(f)}.png`;
+  if (!sn.src.endsWith(src)) { sn.src = src; await sn.decode(); }
+  if (t < END + 0.6) { drawScreen(t); placeScreen(f); }
+  const a = Math.min(1, Math.max(0, (t - SW_T) / 0.6)) * (t > END + 0.3 ? Math.max(0, 1 - (t - END - 0.3) / 0.4) : 1);
+  drawSnow(sw, FL, t, SW_T - 3, a, 1);
+  drawSnow(fx, FLK, t, END, Math.min(1, Math.max(0, (t - END - 0.8) / 1.2)), 1);
+};
+// 0. 暗いところから、夜の教室の机へ
+tl.fromTo('#blk', { opacity: 1 }, { opacity: 0, duration: 0.8, ease: 'power1.out' }, 0);
+// 1. 🎄 を押して、クリスマスの見た目に（3.55秒）
+tl.fromTo('#flash', { opacity: 0 }, { opacity: 0.32, duration: 0.05 }, SW_T)
+  .to('#flash', { opacity: 0, duration: 0.55, ease: 'power2.out' }, SW_T + 0.05)
+  .to('.bokeh', { opacity: 0.5, duration: 1.0, stagger: 0.04 }, SW_T + 0.05)
+  .fromTo('#stage', { scale: 1 }, { scale: 1.06, duration: ASK - P1 + 0.4, ease: 'sine.inOut' }, P1);
+// 2. 問いかけ（6.55〜9.4秒）：画面はぼかして暗く
+tl.to('#stage', { filter: 'blur(12px) brightness(0.42)', duration: 0.5, ease: 'power1.inOut' }, ASK - 0.1)
+  .to('#ask', { opacity: 1, duration: 0.5 }, ASK)
+  .from('#ask .q', { y: 30, filter: 'blur(8px)', duration: 0.8, ease: 'power3.out' }, ASK)
+  .from('#ask .r', { opacity: 0, duration: 0.5 }, ASK + 0.6)
+  .from('#ask .c', { opacity: 0, duration: 0.5 }, ASK + 0.9)
+  .to(['#ask', '.bokeh'], { opacity: 0, duration: 0.4 }, END - 0.2);
+// 3. 最後の札（9.4秒〜）：カミングスーンの札と対に。ゆっくり寄りながら雪、最後は黒へ
+tl.to('#cs', { opacity: 1, duration: 0.6 }, END)
+  .from('#cs .d', { scale: 0.94, opacity: 0, filter: 'blur(14px)', duration: 1.1, ease: 'power3.out' }, END + 0.15)
+  .from('#cs .rule', { scaleX: 0, duration: 0.7, ease: 'power2.out' }, END + 0.65)
+  .from('#cs .m', { opacity: 0, letterSpacing: '.28em', duration: 1.0, ease: 'power3.out' }, END + 0.7)
+  .from('#cs .logo', { opacity: 0, y: 14, duration: 0.6 }, END + 1.05)
+  .from('#cs .n', { opacity: 0, duration: 0.5 }, END + 1.15)
+  .fromTo('#cs', { scale: 1 }, { scale: 1.035, duration: window.DURATION - END, ease: 'none' }, END)
+  .to('#blk', { opacity: 1, duration: 1.1, ease: 'power1.in' }, window.DURATION - 1.2);
 tl.to({}, { duration: 0.01 }, window.DURATION);
 </script>
 </body></html>

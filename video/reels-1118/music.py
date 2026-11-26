@@ -317,28 +317,54 @@ def impact():                              # 切り替わる一瞬の「どん�
 
 
 def r5():
-    """クリスマスモード（12.5秒）。暗いうなり → 切り替えの「どん」→ 鈴のような分散と和音（C の明るい進行）→ 終わりの和音"""
-    m = Mix(12.5)
-    m.add(drone(note("C2"), 3.55), 0.0, 0.55)                                   # 出だしの低いうなり
-    m.add(whoosh(1.2), 2.35, 0.35)                                               # 切り替えの前の吸い込み
-    for t in (1.2, 1.9, 2.5, 3.0, 3.3): m.add(tick(1500), t, 0.12, 0.2)          # 時計のような小さな音
-    m.add(impact(), 3.55, 0.9)
-    m.add(bell(note("E6")), 3.56, 0.32, 0.2); m.add(bell(note("G6")), 3.62, 0.22, -0.2); m.add(bell(note("C7")), 3.7, 0.16)
-    CH = [("C", ["C3", "G3", "E4", "G4", "C5"]), ("Am", ["A2", "E3", "C4", "E4", "A4"]), ("F", ["F2", "C3", "A3", "C4", "F4"]), ("G", ["G2", "D3", "B3", "D4", "G4"])]
-    t = 3.6; k = 0
-    while t < 10.5:
-        name, ch = CH[k % 4]; fs = [note(n) for n in ch]
-        m.add(pad(fs[1:4], 1.9), t, 0.22)
-        m.add(soft(fs[0] / 2 * 2, 2.6, 1.4), t, 0.30)
-        for j in range(8):                                                      # 鈴のような細かい分散（0.22秒おき）
-            f = fs[1 + (j % 4)] * 4
-            m.add(bell(f), t + j * 0.22, 0.05 + 0.02 * (j % 2), (-0.35, 0.35)[j % 2])
-        t += 1.75; k += 1
-    m.add(impact(), 6.75, 0.35)                                                  # 題が出るところで、軽く
-    for f, d in (("C4", 0), ("E4", 0.05), ("G4", 0.1), ("C5", 0.15), ("E5", 0.2)):
-        m.add(soft(note(f), 2.6, 1.6), 10.6 + d, 0.22)                          # 終わりの和音
-    m.add(bell(note("C7")), 10.65, 0.14)
-    master(m, "r5", fade_out=1.4)
+    """クリスマスモードの本編（15.4秒）。2026-11-26 に作り直し（その前は、暗いうなり → 鈴の分散）。
+    カミングスーン（r6）と同じ楽器（チェレスタ・鈴・弦・声・鐘・ハープ）と同じ出だしの旋律で、続きの動画だと分かるようにした（イ長調・3拍子・1拍 0.5 秒。オリジナル）。
+    机のスマホに寄る（旋律と弦、鈴がだんだん、ハープのかけ上がり）→ 🎄 を押す「こつ」→ 切り替わる一瞬に「しゃらん」と鐘ときらきら →
+    ずん・ちゃっ・ちゃっのワルツと鈴 → 問いかけ → 日付で温かい和音と声（A → D/A → A）。場面の時刻は r5.html と同じ"""
+    m = Mix(15.4); B = 0.5
+    J = jingles(13)
+    def cel(n, t, g, pan=0.0): m.add(celesta(note(n)), t, g, pan); m.add(bell(note(n) * 2), t, g * 0.12, -pan)
+    bar = lambda k: 0.55 + 3 * B * k                     # 小節の頭（3小節目の頭 3.55 秒が切り替わり）
+    # 1. 机のスマホに寄る（0〜3.55秒）
+    m.add(wind(2.6), 0.0, 0.1)
+    for n, t in (("E5", bar(0)), ("A5", bar(0) + B), ("C#6", bar(0) + 2 * B), ("B5", bar(1)), ("A5", bar(1) + 1.5 * B), ("F#5", bar(1) + 2 * B)):
+        cel(n, t, 0.3, 0.1)
+    m.add(strings(("A2", "E3", "A3", "C#4"), 1.6, att=1.0, rel=0.4), bar(0), 0.13)
+    m.add(strings(("F#2", "C#3", "F#3", "A3"), 1.55, att=0.5, rel=0.1), bar(1), 0.17)
+    sleigh_run(m, J, bar(1), bar(2) - 0.05, B / 2, 0.04, 0.13)
+    for i, n in enumerate(("A4", "B4", "C#5", "D5", "E5", "F#5", "G#5", "A5", "B5", "C#6")):   # ハープのかけ上がり
+        m.add(pluck(note(n), 1.2, 0.8), 3.05 + 0.45 * i / 10, 0.09, -0.4 + 0.8 * i / 10)
+    m.add(pop(1300), 3.33, 0.18)                                                       # 🎄 を押す「こつ」
+    # 2. 切り替わる（3.55秒）：「しゃらん」・鐘・きらきら・弦と声
+    S = bar(2)
+    m.add(sleigh_crash(), S, 0.3, 0.1); m.add(toll(note("A2")), S, 0.3); m.add(timp(note("A1")), S, 0.3)
+    for n in ("A6", "C#7", "E7"): m.add(bell(note(n)), S + 0.01, 0.06)
+    m.add(strings(("A2", "E3", "A3", "C#4", "E4", "A4"), 1.5, att=0.03, rel=0.4, cutoff=3200), S, 0.22)
+    m.add(choir(("A3", "C#4", "E4"), 1.5, att=0.3, rel=0.5), S, 0.1)
+    # 3. ワルツ（3.55〜9.55秒）：A → D → Bm → E
+    prog = (("A2", ("C#5", "E5", "A5"), ("A2", "E3", "A3", "C#4")), ("D3", ("D5", "F#5", "A5"), ("D3", "F#3", "A3", "D4")),
+            ("B2", ("D5", "F#5", "B5"), ("B2", "F#3", "B3", "D4")), ("E3", ("D5", "G#5", "B5"), ("E3", "G#3", "B3", "D4")))
+    for k, (bass, ch, pad_) in enumerate(prog):
+        t = bar(2 + k)
+        m.add(pluck(note(bass), 0.9, 0.5), t, 0.42)
+        for jb in (1, 2):
+            for n in ch: m.add(celesta(note(n)), t + jb * B, 0.05, (-0.3, 0.3)[jb - 1])
+        if k: m.add(strings(pad_, 3 * B, att=0.2, rel=0.2), t, 0.15)
+    for n, t, d in (("A5", bar(2), 0), ("C#6", bar(2) + B, 0), ("E6", bar(2) + 2 * B, 0), ("F#6", bar(3), 0), ("E6", bar(3) + B, 0), ("D6", bar(3) + 2 * B, 0),
+                    ("C#6", bar(4), 0), ("B5", bar(4) + 1.5 * B, 0), ("A5", bar(4) + 2 * B, 0), ("B5", bar(5), 0), ("G#5", bar(5) + 2 * B, 0)):
+        cel(n, t, 0.24)
+    sleigh_run(m, J, S, bar(4), B / 2, 0.14, 0.15)
+    sleigh_run(m, J, bar(4), bar(6) - 0.05, B / 2, 0.12, 0.08)                         # 問いかけの間は少し静かに
+    # 4. 日付（9.55秒〜）：A → D/A → A。弦と声、チェレスタ、鈴をひと振りずつ
+    E = bar(6)
+    m.add(toll(note("A2")), E, 0.16)
+    for names, t0, d, a, r in ((("A2", "E3", "A3", "C#4", "E4"), E, 1.6, 0.6, 0.4), (("A2", "D3", "F#3", "A3", "D4"), E + 1.5, 1.6, 0.4, 0.4), (("A2", "E3", "A3", "C#4", "E4"), E + 3.0, 2.85, 0.4, 1.8)):
+        m.add(strings(names, d, att=a, rel=r), t0, 0.19)
+        m.add(choir(names[2:], d, att=a + 0.3, rel=r), t0 + 0.05, 0.15)
+    for n, t, gg in (("E6", E + 0.05, 0.22), ("C#6", E + 0.55, 0.2), ("A5", E + 1.05, 0.2), ("B5", E + 1.55, 0.2), ("A5", E + 2.05, 0.18), ("C#6", E + 3.0, 0.18), ("A5", E + 3.02, 0.12)):
+        cel(n, t, gg)
+    for t, gg in ((E, 0.11), (E + 1.5, 0.08), (E + 3.0, 0.07), (E + 4.3, 0.05)): shake_once(m, J, t, gg)
+    master(m, "r5", fade_out=1.8)
 
 
 def wind(dur):                             # 夜の風（こもった雑音が、ゆっくり強くなったり弱くなったり）
@@ -405,28 +431,38 @@ def timp(f):                                # ティンパニのような低い�
     return body + 0.3 * onepole(noise(1.2), 0.08) * np.exp(-t / 0.03)
 
 
-def r6():
-    """カミングスーン（16.5秒）。2026-11-24 運営「音楽をもっとクリスマスに」で作り直し（その前は、風と低いうなりの暗い音）。
-    鈴・チェレスタ・弦・聖歌隊ふうの声・教会の鐘・ハープの音で、イ長調・3拍子のオリジナルの旋律（既存の曲ではない）。
-    星（チェレスタの旋律と弦、鈴がだんだん）→ 扉で鐘と「しゃらん」→ ずん・ちゃっ・ちゃっのワルツ → 箱が飛び出す前の高まり → 飛び出してきらきら →
-    暗転で止めて低い鐘 → 日付で温かい和音と声（A → D/A → A で終わる）。場面の時刻は r6.html と同じ"""
-    m = Mix(16.5); B = 0.55
-    jr = np.random.default_rng(11)          # 鈴の音のばらつき（ほかのリールの音を変えないよう、別の種）
-    def jingle(dur=0.35):
+def jingles(seed=11):                        # 鈴ひと鳴りの音を10とおり（高い小さな鈴を7つ＋「しゃっ」という雑音）。種を固定して毎回同じ音に
+    jr = np.random.default_rng(seed)
+    def one(dur=0.35):
         t = np.arange(int(dur * SR)) / SR; out = np.zeros_like(t)
         for _ in range(7):
             f = 2600 + 4400 * jr.random(); o = int(jr.random() * 0.022 * SR); d = 0.05 + 0.12 * jr.random(); tt = t[: len(t) - o]
             out[o:] += (np.sin(2 * np.pi * f * tt) + 0.4 * np.sin(2 * np.pi * f * 2.31 * tt)) * np.exp(-tt / d) * (0.5 + 0.5 * jr.random())
         nz = fft_filter(jr.standard_normal(len(t)), lambda fr: (fr > 4500) * 1.0)
         return (out / 7 + 0.35 * nz * np.exp(-t / 0.018))
-    JING = [2.6 * jingle() for _ in range(10)]          # 鈴がほかの楽器に埋もれないよう大きめに
-    def sleigh(t0, t1, step, g0, g1, accent=2):
-        k, t = 0, t0
-        while t < t1 - 1e-6:
-            g = g0 + (g1 - g0) * (t - t0) / max(1e-6, t1 - t0)
-            m.add(JING[k % 10], t, g * (1.0 if k % accent == 0 else 0.6), (-0.25, 0.25)[k % 2]); k += 1; t += step
-    def shake(t0, g):                       # 鈴をひと振り
-        for k in range(7): m.add(JING[k % 10], t0 + k * 0.06, g * np.sin(np.pi * (k + 0.5) / 7), (-0.3, 0.3)[k % 2])
+    return [2.6 * one() for _ in range(10)]   # 鈴がほかの楽器に埋もれないよう大きめに
+
+
+def sleigh_run(m, J, t0, t1, step, g0, g1, accent=2):   # 鈴を一定の間隔で鳴らし続ける（g0 → g1 へ大きさを変える）
+    k, t = 0, t0
+    while t < t1 - 1e-6:
+        g = g0 + (g1 - g0) * (t - t0) / max(1e-6, t1 - t0)
+        m.add(J[k % 10], t, g * (1.0 if k % accent == 0 else 0.6), (-0.25, 0.25)[k % 2]); k += 1; t += step
+
+
+def shake_once(m, J, t0, g):                  # 鈴をひと振り
+    for k in range(7): m.add(J[k % 10], t0 + k * 0.06, g * np.sin(np.pi * (k + 0.5) / 7), (-0.3, 0.3)[k % 2])
+
+
+def r6():
+    """カミングスーン（16.5秒）。2026-11-24 運営「音楽をもっとクリスマスに」で作り直し（その前は、風と低いうなりの暗い音）。
+    鈴・チェレスタ・弦・聖歌隊ふうの声・教会の鐘・ハープの音で、イ長調・3拍子のオリジナルの旋律（既存の曲ではない）。
+    星（チェレスタの旋律と弦、鈴がだんだん）→ 扉で鐘と「しゃらん」→ ずん・ちゃっ・ちゃっのワルツ → 箱が飛び出す前の高まり → 飛び出してきらきら →
+    暗転で止めて低い鐘 → 日付で温かい和音と声（A → D/A → A で終わる）。場面の時刻は r6.html と同じ"""
+    m = Mix(16.5); B = 0.55
+    J = jingles(11)
+    def sleigh(t0, t1, step, g0, g1, accent=2): sleigh_run(m, J, t0, t1, step, g0, g1, accent)
+    def shake(t0, g): shake_once(m, J, t0, g)
     def cel(n, t, g, pan=0.0): m.add(celesta(note(n)), t, g, pan); m.add(bell(note(n) * 2), t, g * 0.12, -pan)
 
     # 1. 星（0〜5.5秒）：3拍子の旋律。A → F#m → D・E
