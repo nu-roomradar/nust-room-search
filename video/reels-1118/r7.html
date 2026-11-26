@@ -58,7 +58,7 @@ body{background:#000}
   </div></div>
 </div>
 <canvas id="snow" width="1080" height="1920"></canvas>
-<div class="lab" id="lab1"></div><div class="lab" id="lab2"></div><div class="lab" id="lab3"></div>
+<div class="lab" id="lab0"></div><div class="lab" id="lab1"></div><div class="lab" id="lab2"></div><div class="lab" id="lab3"></div>
 <div class="flash" id="flash"></div>
 <div id="ask">
   <div class="q">次の空きコマ、<br><b>もう決めた？</b></div>
@@ -88,7 +88,7 @@ const pad = f => String(f).padStart(4, '0');
 const box = document.getElementById('box');
 const $ = id => document.getElementById(id);
 const SRC = MODE === 'a'
-  ? { L1: 'main_x', L2: 'nextlong_x', L3: 'room_x', L4: 'find_x' }
+  ? { L1: 'main_n', L2: 'main_x', L3: 'nextlong_x', L4: 'room_x', L5: 'find_x' }
   : { L1: 'main_n', L2: 'main_x', L3: 'room_n', L4: 'room_x', L5: 'find_n', L6: 'find_x' };
 window.READY = false;
 Promise.all(Object.entries(SRC).map(([id, n]) => { $(id).src = `assets/xs_${n}.png`; return $(id).decode(); })).then(() => { window.READY = true; });
@@ -144,7 +144,7 @@ const BULB = [[0.0513, 0.0236, '255,90,100'], [0.1538, 0.0284, '255,205,80'], [0
 const SFL = Array.from({ length: 36 }, () => ({ x: rnd() * 632, y: rnd() * 1368, r: 1.2 + rnd() * 2.6, v: 40 + rnd() * 70, sw: 6 + rnd() * 14, ph: rnd() * 6.28, o: 0.3 + rnd() * 0.45 }));
 function drawScrFx(t) {
   sf.clearRect(0, 0, 632, 1368);
-  if (t < S + 1.2 || t > END + 0.5) return;
+  if (t < S + 2.0 || t > END + 0.5) return;                // クリスマスの見た目になってから
   sf.globalCompositeOperation = 'lighter';
   BULB.forEach(([u, v, c], k) => {
     const a = 0.2 + 0.8 * Math.pow(0.5 + 0.5 * Math.sin(t * 2.6 + k * 1.9), 2), x = u * 632, y = v * 1368 * (844 / 844), g = sf.createRadialGradient(x, y, 0, x, y, 26);
@@ -200,15 +200,22 @@ $('lab2').innerHTML = '教室の1週間も、<b>クリスマスに。</b>';
 $('lab3').innerHTML = '教室さがしも、<b>クリスマスに。</b>';
 const lab = (from, to, at) => tl.to(from, { opacity: 0, y: -10, duration: 0.25 }, at).fromTo(to, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, immediateRender: false }, at + 0.2);
 const slide = (id, at) => tl.fromTo(id, { opacity: 1, x: 632 }, { x: 0, duration: 0.42, ease: 'power3.out', immediateRender: false }, at);
+// v10（運営「最初の画面だけ普通モードからクリスマス仕様に変化で」）：箱から出てきたときはいつもの見た目。金色の線が走って、クリスマスの見た目になる
+const SWP = S + 1.5;
+$('lab0').innerHTML = 'いつもの検索画面が、';
 tl.set('#L1', { opacity: 1 }, 0)
-  .fromTo('#lab1', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5 }, S + 0.9);
+  .fromTo('#lab0', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.35 }, S + 0.85)
+  .set('#L2', { opacity: 1, clipPath: 'inset(0 100% 0 0)' }, SWP)
+  .to('#L2', { clipPath: 'inset(0 0% 0 0)', duration: 0.5, ease: 'power2.inOut' }, SWP)
+  .fromTo('#edge', { left: 0, opacity: 1 }, { left: 632, duration: 0.5, ease: 'power2.inOut', immediateRender: false }, SWP).set('#edge', { opacity: 0 }, SWP + 0.5);
+lab('#lab0', '#lab1', SWP + 0.1);
 tapAt(195, 390, bar(2));                                                   // 「次（火曜4限）」を押す
-tl.to('#L2', { opacity: 1, duration: 0.18 }, bar(2) + 0.08)
-  .to('#L2', { y: -150 * K, duration: 0.9, ease: 'power2.inOut' }, bar(2) + 0.7)        // 一覧を下へ流して
-  .to('#L2', { y: 0, duration: 0.8, ease: 'power2.inOut' }, bar(3) + 0.45);             // 上へ戻る
+tl.to('#L3', { opacity: 1, duration: 0.18 }, bar(2) + 0.08)
+  .to('#L3', { y: -150 * K, duration: 0.9, ease: 'power2.inOut' }, bar(2) + 0.7)        // 一覧を下へ流して
+  .to('#L3', { y: 0, duration: 0.8, ease: 'power2.inOut' }, bar(3) + 0.45);             // 上へ戻る
 tapAt(316, 597, bar(4));                                                   // 教室 133 を押す
-slide('#L3', bar(4) + 0.08); lab('#lab1', '#lab2', bar(4) + 0.05);         // 教室の1週間
-slide('#L4', bar(6)); lab('#lab2', '#lab3', bar(6) - 0.05);                // 教室さがし
+slide('#L4', bar(4) + 0.08); lab('#lab1', '#lab2', bar(4) + 0.05);         // 教室の1週間
+slide('#L5', bar(6)); lab('#lab2', '#lab3', bar(6) - 0.05);                // 教室さがし
 // 2. 問いかけ（9.55〜12.4秒）：スマホは後ろへ下がってぼける
 tl.to('#stage', { filter: 'blur(14px) brightness(0.4)', scale: 0.92, duration: 0.5, ease: 'power1.inOut' }, ASK - 0.15)
   .to('.lab', { opacity: 0, duration: 0.3 }, ASK - 0.2)
