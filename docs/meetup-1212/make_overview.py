@@ -95,7 +95,7 @@ ul.p{{list-style:none}} ul.p li{{position:relative;padding-left:4mm}} ul.p li:be
 
 <div class="r">
   <div class="rec">
-    <div class="t">いっしょに作る<br><span>メンバーを募集</span>しています</div>
+    <div class="t">いっしょに作る<br><span>メンバーを募集中</span></div>
     <ul>
       <li><b>時間割データの取り込み</b>Excel の時間割を読み込む仕組み（Python）</li>
       <li><b>画面づくり</b>HTML・CSS、検索アプリ（Flask）</li>
