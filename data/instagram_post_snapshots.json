@@ -1,8 +1,8 @@
 [
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "17857923606658370",
-  "age_days": 161.6,
+  "age_days": 165.6,
   "views": 145,
   "reach": 52,
   "likes": 0,
@@ -17,9 +17,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "17861452197647907",
-  "age_days": 139.9,
+  "age_days": 143.9,
   "views": 208,
   "reach": 103,
   "likes": 1,
@@ -34,9 +34,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "17888292051580715",
-  "age_days": 151.9,
+  "age_days": 155.9,
   "views": 96,
   "reach": 46,
   "likes": 0,
@@ -51,9 +51,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "17911626324517925",
-  "age_days": 41.8,
+  "age_days": 45.8,
   "views": 54,
   "reach": 32,
   "likes": 0,
@@ -68,9 +68,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "17911770186288414",
-  "age_days": 59.9,
+  "age_days": 64.0,
   "views": 63,
   "reach": 34,
   "likes": 1,
@@ -85,9 +85,41 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
+  "id": "17917588512558562",
+  "age_days": 0.7,
+  "views": 151,
+  "reach": 127,
+  "likes": 1,
+  "comments": 0,
+  "saved": 0,
+  "shares": 0,
+  "total_interactions": 1,
+  "ig_reels_avg_watch_time": 3182,
+  "ig_reels_video_view_total_time": 410570,
+  "like_count": 1,
+  "comments_count": 0
+ },
+ {
+  "date": "2026-11-27",
+  "id": "17928862746441421",
+  "age_days": 2.7,
+  "views": 310,
+  "reach": 238,
+  "likes": 3,
+  "comments": 0,
+  "saved": 1,
+  "shares": 0,
+  "total_interactions": 4,
+  "ig_reels_avg_watch_time": 5993,
+  "ig_reels_video_view_total_time": 1438386,
+  "like_count": 3,
+  "comments_count": 0
+ },
+ {
+  "date": "2026-11-27",
   "id": "17930638392321816",
-  "age_days": 164.5,
+  "age_days": 168.5,
   "views": 251,
   "reach": 66,
   "likes": 0,
@@ -102,9 +134,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "17968527305915017",
-  "age_days": 153.8,
+  "age_days": 157.8,
   "views": 77,
   "reach": 38,
   "likes": 0,
@@ -119,27 +151,27 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "17971451283079268",
-  "age_days": 10.8,
-  "views": 121,
-  "reach": 93,
+  "age_days": 14.8,
+  "views": 126,
+  "reach": 97,
   "likes": 2,
   "comments": 0,
   "saved": 0,
   "shares": 0,
   "total_interactions": 2,
-  "ig_reels_avg_watch_time": 4426,
-  "ig_reels_video_view_total_time": 420520,
+  "ig_reels_avg_watch_time": 4547,
+  "ig_reels_video_view_total_time": 454760,
   "like_count": 2,
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "17977961382072184",
-  "age_days": 5.6,
-  "views": 86,
-  "reach": 29,
+  "age_days": 9.6,
+  "views": 90,
+  "reach": 31,
   "likes": 0,
   "comments": 0,
   "saved": 0,
@@ -152,11 +184,11 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "17998994606868021",
-  "age_days": 7.8,
-  "views": 100,
-  "reach": 26,
+  "age_days": 11.8,
+  "views": 110,
+  "reach": 30,
   "likes": 0,
   "comments": 0,
   "saved": 0,
@@ -169,11 +201,11 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18033964571886834",
-  "age_days": 23.8,
-  "views": 123,
-  "reach": 43,
+  "age_days": 27.8,
+  "views": 126,
+  "reach": 45,
   "likes": 2,
   "comments": 0,
   "saved": 0,
@@ -186,11 +218,11 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18048232907546185",
-  "age_days": 185.5,
-  "views": 304,
-  "reach": 119,
+  "age_days": 189.5,
+  "views": 305,
+  "reach": 120,
   "likes": 1,
   "comments": 0,
   "saved": 0,
@@ -203,9 +235,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18075703601710429",
-  "age_days": 60.5,
+  "age_days": 64.5,
   "views": 56,
   "reach": 34,
   "likes": 1,
@@ -220,11 +252,11 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18079996802557025",
-  "age_days": 185.5,
-  "views": 216,
-  "reach": 101,
+  "age_days": 189.5,
+  "views": 217,
+  "reach": 102,
   "likes": 1,
   "comments": 0,
   "saved": 0,
@@ -237,9 +269,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18086753357394182",
-  "age_days": 135.6,
+  "age_days": 139.7,
   "views": 96,
   "reach": 50,
   "likes": 0,
@@ -254,9 +286,25 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
+  "id": "18093903509692345",
+  "age_days": 2.0,
+  "views": 148,
+  "reach": 119,
+  "likes": 0,
+  "comments": 0,
+  "saved": 0,
+  "shares": 0,
+  "total_interactions": 0,
+  "ig_reels_avg_watch_time": 2842,
+  "ig_reels_video_view_total_time": 361028,
+  "like_count": 0,
+  "comments_count": 0
+ },
+ {
+  "date": "2026-11-27",
   "id": "18099562253427964",
-  "age_days": 36.9,
+  "age_days": 40.9,
   "views": 74,
   "reach": 56,
   "likes": 0,
@@ -270,9 +318,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18101242382435285",
-  "age_days": 17.1,
+  "age_days": 21.1,
   "views": 107,
   "reach": 31,
   "likes": 0,
@@ -287,9 +335,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18105204238957394",
-  "age_days": 184.7,
+  "age_days": 188.7,
   "views": 336,
   "reach": 125,
   "likes": 2,
@@ -304,9 +352,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18107356655239414",
-  "age_days": 48.9,
+  "age_days": 52.9,
   "views": 114,
   "reach": 61,
   "likes": 2,
@@ -321,9 +369,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18107668121528864",
-  "age_days": 19.6,
+  "age_days": 23.6,
   "views": 115,
   "reach": 33,
   "likes": 2,
@@ -338,9 +386,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18109053613942311",
-  "age_days": 153.8,
+  "age_days": 157.8,
   "views": 93,
   "reach": 42,
   "likes": 0,
@@ -355,9 +403,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18112675499133828",
-  "age_days": 56.0,
+  "age_days": 60.0,
   "views": 71,
   "reach": 36,
   "likes": 1,
@@ -372,9 +420,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18116560232020423",
-  "age_days": 23.1,
+  "age_days": 27.1,
   "views": 110,
   "reach": 39,
   "likes": 0,
@@ -389,25 +437,25 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18130803157894947",
-  "age_days": 3.8,
-  "views": 190,
-  "reach": 143,
-  "likes": 0,
+  "age_days": 7.8,
+  "views": 204,
+  "reach": 150,
+  "likes": 1,
   "comments": 0,
   "saved": 0,
   "shares": 0,
-  "total_interactions": 0,
-  "ig_reels_avg_watch_time": 4257,
-  "ig_reels_video_view_total_time": 625849,
-  "like_count": 0,
+  "total_interactions": 1,
+  "ig_reels_avg_watch_time": 4669,
+  "ig_reels_video_view_total_time": 733083,
+  "like_count": 1,
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18130805212838992",
-  "age_days": 30.9,
+  "age_days": 34.9,
   "views": 121,
   "reach": 62,
   "likes": 1,
@@ -422,9 +470,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18139226851538481",
-  "age_days": 55.1,
+  "age_days": 59.1,
   "views": 82,
   "reach": 43,
   "likes": 1,
@@ -439,11 +487,11 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18158854621455608",
-  "age_days": 185.5,
-  "views": 468,
-  "reach": 174,
+  "age_days": 189.5,
+  "views": 469,
+  "reach": 175,
   "likes": 3,
   "comments": 0,
   "saved": 3,
@@ -456,11 +504,11 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18160583989459042",
-  "age_days": 165.4,
-  "views": 489,
-  "reach": 163,
+  "age_days": 169.4,
+  "views": 497,
+  "reach": 167,
   "likes": 1,
   "comments": 0,
   "saved": 0,
@@ -473,9 +521,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18220549132332512",
-  "age_days": 110.0,
+  "age_days": 114.0,
   "views": 88,
   "reach": 39,
   "likes": 1,
@@ -490,9 +538,9 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18232074727324212",
-  "age_days": 44.9,
+  "age_days": 48.9,
   "views": 62,
   "reach": 39,
   "likes": 0,
@@ -507,11 +555,11 @@
   "comments_count": 0
  },
  {
-  "date": "2026-11-23",
+  "date": "2026-11-27",
   "id": "18495992521105220",
-  "age_days": 11.8,
-  "views": 84,
-  "reach": 29,
+  "age_days": 15.8,
+  "views": 91,
+  "reach": 31,
   "likes": 0,
   "comments": 0,
   "saved": 0,
