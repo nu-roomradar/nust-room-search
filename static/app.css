@@ -909,3 +909,6 @@ html:has(> body.theme-newyear) { background-color: #0f0a09; }
     body[class*="theme-"] .logo { font-size: min(2rem, calc((100vw - 34px) / 11.6)); }
     body[class*="theme-"] .logo-season { font-size: min(1.7rem, calc((100vw - 34px) / 14.5)); margin-left: 4px; }
 }
+
+/* 静かに学習したい人への案内（結果の下の注意のすぐ下。控えめに） */
+.quiet-tip { margin: 10px 2px 0; font-size: 12.5px; line-height: 1.6; color: var(--muted, #94a3b8); }
