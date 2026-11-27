@@ -3,7 +3,8 @@ OK をもらった広告ふうの画像（文字入り。assets/instagram/ad/ad3
   python3 compose_og2.py <a|b|c> <出力.png>
   a：左に扉の画像、右に案内（はじめての人へ・2分で読める・何のサービスか）
   b：扉の画像を真ん中に大きく、左右に残りの2枚を少しのぞかせる（3枚ひと組に見せる）
-  c：3枚を横に並べ、下に細い帯で案内"""
+  c：3枚を横に並べ、下に細い帯で案内
+  d：左に扉の画像、右に大きな字で「RoomRadar／日大理工の空き教室検索」（紹介ページ・about 用）"""
 import sys, os
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "scripts"))
@@ -33,6 +34,16 @@ if kind == "a":
   <div style="margin-top:10px;font-weight:900;font-size:92px;line-height:1.12;letter-spacing:-.01em">2分でわかる</div>
   <div style="margin-top:6px;font-family:Syne;font-weight:800;font-size:60px;line-height:1.1">RoomRadar</div>
   <div style="margin-top:26px;font-weight:900;font-size:34px;line-height:1.45;color:#dfe7f6">日大理工の空き教室を、<br>時間割から探せる。</div>
+</div>"""
+elif kind == "d":
+    # 2026-11-27 運営「（LINE のカードで）見た感じ分かりづらいかも」→ 紹介ページ・about 用。左に扉の画像、右に大きな字で「何のサービスか」だけ
+    body = f"""<img class="ad" src="{door}" style="left:0;top:0;width:504px;height:630px;box-shadow:none">
+<div style="position:absolute;left:504px;top:0;width:60px;height:630px;background:linear-gradient(90deg,rgba(0,0,0,.35),rgba(0,0,0,0))"></div>
+<div style="position:absolute;left:566px;right:36px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center">
+  <div style="font-family:Syne;font-weight:800;font-size:62px;line-height:1.05;letter-spacing:-.01em">RoomRadar</div>
+  <div style="margin-top:22px;font-weight:900;font-size:60px;line-height:1.25">日大理工の<br>空き教室検索</div>
+  <div style="margin-top:26px;font-weight:700;font-size:30px;line-height:1.5;color:#dfe7f6">時間割から、いま授業のない<br>教室がすぐ分かる。</div>
+  <div style="margin-top:22px;font-weight:700;font-size:23px;line-height:1.5;color:#ffd9b0">学生開発・試験運用中<br>（大学公式のサービスではありません）</div>
 </div>"""
 elif kind == "b":
     body = f"""<img class="ad" src="{hero}" style="left:-150px;top:70px;width:392px;height:490px;opacity:.55;filter:saturate(.8)">
