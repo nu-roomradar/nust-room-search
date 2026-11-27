@@ -57,7 +57,7 @@ body{{font-family:'S';color:#14213d;background:#fff;position:relative;overflow:h
 .p{{font-size:3.45mm;line-height:1.62;color:#27324a}}
 .p b{{color:#0b1b3f}} .p em{{font-style:normal;background:linear-gradient(transparent 62%,#ffe1b8 62%)}}
 ul.p{{list-style:none}} ul.p li{{position:relative;padding-left:4mm}} ul.p li:before{{content:"";position:absolute;left:.6mm;top:2.5mm;width:1.6mm;height:1.6mm;border-radius:50%;background:#1d4ed8}}
-.ph{{position:absolute;left:168mm;top:56mm;width:46mm;height:99.5mm;border-radius:7mm;background:#1b1e25;padding:1.6mm;box-shadow:0 2mm 6mm rgba(11,27,63,.25)}}
+.ph{{position:absolute;left:168mm;top:56mm;width:46mm;height:99.5mm;border-radius:7mm;background:#1b1e25;padding:1.6mm}}
 .ph img{{width:100%;height:100%;border-radius:5.6mm;object-fit:cover;object-position:top}}
 .ph p{{position:absolute;left:0;right:0;top:101.5mm;text-align:center;font-size:2.9mm;color:#5b6478}}
 .r{{position:absolute;left:220mm;top:56mm;width:65mm}}
@@ -131,8 +131,9 @@ with sync_playwright() as p:
     b = p.chromium.launch(executable_path=find_chrome())
     pg = b.new_page(viewport={"width": 1123, "height": 794}, device_scale_factor=3)
     pg.goto("file://" + tmp); pg.evaluate("document.fonts.ready"); pg.wait_for_timeout(600)
-    pg.pdf(path=pdf, width="297mm", height="210mm", print_background=True)
     pg.screenshot(path=png); b.close()
+# PDF は絵にしてから作る（2026-11-27：iPhone の PDF 表示で、スマホの絵の影が灰色の四角になった。見る側のアプリで見え方が変わらないようにする）
+Image.open(png).convert("RGB").save(pdf, "PDF", resolution=3369 / 297 * 25.4)
 os.remove(tmp)
 from pptx import Presentation
 from pptx.util import Mm
